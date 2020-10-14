@@ -16,4 +16,6 @@
 
 //! A compilation of traits and helpers for implementing the Governance OS
 
+#![cfg_attr(not(feature = "std"), no_std)]
+
 pub mod currencies;
