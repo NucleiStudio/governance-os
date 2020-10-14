@@ -16,8 +16,13 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use frame_support::{decl_error, decl_event, decl_module, decl_storage, dispatch, traits::Get};
-use frame_system::ensure_signed;
+use frame_support::{decl_error, decl_event, decl_module, decl_storage, Parameter};
+use pallet_balances::AccountData;
+use sp_runtime::traits::{AtLeast32BitUnsigned, CheckedAdd, MaybeSerializeDeserialize, Member};
+use sp_std::cmp::{Eq, PartialEq};
+
+#[cfg(feature = "std")]
+use sp_std::collections::btree_map::BTreeMap;
 
 #[cfg(test)]
 mod mock;
@@ -25,27 +30,54 @@ mod mock;
 #[cfg(test)]
 mod tests;
 
-/// Configure the pallet by specifying the parameters and types on which it depends.
+mod currencies;
+
 pub trait Trait: frame_system::Trait {
     /// Because this pallet emits events, it depends on the runtime's definition of an event.
     type Event: From<Event<Self>> + Into<<Self as frame_system::Trait>::Event>;
+
+    /// The type used to identify currencies
+    type CurrencyId: Parameter + Member + Copy + MaybeSerializeDeserialize + Ord;
+
+    /// The balance of an account.
+    type Balance: Parameter
+        + Member
+        + AtLeast32BitUnsigned
+        + Default
+        + Copy
+        + MaybeSerializeDeserialize;
 }
 
-// The pallet's runtime storage items.
-// https://substrate.dev/docs/en/knowledgebase/runtime/storage
 decl_storage! {
-    // A unique name is used to ensure that the pallet's storage items are isolated.
-    // This name may be updated, but each pallet in the runtime must use a unique name.
-    // ---------------------------------vvvvvvvvvvvvvv
-    trait Store for Module<T: Trait> as TemplateModule {
-        // Learn more about declaring storage items:
-        // https://substrate.dev/docs/en/knowledgebase/runtime/storage#declaring-storage-items
-        Something get(fn something): Option<u32>;
+    trait Store for Module<T: Trait> as Tokens {
+        pub TotalIssuances get(fn total_issuances) build(|config: &GenesisConfig<T>| {
+            config
+                .endowed_accounts
+                .iter()
+                .map(|(currency_id, _, initial_balance)| (currency_id, initial_balance))
+                .fold(BTreeMap::<T::CurrencyId, T::Balance>::new(), |mut acc, (currency_id, initial_balance)| {
+                    if let Some(issuance) = acc.get_mut(currency_id) {
+                        *issuance = issuance.checked_add(initial_balance).expect("total issuance cannot overflow when building genesis");
+                    } else {
+                        acc.insert(*currency_id, *initial_balance);
+                    }
+                    acc
+                })
+                .into_iter()
+                .collect::<Vec<_>>()
+        }): map hasher(blake2_128_concat) T::CurrencyId => T::Balance;
+        pub Balances get(fn balances): double_map hasher(blake2_128_concat) T::AccountId, hasher(blake2_128_concat) T::CurrencyId => AccountData<T::Balance>;
+    }
+    add_extra_genesis {
+        config(endowed_accounts): Vec<(T::CurrencyId, T::AccountId, T::Balance)>;
+        build(|config: &GenesisConfig<T>| {
+            config.endowed_accounts.iter().for_each(|(currency_id, account_id, initial_balance)| {
+                <Balances<T>>::mutate(account_id, currency_id, |account_data| account_data.free = *initial_balance)
+            })
+        })
     }
 }
 
-// Pallets use events to inform users when important changes are made.
-// https://substrate.dev/docs/en/knowledgebase/runtime/events
 decl_event!(
     pub enum Event<T>
     where
@@ -57,62 +89,69 @@ decl_event!(
     }
 );
 
-// Errors inform users that something went wrong.
 decl_error! {
     pub enum Error for Module<T: Trait> {
-        /// Error names should be descriptive.
-        NoneValue,
-        /// Errors should have helpful documentation associated with them.
-        StorageOverflow,
+        /// This operation will cause total issuance to overflow for the given currency
+        TotalIssuanceOverflow,
+        /// This operation will cause total issuance to underflow for the given currency
+        TotalIssuanceUnderflow,
+        /// This operation will cause the balance of an account to overflow for the
+        /// given currency
+        BalanceOverflow,
+        /// There are not enough coins inside the balance of the user to perform the action
+        BalanceTooLow,
     }
 }
 
-// Dispatchable functions allows users to interact with the pallet and invoke state changes.
-// These functions materialize as "extrinsics", which are often compared to transactions.
-// Dispatchable functions must be annotated with a weight and must return a DispatchResult.
 decl_module! {
     pub struct Module<T: Trait> for enum Call where origin: T::Origin {
-        // Errors must be initialized if they are used by the pallet.
-        type Error = Error<T>;
+        //type Error = Error<T>;
 
-        // Events must be initialized if they are used by the pallet.
         fn deposit_event() = default;
 
-        /// An example dispatchable that takes a singles value as a parameter, writes the value to
-        /// storage and emits an event. This function must be dispatched by a signed extrinsic.
-        #[weight = 10_000 + T::DbWeight::get().writes(1)]
-        pub fn do_something(origin, something: u32) -> dispatch::DispatchResult {
-            // Check that the extrinsic was signed and get the signer.
-            // This function will return an error if the extrinsic is not signed.
-            // https://substrate.dev/docs/en/knowledgebase/runtime/origin
-            let who = ensure_signed(origin)?;
+        // /// An example dispatchable that takes a singles value as a parameter, writes the value to
+        // /// storage and emits an event. This function must be dispatched by a signed extrinsic.
+        // #[weight = 10_000 + T::DbWeight::get().writes(1)]
+        // pub fn do_something(origin, something: u32) -> dispatch::DispatchResult {
+        //     // Check that the extrinsic was signed and get the signer.
+        //     // This function will return an error if the extrinsic is not signed.
+        //     // https://substrate.dev/docs/en/knowledgebase/runtime/origin
+        //     let who = ensure_signed(origin)?;
 
-            // Update storage.
-            Something::put(something);
+        //     // Update storage.
+        //     Something::put(something);
 
-            // Emit an event.
-            Self::deposit_event(RawEvent::SomethingStored(something, who));
-            // Return a successful DispatchResult
-            Ok(())
-        }
+        //     // Emit an event.
+        //     Self::deposit_event(RawEvent::SomethingStored(something, who));
+        //     // Return a successful DispatchResult
+        //     Ok(())
+        // }
 
-        /// An example dispatchable that may throw a custom error.
-        #[weight = 10_000 + T::DbWeight::get().reads_writes(1,1)]
-        pub fn cause_error(origin) -> dispatch::DispatchResult {
-            let _who = ensure_signed(origin)?;
+        // /// An example dispatchable that may throw a custom error.
+        // #[weight = 10_000 + T::DbWeight::get().reads_writes(1,1)]
+        // pub fn cause_error(origin) -> dispatch::DispatchResult {
+        //     let _who = ensure_signed(origin)?;
 
-            // Read a value from storage.
-            match Something::get() {
-                // Return an error if the value has not been set.
-                None => Err(Error::<T>::NoneValue)?,
-                Some(old) => {
-                    // Increment the value read from storage; will error in the event of overflow.
-                    let new = old.checked_add(1).ok_or(Error::<T>::StorageOverflow)?;
-                    // Update the value in storage with the incremented result.
-                    Something::put(new);
-                    Ok(())
-                },
-            }
-        }
+        //     // Read a value from storage.
+        //     match Something::get() {
+        //         // Return an error if the value has not been set.
+        //         None => Err(Error::<T>::NoneValue)?,
+        //         Some(old) => {
+        //             // Increment the value read from storage; will error in the event of overflow.
+        //             let new = old.checked_add(1).ok_or(Error::<T>::StorageOverflow)?;
+        //             // Update the value in storage with the incremented result.
+        //             Something::put(new);
+        //             Ok(())
+        //         },
+        //     }
+        // }
+    }
+}
+
+impl<T: Trait> Module<T> {
+    /// Set the free balance of `who` in `currency_id`. You are supposed to update the total
+    /// issuance yourself.
+    fn set_free_balance(currency_id: T::CurrencyId, who: &T::AccountId, balance: T::Balance) {
+        <Balances<T>>::mutate(who, currency_id, |account_data| account_data.free = balance);
     }
 }

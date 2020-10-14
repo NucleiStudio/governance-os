@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-use crate::{Module, Trait};
+use crate::{GenesisConfig, Module, Trait};
 use frame_support::{impl_outer_origin, parameter_types, weights::Weight};
 use frame_system as system;
+pub use governance_os_support::Currencies;
 use sp_core::H256;
 use sp_runtime::{
     testing::Header,
@@ -28,7 +29,9 @@ impl_outer_origin! {
     pub enum Origin for Test {}
 }
 
-// Configure a mock runtime to test the pallet.
+type AccountId = u64;
+type Balance = u64;
+type CurrencyId = u8;
 
 #[derive(Clone, Eq, PartialEq)]
 pub struct Test;
@@ -47,7 +50,7 @@ impl system::Trait for Test {
     type BlockNumber = u64;
     type Hash = H256;
     type Hashing = BlakeTwo256;
-    type AccountId = u64;
+    type AccountId = AccountId;
     type Lookup = IdentityLookup<Self::AccountId>;
     type Header = Header;
     type Event = ();
@@ -69,14 +72,52 @@ impl system::Trait for Test {
 
 impl Trait for Test {
     type Event = ();
+    type CurrencyId = CurrencyId;
+    type Balance = Balance;
 }
 
-pub type TestModule = Module<Test>;
+pub type System = frame_system::Module<Test>;
+pub type Tokens = Module<Test>;
 
-// Build genesis storage according to the mock runtime.
-pub fn new_test_ext() -> sp_io::TestExternalities {
-    system::GenesisConfig::default()
-        .build_storage::<Test>()
-        .unwrap()
-        .into()
+pub const ALICE: AccountId = 1;
+pub const BOB: AccountId = 2;
+pub const TEST_TOKEN_ID: CurrencyId = 3;
+
+pub struct ExtBuilder {
+    endowed_accounts: Vec<(CurrencyId, AccountId, Balance)>,
+}
+
+impl Default for ExtBuilder {
+    fn default() -> Self {
+        Self {
+            endowed_accounts: vec![],
+        }
+    }
+}
+
+impl ExtBuilder {
+    pub fn balances(mut self, endowed_accounts: Vec<(CurrencyId, AccountId, Balance)>) -> Self {
+        self.endowed_accounts = endowed_accounts;
+        self
+    }
+
+    pub fn one_hundred_for_alice_n_bob(self) -> Self {
+        self.balances(vec![(TEST_TOKEN_ID, ALICE, 100), (TEST_TOKEN_ID, BOB, 100)])
+    }
+
+    pub fn build(self) -> sp_io::TestExternalities {
+        let mut t = frame_system::GenesisConfig::default()
+            .build_storage::<Test>()
+            .unwrap();
+
+        GenesisConfig::<Test> {
+            endowed_accounts: self.endowed_accounts,
+        }
+        .assimilate_storage(&mut t)
+        .unwrap();
+
+        let mut ext = sp_io::TestExternalities::new(t);
+        ext.execute_with(|| System::set_block_number(1));
+        ext
+    }
 }

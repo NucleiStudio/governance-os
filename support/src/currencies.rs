@@ -47,17 +47,23 @@ pub trait Currencies<AccountId> {
 
     // PUBLIC IMMUTABLES
 
-    /// The combined balance of `who`.
-    fn total_balance(currency_id: Self::CurrencyId, who: &AccountId) -> Self::Balance;
-
     /// The total amount of issuance in the system.
     fn total_issuance(currency_id: Self::CurrencyId) -> Self::Balance;
 
-    /// Reduce the total issuance by `amount`.
-    fn burn(currency_id: Self::CurrencyId, amount: Self::Balance) -> DispatchResult;
+    /// Remove `amount` tokens from `who` balance. If there are not enough tokens
+    /// it will error.
+    fn burn(
+        currency_id: Self::CurrencyId,
+        who: &AccountId,
+        amount: Self::Balance,
+    ) -> DispatchResult;
 
-    /// Increase the total issuance by `amount`.
-    fn mint(currency_id: Self::CurrencyId, amount: Self::Balance) -> DispatchResult;
+    /// Increase the balance of `who` by `amount`.
+    fn mint(
+        currency_id: Self::CurrencyId,
+        who: &AccountId,
+        amount: Self::Balance,
+    ) -> DispatchResult;
 
     /// The 'free' balance of a given account.
     fn free_balance(currency_id: Self::CurrencyId, who: &AccountId) -> Self::Balance;
@@ -82,14 +88,6 @@ pub trait Currencies<AccountId> {
         currency_id: Self::CurrencyId,
         source: &AccountId,
         dest: &AccountId,
-        value: Self::Balance,
-    ) -> DispatchResult;
-
-    /// Removes some free balance from `who`. This may check any locks, vesting, and
-    /// liquidity requirements. If the removal is not possible, then it returns `Err`.
-    fn withdraw(
-        currency_id: Self::CurrencyId,
-        who: &AccountId,
         value: Self::Balance,
     ) -> DispatchResult;
 }
