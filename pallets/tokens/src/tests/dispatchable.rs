@@ -58,3 +58,32 @@ fn mint_works() {
         assert_eq!(Tokens::free_balance(TEST_TOKEN_ID, &ALICE), 100);
     })
 }
+
+#[test]
+fn burn_fails_if_not_owner() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            assert_noop!(
+                Tokens::burn(Origin::signed(42), TEST_TOKEN_ID, ALICE, 100),
+                Error::<Test>::NotCurrencyOwner
+            );
+        })
+}
+
+#[test]
+fn burn_works() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            assert_ok!(Tokens::burn(
+                Origin::signed(TEST_TOKEN_OWNER),
+                TEST_TOKEN_ID,
+                ALICE,
+                100
+            ));
+            assert_eq!(Tokens::free_balance(TEST_TOKEN_ID, &ALICE), 0); // Burned the balance
+        })
+}

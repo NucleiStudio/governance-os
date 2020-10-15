@@ -48,7 +48,11 @@ fn burn_should_work() {
         .one_hundred_for_alice_n_bob()
         .build()
         .execute_with(|| {
-            assert_ok!(Tokens::burn(TEST_TOKEN_ID, &ALICE, 10));
+            assert_ok!(<Tokens as Currencies<AccountId>>::burn(
+                TEST_TOKEN_ID,
+                &ALICE,
+                10
+            ));
             assert_eq!(Tokens::free_balance(TEST_TOKEN_ID, &ALICE), 90);
         })
 }

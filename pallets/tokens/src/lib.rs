@@ -112,6 +112,8 @@ decl_event!(
         CurrencyCreated(CurrencyId, AccountId),
         /// Some units of currency were issued. [currency_id, dest, amount]
         CurrencyMinted(CurrencyId, AccountId, Balance),
+        /// Some units of currency were destroyed. [currency_id, source, amount]
+        CurrencyBurned(CurrencyId, AccountId, Balance),
     }
 );
 
@@ -166,6 +168,18 @@ decl_module! {
             <Self as Currencies<T::AccountId>>::mint(currency_id, &to, amount)?;
 
             Self::deposit_event(RawEvent::CurrencyMinted(currency_id, to, amount));
+            Ok(())
+        }
+
+        /// Destroy some units of the currency identified by `currency_id` from `from`.
+        /// Can only be called by the owner of the currency.
+        #[weight = 0]
+        pub fn burn(origin, currency_id: T::CurrencyId, from: <T::Lookup as StaticLookup>::Source, amount: T::Balance) -> DispatchResult {
+            Self::ensure_owner_of_currency(origin, currency_id)?;
+            let source = T::Lookup::lookup(from)?;
+            <Self as Currencies<T::AccountId>>::burn(currency_id, &source, amount)?;
+
+            Self::deposit_event(RawEvent::CurrencyBurned(currency_id, source, amount));
             Ok(())
         }
     }
