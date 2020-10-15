@@ -33,7 +33,11 @@ fn transfer_should_work() {
 #[test]
 fn mint_should_work() {
     ExtBuilder::default().build().execute_with(|| {
-        assert_ok!(Tokens::mint(TEST_TOKEN_ID, &ALICE, 100));
+        assert_ok!(<Tokens as Currencies<AccountId>>::mint(
+            TEST_TOKEN_ID,
+            &ALICE,
+            100
+        ));
         assert_eq!(Tokens::free_balance(TEST_TOKEN_ID, &ALICE), 100);
     })
 }

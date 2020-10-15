@@ -136,7 +136,7 @@ where
         who: &Pallet::AccountId,
         amount: Self::Balance,
     ) -> std::result::Result<Self::PositiveImbalance, DispatchError> {
-        Module::<Pallet>::mint(GetCurrencyId::get(), who, amount)?;
+        <Module<Pallet> as Currencies<Pallet::AccountId>>::mint(GetCurrencyId::get(), who, amount)?;
         Ok(Self::PositiveImbalance::new(amount))
     }
 

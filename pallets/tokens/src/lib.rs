@@ -28,8 +28,11 @@ use frame_support::{
     decl_error, decl_event, decl_module, decl_storage, dispatch::DispatchResult, ensure, Parameter,
 };
 use frame_system::ensure_signed;
+use governance_os_support::Currencies;
 use pallet_balances::AccountData;
-use sp_runtime::traits::{AtLeast32BitUnsigned, CheckedAdd, MaybeSerializeDeserialize, Member};
+use sp_runtime::traits::{
+    AtLeast32BitUnsigned, CheckedAdd, MaybeSerializeDeserialize, Member, StaticLookup,
+};
 use sp_std::cmp::{Eq, PartialEq};
 
 #[cfg(feature = "std")]
@@ -102,10 +105,13 @@ decl_event!(
     pub enum Event<T>
     where
         AccountId = <T as frame_system::Trait>::AccountId,
+        Balance = <T as Trait>::Balance,
         CurrencyId = <T as Trait>::CurrencyId,
     {
         /// A new currency has been created. [currency id, owner]
         CurrencyCreated(CurrencyId, AccountId),
+        /// Some units of currency were issued. [currency_id, dest, amount]
+        CurrencyMinted(CurrencyId, AccountId, Balance),
     }
 );
 
@@ -122,6 +128,8 @@ decl_error! {
         BalanceTooLow,
         /// The currency ID is already used by another currency
         CurrencyAlreadyExists,
+        /// This call an only be used by the currency owner
+        NotCurrencyOwner,
     }
 }
 
@@ -148,6 +156,18 @@ decl_module! {
             Self::deposit_event(RawEvent::CurrencyCreated(currency_id, who));
             Ok(())
         }
+
+        /// Issue some units of the currency identified by `currency_id` and credit them to `dest`.
+        /// Can only be called by the owner of the currency.
+        #[weight = 0]
+        pub fn mint(origin, currency_id: T::CurrencyId, dest: <T::Lookup as StaticLookup>::Source, amount: T::Balance) -> DispatchResult {
+            Self::ensure_owner_of_currency(origin, currency_id)?;
+            let to = T::Lookup::lookup(dest)?;
+            <Self as Currencies<T::AccountId>>::mint(currency_id, &to, amount)?;
+
+            Self::deposit_event(RawEvent::CurrencyMinted(currency_id, to, amount));
+            Ok(())
+        }
     }
 }
 
@@ -156,5 +176,16 @@ impl<T: Trait> Module<T> {
     /// issuance yourself.
     fn set_free_balance(currency_id: T::CurrencyId, who: &T::AccountId, balance: T::Balance) {
         <Balances<T>>::mutate(who, currency_id, |account_data| account_data.free = balance);
+    }
+
+    /// Make sure that `origin` is the owner of  `currency_id`.
+    fn ensure_owner_of_currency(origin: T::Origin, currency_id: T::CurrencyId) -> DispatchResult {
+        let sender = ensure_signed(origin)?;
+        ensure!(
+            Details::<T>::get(currency_id).owner == sender,
+            Error::<T>::NotCurrencyOwner
+        );
+
+        Ok(())
     }
 }

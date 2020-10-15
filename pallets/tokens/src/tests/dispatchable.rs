@@ -35,3 +35,26 @@ fn create_duplicate_currency_id_fails() {
         );
     })
 }
+
+#[test]
+fn mint_fails_if_not_owner() {
+    ExtBuilder::default().build().execute_with(|| {
+        assert_noop!(
+            Tokens::mint(Origin::signed(42), TEST_TOKEN_ID, ALICE, 100),
+            Error::<Test>::NotCurrencyOwner
+        );
+    })
+}
+
+#[test]
+fn mint_works() {
+    ExtBuilder::default().build().execute_with(|| {
+        assert_ok!(Tokens::mint(
+            Origin::signed(TEST_TOKEN_OWNER),
+            TEST_TOKEN_ID,
+            ALICE,
+            100
+        ));
+        assert_eq!(Tokens::free_balance(TEST_TOKEN_ID, &ALICE), 100);
+    })
+}
