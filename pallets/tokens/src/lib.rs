@@ -107,13 +107,16 @@ decl_event!(
         AccountId = <T as frame_system::Trait>::AccountId,
         Balance = <T as Trait>::Balance,
         CurrencyId = <T as Trait>::CurrencyId,
+        Details = CurrencyDetails<<T as frame_system::Trait>::AccountId>,
     {
-        /// A new currency has been created. [currency id, owner]
-        CurrencyCreated(CurrencyId, AccountId),
+        /// A new currency has been created. [currency id, details]
+        CurrencyCreated(CurrencyId, Details),
         /// Some units of currency were issued. [currency_id, dest, amount]
         CurrencyMinted(CurrencyId, AccountId, Balance),
         /// Some units of currency were destroyed. [currency_id, source, amount]
         CurrencyBurned(CurrencyId, AccountId, Balance),
+        /// Some details about a currency were changed. [currency_id, details]
+        CurrencyDetailsChanged(CurrencyId, Details),
     }
 );
 
@@ -151,11 +154,12 @@ decl_module! {
 
             ensure!(!Details::<T>::contains_key(currency_id), Error::<T>::CurrencyAlreadyExists);
 
-            Details::<T>::mutate(currency_id, |details| *details = CurrencyDetails {
+            let details = CurrencyDetails {
                 owner: who.clone(),
-            });
+            };
+            Details::<T>::mutate(currency_id, |det| *det = details.clone());
 
-            Self::deposit_event(RawEvent::CurrencyCreated(currency_id, who));
+            Self::deposit_event(RawEvent::CurrencyCreated(currency_id, details));
             Ok(())
         }
 
@@ -180,6 +184,17 @@ decl_module! {
             <Self as Currencies<T::AccountId>>::burn(currency_id, &source, amount)?;
 
             Self::deposit_event(RawEvent::CurrencyBurned(currency_id, source, amount));
+            Ok(())
+        }
+
+        /// Update details about the currency identified by `currency_id`. For instance, this
+        /// can be used to change the owner of the currency. Can only be called by the owner.
+        #[weight = 0]
+        pub fn update_details(origin, currency_id: T::CurrencyId, details: CurrencyDetails<T::AccountId>) -> DispatchResult {
+            Self::ensure_owner_of_currency(origin, currency_id)?;
+            <Details<T>>::mutate(currency_id, |det| *det = details.clone());
+
+            Self::deposit_event(RawEvent::CurrencyDetailsChanged(currency_id, details));
             Ok(())
         }
     }

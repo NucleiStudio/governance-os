@@ -15,7 +15,7 @@
  */
 
 use super::mock::*;
-use crate::Error;
+use crate::{CurrencyDetails, Error};
 use frame_support::{assert_noop, assert_ok};
 
 #[test]
@@ -85,5 +85,37 @@ fn burn_works() {
                 100
             ));
             assert_eq!(Tokens::free_balance(TEST_TOKEN_ID, &ALICE), 0); // Burned the balance
+        })
+}
+
+#[test]
+fn update_details_fails_if_not_owner() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            assert_noop!(
+                Tokens::update_details(
+                    Origin::signed(42),
+                    TEST_TOKEN_ID,
+                    CurrencyDetails { owner: ALICE }
+                ),
+                Error::<Test>::NotCurrencyOwner
+            );
+        })
+}
+
+#[test]
+fn update_details_works() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            assert_ok!(Tokens::update_details(
+                Origin::signed(TEST_TOKEN_OWNER),
+                TEST_TOKEN_ID,
+                CurrencyDetails { owner: ALICE }
+            ));
+            assert_eq!(Tokens::details(TEST_TOKEN_ID).owner, ALICE);
         })
 }
