@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-use crate::{GenesisConfig, Module, NativeCurrencyAdapter, Trait};
+use crate::{CurrencyDetails, GenesisConfig, Module, NativeCurrencyAdapter, Trait};
 use frame_support::{impl_outer_origin, parameter_types, weights::Weight};
 use frame_system as system;
 pub use governance_os_support::Currencies;
@@ -87,15 +87,20 @@ pub type TokensCurrencyAdapter = NativeCurrencyAdapter<Test, GetTestTokenId>;
 pub const ALICE: AccountId = 1;
 pub const BOB: AccountId = 2;
 pub const TEST_TOKEN_ID: CurrencyId = 3;
+pub const TEST_TOKEN_OWNER: AccountId = 4;
 
 pub struct ExtBuilder {
     endowed_accounts: Vec<(CurrencyId, AccountId, Balance)>,
+    test_token_details: CurrencyDetails<AccountId>,
 }
 
 impl Default for ExtBuilder {
     fn default() -> Self {
         Self {
             endowed_accounts: vec![],
+            test_token_details: CurrencyDetails {
+                owner: TEST_TOKEN_OWNER,
+            },
         }
     }
 }
@@ -117,6 +122,7 @@ impl ExtBuilder {
 
         GenesisConfig::<Test> {
             endowed_accounts: self.endowed_accounts,
+            currency_details: vec![(TEST_TOKEN_ID, self.test_token_details)],
         }
         .assimilate_storage(&mut t)
         .unwrap();

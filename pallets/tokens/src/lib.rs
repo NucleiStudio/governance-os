@@ -24,7 +24,10 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use frame_support::{decl_error, decl_event, decl_module, decl_storage, Parameter};
+use frame_support::{
+    decl_error, decl_event, decl_module, decl_storage, dispatch::DispatchResult, ensure, Parameter,
+};
+use frame_system::ensure_signed;
 use pallet_balances::AccountData;
 use sp_runtime::traits::{AtLeast32BitUnsigned, CheckedAdd, MaybeSerializeDeserialize, Member};
 use sp_std::cmp::{Eq, PartialEq};
@@ -37,9 +40,11 @@ mod tests;
 
 mod adapter;
 mod currencies;
+mod details;
 mod imbalances;
 
 pub use adapter::NativeCurrencyAdapter;
+pub use details::CurrencyDetails;
 
 pub trait Trait: frame_system::Trait {
     /// Because this pallet emits events, it depends on the runtime's definition of an event.
@@ -76,13 +81,19 @@ decl_storage! {
                 .collect::<Vec<_>>()
         }): map hasher(blake2_128_concat) T::CurrencyId => T::Balance;
         pub Balances get(fn balances): double_map hasher(blake2_128_concat) T::AccountId, hasher(blake2_128_concat) T::CurrencyId => AccountData<T::Balance>;
+        pub Details get(fn details): map hasher(blake2_128_concat) T::CurrencyId => CurrencyDetails<T::AccountId>;
     }
     add_extra_genesis {
         config(endowed_accounts): Vec<(T::CurrencyId, T::AccountId, T::Balance)>;
+        config(currency_details): Vec<(T::CurrencyId, CurrencyDetails<T::AccountId>)>;
         build(|config: &GenesisConfig<T>| {
             config.endowed_accounts.iter().for_each(|(currency_id, account_id, initial_balance)| {
                 <Balances<T>>::mutate(account_id, currency_id, |account_data| account_data.free = *initial_balance)
-            })
+            });
+
+            config.currency_details.iter().for_each(|(currency_id, details)| {
+                <Details<T>>::mutate(currency_id, |det| *det = details.clone())
+            });
         })
     }
 }
@@ -91,10 +102,10 @@ decl_event!(
     pub enum Event<T>
     where
         AccountId = <T as frame_system::Trait>::AccountId,
+        CurrencyId = <T as Trait>::CurrencyId,
     {
-        /// Event documentation should end with an array that provides descriptive names for event
-        /// parameters. [something, who]
-        SomethingStored(u32, AccountId),
+        /// A new currency has been created. [currency id, owner]
+        CurrencyCreated(CurrencyId, AccountId),
     }
 );
 
@@ -109,51 +120,34 @@ decl_error! {
         BalanceOverflow,
         /// There are not enough coins inside the balance of the user to perform the action
         BalanceTooLow,
+        /// The currency ID is already used by another currency
+        CurrencyAlreadyExists,
     }
 }
 
 decl_module! {
     pub struct Module<T: Trait> for enum Call where origin: T::Origin {
-        //type Error = Error<T>;
+        type Error = Error<T>;
 
         fn deposit_event() = default;
 
-        // /// An example dispatchable that takes a singles value as a parameter, writes the value to
-        // /// storage and emits an event. This function must be dispatched by a signed extrinsic.
-        // #[weight = 10_000 + T::DbWeight::get().writes(1)]
-        // pub fn do_something(origin, something: u32) -> dispatch::DispatchResult {
-        //     // Check that the extrinsic was signed and get the signer.
-        //     // This function will return an error if the extrinsic is not signed.
-        //     // https://substrate.dev/docs/en/knowledgebase/runtime/origin
-        //     let who = ensure_signed(origin)?;
+        /// Creates a new currency with 0 units, to issue units to people one would have to call
+        /// `issue`. This will register the caller of this dispatchable as the owner of the currency
+        /// so they can issue or burn units. This will produce an error if `currency_id` is already
+        /// used by another currency.
+        #[weight = 0]
+        pub fn create(origin, currency_id: T::CurrencyId) -> DispatchResult {
+            let who = ensure_signed(origin)?;
 
-        //     // Update storage.
-        //     Something::put(something);
+            ensure!(!Details::<T>::contains_key(currency_id), Error::<T>::CurrencyAlreadyExists);
 
-        //     // Emit an event.
-        //     Self::deposit_event(RawEvent::SomethingStored(something, who));
-        //     // Return a successful DispatchResult
-        //     Ok(())
-        // }
+            Details::<T>::mutate(currency_id, |details| *details = CurrencyDetails {
+                owner: who.clone(),
+            });
 
-        // /// An example dispatchable that may throw a custom error.
-        // #[weight = 10_000 + T::DbWeight::get().reads_writes(1,1)]
-        // pub fn cause_error(origin) -> dispatch::DispatchResult {
-        //     let _who = ensure_signed(origin)?;
-
-        //     // Read a value from storage.
-        //     match Something::get() {
-        //         // Return an error if the value has not been set.
-        //         None => Err(Error::<T>::NoneValue)?,
-        //         Some(old) => {
-        //             // Increment the value read from storage; will error in the event of overflow.
-        //             let new = old.checked_add(1).ok_or(Error::<T>::StorageOverflow)?;
-        //             // Update the value in storage with the incremented result.
-        //             Something::put(new);
-        //             Ok(())
-        //         },
-        //     }
-        // }
+            Self::deposit_event(RawEvent::CurrencyCreated(currency_id, who));
+            Ok(())
+        }
     }
 }
 

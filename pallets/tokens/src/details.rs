@@ -14,8 +14,13 @@
  * limitations under the License.
  */
 
-pub mod adapter;
-pub mod currencies;
-pub mod dispatchable;
-pub mod genesis;
-pub mod mock;
+use crate::*;
+use codec::{Decode, Encode};
+use sp_runtime::RuntimeDebug;
+
+/// This structure is used to encode metadata about a currency, for instance,
+/// which account is its "owner" and thus can mint or burn units.
+#[derive(Encode, Decode, Clone, PartialEq, Eq, Default, RuntimeDebug)]
+pub struct CurrencyDetails<AccountId> {
+    pub owner: AccountId,
+}

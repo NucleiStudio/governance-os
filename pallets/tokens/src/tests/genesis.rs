@@ -36,3 +36,10 @@ fn does_not_set_balances_by_default() {
         assert_eq!(Tokens::total_issuance(TEST_TOKEN_ID), 0);
     })
 }
+
+#[test]
+fn set_test_token_details_approprietaly() {
+    ExtBuilder::default()
+        .build()
+        .execute_with(|| assert_eq!(Tokens::details(TEST_TOKEN_ID).owner, TEST_TOKEN_OWNER))
+}

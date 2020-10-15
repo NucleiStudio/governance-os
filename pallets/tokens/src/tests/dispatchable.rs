@@ -14,8 +14,24 @@
  * limitations under the License.
  */
 
-pub mod adapter;
-pub mod currencies;
-pub mod dispatchable;
-pub mod genesis;
-pub mod mock;
+use super::mock::*;
+use crate::Error;
+use frame_support::{assert_noop, assert_ok};
+
+#[test]
+fn create_works() {
+    ExtBuilder::default().build().execute_with(|| {
+        assert_ok!(Tokens::create(Origin::signed(TEST_TOKEN_OWNER), 42));
+        assert_eq!(Tokens::details(42).owner, TEST_TOKEN_OWNER);
+    })
+}
+
+#[test]
+fn create_duplicate_currency_id_fails() {
+    ExtBuilder::default().build().execute_with(|| {
+        assert_noop!(
+            Tokens::create(Origin::signed(TEST_TOKEN_OWNER), TEST_TOKEN_ID),
+            Error::<Test>::CurrencyAlreadyExists
+        );
+    })
+}
