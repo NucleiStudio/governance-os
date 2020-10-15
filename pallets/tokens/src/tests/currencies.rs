@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-use crate::{mock::*, Error};
+use super::mock::*;
+use crate::Error;
 use frame_support::{assert_noop, assert_ok};
 
 #[test]

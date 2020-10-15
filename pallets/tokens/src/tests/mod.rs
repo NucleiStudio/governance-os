@@ -14,5 +14,7 @@
  * limitations under the License.
  */
 
-pub mod tests_currencies;
-pub mod tests_genesis;
+pub mod adapter;
+pub mod currencies;
+pub mod genesis;
+pub mod mock;

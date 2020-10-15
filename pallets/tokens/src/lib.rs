@@ -14,6 +14,14 @@
  * limitations under the License.
  */
 
+//! This pallet implements the code to support a multi currency runtime.
+//! Along with compatibility with the `Currency` trait through the use
+//! of `NativeCurrencyAdapter`.
+//! Caveats:
+//! - for now, we do not support `reasons` and `existence_requirements`
+//! - for now, we do not support `ExistentialDeposit`
+//! - for now, we do not support locking or reserving funds
+
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use frame_support::{decl_error, decl_event, decl_module, decl_storage, Parameter};
@@ -25,12 +33,13 @@ use sp_std::cmp::{Eq, PartialEq};
 use sp_std::collections::btree_map::BTreeMap;
 
 #[cfg(test)]
-mod mock;
-
-#[cfg(test)]
 mod tests;
 
+mod adapter;
 mod currencies;
+mod imbalances;
+
+pub use adapter::NativeCurrencyAdapter;
 
 pub trait Trait: frame_system::Trait {
     /// Because this pallet emits events, it depends on the runtime's definition of an event.

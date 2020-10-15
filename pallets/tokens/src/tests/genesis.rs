@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-use crate::mock::*;
+use super::mock::*;
 
 #[test]
 fn set_storage_correctly() {
