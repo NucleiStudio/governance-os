@@ -22,5 +22,7 @@ use sp_runtime::RuntimeDebug;
 /// which account is its "owner" and thus can mint or burn units.
 #[derive(Encode, Decode, Clone, PartialEq, Eq, Default, RuntimeDebug)]
 pub struct CurrencyDetails<AccountId> {
+    /// The owner of the currency, typically it can mint or burn units of this
+    /// currency.
     pub owner: AccountId,
 }
