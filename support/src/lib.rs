@@ -20,4 +20,4 @@
 
 pub mod currencies;
 
-pub use currencies::Currencies;
+pub use currencies::{Currencies, ReservableCurrencies};
