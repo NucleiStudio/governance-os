@@ -14,105 +14,220 @@
  * limitations under the License.
  */
 
+//! This pallet implements the code to support a multi currency runtime.
+//! Along with compatibility with the `Currency` trait through the use
+//! of `NativeCurrencyAdapter`.
+//! Caveats:
+//! - for now, we do not support `reasons` and `existence_requirements`
+//! - for now, we do not support `ExistentialDeposit`
+//! - for now, we do not support locking or reserving funds
+
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use frame_support::{decl_error, decl_event, decl_module, decl_storage, dispatch, traits::Get};
+use frame_support::{
+    decl_error, decl_event, decl_module, decl_storage, dispatch::DispatchResult, ensure, Parameter,
+};
 use frame_system::ensure_signed;
+use governance_os_support::Currencies;
+use pallet_balances::AccountData;
+use sp_runtime::traits::{
+    AtLeast32BitUnsigned, CheckedAdd, MaybeSerializeDeserialize, Member, StaticLookup,
+};
+use sp_std::cmp::{Eq, PartialEq};
 
-#[cfg(test)]
-mod mock;
+#[cfg(feature = "std")]
+use sp_std::collections::btree_map::BTreeMap;
 
 #[cfg(test)]
 mod tests;
 
-/// Configure the pallet by specifying the parameters and types on which it depends.
+mod adapter;
+mod currencies;
+mod details;
+mod imbalances;
+
+pub use adapter::NativeCurrencyAdapter;
+pub use details::CurrencyDetails;
+
 pub trait Trait: frame_system::Trait {
     /// Because this pallet emits events, it depends on the runtime's definition of an event.
     type Event: From<Event<Self>> + Into<<Self as frame_system::Trait>::Event>;
+
+    /// The type used to identify currencies
+    type CurrencyId: Parameter + Member + Copy + MaybeSerializeDeserialize + Ord;
+
+    /// The balance of an account.
+    type Balance: Parameter
+        + Member
+        + AtLeast32BitUnsigned
+        + Default
+        + Copy
+        + MaybeSerializeDeserialize;
 }
 
-// The pallet's runtime storage items.
-// https://substrate.dev/docs/en/knowledgebase/runtime/storage
 decl_storage! {
-    // A unique name is used to ensure that the pallet's storage items are isolated.
-    // This name may be updated, but each pallet in the runtime must use a unique name.
-    // ---------------------------------vvvvvvvvvvvvvv
-    trait Store for Module<T: Trait> as TemplateModule {
-        // Learn more about declaring storage items:
-        // https://substrate.dev/docs/en/knowledgebase/runtime/storage#declaring-storage-items
-        Something get(fn something): Option<u32>;
+    trait Store for Module<T: Trait> as Tokens {
+        pub TotalIssuances get(fn total_issuances) build(|config: &GenesisConfig<T>| {
+            config
+                .endowed_accounts
+                .iter()
+                .map(|(currency_id, _, initial_balance)| (currency_id, initial_balance))
+                .fold(BTreeMap::<T::CurrencyId, T::Balance>::new(), |mut acc, (currency_id, initial_balance)| {
+                    if let Some(issuance) = acc.get_mut(currency_id) {
+                        *issuance = issuance.checked_add(initial_balance).expect("total issuance cannot overflow when building genesis");
+                    } else {
+                        acc.insert(*currency_id, *initial_balance);
+                    }
+                    acc
+                })
+                .into_iter()
+                .collect::<Vec<_>>()
+        }): map hasher(blake2_128_concat) T::CurrencyId => T::Balance;
+        pub Balances get(fn balances): double_map hasher(blake2_128_concat) T::AccountId, hasher(blake2_128_concat) T::CurrencyId => AccountData<T::Balance>;
+        pub Details get(fn details): map hasher(blake2_128_concat) T::CurrencyId => CurrencyDetails<T::AccountId>;
+    }
+    add_extra_genesis {
+        config(endowed_accounts): Vec<(T::CurrencyId, T::AccountId, T::Balance)>;
+        config(currency_details): Vec<(T::CurrencyId, CurrencyDetails<T::AccountId>)>;
+        build(|config: &GenesisConfig<T>| {
+            config.endowed_accounts.iter().for_each(|(currency_id, account_id, initial_balance)| {
+                <Balances<T>>::mutate(account_id, currency_id, |account_data| account_data.free = *initial_balance)
+            });
+
+            config.currency_details.iter().for_each(|(currency_id, details)| {
+                <Details<T>>::mutate(currency_id, |det| *det = details.clone())
+            });
+        })
     }
 }
 
-// Pallets use events to inform users when important changes are made.
-// https://substrate.dev/docs/en/knowledgebase/runtime/events
 decl_event!(
     pub enum Event<T>
     where
         AccountId = <T as frame_system::Trait>::AccountId,
+        Balance = <T as Trait>::Balance,
+        CurrencyId = <T as Trait>::CurrencyId,
+        Details = CurrencyDetails<<T as frame_system::Trait>::AccountId>,
     {
-        /// Event documentation should end with an array that provides descriptive names for event
-        /// parameters. [something, who]
-        SomethingStored(u32, AccountId),
+        /// A new currency has been created. [currency id, details]
+        CurrencyCreated(CurrencyId, Details),
+        /// Some units of currency were issued. [currency_id, dest, amount]
+        CurrencyMinted(CurrencyId, AccountId, Balance),
+        /// Some units of currency were destroyed. [currency_id, source, amount]
+        CurrencyBurned(CurrencyId, AccountId, Balance),
+        /// Some details about a currency were changed. [currency_id, details]
+        CurrencyDetailsChanged(CurrencyId, Details),
+        /// Some units of currency were transferred. [currency_id, source, dest, amount]
+        CurrencyTransferred(CurrencyId, AccountId, AccountId, Balance),
     }
 );
 
-// Errors inform users that something went wrong.
 decl_error! {
     pub enum Error for Module<T: Trait> {
-        /// Error names should be descriptive.
-        NoneValue,
-        /// Errors should have helpful documentation associated with them.
-        StorageOverflow,
+        /// This operation will cause total issuance to overflow for the given currency
+        TotalIssuanceOverflow,
+        /// This operation will cause total issuance to underflow for the given currency
+        TotalIssuanceUnderflow,
+        /// This operation will cause the balance of an account to overflow for the
+        /// given currency
+        BalanceOverflow,
+        /// There are not enough coins inside the balance of the user to perform the action
+        BalanceTooLow,
+        /// The currency ID is already used by another currency
+        CurrencyAlreadyExists,
+        /// This call an only be used by the currency owner
+        NotCurrencyOwner,
     }
 }
 
-// Dispatchable functions allows users to interact with the pallet and invoke state changes.
-// These functions materialize as "extrinsics", which are often compared to transactions.
-// Dispatchable functions must be annotated with a weight and must return a DispatchResult.
 decl_module! {
     pub struct Module<T: Trait> for enum Call where origin: T::Origin {
-        // Errors must be initialized if they are used by the pallet.
         type Error = Error<T>;
 
-        // Events must be initialized if they are used by the pallet.
         fn deposit_event() = default;
 
-        /// An example dispatchable that takes a singles value as a parameter, writes the value to
-        /// storage and emits an event. This function must be dispatched by a signed extrinsic.
-        #[weight = 10_000 + T::DbWeight::get().writes(1)]
-        pub fn do_something(origin, something: u32) -> dispatch::DispatchResult {
-            // Check that the extrinsic was signed and get the signer.
-            // This function will return an error if the extrinsic is not signed.
-            // https://substrate.dev/docs/en/knowledgebase/runtime/origin
+        /// Creates a new currency with 0 units, to issue units to people one would have to call
+        /// `issue`. This will register the caller of this dispatchable as the owner of the currency
+        /// so they can issue or burn units. This will produce an error if `currency_id` is already
+        /// used by another currency.
+        #[weight = 0]
+        pub fn create(origin, currency_id: T::CurrencyId) -> DispatchResult {
             let who = ensure_signed(origin)?;
 
-            // Update storage.
-            Something::put(something);
+            ensure!(!Details::<T>::contains_key(currency_id), Error::<T>::CurrencyAlreadyExists);
 
-            // Emit an event.
-            Self::deposit_event(RawEvent::SomethingStored(something, who));
-            // Return a successful DispatchResult
+            let details = CurrencyDetails {
+                owner: who.clone(),
+            };
+            Details::<T>::mutate(currency_id, |det| *det = details.clone());
+
+            Self::deposit_event(RawEvent::CurrencyCreated(currency_id, details));
             Ok(())
         }
 
-        /// An example dispatchable that may throw a custom error.
-        #[weight = 10_000 + T::DbWeight::get().reads_writes(1,1)]
-        pub fn cause_error(origin) -> dispatch::DispatchResult {
-            let _who = ensure_signed(origin)?;
+        /// Issue some units of the currency identified by `currency_id` and credit them to `dest`.
+        /// Can only be called by the owner of the currency.
+        #[weight = 0]
+        pub fn mint(origin, currency_id: T::CurrencyId, dest: <T::Lookup as StaticLookup>::Source, amount: T::Balance) -> DispatchResult {
+            Self::ensure_owner_of_currency(origin, currency_id)?;
+            let to = T::Lookup::lookup(dest)?;
+            <Self as Currencies<T::AccountId>>::mint(currency_id, &to, amount)?;
 
-            // Read a value from storage.
-            match Something::get() {
-                // Return an error if the value has not been set.
-                None => Err(Error::<T>::NoneValue)?,
-                Some(old) => {
-                    // Increment the value read from storage; will error in the event of overflow.
-                    let new = old.checked_add(1).ok_or(Error::<T>::StorageOverflow)?;
-                    // Update the value in storage with the incremented result.
-                    Something::put(new);
-                    Ok(())
-                },
-            }
+            Self::deposit_event(RawEvent::CurrencyMinted(currency_id, to, amount));
+            Ok(())
         }
+
+        /// Destroy some units of the currency identified by `currency_id` from `from`.
+        /// Can only be called by the owner of the currency.
+        #[weight = 0]
+        pub fn burn(origin, currency_id: T::CurrencyId, from: <T::Lookup as StaticLookup>::Source, amount: T::Balance) -> DispatchResult {
+            Self::ensure_owner_of_currency(origin, currency_id)?;
+            let source = T::Lookup::lookup(from)?;
+            <Self as Currencies<T::AccountId>>::burn(currency_id, &source, amount)?;
+
+            Self::deposit_event(RawEvent::CurrencyBurned(currency_id, source, amount));
+            Ok(())
+        }
+
+        /// Update details about the currency identified by `currency_id`. For instance, this
+        /// can be used to change the owner of the currency. Can only be called by the owner.
+        #[weight = 0]
+        pub fn update_details(origin, currency_id: T::CurrencyId, details: CurrencyDetails<T::AccountId>) -> DispatchResult {
+            Self::ensure_owner_of_currency(origin, currency_id)?;
+            <Details<T>>::mutate(currency_id, |det| *det = details.clone());
+
+            Self::deposit_event(RawEvent::CurrencyDetailsChanged(currency_id, details));
+            Ok(())
+        }
+
+        /// Transfer `amount` units of the currency identified by `currency_id` from the origin's
+        /// account to the balance of `dest`.
+        #[weight = 0]
+        pub fn transfer(origin, currency_id: T::CurrencyId, dest: <T::Lookup as StaticLookup>::Source, amount: T::Balance) -> DispatchResult {
+            let from = ensure_signed(origin)?;
+            let to = T::Lookup::lookup(dest)?;
+
+            <Self as Currencies<T::AccountId>>::transfer(currency_id, &from, &to, amount)?;
+            Ok(())
+        }
+    }
+}
+
+impl<T: Trait> Module<T> {
+    /// Set the free balance of `who` in `currency_id`. You are supposed to update the total
+    /// issuance yourself.
+    fn set_free_balance(currency_id: T::CurrencyId, who: &T::AccountId, balance: T::Balance) {
+        <Balances<T>>::mutate(who, currency_id, |account_data| account_data.free = balance);
+    }
+
+    /// Make sure that `origin` is the owner of  `currency_id`.
+    fn ensure_owner_of_currency(origin: T::Origin, currency_id: T::CurrencyId) -> DispatchResult {
+        let sender = ensure_signed(origin)?;
+        ensure!(
+            Details::<T>::get(currency_id).owner == sender,
+            Error::<T>::NotCurrencyOwner
+        );
+
+        Ok(())
     }
 }
