@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-#![cfg_attr(not(feature = "std"), no_std)]
-
 use crate::*;
 use sp_runtime::{
     traits::{CheckedAdd, CheckedSub},

@@ -29,7 +29,7 @@ use frame_support::{
 };
 use frame_system::ensure_signed;
 use governance_os_support::Currencies;
-use pallet_balances::AccountData;
+pub use pallet_balances::AccountData;
 use sp_runtime::traits::{
     AtLeast32BitUnsigned, CheckedAdd, MaybeSerializeDeserialize, Member, StaticLookup,
 };
