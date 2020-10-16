@@ -103,6 +103,12 @@ impl<T: Trait> governance_os_support::Currencies<T::AccountId> for Module<T> {
         Self::set_free_balance(currency_id, source, source_new_balance);
         Self::set_free_balance(currency_id, dest, dest_new_balance);
 
+        Self::deposit_event(RawEvent::CurrencyTransferred(
+            currency_id,
+            source.clone(),
+            dest.clone(),
+            amount,
+        ));
         Ok(())
     }
 }

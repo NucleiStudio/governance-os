@@ -24,7 +24,12 @@ fn transfer_should_work() {
         .one_hundred_for_alice_n_bob()
         .build()
         .execute_with(|| {
-            assert_ok!(Tokens::transfer(TEST_TOKEN_ID, &ALICE, &BOB, 50));
+            assert_ok!(<Tokens as Currencies<AccountId>>::transfer(
+                TEST_TOKEN_ID,
+                &ALICE,
+                &BOB,
+                50
+            ));
             assert_eq!(Tokens::free_balance(TEST_TOKEN_ID, &ALICE), 50);
             assert_eq!(Tokens::free_balance(TEST_TOKEN_ID, &BOB), 150);
         })

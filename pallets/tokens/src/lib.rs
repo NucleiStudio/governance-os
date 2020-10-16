@@ -117,6 +117,8 @@ decl_event!(
         CurrencyBurned(CurrencyId, AccountId, Balance),
         /// Some details about a currency were changed. [currency_id, details]
         CurrencyDetailsChanged(CurrencyId, Details),
+        /// Some units of currency were transferred. [currency_id, source, dest, amount]
+        CurrencyTransferred(CurrencyId, AccountId, AccountId, Balance),
     }
 );
 
@@ -195,6 +197,17 @@ decl_module! {
             <Details<T>>::mutate(currency_id, |det| *det = details.clone());
 
             Self::deposit_event(RawEvent::CurrencyDetailsChanged(currency_id, details));
+            Ok(())
+        }
+
+        /// Transfer `amount` units of the currency identified by `currency_id` from the origin's
+        /// account to the balance of `dest`.
+        #[weight = 0]
+        pub fn transfer(origin, currency_id: T::CurrencyId, dest: <T::Lookup as StaticLookup>::Source, amount: T::Balance) -> DispatchResult {
+            let from = ensure_signed(origin)?;
+            let to = T::Lookup::lookup(dest)?;
+
+            <Self as Currencies<T::AccountId>>::transfer(currency_id, &from, &to, amount)?;
             Ok(())
         }
     }

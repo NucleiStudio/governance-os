@@ -105,7 +105,12 @@ where
         amount: Self::Balance,
         _: ExistenceRequirement,
     ) -> DispatchResult {
-        Module::<Pallet>::transfer(GetCurrencyId::get(), source, dest, amount)
+        <Module<Pallet> as Currencies<Pallet::AccountId>>::transfer(
+            GetCurrencyId::get(),
+            source,
+            dest,
+            amount,
+        )
     }
 
     fn slash(

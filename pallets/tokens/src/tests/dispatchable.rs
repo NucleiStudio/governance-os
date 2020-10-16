@@ -119,3 +119,20 @@ fn update_details_works() {
             assert_eq!(Tokens::details(TEST_TOKEN_ID).owner, ALICE);
         })
 }
+
+#[test]
+fn transfer_works() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            assert_ok!(Tokens::transfer(
+                Origin::signed(ALICE),
+                TEST_TOKEN_ID,
+                BOB,
+                50
+            ));
+            assert_eq!(Tokens::free_balance(TEST_TOKEN_ID, &ALICE), 50);
+            assert_eq!(Tokens::free_balance(TEST_TOKEN_ID, &BOB), 150);
+        })
+}
