@@ -75,3 +75,16 @@ fn ensure_can_withdraw_should_work() {
             );
         })
 }
+
+#[test]
+fn total_balance_work() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            assert_eq!(Tokens::total_balance(TEST_TOKEN_ID, &ALICE), 100);
+            Tokens::set_reserved_balance(TEST_TOKEN_ID, &ALICE, 100);
+            assert_eq!(Tokens::free_balance(TEST_TOKEN_ID, &ALICE), 100);
+            assert_eq!(Tokens::total_balance(TEST_TOKEN_ID, &ALICE), 200);
+        })
+}

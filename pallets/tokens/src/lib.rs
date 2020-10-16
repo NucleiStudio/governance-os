@@ -220,6 +220,13 @@ impl<T: Trait> Module<T> {
         <Balances<T>>::mutate(who, currency_id, |account_data| account_data.free = balance);
     }
 
+    /// Set the reserved balance of `who`. You are supposed to update the total issuance yourself.
+    fn set_reserved_balance(currency_id: T::CurrencyId, who: &T::AccountId, balance: T::Balance) {
+        <Balances<T>>::mutate(who, currency_id, |account_data| {
+            account_data.reserved = balance
+        })
+    }
+
     /// Make sure that `origin` is the owner of  `currency_id`.
     fn ensure_owner_of_currency(origin: T::Origin, currency_id: T::CurrencyId) -> DispatchResult {
         let sender = ensure_signed(origin)?;

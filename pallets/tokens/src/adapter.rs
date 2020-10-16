@@ -45,7 +45,7 @@ where
     type NegativeImbalance = NegativeImbalance<Pallet, GetCurrencyId>;
 
     fn total_balance(who: &Pallet::AccountId) -> Self::Balance {
-        Module::<Pallet>::free_balance(GetCurrencyId::get(), who)
+        Module::<Pallet>::total_balance(GetCurrencyId::get(), who)
     }
 
     fn can_slash(who: &Pallet::AccountId, amount: Self::Balance) -> bool {

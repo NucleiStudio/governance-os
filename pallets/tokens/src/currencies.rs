@@ -16,7 +16,7 @@
 
 use crate::*;
 use sp_runtime::{
-    traits::{CheckedAdd, CheckedSub},
+    traits::{CheckedAdd, CheckedSub, Saturating},
     DispatchResult,
 };
 
@@ -70,6 +70,11 @@ impl<T: Trait> governance_os_support::Currencies<T::AccountId> for Module<T> {
 
     fn free_balance(currency_id: Self::CurrencyId, who: &T::AccountId) -> Self::Balance {
         Self::balances(who, currency_id).free
+    }
+
+    fn total_balance(currency_id: Self::CurrencyId, who: &T::AccountId) -> Self::Balance {
+        let account_data = Self::balances(who, currency_id);
+        account_data.free.saturating_add(account_data.reserved)
     }
 
     fn ensure_can_withdraw(

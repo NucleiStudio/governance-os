@@ -226,3 +226,16 @@ fn slash() {
             assert_eq!(TokensCurrencyAdapter::total_issuance(), 200);
         })
 }
+
+#[test]
+fn total_balance() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            assert_eq!(TokensCurrencyAdapter::total_balance(&ALICE), 100);
+            Tokens::set_reserved_balance(TEST_TOKEN_ID, &ALICE, 100);
+            assert_eq!(TokensCurrencyAdapter::free_balance(&ALICE), 100);
+            assert_eq!(TokensCurrencyAdapter::total_balance(&ALICE), 200);
+        })
+}
