@@ -38,10 +38,12 @@ use sp_std::prelude::*;
 use sp_version::RuntimeVersion;
 
 mod constants;
+mod pallets_consensus;
 mod pallets_core;
 mod pallets_economics;
 mod version;
 
+pub use pallets_consensus::SessionKeys;
 pub use pallets_economics::NativeCurrency;
 pub use version::VERSION;
 
@@ -55,6 +57,11 @@ construct_runtime!(
         // Core
         System: frame_system::{Module, Call, Config, Storage, Event<T>},
         Indices: pallet_indices::{Module, Call, Storage, Config<T>, Event<T>},
+
+        // Consensus
+        Aura: pallet_aura::{Module, Config<T>, Inherent},
+        Grandpa: pallet_grandpa::{Module, Call, Storage, Config, Event},
+        Timestamp: pallet_timestamp::{Module, Call, Storage, Inherent},
 
         // Economics
         Tokens: governance_os_pallet_tokens::{Module, Call, Storage, Config<T>, Event<T>},
