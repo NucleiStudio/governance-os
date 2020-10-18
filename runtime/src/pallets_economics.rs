@@ -14,18 +14,20 @@
  * limitations under the License.
  */
 
-use crate::*;
-use codec::{Decode, Encode};
-#[cfg(feature = "std")]
-use serde::{Deserialize, Serialize};
-use sp_runtime::RuntimeDebug;
+use crate::{Event, Runtime};
+use frame_support::parameter_types;
+use governance_os_pallet_tokens::NativeCurrencyAdapter;
+use governance_os_primitives::{Balance, CurrencyId};
 
-/// This structure is used to encode metadata about a currency, for instance,
-/// which account is its "owner" and thus can mint or burn units.
-#[derive(Encode, Decode, Clone, PartialEq, Eq, Default, RuntimeDebug)]
-#[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
-pub struct CurrencyDetails<AccountId> {
-    /// The owner of the currency, typically it can mint or burn units of this
-    /// currency.
-    pub owner: AccountId,
+impl governance_os_pallet_tokens::Trait for Runtime {
+    type Event = Event;
+    type Balance = Balance;
+    type CurrencyId = CurrencyId;
 }
+
+parameter_types! {
+    pub const NativeCurrencyId: CurrencyId = CurrencyId::Native;
+}
+
+/// The system's native currency, typically used to pay for fees.
+pub type NativeCurrency = NativeCurrencyAdapter<Runtime, NativeCurrencyId>;
