@@ -108,6 +108,8 @@ pub trait ReservableCurrencies<AccountId>: Currencies<AccountId> {
     ///
     /// As much funds up to `value` will be deducted as possible. If the reserve balance of `who`
     /// is less than `value`, then a non-zero second item will be returned.
+    ///
+    /// This will update the total issuance of the currency.
     fn slash_reserved(
         currency_id: Self::CurrencyId,
         who: &AccountId,

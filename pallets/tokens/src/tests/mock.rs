@@ -17,7 +17,7 @@
 use crate::{CurrencyDetails, GenesisConfig, Module, NativeCurrencyAdapter, Trait};
 use frame_support::{impl_outer_origin, parameter_types, weights::Weight};
 use frame_system as system;
-pub use governance_os_support::Currencies;
+pub use governance_os_support::{Currencies, ReservableCurrencies};
 use sp_core::H256;
 use sp_runtime::{
     testing::Header,

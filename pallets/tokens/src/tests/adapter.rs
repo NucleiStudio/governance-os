@@ -234,8 +234,8 @@ fn total_balance() {
         .build()
         .execute_with(|| {
             assert_eq!(TokensCurrencyAdapter::total_balance(&ALICE), 100);
-            Tokens::set_reserved_balance(TEST_TOKEN_ID, &ALICE, 100);
-            assert_eq!(TokensCurrencyAdapter::free_balance(&ALICE), 100);
-            assert_eq!(TokensCurrencyAdapter::total_balance(&ALICE), 200);
+            assert_ok!(Tokens::reserve(TEST_TOKEN_ID, &ALICE, 100));
+            assert_eq!(TokensCurrencyAdapter::free_balance(&ALICE), 0);
+            assert_eq!(TokensCurrencyAdapter::total_balance(&ALICE), 100);
         })
 }
