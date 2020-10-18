@@ -16,6 +16,7 @@
 
 use crate::{constants::time, Aura, Call, Event, Grandpa, Runtime};
 use frame_support::{parameter_types, traits::KeyOwnerProofSystem};
+use governance_os_primitives::Moment;
 use pallet_grandpa::AuthorityId as GrandpaId;
 use sp_consensus_aura::sr25519::AuthorityId as AuraId;
 use sp_core::crypto::KeyTypeId;
@@ -48,12 +49,12 @@ impl pallet_grandpa::Trait for Runtime {
 }
 
 parameter_types! {
-    pub const MinimumPeriod: u64 = time::SLOT_DURATION / 2;
+    pub const MinimumPeriod: Moment = time::SLOT_DURATION / 2;
 }
 
 impl pallet_timestamp::Trait for Runtime {
     /// A timestamp: milliseconds since the unix epoch.
-    type Moment = u64;
+    type Moment = Moment;
     type OnTimestampSet = Aura;
     type MinimumPeriod = MinimumPeriod;
     type WeightInfo = ();
