@@ -16,9 +16,10 @@
 
 use crate::*;
 use frame_support::traits::{
-    Currency, ExistenceRequirement, Get, Imbalance, SignedImbalance, WithdrawReasons,
+    BalanceStatus, Currency, ExistenceRequirement, Get, Imbalance, ReservableCurrency,
+    SignedImbalance, WithdrawReasons,
 };
-use governance_os_support::Currencies;
+use governance_os_support::{Currencies, ReservableCurrencies};
 use imbalances::{NegativeImbalance, PositiveImbalance};
 use sp_runtime::{
     traits::{Bounded, CheckedAdd, CheckedSub, Zero},
@@ -183,5 +184,57 @@ where
         } else {
             SignedImbalance::Negative(NegativeImbalance::new(old_balance - value))
         }
+    }
+}
+
+impl<Pallet, GetCurrencyId> ReservableCurrency<Pallet::AccountId>
+    for NativeCurrencyAdapter<Pallet, GetCurrencyId>
+where
+    Pallet: Trait,
+    GetCurrencyId: Get<Pallet::CurrencyId>,
+{
+    fn can_reserve(who: &Pallet::AccountId, amount: Self::Balance) -> bool {
+        Module::<Pallet>::can_reserve(GetCurrencyId::get(), who, amount)
+    }
+
+    fn slash_reserved(
+        who: &Pallet::AccountId,
+        amount: Self::Balance,
+    ) -> (Self::NegativeImbalance, Self::Balance) {
+        let mut slashed = amount;
+        <Balances<Pallet>>::mutate(who, GetCurrencyId::get(), |data| {
+            slashed = data.reserved.min(amount);
+            // Slashed will be at most equal to data.reserved, no underflow
+            data.reserved -= slashed;
+        });
+
+        (Self::NegativeImbalance::new(slashed), amount - slashed)
+    }
+
+    fn reserved_balance(who: &Pallet::AccountId) -> Self::Balance {
+        Module::<Pallet>::reserved_balance(GetCurrencyId::get(), who)
+    }
+
+    fn reserve(who: &Pallet::AccountId, amount: Self::Balance) -> DispatchResult {
+        Module::<Pallet>::reserve(GetCurrencyId::get(), who, amount)
+    }
+
+    fn unreserve(who: &Pallet::AccountId, amount: Self::Balance) -> Self::Balance {
+        Module::<Pallet>::unreserve(GetCurrencyId::get(), who, amount)
+    }
+
+    fn repatriate_reserved(
+        slashed: &Pallet::AccountId,
+        beneficiary: &Pallet::AccountId,
+        amount: Self::Balance,
+        status: BalanceStatus,
+    ) -> result::Result<Self::Balance, DispatchError> {
+        Module::<Pallet>::repatriate_reserved(
+            GetCurrencyId::get(),
+            slashed,
+            beneficiary,
+            amount,
+            status,
+        )
     }
 }
