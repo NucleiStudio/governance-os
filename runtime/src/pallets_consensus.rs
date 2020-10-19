@@ -17,8 +17,8 @@
 use crate::{constants::time, Aura, Call, Event, Grandpa, Runtime};
 use frame_support::{parameter_types, traits::KeyOwnerProofSystem};
 use governance_os_primitives::Moment;
-use pallet_grandpa::AuthorityId as GrandpaId;
-use sp_consensus_aura::sr25519::AuthorityId as AuraId;
+pub use pallet_grandpa::AuthorityId as GrandpaId;
+pub use sp_consensus_aura::sr25519::AuthorityId as AuraId;
 use sp_core::crypto::KeyTypeId;
 use sp_runtime::impl_opaque_keys;
 use sp_std::vec::Vec;
