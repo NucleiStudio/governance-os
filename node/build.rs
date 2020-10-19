@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-//! A compilation of traits and helpers for implementing the Governance OS
+use substrate_build_script_utils::{generate_cargo_keys, rerun_if_git_head_changed};
 
-#![cfg_attr(not(feature = "std"), no_std)]
-
-pub mod currencies;
-
-pub use currencies::{Currencies, ReservableCurrencies};
+fn main() {
+    generate_cargo_keys();
+    rerun_if_git_head_changed();
+}

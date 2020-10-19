@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-#![cfg_attr(not(feature = "std"), no_std)]
-
 use crate::*;
+use frame_support::traits::BalanceStatus;
+use governance_os_support::{Currencies, ReservableCurrencies};
 use sp_runtime::{
-    traits::{CheckedAdd, CheckedSub},
-    DispatchResult,
+    traits::{CheckedAdd, CheckedSub, Saturating},
+    DispatchError, DispatchResult,
 };
+use sp_std::result;
 
-impl<T: Trait> governance_os_support::Currencies<T::AccountId> for Module<T> {
+impl<T: Trait> Currencies<T::AccountId> for Module<T> {
     type CurrencyId = T::CurrencyId;
     type Balance = T::Balance;
 
@@ -74,6 +75,11 @@ impl<T: Trait> governance_os_support::Currencies<T::AccountId> for Module<T> {
         Self::balances(who, currency_id).free
     }
 
+    fn total_balance(currency_id: Self::CurrencyId, who: &T::AccountId) -> Self::Balance {
+        let account_data = Self::balances(who, currency_id);
+        account_data.free.saturating_add(account_data.reserved)
+    }
+
     fn ensure_can_withdraw(
         currency_id: Self::CurrencyId,
         who: &T::AccountId,
@@ -110,5 +116,105 @@ impl<T: Trait> governance_os_support::Currencies<T::AccountId> for Module<T> {
             amount,
         ));
         Ok(())
+    }
+}
+
+impl<T: Trait> ReservableCurrencies<T::AccountId> for Module<T> {
+    fn can_reserve(
+        currency_id: Self::CurrencyId,
+        who: &T::AccountId,
+        amount: Self::Balance,
+    ) -> bool {
+        Self::ensure_can_withdraw(currency_id, who, amount).is_ok()
+    }
+
+    fn slash_reserved(
+        currency_id: Self::CurrencyId,
+        who: &T::AccountId,
+        value: Self::Balance,
+    ) -> Self::Balance {
+        let reserved_balance = Self::reserved_balance(currency_id, who);
+        let actual = reserved_balance.min(value);
+
+        // Amount will be at most equal to the total reserved balance thus neglecting the
+        // risk of any underflow
+        <Balances<T>>::mutate(who, currency_id, |d| d.reserved -= actual);
+        <TotalIssuances<T>>::mutate(currency_id, |v| *v -= actual);
+
+        // Return whatever we couldn't slash
+        value - actual
+    }
+
+    fn reserved_balance(currency_id: Self::CurrencyId, who: &T::AccountId) -> Self::Balance {
+        Self::balances(who, currency_id).reserved
+    }
+
+    fn reserve(
+        currency_id: Self::CurrencyId,
+        who: &T::AccountId,
+        amount: Self::Balance,
+    ) -> DispatchResult {
+        Self::ensure_can_withdraw(currency_id, who, amount)?;
+
+        // Because of the call to `ensure_can_withdraw` we now that amount is at most equal
+        // to the balance of the account, thus neflecting the use for the safe math checks.
+        <Balances<T>>::mutate(who, currency_id, |data| {
+            data.free -= amount;
+            data.reserved += amount;
+        });
+
+        Ok(())
+    }
+
+    fn unreserve(
+        currency_id: Self::CurrencyId,
+        who: &T::AccountId,
+        amount: Self::Balance,
+    ) -> Self::Balance {
+        // Take the smallest between all the coins reserved or the amount
+        let unreserved = Self::balances(who, currency_id).reserved.min(amount);
+
+        // The amount will be at most equal to the reserved balance, thus we cannot have any
+        // overflow / underflow situation
+        <Balances<T>>::mutate(who, currency_id, |data| {
+            data.free += unreserved;
+            data.reserved -= unreserved;
+        });
+
+        // Return the amount of coins we couldn't unreserve
+        amount - unreserved
+    }
+
+    fn repatriate_reserved(
+        currency_id: Self::CurrencyId,
+        slashed: &T::AccountId,
+        beneficiary: &T::AccountId,
+        value: Self::Balance,
+        status: BalanceStatus,
+    ) -> result::Result<Self::Balance, DispatchError> {
+        if slashed == beneficiary {
+            return match status {
+                BalanceStatus::Free => Ok(Self::unreserve(currency_id, slashed, value)),
+                BalanceStatus::Reserved => {
+                    // If balance > value saturates to 0
+                    Ok(value.saturating_sub(Self::reserved_balance(currency_id, slashed)))
+                }
+            };
+        }
+
+        let from_account = Self::balances(slashed, currency_id);
+        let to_account = Self::balances(beneficiary, currency_id);
+        let actual = from_account.reserved.min(value);
+        match status {
+            BalanceStatus::Free => {
+                Self::set_free_balance(currency_id, beneficiary, to_account.free + actual);
+            }
+            BalanceStatus::Reserved => {
+                <Balances<T>>::mutate(beneficiary, currency_id, |d| d.reserved += actual);
+            }
+        }
+        <Balances<T>>::mutate(slashed, currency_id, |d| d.reserved -= actual);
+
+        Ok(value - actual)
     }
 }

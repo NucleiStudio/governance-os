@@ -18,7 +18,10 @@ use super::mock::*;
 use crate::Error;
 use frame_support::{
     assert_noop, assert_ok,
-    traits::{Currency, ExistenceRequirement, Imbalance, SignedImbalance, WithdrawReason},
+    traits::{
+        BalanceStatus, Currency, ExistenceRequirement, Imbalance, ReservableCurrency,
+        SignedImbalance, WithdrawReason,
+    },
 };
 
 #[test]
@@ -224,5 +227,198 @@ fn slash() {
 
             // No issuance changes until the imbalances are consumed
             assert_eq!(TokensCurrencyAdapter::total_issuance(), 200);
+        })
+}
+
+#[test]
+fn total_balance() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            assert_eq!(TokensCurrencyAdapter::total_balance(&ALICE), 100);
+            assert_ok!(Tokens::reserve(TEST_TOKEN_ID, &ALICE, 100));
+            assert_eq!(TokensCurrencyAdapter::free_balance(&ALICE), 0);
+            assert_eq!(TokensCurrencyAdapter::total_balance(&ALICE), 100);
+        })
+}
+
+#[test]
+fn reserve_fails_if_not_enough_funds() {
+    ExtBuilder::default().build().execute_with(|| {
+        assert_noop!(
+            TokensCurrencyAdapter::reserve(&ALICE, 100),
+            Error::<Test>::BalanceTooLow
+        );
+    })
+}
+
+#[test]
+fn reserve() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            assert_eq!(TokensCurrencyAdapter::can_reserve(&ALICE, 55), true);
+            assert_ok!(TokensCurrencyAdapter::reserve(&ALICE, 55));
+            assert_eq!(TokensCurrencyAdapter::can_reserve(&ALICE, 55), false);
+            assert_eq!(TokensCurrencyAdapter::can_reserve(&ALICE, 45), true);
+            assert_eq!(TokensCurrencyAdapter::free_balance(&ALICE), 45);
+            assert_eq!(TokensCurrencyAdapter::reserved_balance(&ALICE), 55);
+            assert_eq!(TokensCurrencyAdapter::total_balance(&ALICE), 100);
+        })
+}
+
+#[test]
+fn unreserve() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            assert_ok!(TokensCurrencyAdapter::reserve(&ALICE, 100));
+            assert_eq!(TokensCurrencyAdapter::unreserve(&ALICE, 55), 0);
+            assert_eq!(TokensCurrencyAdapter::reserved_balance(&ALICE), 45);
+            // Returns the amount of extra coins that couldn't be unreserved since they were not even reserved
+            assert_eq!(TokensCurrencyAdapter::unreserve(&ALICE, 55), 10);
+            assert_eq!(TokensCurrencyAdapter::reserved_balance(&ALICE), 0);
+
+            assert_eq!(TokensCurrencyAdapter::free_balance(&ALICE), 100);
+            assert_eq!(TokensCurrencyAdapter::total_balance(&ALICE), 100);
+        })
+}
+
+#[test]
+fn repatriate_reserved_slashed_is_beneficiary_free_balance() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            assert_ok!(TokensCurrencyAdapter::reserve(&ALICE, 50));
+
+            // Basically will unreserve the stuff
+            assert_eq!(
+                TokensCurrencyAdapter::repatriate_reserved(
+                    &ALICE,
+                    &ALICE,
+                    30,
+                    BalanceStatus::Free,
+                ),
+                Ok(0)
+            );
+            assert_eq!(TokensCurrencyAdapter::reserved_balance(&ALICE), 20);
+            assert_eq!(
+                TokensCurrencyAdapter::repatriate_reserved(
+                    &ALICE,
+                    &ALICE,
+                    30,
+                    BalanceStatus::Free,
+                ),
+                Ok(10)
+            );
+            assert_eq!(TokensCurrencyAdapter::reserved_balance(&ALICE), 0);
+        })
+}
+
+#[test]
+fn repatriate_reserved_slashed_is_beneficiary_reserved_balance() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            assert_ok!(TokensCurrencyAdapter::reserve(&ALICE, 50));
+
+            // Doesn't really do anything but return slashed - reserved_balance
+            assert_eq!(
+                TokensCurrencyAdapter::repatriate_reserved(
+                    &ALICE,
+                    &ALICE,
+                    30,
+                    BalanceStatus::Reserved,
+                ),
+                Ok(0)
+            );
+            assert_eq!(TokensCurrencyAdapter::reserved_balance(&ALICE), 50);
+            assert_eq!(
+                TokensCurrencyAdapter::repatriate_reserved(
+                    &ALICE,
+                    &ALICE,
+                    60,
+                    BalanceStatus::Reserved,
+                ),
+                Ok(10)
+            );
+            assert_eq!(TokensCurrencyAdapter::reserved_balance(&ALICE), 50);
+        })
+}
+
+#[test]
+fn repatriate_reserved_free_balance() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            assert_ok!(TokensCurrencyAdapter::reserve(&ALICE, 50));
+
+            // Basically will unreserve the stuff
+            assert_eq!(
+                TokensCurrencyAdapter::repatriate_reserved(&ALICE, &BOB, 30, BalanceStatus::Free,),
+                Ok(0)
+            );
+            assert_eq!(TokensCurrencyAdapter::reserved_balance(&ALICE), 20);
+            assert_eq!(TokensCurrencyAdapter::free_balance(&BOB), 130);
+            assert_eq!(
+                TokensCurrencyAdapter::repatriate_reserved(&ALICE, &BOB, 30, BalanceStatus::Free,),
+                Ok(10)
+            );
+            assert_eq!(TokensCurrencyAdapter::reserved_balance(&ALICE), 0);
+            assert_eq!(TokensCurrencyAdapter::free_balance(&BOB), 150);
+        })
+}
+
+#[test]
+fn repatriate_reserved_reserved_balance() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            assert_ok!(TokensCurrencyAdapter::reserve(&ALICE, 50));
+
+            // Basically will unreserve the stuff
+            assert_eq!(
+                TokensCurrencyAdapter::repatriate_reserved(
+                    &ALICE,
+                    &BOB,
+                    30,
+                    BalanceStatus::Reserved,
+                ),
+                Ok(0)
+            );
+            assert_eq!(TokensCurrencyAdapter::reserved_balance(&ALICE), 20);
+            assert_eq!(TokensCurrencyAdapter::reserved_balance(&BOB), 30);
+            assert_eq!(
+                TokensCurrencyAdapter::repatriate_reserved(
+                    &ALICE,
+                    &BOB,
+                    30,
+                    BalanceStatus::Reserved,
+                ),
+                Ok(10)
+            );
+            assert_eq!(TokensCurrencyAdapter::reserved_balance(&ALICE), 0);
+            assert_eq!(TokensCurrencyAdapter::reserved_balance(&BOB), 50);
+        })
+}
+
+#[test]
+fn slash_reserved() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            assert_ok!(TokensCurrencyAdapter::reserve(&ALICE, 25));
+
+            let (imbalance, unslashed) = TokensCurrencyAdapter::slash_reserved(&ALICE, 50);
+            assert_eq!(imbalance.peek(), 25);
+            assert_eq!(unslashed, 25);
         })
 }

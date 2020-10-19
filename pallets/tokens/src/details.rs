@@ -16,11 +16,14 @@
 
 use crate::*;
 use codec::{Decode, Encode};
+#[cfg(feature = "std")]
+use serde::{Deserialize, Serialize};
 use sp_runtime::RuntimeDebug;
 
 /// This structure is used to encode metadata about a currency, for instance,
 /// which account is its "owner" and thus can mint or burn units.
 #[derive(Encode, Decode, Clone, PartialEq, Eq, Default, RuntimeDebug)]
+#[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 pub struct CurrencyDetails<AccountId> {
     /// The owner of the currency, typically it can mint or burn units of this
     /// currency.

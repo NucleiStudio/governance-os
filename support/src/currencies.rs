@@ -20,13 +20,15 @@
 //! this one.
 
 use codec::FullCodec;
+use frame_support::traits::BalanceStatus;
 use sp_runtime::{
     traits::{AtLeast32BitUnsigned, MaybeSerializeDeserialize},
-    DispatchResult,
+    DispatchError, DispatchResult,
 };
 use sp_std::{
     cmp::{Eq, PartialEq},
     fmt::Debug,
+    result,
 };
 
 /// Abstraction trait over a multiple currencies system, each currency type
@@ -68,6 +70,9 @@ pub trait Currencies<AccountId> {
     /// The 'free' balance of a given account.
     fn free_balance(currency_id: Self::CurrencyId, who: &AccountId) -> Self::Balance;
 
+    /// The total balance of a given account. This may include non `free` funds.
+    fn total_balance(currency_id: Self::CurrencyId, who: &AccountId) -> Self::Balance;
+
     /// Returns `Ok` if the account is able to make a withdrawal of the given amount.
     /// Basically, it's just a dry-run of `withdraw`.
     ///
@@ -90,4 +95,70 @@ pub trait Currencies<AccountId> {
         dest: &AccountId,
         value: Self::Balance,
     ) -> DispatchResult;
+}
+
+/// An extension of the `Currencies` trait to allow the runtime to reserve
+/// funds from the token holders.
+pub trait ReservableCurrencies<AccountId>: Currencies<AccountId> {
+    /// Same result as `reserve(who, value)` (but without the side-effects) assuming there
+    /// are no balance changes in the meantime.
+    fn can_reserve(currency_id: Self::CurrencyId, who: &AccountId, value: Self::Balance) -> bool;
+
+    /// Deducts up to `value` from reserved balance of `who`. This function cannot fail.
+    ///
+    /// As much funds up to `value` will be deducted as possible. If the reserve balance of `who`
+    /// is less than `value`, then a non-zero second item will be returned.
+    ///
+    /// This will update the total issuance of the currency.
+    fn slash_reserved(
+        currency_id: Self::CurrencyId,
+        who: &AccountId,
+        value: Self::Balance,
+    ) -> Self::Balance;
+
+    /// The amount of the balance of a given account that is externally reserved; this can still get
+    /// slashed, but gets slashed last of all.
+    ///
+    /// This balance is a 'reserve' balance that other subsystems use in order to set aside tokens
+    /// that are still 'owned' by the account holder, but which are suspendable.
+    fn reserved_balance(currency_id: Self::CurrencyId, who: &AccountId) -> Self::Balance;
+
+    /// Moves `value` from balance to reserved balance.
+    ///
+    /// If the free balance is lower than `value`, then no funds will be moved and an `Err` will
+    /// be returned to notify of this. This is different behavior than `unreserve`.
+    fn reserve(
+        currency_id: Self::CurrencyId,
+        who: &AccountId,
+        value: Self::Balance,
+    ) -> DispatchResult;
+
+    /// Moves up to `value` from reserved balance to free balance. This function cannot fail.
+    ///
+    /// As much funds up to `value` will be moved as possible. If the reserve balance of `who`
+    /// is less than `value`, then the remaining amount will be returned.
+    ///
+    /// # NOTES
+    ///
+    /// - This is different from `reserve`.
+    fn unreserve(
+        currency_id: Self::CurrencyId,
+        who: &AccountId,
+        value: Self::Balance,
+    ) -> Self::Balance;
+
+    /// Moves up to `value` from reserved balance of account `slashed` to balance of account
+    /// `beneficiary`. `beneficiary` must exist for this to succeed. If it does not, `Err` will be
+    /// returned. Funds will be placed in either the `free` balance or the `reserved` balance,
+    /// depending on the `status`.
+    ///
+    /// As much funds up to `value` will be deducted as possible. If this is less than `value`,
+    /// then `Ok(non_zero)` will be returned.
+    fn repatriate_reserved(
+        currency_id: Self::CurrencyId,
+        slashed: &AccountId,
+        beneficiary: &AccountId,
+        value: Self::Balance,
+        status: BalanceStatus,
+    ) -> result::Result<Self::Balance, DispatchError>;
 }

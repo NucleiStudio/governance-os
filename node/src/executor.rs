@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-//! A compilation of traits and helpers for implementing the Governance OS
+use sc_executor::native_executor_instance;
+pub use sc_executor::NativeExecutor;
 
-#![cfg_attr(not(feature = "std"), no_std)]
-
-pub mod currencies;
-
-pub use currencies::{Currencies, ReservableCurrencies};
+native_executor_instance!(
+    pub Executor,
+    governance_os_runtime::api::dispatch,
+    governance_os_runtime::native_version,
+    frame_benchmarking::benchmarking::HostFunctions,
+);

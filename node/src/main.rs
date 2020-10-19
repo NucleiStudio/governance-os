@@ -14,10 +14,16 @@
  * limitations under the License.
  */
 
-//! A compilation of traits and helpers for implementing the Governance OS
+//! This module contains the code to generate a binary using the governace OS
+//! runtime.
 
-#![cfg_attr(not(feature = "std"), no_std)]
+mod chain_spec;
+mod cli;
+mod command;
+mod executor;
+mod rpc;
+mod service;
 
-pub mod currencies;
-
-pub use currencies::{Currencies, ReservableCurrencies};
+fn main() -> sc_cli::Result<()> {
+    command::run()
+}
