@@ -38,6 +38,8 @@ use sp_std::cmp::{Eq, PartialEq};
 #[cfg(feature = "std")]
 use sp_std::collections::btree_map::BTreeMap;
 
+#[cfg(feature = "runtime-benchmarks")]
+mod benchmarking;
 #[cfg(test)]
 mod tests;
 
@@ -54,7 +56,7 @@ pub trait Trait: frame_system::Trait {
     type Event: From<Event<Self>> + Into<<Self as frame_system::Trait>::Event>;
 
     /// The type used to identify currencies
-    type CurrencyId: Parameter + Member + Copy + MaybeSerializeDeserialize + Ord;
+    type CurrencyId: Parameter + Member + Copy + MaybeSerializeDeserialize + Ord + Default;
 
     /// The balance of an account.
     type Balance: Parameter
