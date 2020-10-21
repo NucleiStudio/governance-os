@@ -23,6 +23,7 @@ impl governance_os_pallet_tokens::Trait for Runtime {
     type Event = Event;
     type Balance = Balance;
     type CurrencyId = CurrencyId;
+    type WeightInfo = ();
 }
 
 parameter_types! {
