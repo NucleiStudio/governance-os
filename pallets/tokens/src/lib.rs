@@ -26,6 +26,7 @@
 
 use frame_support::{
     decl_error, decl_event, decl_module, decl_storage, dispatch::DispatchResult, ensure, Parameter,
+    weights::Weight,
 };
 use frame_system::ensure_signed;
 use governance_os_support::Currencies;
@@ -45,11 +46,20 @@ mod tests;
 
 mod adapter;
 mod currencies;
+mod default_weights;
 mod details;
 mod imbalances;
 
 pub use adapter::NativeCurrencyAdapter;
 pub use details::CurrencyDetails;
+
+pub trait WeightInfo {
+    fn create() -> Weight;
+    fn mint() -> Weight;
+    fn burn() -> Weight;
+    fn update_details() -> Weight;
+    fn transfer() -> Weight;
+}
 
 pub trait Trait: frame_system::Trait {
     /// Because this pallet emits events, it depends on the runtime's definition of an event.
@@ -65,6 +75,9 @@ pub trait Trait: frame_system::Trait {
         + Default
         + Copy
         + MaybeSerializeDeserialize;
+
+    /// Weight values for this pallet
+    type WeightInfo: WeightInfo;
 }
 
 decl_storage! {
@@ -152,8 +165,8 @@ decl_module! {
         /// `issue`. This will register the caller of this dispatchable as the owner of the currency
         /// so they can issue or burn units. This will produce an error if `currency_id` is already
         /// used by another currency.
-        #[weight = 0]
-        pub fn create(origin, currency_id: T::CurrencyId) -> DispatchResult {
+        #[weight = T::WeightInfo::create()]
+        pub fn create(origin, currency_id: T::CurrencyId) {
             let who = ensure_signed(origin)?;
 
             ensure!(!Details::<T>::contains_key(currency_id), Error::<T>::CurrencyAlreadyExists);
@@ -164,53 +177,48 @@ decl_module! {
             Details::<T>::mutate(currency_id, |det| *det = details.clone());
 
             Self::deposit_event(RawEvent::CurrencyCreated(currency_id, details));
-            Ok(())
         }
 
         /// Issue some units of the currency identified by `currency_id` and credit them to `dest`.
         /// Can only be called by the owner of the currency.
-        #[weight = 0]
-        pub fn mint(origin, currency_id: T::CurrencyId, dest: <T::Lookup as StaticLookup>::Source, amount: T::Balance) -> DispatchResult {
+        #[weight = T::WeightInfo::mint()]
+        pub fn mint(origin, currency_id: T::CurrencyId, dest: <T::Lookup as StaticLookup>::Source, amount: T::Balance) {
             Self::ensure_owner_of_currency(origin, currency_id)?;
             let to = T::Lookup::lookup(dest)?;
             <Self as Currencies<T::AccountId>>::mint(currency_id, &to, amount)?;
 
             Self::deposit_event(RawEvent::CurrencyMinted(currency_id, to, amount));
-            Ok(())
         }
 
         /// Destroy some units of the currency identified by `currency_id` from `from`.
         /// Can only be called by the owner of the currency.
-        #[weight = 0]
-        pub fn burn(origin, currency_id: T::CurrencyId, from: <T::Lookup as StaticLookup>::Source, amount: T::Balance) -> DispatchResult {
+        #[weight = T::WeightInfo::burn()]
+        pub fn burn(origin, currency_id: T::CurrencyId, from: <T::Lookup as StaticLookup>::Source, amount: T::Balance) {
             Self::ensure_owner_of_currency(origin, currency_id)?;
             let source = T::Lookup::lookup(from)?;
             <Self as Currencies<T::AccountId>>::burn(currency_id, &source, amount)?;
 
             Self::deposit_event(RawEvent::CurrencyBurned(currency_id, source, amount));
-            Ok(())
         }
 
         /// Update details about the currency identified by `currency_id`. For instance, this
         /// can be used to change the owner of the currency. Can only be called by the owner.
-        #[weight = 0]
-        pub fn update_details(origin, currency_id: T::CurrencyId, details: CurrencyDetails<T::AccountId>) -> DispatchResult {
+        #[weight = T::WeightInfo::update_details()]
+        pub fn update_details(origin, currency_id: T::CurrencyId, details: CurrencyDetails<T::AccountId>) {
             Self::ensure_owner_of_currency(origin, currency_id)?;
             <Details<T>>::mutate(currency_id, |det| *det = details.clone());
 
             Self::deposit_event(RawEvent::CurrencyDetailsChanged(currency_id, details));
-            Ok(())
         }
 
         /// Transfer `amount` units of the currency identified by `currency_id` from the origin's
         /// account to the balance of `dest`.
-        #[weight = 0]
-        pub fn transfer(origin, currency_id: T::CurrencyId, dest: <T::Lookup as StaticLookup>::Source, amount: T::Balance) -> DispatchResult {
+        #[weight = T::WeightInfo::transfer()]
+        pub fn transfer(origin, currency_id: T::CurrencyId, dest: <T::Lookup as StaticLookup>::Source, amount: T::Balance) {
             let from = ensure_signed(origin)?;
             let to = T::Lookup::lookup(dest)?;
 
             <Self as Currencies<T::AccountId>>::transfer(currency_id, &from, &to, amount)?;
-            Ok(())
         }
     }
 }

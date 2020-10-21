@@ -74,6 +74,7 @@ impl Trait for Test {
     type Event = ();
     type CurrencyId = CurrencyId;
     type Balance = Balance;
+    type WeightInfo = ();
 }
 
 parameter_types! {
