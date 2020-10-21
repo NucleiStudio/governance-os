@@ -25,8 +25,8 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use frame_support::{
-    decl_error, decl_event, decl_module, decl_storage, dispatch::DispatchResult, ensure, Parameter,
-    weights::Weight,
+    decl_error, decl_event, decl_module, decl_storage, dispatch::DispatchResult, ensure,
+    weights::Weight, Parameter,
 };
 use frame_system::ensure_signed;
 use governance_os_support::Currencies;
