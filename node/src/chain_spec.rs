@@ -150,3 +150,28 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
         None,
     ))
 }
+
+/// The dummy chain spec is a chain with no balances, currencies or dOrgs. It is
+/// mostly used for benchmarking purposes.
+pub fn dummy_config() -> Result<ChainSpec, String> {
+    let wasm_binary = WASM_BINARY.ok_or("Development wasm binary not available".to_string())?;
+
+    Ok(ChainSpec::from_genesis(
+        "Dummy",
+        "dummy",
+        ChainType::Custom("dummy".to_string()),
+        move || {
+            testnet_genesis(
+                wasm_binary,
+                vec![authority_keys_from_seed("Alice")],
+                vec![],
+                Some(vec![]),
+            )
+        },
+        vec![],
+        None,
+        None,
+        None,
+        None,
+    ))
+}
