@@ -17,8 +17,8 @@
 use governance_os_pallet_tokens::CurrencyDetails;
 use governance_os_primitives::{AccountId, CurrencyId, Signature};
 use governance_os_runtime::{
-    AuraConfig, AuraId, GenesisConfig, GrandpaConfig, GrandpaId, IndicesConfig, NativeCurrencyId,
-    SystemConfig, TokensConfig, WASM_BINARY,
+    AuraConfig, AuraId, GenesisConfig, GrandpaConfig, GrandpaId, NativeCurrencyId, SystemConfig,
+    TokensConfig, WASM_BINARY,
 };
 use sc_service::ChainType;
 use sp_core::{sr25519, Pair, Public};
@@ -78,7 +78,6 @@ fn testnet_genesis(
                 .map(|x| (x.1.clone(), 1))
                 .collect(),
         }),
-        pallet_indices: Some(IndicesConfig { indices: vec![] }),
         governance_os_pallet_tokens: Some(TokensConfig {
             endowed_accounts: endowed_accounts
                 .iter()

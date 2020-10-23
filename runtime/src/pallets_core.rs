@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 
-use crate::{
-    constants::currency::DOLLARS, Call, Event, Indices, NativeCurrency, Origin, PalletInfo,
-    Runtime, VERSION,
-};
+use crate::{Call, Event, Origin, PalletInfo, Runtime, VERSION};
 use frame_support::{
     parameter_types,
     weights::{
@@ -25,10 +22,10 @@ use frame_support::{
         Weight,
     },
 };
-use governance_os_primitives::{AccountId, AccountIndex, Balance, BlockNumber, Hash, Index};
+use governance_os_primitives::{AccountId, Balance, BlockNumber, Hash, Index};
 use sp_runtime::{
     generic,
-    traits::{BlakeTwo256, Saturating},
+    traits::{BlakeTwo256, IdentityLookup, Saturating},
     Perbill,
 };
 use sp_version::RuntimeVersion;
@@ -60,7 +57,7 @@ impl frame_system::Trait for Runtime {
     type Hash = Hash;
     type Hashing = BlakeTwo256;
     type AccountId = AccountId;
-    type Lookup = Indices;
+    type Lookup = IdentityLookup<AccountId>;
     type Header = generic::Header<BlockNumber, BlakeTwo256>;
     type Event = Event;
     type BlockHashCount = BlockHashCount;
@@ -77,16 +74,4 @@ impl frame_system::Trait for Runtime {
     type OnNewAccount = ();
     type OnKilledAccount = ();
     type SystemWeightInfo = ();
-}
-
-parameter_types! {
-    pub const IndexDeposit: Balance = 1 * DOLLARS;
-}
-
-impl pallet_indices::Trait for Runtime {
-    type AccountIndex = AccountIndex;
-    type Currency = NativeCurrency;
-    type Deposit = IndexDeposit;
-    type Event = Event;
-    type WeightInfo = ();
 }
