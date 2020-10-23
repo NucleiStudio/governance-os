@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-use crate::{Call, Event, Origin, PalletInfo, Runtime, VERSION};
+use crate::{weights, Call, Event, Origin, PalletInfo, Runtime, VERSION};
 use frame_support::{
     parameter_types,
     weights::{
@@ -73,5 +73,5 @@ impl frame_system::Trait for Runtime {
     type AccountData = governance_os_pallet_tokens::AccountData<CurrencyId, Balance>;
     type OnNewAccount = ();
     type OnKilledAccount = ();
-    type SystemWeightInfo = ();
+    type SystemWeightInfo = weights::frame_system::WeightInfo;
 }

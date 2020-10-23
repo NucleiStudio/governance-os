@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-use crate::{constants::time, Aura, Call, Event, Grandpa, Runtime};
+use crate::{constants::time, weights, Aura, Call, Event, Grandpa, Runtime};
 use frame_support::{parameter_types, traits::KeyOwnerProofSystem};
 use governance_os_primitives::Moment;
 pub use pallet_grandpa::AuthorityId as GrandpaId;
@@ -45,7 +45,7 @@ impl pallet_grandpa::Trait for Runtime {
         GrandpaId,
     )>>::IdentificationTuple;
     type HandleEquivocation = ();
-    type WeightInfo = ();
+    type WeightInfo = weights::pallet_grandpa::WeightInfo;
 }
 
 parameter_types! {
@@ -57,5 +57,5 @@ impl pallet_timestamp::Trait for Runtime {
     type Moment = Moment;
     type OnTimestampSet = Aura;
     type MinimumPeriod = MinimumPeriod;
-    type WeightInfo = ();
+    type WeightInfo = weights::pallet_timestamp::WeightInfo;
 }
