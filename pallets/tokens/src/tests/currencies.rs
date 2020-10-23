@@ -39,6 +39,24 @@ fn transfer_should_work() {
 }
 
 #[test]
+fn transfer_to_self_is_noop() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            assert_ok!(<Tokens as Currencies<AccountId>>::transfer(
+                TEST_TOKEN_ID,
+                &ALICE,
+                &ALICE,
+                50
+            ));
+            assert_eq!(Tokens::free_balance(TEST_TOKEN_ID, &ALICE), 100);
+            assert_eq!(Tokens::free_balance(TEST_TOKEN_ID, &BOB), 100);
+            assert_eq!(Tokens::total_issuance(TEST_TOKEN_ID), 200);
+        })
+}
+
+#[test]
 fn mint_should_work() {
     ExtBuilder::default().build().execute_with(|| {
         assert_ok!(<Tokens as Currencies<AccountId>>::mint(

@@ -99,15 +99,20 @@ impl<T: Trait> Currencies<T::AccountId> for Module<T> {
     ) -> DispatchResult {
         Self::ensure_can_withdraw(currency_id, source, amount)?;
 
-        let source_new_balance = Self::free_balance(currency_id, source)
-            .checked_sub(&amount)
-            .ok_or(Error::<T>::BalanceTooLow)?;
-        let dest_new_balance = Self::free_balance(currency_id, dest)
-            .checked_add(&amount)
-            .ok_or(Error::<T>::BalanceOverflow)?;
-
-        Self::set_free_balance(currency_id, source, source_new_balance);
-        Self::set_free_balance(currency_id, dest, dest_new_balance);
+        Self::set_free_balance(
+            currency_id,
+            source,
+            Self::free_balance(currency_id, source)
+                .checked_sub(&amount)
+                .ok_or(Error::<T>::BalanceTooLow)?,
+        );
+        Self::set_free_balance(
+            currency_id,
+            dest,
+            Self::free_balance(currency_id, dest)
+                .checked_add(&amount)
+                .ok_or(Error::<T>::BalanceOverflow)?,
+        );
 
         Self::deposit_event(RawEvent::CurrencyTransferred(
             currency_id,
