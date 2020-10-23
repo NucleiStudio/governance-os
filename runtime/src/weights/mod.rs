@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-pub mod adapter;
-pub mod currencies;
-pub mod dispatchable;
-pub mod genesis;
-pub mod misc;
-pub mod mock;
+pub mod frame_system;
+pub mod pallet_grandpa;
+pub mod pallet_timestamp;

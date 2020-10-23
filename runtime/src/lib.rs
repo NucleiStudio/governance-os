@@ -35,7 +35,7 @@ use sp_api::impl_runtime_apis;
 use sp_core::{crypto::KeyTypeId, OpaqueMetadata};
 use sp_runtime::{
     generic,
-    traits::{BlakeTwo256, Block as BlockT, NumberFor, StaticLookup},
+    traits::{BlakeTwo256, Block as BlockT, NumberFor},
     transaction_validity::{TransactionSource, TransactionValidity},
     ApplyExtrinsicResult,
 };
@@ -47,6 +47,7 @@ mod pallets_consensus;
 mod pallets_core;
 mod pallets_economics;
 mod version;
+mod weights;
 
 pub use pallets_consensus::{AuraId, GrandpaId, SessionKeys};
 pub use pallets_economics::{NativeCurrency, NativeCurrencyId};
@@ -63,7 +64,6 @@ construct_runtime!(
     {
         // Core
         System: frame_system::{Module, Call, Config, Storage, Event<T>},
-        Indices: pallet_indices::{Module, Call, Storage, Config<T>, Event<T>},
         RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Module, Call, Storage},
 
         // Consensus
@@ -78,7 +78,7 @@ construct_runtime!(
 );
 
 /// The address format for describing accounts.
-pub type Address = <Indices as StaticLookup>::Source;
+pub type Address = AccountId;
 /// Block header type as expected by this runtime.
 pub type Header = generic::Header<BlockNumber, BlakeTwo256>;
 /// Block type as expected by this runtime.
@@ -246,7 +246,7 @@ impl_runtime_apis! {
 
             add_benchmark!(params, batches, frame_system, SystemBench::<Runtime>);
             add_benchmark!(params, batches, governance_os_pallet_tokens, Tokens);
-            add_benchmark!(params, batches, pallet_indices, Indices);
+            add_benchmark!(params, batches, pallet_grandpa, Grandpa);
             add_benchmark!(params, batches, pallet_timestamp, Timestamp);
 
             if batches.is_empty() { return Err("Benchmark not found for this pallet.".into()) }

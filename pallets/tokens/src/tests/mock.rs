@@ -64,7 +64,7 @@ impl system::Trait for Test {
     type AvailableBlockRatio = AvailableBlockRatio;
     type Version = ();
     type PalletInfo = ();
-    type AccountData = ();
+    type AccountData = crate::AccountData<CurrencyId, Balance>;
     type OnNewAccount = ();
     type OnKilledAccount = ();
     type SystemWeightInfo = ();
@@ -75,6 +75,7 @@ impl Trait for Test {
     type CurrencyId = CurrencyId;
     type Balance = Balance;
     type WeightInfo = ();
+    type AccountStore = System;
 }
 
 parameter_types! {

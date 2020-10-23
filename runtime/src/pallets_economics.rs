@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-use crate::{Event, Runtime};
+use crate::{Event, Runtime, System};
 use frame_support::{parameter_types, weights::IdentityFee};
 use governance_os_pallet_tokens::NativeCurrencyAdapter;
 use governance_os_primitives::{Balance, CurrencyId};
@@ -24,6 +24,7 @@ impl governance_os_pallet_tokens::Trait for Runtime {
     type Balance = Balance;
     type CurrencyId = CurrencyId;
     type WeightInfo = ();
+    type AccountStore = System;
 }
 
 parameter_types! {

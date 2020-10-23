@@ -202,7 +202,7 @@ where
         amount: Self::Balance,
     ) -> (Self::NegativeImbalance, Self::Balance) {
         let mut slashed = amount;
-        <Balances<Pallet>>::mutate(who, GetCurrencyId::get(), |data| {
+        Module::<Pallet>::mutate_currency_account(GetCurrencyId::get(), who, |data| {
             slashed = data.reserved.min(amount);
             // Slashed will be at most equal to data.reserved, no underflow
             data.reserved -= slashed;
