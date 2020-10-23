@@ -245,6 +245,7 @@ impl_runtime_apis! {
 
             add_benchmark!(params, batches, frame_system, SystemBench::<Runtime>);
             add_benchmark!(params, batches, governance_os_pallet_tokens, Tokens);
+            add_benchmark!(params, batches, pallet_grandpa, Grandpa);
             add_benchmark!(params, batches, pallet_timestamp, Timestamp);
 
             if batches.is_empty() { return Err("Benchmark not found for this pallet.".into()) }
