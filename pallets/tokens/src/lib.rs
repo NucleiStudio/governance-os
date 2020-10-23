@@ -242,18 +242,26 @@ impl<T: Trait> Module<T> {
         Ok(())
     }
 
-    /// Low Level call. Mutate a `who`'s `AccountCurrencyData` for `currency_id`.
+    /// Low Level call. Mutate a `who`'s `AccountCurrencyData` for `currency_id`. If a balance is set to 0
+    /// or `who` no longers holds any currencies storage will be cleaned accordingly.
     fn mutate_currency_account<R>(
         currency_id: T::CurrencyId,
         who: &T::AccountId,
         f: impl FnOnce(&mut AccountCurrencyData<T::Balance>) -> R,
     ) -> R {
-        T::AccountStore::mutate(who, |account_data| {
+        T::AccountStore::mutate_exists(who, |maybe_account_data| {
+            let mut account_data = maybe_account_data.take().unwrap_or_default();
             let mut currency_data = account_data.entry(currency_id).or_default();
             let result = f(&mut currency_data);
 
             if currency_data.total() == Zero::zero() {
                 drop(account_data.remove(&currency_id));
+            }
+
+            if account_data.is_empty() {
+                *maybe_account_data = None;
+            } else {
+                *maybe_account_data = Some(account_data);
             }
 
             result

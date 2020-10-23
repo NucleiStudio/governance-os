@@ -42,3 +42,23 @@ fn kill_currency_if_balance_down_to_zero() {
             );
         })
 }
+
+#[test]
+fn kill_account_if_all_balances_down_to_zero() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            assert_ok!(<Tokens as Currencies<AccountId>>::transfer(
+                TEST_TOKEN_ID,
+                &ALICE,
+                &BOB,
+                Tokens::free_balance(TEST_TOKEN_ID, &ALICE),
+            ));
+
+            // We can still view the balance(s)
+            assert_eq!(Tokens::free_balance(TEST_TOKEN_ID, &ALICE), 0);
+            // Deleted the entry
+            assert_eq!(<Account<Test>>::contains_key(&ALICE), false);
+        })
+}
