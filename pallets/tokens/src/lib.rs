@@ -31,7 +31,7 @@ use frame_support::{
 use frame_system::ensure_signed;
 use governance_os_support::Currencies;
 use sp_runtime::traits::{
-    AtLeast32BitUnsigned, CheckedAdd, MaybeSerializeDeserialize, Member, StaticLookup,
+    AtLeast32BitUnsigned, CheckedAdd, MaybeSerializeDeserialize, Member, StaticLookup, Zero,
 };
 use sp_std::cmp::{Eq, PartialEq};
 
@@ -243,15 +243,21 @@ impl<T: Trait> Module<T> {
     }
 
     /// Low Level call. Mutate a `who`'s `AccountCurrencyData` for `currency_id`.
-    fn mutate_currency_account(
+    fn mutate_currency_account<R>(
         currency_id: T::CurrencyId,
         who: &T::AccountId,
-        f: impl FnOnce(&mut AccountCurrencyData<T::Balance>),
-    ) {
+        f: impl FnOnce(&mut AccountCurrencyData<T::Balance>) -> R,
+    ) -> R {
         T::AccountStore::mutate(who, |account_data| {
             let mut currency_data = account_data.entry(currency_id).or_default();
-            f(&mut currency_data)
-        });
+            let result = f(&mut currency_data);
+
+            if currency_data.total() == Zero::zero() {
+                drop(account_data.remove(&currency_id));
+            }
+
+            result
+        })
     }
 
     /// Return the `AccountCurrencyData` for the `who` and `currency_id`.
@@ -260,8 +266,8 @@ impl<T: Trait> Module<T> {
         who: &T::AccountId,
     ) -> AccountCurrencyData<T::Balance> {
         T::AccountStore::get(who)
-            .get(&currency_id)
-            .unwrap_or(&AccountCurrencyData::default())
+            .entry(currency_id)
+            .or_default()
             .clone()
     }
 }

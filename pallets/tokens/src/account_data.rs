@@ -15,7 +15,7 @@
  */
 
 use codec::{Decode, Encode};
-use sp_runtime::RuntimeDebug;
+use sp_runtime::{traits::Saturating, RuntimeDebug};
 use sp_std::collections::btree_map::BTreeMap;
 
 /// All balance information for an account and an associated currency.
@@ -34,6 +34,12 @@ pub struct AccountCurrencyData<Balance> {
     /// This balance is a 'reserve' balance that other subsystems use in order to set aside tokens
     /// that are still 'owned' by the account holder, but which are suspendable.
     pub reserved: Balance,
+}
+impl<Balance: Saturating + Copy> AccountCurrencyData<Balance> {
+    /// Computes and return the total balance, including reserved funds.
+    pub fn total(&self) -> Balance {
+        self.free.saturating_add(self.reserved)
+    }
 }
 
 /// All balance and currency informations for an account.
