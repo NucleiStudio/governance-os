@@ -26,11 +26,10 @@
 
 use frame_support::{
     decl_error, decl_event, decl_module, decl_storage, dispatch::DispatchResult, ensure,
-    weights::Weight, Parameter,
+    traits::StoredMap, weights::Weight, Parameter,
 };
 use frame_system::ensure_signed;
 use governance_os_support::Currencies;
-pub use pallet_balances::AccountData;
 use sp_runtime::traits::{
     AtLeast32BitUnsigned, CheckedAdd, MaybeSerializeDeserialize, Member, StaticLookup,
 };
@@ -44,12 +43,14 @@ mod benchmarking;
 #[cfg(test)]
 mod tests;
 
+mod account_data;
 mod adapter;
 mod currencies;
 mod default_weights;
 mod details;
 mod imbalances;
 
+pub use account_data::{AccountCurrencyData, AccountData};
 pub use adapter::NativeCurrencyAdapter;
 pub use details::CurrencyDetails;
 
@@ -76,6 +77,9 @@ pub trait Trait: frame_system::Trait {
         + Copy
         + MaybeSerializeDeserialize;
 
+    /// The means of storing the balances of an account.
+    type AccountStore: StoredMap<Self::AccountId, AccountData<Self::CurrencyId, Self::Balance>>;
+
     /// Weight values for this pallet
     type WeightInfo: WeightInfo;
 }
@@ -98,19 +102,16 @@ decl_storage! {
                 .into_iter()
                 .collect::<Vec<_>>()
         }): map hasher(blake2_128_concat) T::CurrencyId => T::Balance;
-        pub Balances get(fn balances): double_map hasher(blake2_128_concat) T::AccountId, hasher(blake2_128_concat) T::CurrencyId => AccountData<T::Balance>;
-        pub Details get(fn details): map hasher(blake2_128_concat) T::CurrencyId => CurrencyDetails<T::AccountId>;
+        pub Details get(fn details) build(|config: &GenesisConfig<T>| {
+            config.currency_details.clone()
+        }): map hasher(blake2_128_concat) T::CurrencyId => CurrencyDetails<T::AccountId>;
     }
     add_extra_genesis {
         config(endowed_accounts): Vec<(T::CurrencyId, T::AccountId, T::Balance)>;
         config(currency_details): Vec<(T::CurrencyId, CurrencyDetails<T::AccountId>)>;
         build(|config: &GenesisConfig<T>| {
             config.endowed_accounts.iter().for_each(|(currency_id, account_id, initial_balance)| {
-                <Balances<T>>::mutate(account_id, currency_id, |account_data| account_data.free = *initial_balance)
-            });
-
-            config.currency_details.iter().for_each(|(currency_id, details)| {
-                <Details<T>>::mutate(currency_id, |det| *det = details.clone())
+                Module::<T>::set_free_balance(*currency_id, account_id, *initial_balance);
             });
         })
     }
@@ -227,7 +228,7 @@ impl<T: Trait> Module<T> {
     /// Set the free balance of `who` in `currency_id`. You are supposed to update the total
     /// issuance yourself.
     fn set_free_balance(currency_id: T::CurrencyId, who: &T::AccountId, balance: T::Balance) {
-        <Balances<T>>::mutate(who, currency_id, |account_data| account_data.free = balance);
+        Self::mutate_currency_account(currency_id, who, |data| data.free = balance);
     }
 
     /// Make sure that `origin` is the owner of  `currency_id`.
@@ -239,5 +240,28 @@ impl<T: Trait> Module<T> {
         );
 
         Ok(())
+    }
+
+    /// Low Level call. Mutate a `who`'s `AccountCurrencyData` for `currency_id`.
+    fn mutate_currency_account(
+        currency_id: T::CurrencyId,
+        who: &T::AccountId,
+        f: impl FnOnce(&mut AccountCurrencyData<T::Balance>),
+    ) {
+        T::AccountStore::mutate(who, |account_data| {
+            let mut currency_data = account_data.entry(currency_id).or_default();
+            f(&mut currency_data)
+        });
+    }
+
+    /// Return the `AccountCurrencyData` for the `who` and `currency_id`.
+    fn get_currency_account(
+        currency_id: T::CurrencyId,
+        who: &T::AccountId,
+    ) -> AccountCurrencyData<T::Balance> {
+        T::AccountStore::get(who)
+            .get(&currency_id)
+            .unwrap_or(&AccountCurrencyData::default())
+            .clone()
     }
 }
