@@ -25,8 +25,23 @@ pub enum Bylaw<T: Trait> {
     Allow,
     /// Refuse the extrinsic.
     Deny,
+    /// Combine the parameters via an AND logic operation.
+    And(Box<Bylaw<T>>, Box<Bylaw<T>>),
+    /// Combine the parameters via an OR logic operation.
+    Or(Box<Bylaw<T>>, Box<Bylaw<T>>),
+    /// Combine the parameters via an XOR logic operation.
+    Xor(Box<Bylaw<T>>, Box<Bylaw<T>>),
+    /// Invert the result of its parameter.
+    Not(Box<Bylaw<T>>),
 
+    /// To be delted. Do not use.
     Mock(T::AccountId),
+}
+
+macro_rules! impl_logic_gate {
+    ($left:ident, $right: ident, $op:tt, $who:expr, $call:expr, $info:expr, $len:expr) => {
+        $left.validate($who, $call, $info, $len) $op $right.validate($who, $call, $info, $len)
+    };
 }
 
 impl<T: Trait> Rule for Bylaw<T> {
@@ -35,16 +50,20 @@ impl<T: Trait> Rule for Bylaw<T> {
 
     fn validate(
         &self,
-        _who: &Self::AccountId,
-        _call: &Self::Call,
-        _info: &DispatchInfoOf<Self::Call>,
-        _len: usize,
+        who: &Self::AccountId,
+        call: &Self::Call,
+        info: &DispatchInfoOf<Self::Call>,
+        len: usize,
     ) -> bool {
         use Bylaw::*;
 
         match self {
             Allow => true,
             Deny => false,
+            And(left, right) => impl_logic_gate!(left, right, &, who, call, info, len),
+            Or(left, right) => impl_logic_gate!(left, right, |, who, call, info, len),
+            Xor(left, right) => impl_logic_gate!(left, right, ^, who, call, info, len),
+            Not(bylaw) => !bylaw.validate(who, call, info, len),
             _ => todo!(),
         }
     }

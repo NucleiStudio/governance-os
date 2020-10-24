@@ -34,5 +34,61 @@ macro_rules! test_bylaw {
     };
 }
 
-test_bylaw!(deny, Deny, false);
+macro_rules! bylaw_truth {
+    ($variant:ident, $operand:tt, $left_op:expr, $right_op:expr, $left_result:expr, $right_result:expr) => {
+        let bylaw: Bylaw<Test> = $variant($left_op, $right_op);
+        let call = Call::System(frame_system::Call::remark(vec![]));
+        assert_eq!(
+            bylaw.validate(&ALICE, &call, &call.get_dispatch_info(), 0),
+            $left_result $operand $right_result
+        );
+    };
+}
+
+macro_rules! test_bylaw_truth_table {
+    ($test_name:ident, $variant:ident, $operand:tt) => {
+        #[test]
+        fn $test_name() {
+            bylaw_truth!(
+                $variant,
+                $operand,
+                Box::new(Allow),
+                Box::new(Allow),
+                true,
+                true
+            );
+            bylaw_truth!(
+                $variant,
+                $operand,
+                Box::new(Allow),
+                Box::new(Deny),
+                true,
+                false
+            );
+            bylaw_truth!(
+                $variant,
+                $operand,
+                Box::new(Deny),
+                Box::new(Allow),
+                false,
+                true
+            );
+            bylaw_truth!(
+                $variant,
+                $operand,
+                Box::new(Deny),
+                Box::new(Deny),
+                false,
+                false
+            );
+        }
+    };
+}
+
 test_bylaw!(allow, Allow, true);
+test_bylaw!(deny, Deny, false);
+test_bylaw_truth_table!(and, And, &);
+test_bylaw_truth_table!(or, Or, |);
+test_bylaw_truth_table!(xor, Xor, ^);
+test_bylaw!(not_true, Not(Box::new(Allow)), false);
+test_bylaw!(not_false, Not(Box::new(Deny)), true);
