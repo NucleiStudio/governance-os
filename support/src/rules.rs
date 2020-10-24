@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-//! A compilation of traits and helpers for implementing the Governance OS
+use sp_runtime::traits::{DispatchInfoOf, Dispatchable};
 
-#![cfg_attr(not(feature = "std"), no_std)]
+/// A common trait that can be implemented to filter calls.
+pub trait Rule {
+    type AccountId;
+    type Call: Dispatchable;
 
-#[cfg(feature = "runtime-benchmarks")]
-pub mod benchmarking;
-pub mod currencies;
-pub mod rules;
-pub mod testing;
-
-pub use currencies::{Currencies, ReservableCurrencies};
+    fn validate(
+        &self,
+        who: &Self::AccountId,
+        call: &Self::Call,
+        info: &DispatchInfoOf<Self::Call>,
+        len: usize,
+    ) -> bool;
+}

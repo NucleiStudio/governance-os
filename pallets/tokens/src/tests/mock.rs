@@ -15,34 +15,29 @@
  */
 
 use crate::{CurrencyDetails, GenesisConfig, Module, NativeCurrencyAdapter, Trait};
-use frame_support::{impl_outer_origin, parameter_types, weights::Weight};
-use frame_system as system;
-pub use governance_os_support::{Currencies, ReservableCurrencies};
+use frame_support::{impl_outer_origin, parameter_types};
+pub use governance_os_support::{
+    testing::{
+        primitives::{AccountId, Balance, CurrencyId},
+        AvailableBlockRatio, BlockHashCount, MaximumBlockLength, MaximumBlockWeight, ALICE, BOB,
+        TEST_TOKEN_ID, TEST_TOKEN_OWNER,
+    },
+    Currencies, ReservableCurrencies,
+};
 use sp_core::H256;
 use sp_runtime::{
     testing::Header,
     traits::{BlakeTwo256, IdentityLookup},
-    Perbill,
 };
 
 impl_outer_origin! {
     pub enum Origin for Test {}
 }
 
-pub type AccountId = u64;
-pub type Balance = u64;
-pub type CurrencyId = u8;
-
 #[derive(Clone, Eq, PartialEq)]
 pub struct Test;
-parameter_types! {
-    pub const BlockHashCount: u64 = 250;
-    pub const MaximumBlockWeight: Weight = 1024;
-    pub const MaximumBlockLength: u32 = 2 * 1024;
-    pub const AvailableBlockRatio: Perbill = Perbill::from_percent(75);
-}
 
-impl system::Trait for Test {
+impl frame_system::Trait for Test {
     type BaseCallFilter = ();
     type Origin = Origin;
     type Call = ();
@@ -85,11 +80,6 @@ parameter_types! {
 pub type System = frame_system::Module<Test>;
 pub type Tokens = Module<Test>;
 pub type TokensCurrencyAdapter = NativeCurrencyAdapter<Test, GetTestTokenId>;
-
-pub const ALICE: AccountId = 1;
-pub const BOB: AccountId = 2;
-pub const TEST_TOKEN_ID: CurrencyId = 3;
-pub const TEST_TOKEN_OWNER: AccountId = 4;
 
 pub struct ExtBuilder {
     endowed_accounts: Vec<(CurrencyId, AccountId, Balance)>,
