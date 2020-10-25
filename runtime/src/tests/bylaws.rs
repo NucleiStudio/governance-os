@@ -14,20 +14,24 @@
  * limitations under the License.
  */
 
-use super::mock::*;
-use crate::Bylaw::{self, *};
+use crate::{
+    Bylaw::{self, *},
+    Call,
+};
 use frame_support::weights::GetDispatchInfo;
+use governance_os_primitives::AccountId;
 use governance_os_support::rules::Rule;
-use governance_os_support::testing::ALICE;
+use sp_runtime::{traits::AccountIdConversion, ModuleId};
 
 macro_rules! test_bylaw {
     ($test_name:ident, $variant:expr, $result:expr) => {
         #[test]
         fn $test_name() {
-            let bylaw: Bylaw<Test> = $variant;
+            let alice: AccountId = ModuleId(*b"tt/bylaw").into_account();
+            let bylaw: Bylaw = $variant;
             let call = Call::System(frame_system::Call::remark(vec![]));
             assert_eq!(
-                bylaw.validate(&ALICE, &call, &call.get_dispatch_info(), 0),
+                bylaw.validate(&alice, &call, &call.get_dispatch_info(), 0),
                 $result
             );
         }
@@ -36,10 +40,11 @@ macro_rules! test_bylaw {
 
 macro_rules! bylaw_truth {
     ($variant:ident, $operand:tt, $left_op:expr, $right_op:expr, $left_result:expr, $right_result:expr) => {
-        let bylaw: Bylaw<Test> = $variant($left_op, $right_op);
+        let alice: AccountId = ModuleId(*b"tt/bylaw").into_account();
+        let bylaw: Bylaw = $variant($left_op, $right_op);
         let call = Call::System(frame_system::Call::remark(vec![]));
         assert_eq!(
-            bylaw.validate(&ALICE, &call, &call.get_dispatch_info(), 0),
+            bylaw.validate(&alice, &call, &call.get_dispatch_info(), 0),
             $left_result $operand $right_result
         );
     };

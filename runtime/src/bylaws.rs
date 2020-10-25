@@ -14,29 +14,32 @@
  * limitations under the License.
  */
 
-use crate::Trait;
+use crate::Call;
+use codec::{Decode, Encode};
+use governance_os_primitives::AccountId;
 use governance_os_support::rules::Rule;
-use sp_runtime::traits::DispatchInfoOf;
+#[cfg(feature = "std")]
+use serde::{Deserialize, Serialize};
+use sp_runtime::{traits::DispatchInfoOf, RuntimeDebug};
 use sp_std::boxed::Box;
 
 /// We use the enum to create a Domain Specific Language used to decide
 /// wether an extrinsic should be accepted or not.
-pub enum Bylaw<T: Trait> {
+#[derive(Encode, Decode, RuntimeDebug, Clone, Eq, PartialEq)]
+#[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
+pub enum Bylaw {
     /// Allows the extrinsic to go through, no other questions asked.
     Allow,
     /// Refuse the extrinsic.
     Deny,
     /// Combine the parameters via an AND logic operation.
-    And(Box<Bylaw<T>>, Box<Bylaw<T>>),
+    And(Box<Bylaw>, Box<Bylaw>),
     /// Combine the parameters via an OR logic operation.
-    Or(Box<Bylaw<T>>, Box<Bylaw<T>>),
+    Or(Box<Bylaw>, Box<Bylaw>),
     /// Combine the parameters via an XOR logic operation.
-    Xor(Box<Bylaw<T>>, Box<Bylaw<T>>),
+    Xor(Box<Bylaw>, Box<Bylaw>),
     /// Invert the result of its parameter.
-    Not(Box<Bylaw<T>>),
-
-    /// To be delted. Do not use.
-    Mock(T::AccountId),
+    Not(Box<Bylaw>),
 }
 
 macro_rules! impl_logic_gate {
@@ -45,15 +48,12 @@ macro_rules! impl_logic_gate {
     };
 }
 
-impl<T: Trait> Rule for Bylaw<T> {
-    type AccountId = T::AccountId;
-    type Call = T::Call;
-
+impl Rule<AccountId, Call> for Bylaw {
     fn validate(
         &self,
-        who: &Self::AccountId,
-        call: &Self::Call,
-        info: &DispatchInfoOf<Self::Call>,
+        who: &AccountId,
+        call: &Call,
+        info: &DispatchInfoOf<Call>,
         len: usize,
     ) -> bool {
         use Bylaw::*;
@@ -65,7 +65,6 @@ impl<T: Trait> Rule for Bylaw<T> {
             Or(left, right) => impl_logic_gate!(left, right, |, who, call, info, len),
             Xor(left, right) => impl_logic_gate!(left, right, ^, who, call, info, len),
             Not(bylaw) => !bylaw.validate(who, call, info, len),
-            _ => todo!(),
         }
     }
 }

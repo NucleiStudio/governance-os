@@ -28,15 +28,13 @@
 
 use frame_support::{decl_error, decl_event, decl_module, decl_storage, traits::Get, Parameter};
 use frame_system::ensure_signed;
-use governance_os_support::rules::CallTagger;
+use governance_os_support::rules::{CallTagger, Rule};
 use sp_runtime::traits::{MaybeSerializeDeserialize, Member};
 
-pub mod bylaw;
 mod signed_extra;
 #[cfg(test)]
 mod tests;
 
-pub use bylaw::Bylaw;
 pub use signed_extra::CheckBylaws;
 
 pub trait Trait: frame_system::Trait {
@@ -46,9 +44,11 @@ pub trait Trait: frame_system::Trait {
     type Tag: Parameter + Member + Copy + MaybeSerializeDeserialize;
     /// An object to link incoming calls to tags.
     type Tagger: CallTagger<Self::AccountId, Self::Call, Self::Tag>;
+    /// How bylaws are represented inside the system.
+    type Bylaw: Parameter + Member + MaybeSerializeDeserialize + Rule<Self::AccountId, Self::Call>;
     /// The default bylaw to apply to calls without a bylaw already, typically this would be
     /// `Allow` for public networks and `Deny` for permissioned networks.
-    type DefaultBylaw: Get<Bylaw<Self>>;
+    type DefaultBylaw: Get<Self::Bylaw>;
 }
 
 decl_storage! {

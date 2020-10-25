@@ -14,5 +14,4 @@
  * limitations under the License.
  */
 
-pub mod mock;
-pub mod signed_extra;
+pub mod bylaws;

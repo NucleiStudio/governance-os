@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-use crate::{Bylaw, CheckBylaws, Trait};
+use crate::{CheckBylaws, Trait};
 use codec::{Decode, Encode};
 use frame_support::{impl_outer_origin, parameter_types};
 pub use governance_os_runtime::Call;
 use governance_os_support::{
-    rules::CallTagger,
+    rules::{CallTagger, Rule},
     testing::{
         primitives::AccountId, AvailableBlockRatio, BlockHashCount, MaximumBlockLength,
         MaximumBlockWeight,
@@ -29,7 +29,7 @@ use serde::{Deserialize, Serialize};
 use sp_core::H256;
 use sp_runtime::{
     testing::Header,
-    traits::{BlakeTwo256, IdentityLookup},
+    traits::{BlakeTwo256, DispatchInfoOf, IdentityLookup},
     RuntimeDebug,
 };
 use sp_std::{fmt::Debug, marker};
@@ -85,8 +85,31 @@ impl<T: Trait> CallTagger<AccountId, Call, MockTags> for MockTagger<T> {
     }
 }
 
+#[derive(Clone, Eq, PartialEq, Encode, Decode, RuntimeDebug, Serialize, Deserialize)]
+pub enum Bylaw {
+    Allow,
+    Deny,
+}
+
+impl Rule<AccountId, Call> for Bylaw {
+    fn validate(
+        &self,
+        _who: &AccountId,
+        _call: &Call,
+        _info: &DispatchInfoOf<Call>,
+        _len: usize,
+    ) -> bool {
+        use Bylaw::*;
+
+        match self {
+            Allow => true,
+            Deny => false,
+        }
+    }
+}
+
 parameter_types! {
-    pub const DefaultBylaw: Bylaw<Test> = Bylaw::Deny;
+    pub const DefaultBylaw: Bylaw = Bylaw::Deny;
 }
 
 impl Trait for Test {
@@ -94,6 +117,7 @@ impl Trait for Test {
     type Tag = MockTags;
     type Tagger = MockTagger<Test>;
     type DefaultBylaw = DefaultBylaw;
+    type Bylaw = Bylaw;
 }
 
 pub type System = frame_system::Module<Test>;

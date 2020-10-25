@@ -17,15 +17,15 @@
 use sp_runtime::traits::{DispatchInfoOf, Dispatchable};
 
 /// A common trait that can be implemented to filter calls.
-pub trait Rule {
-    type AccountId;
-    type Call: Dispatchable;
-
+pub trait Rule<AccountId, Call>
+where
+    Call: Dispatchable,
+{
     fn validate(
         &self,
-        who: &Self::AccountId,
-        call: &Self::Call,
-        info: &DispatchInfoOf<Self::Call>,
+        who: &AccountId,
+        call: &Call,
+        info: &DispatchInfoOf<Call>,
         len: usize,
     ) -> bool;
 }

@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-use crate::{Call, Event, Runtime};
+use crate::{Bylaw, Call, Event, Runtime};
 use codec::{Decode, Encode};
 use frame_support::parameter_types;
-use governance_os_pallet_bylaws::{Bylaw, Trait as BylawsTrait};
+use governance_os_pallet_bylaws::Trait as BylawsTrait;
 use governance_os_primitives::AccountId;
 #[cfg(feature = "std")]
 use serde::{Deserialize, Serialize};
@@ -47,12 +47,13 @@ impl governance_os_support::rules::CallTagger<AccountId, Call, CallTags> for Cal
 }
 
 parameter_types! {
-    pub const DefaultBylaw: Bylaw<Runtime> = Bylaw::Allow;
+    pub const DefaultBylaw: Bylaw = Bylaw::Allow;
 }
 
 impl BylawsTrait for Runtime {
     type Event = Event;
-    type DefaultBylaw = DefaultBylaw;
     type Tag = CallTags;
     type Tagger = CallTagger;
+    type Bylaw = Bylaw;
+    type DefaultBylaw = DefaultBylaw;
 }
