@@ -19,7 +19,7 @@ use codec::{Decode, Encode};
 use frame_support::{impl_outer_origin, parameter_types};
 pub use governance_os_runtime::Call;
 use governance_os_support::{
-    rules::{CallTagger, Rule},
+    rules::{CallTagger, Rule, SuperSetter},
     testing::{
         primitives::AccountId, AvailableBlockRatio, BlockHashCount, MaximumBlockLength,
         MaximumBlockWeight,
@@ -73,6 +73,15 @@ impl frame_system::Trait for Test {
 pub enum MockTags {
     Test,
     Misc,
+}
+
+impl SuperSetter for MockTags {
+    fn is_superset(&self, other: &Self) -> bool {
+        match (self, other) {
+            (x, y) if x == y => true,
+            _ => false,
+        }
+    }
 }
 
 pub struct MockTagger<T>(marker::PhantomData<T>);

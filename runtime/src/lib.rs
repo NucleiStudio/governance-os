@@ -43,6 +43,7 @@ use sp_std::prelude::*;
 use sp_version::RuntimeVersion;
 
 mod bylaws;
+mod call_tags;
 mod constants;
 mod pallets_consensus;
 mod pallets_core;
@@ -54,6 +55,7 @@ mod version;
 mod weights;
 
 pub use bylaws::Bylaw;
+pub use call_tags::{CallTagger, CallTags};
 pub use pallets_consensus::{AuraId, GrandpaId, SessionKeys};
 pub use pallets_economics::{NativeCurrency, NativeCurrencyId};
 #[cfg(feature = "std")]

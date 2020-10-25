@@ -21,6 +21,8 @@ pub trait Rule<AccountId, Call>
 where
     Call: Dispatchable,
 {
+    /// Shall return `true` if the bylaw lets the call go through. `false`
+    /// if not.
     fn validate(
         &self,
         who: &AccountId,
@@ -34,4 +36,10 @@ where
 /// used to identify them and then match them with some set of rules.
 pub trait CallTagger<AccountId, Call, Tag> {
     fn tag(&self, who: &AccountId, call: &Call) -> Tag;
+}
+
+pub trait SuperSetter {
+    /// Return true if `self` is a superset of `other`. This means that `self`
+    /// is more permissive than `other`.
+    fn is_superset(&self, other: &Self) -> bool;
 }

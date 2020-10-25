@@ -28,7 +28,7 @@
 
 use frame_support::{decl_error, decl_event, decl_module, decl_storage, traits::Get, Parameter};
 use frame_system::ensure_signed;
-use governance_os_support::rules::{CallTagger, Rule};
+use governance_os_support::rules::{CallTagger, Rule, SuperSetter};
 use sp_runtime::traits::{MaybeSerializeDeserialize, Member};
 
 mod signed_extra;
@@ -41,7 +41,7 @@ pub trait Trait: frame_system::Trait {
     /// Because this pallet emits events, it depends on the runtime's definition of an event.
     type Event: From<Event<Self>> + Into<<Self as frame_system::Trait>::Event>;
     /// Tags are used to identify incoming calls and match them to some rules.
-    type Tag: Parameter + Member + Copy + MaybeSerializeDeserialize;
+    type Tag: Parameter + Member + Copy + MaybeSerializeDeserialize + SuperSetter;
     /// An object to link incoming calls to tags.
     type Tagger: CallTagger<Self::AccountId, Self::Call, Self::Tag>;
     /// How bylaws are represented inside the system.

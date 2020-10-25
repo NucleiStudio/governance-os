@@ -15,3 +15,4 @@
  */
 
 pub mod bylaws;
+pub mod call_tags;

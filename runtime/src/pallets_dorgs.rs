@@ -14,43 +14,14 @@
  * limitations under the License.
  */
 
-use crate::{Bylaw, Call, Event, Runtime};
-use codec::{Decode, Encode};
+use crate::{Bylaw, CallTagger, CallTags, Event, Runtime};
 use frame_support::parameter_types;
-use governance_os_pallet_bylaws::Trait as BylawsTrait;
-use governance_os_primitives::AccountId;
-#[cfg(feature = "std")]
-use serde::{Deserialize, Serialize};
-use sp_runtime::RuntimeDebug;
-
-/// Determine a tag for every kind of call.
-#[derive(Encode, Decode, RuntimeDebug, Clone, Copy, Eq, PartialEq)]
-#[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
-pub enum CallTags {
-    System,
-    Economic,
-    Bylaws,
-}
-
-pub struct CallTagger;
-impl governance_os_support::rules::CallTagger<AccountId, Call, CallTags> for CallTagger {
-    fn tag(&self, _who: &AccountId, call: &Call) -> CallTags {
-        match call {
-            Call::System(..)
-            | Call::Timestamp(..)
-            | Call::Grandpa(..)
-            | Call::RandomnessCollectiveFlip(..) => CallTags::System,
-            Call::Tokens(..) => CallTags::Economic,
-            Call::Bylaws(..) => CallTags::Bylaws,
-        }
-    }
-}
 
 parameter_types! {
     pub const DefaultBylaw: Bylaw = Bylaw::Allow;
 }
 
-impl BylawsTrait for Runtime {
+impl governance_os_pallet_bylaws::Trait for Runtime {
     type Event = Event;
     type Tag = CallTags;
     type Tagger = CallTagger;

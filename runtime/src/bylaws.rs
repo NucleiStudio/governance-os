@@ -42,7 +42,7 @@ pub enum Bylaw {
     Not(Box<Bylaw>),
 }
 
-macro_rules! impl_logic_gate {
+macro_rules! impl_combination {
     ($left:ident, $right: ident, $op:tt, $who:expr, $call:expr, $info:expr, $len:expr) => {
         $left.validate($who, $call, $info, $len) $op $right.validate($who, $call, $info, $len)
     };
@@ -61,9 +61,9 @@ impl Rule<AccountId, Call> for Bylaw {
         match self {
             Allow => true,
             Deny => false,
-            And(left, right) => impl_logic_gate!(left, right, &, who, call, info, len),
-            Or(left, right) => impl_logic_gate!(left, right, |, who, call, info, len),
-            Xor(left, right) => impl_logic_gate!(left, right, ^, who, call, info, len),
+            And(left, right) => impl_combination!(left, right, &, who, call, info, len),
+            Or(left, right) => impl_combination!(left, right, |, who, call, info, len),
+            Xor(left, right) => impl_combination!(left, right, ^, who, call, info, len),
             Not(bylaw) => !bylaw.validate(who, call, info, len),
         }
     }
