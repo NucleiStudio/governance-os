@@ -26,17 +26,29 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use frame_support::{decl_error, decl_event, decl_module, decl_storage};
+use frame_support::{decl_error, decl_event, decl_module, decl_storage, traits::Get, Parameter};
+use frame_system::ensure_signed;
+use governance_os_support::rules::CallTagger;
+use sp_runtime::traits::{MaybeSerializeDeserialize, Member};
 
 pub mod bylaw;
+mod signed_extra;
 #[cfg(test)]
 mod tests;
 
 pub use bylaw::Bylaw;
+pub use signed_extra::CheckBylaws;
 
 pub trait Trait: frame_system::Trait {
     /// Because this pallet emits events, it depends on the runtime's definition of an event.
     type Event: From<Event<Self>> + Into<<Self as frame_system::Trait>::Event>;
+    /// Tags are used to identify incoming calls and match them to some rules.
+    type Tag: Parameter + Member + Copy + MaybeSerializeDeserialize;
+    /// An object to link incoming calls to tags.
+    type Tagger: CallTagger<Self::AccountId, Self::Call, Self::Tag>;
+    /// The default bylaw to apply to calls without a bylaw already, typically this would be
+    /// `Allow` for public networks and `Deny` for permissioned networks.
+    type DefaultBylaw: Get<Bylaw<Self>>;
 }
 
 decl_storage! {
@@ -65,5 +77,11 @@ decl_module! {
         type Error = Error<T>;
 
         fn deposit_event() = default;
+
+        #[weight = 0]
+        fn sample_call(origin) {
+            let caller = ensure_signed(origin)?;
+            Self::deposit_event(RawEvent::Sample(caller));
+        }
     }
 }

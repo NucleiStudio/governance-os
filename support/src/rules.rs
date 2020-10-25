@@ -29,3 +29,9 @@ pub trait Rule {
         len: usize,
     ) -> bool;
 }
+
+/// This trait can be used to "tag" incoming calls, this is typically
+/// used to identify them and then match them with some set of rules.
+pub trait CallTagger<AccountId, Call, Tag> {
+    fn tag(&self, who: &AccountId, call: &Call) -> Tag;
+}

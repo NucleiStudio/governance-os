@@ -45,6 +45,7 @@ use sp_version::RuntimeVersion;
 mod constants;
 mod pallets_consensus;
 mod pallets_core;
+mod pallets_dorgs;
 mod pallets_economics;
 mod version;
 mod weights;
@@ -74,6 +75,9 @@ construct_runtime!(
         // Economics
         Tokens: governance_os_pallet_tokens::{Module, Call, Storage, Config<T>, Event<T>},
         TransactionPayment: pallet_transaction_payment::{Module, Storage},
+
+        // dOrgs
+        Bylaws: governance_os_pallet_bylaws::{Module, Call, Storage, Event<T>},
     }
 );
 
@@ -103,6 +107,7 @@ pub type SignedExtra = (
     frame_system::CheckNonce<Runtime>,
     frame_system::CheckWeight<Runtime>,
     pallet_transaction_payment::ChargeTransactionPayment<Runtime>,
+    governance_os_pallet_bylaws::CheckBylaws<Runtime>,
 );
 
 impl_runtime_apis! {

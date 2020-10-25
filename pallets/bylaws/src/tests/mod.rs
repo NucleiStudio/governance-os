@@ -16,3 +16,4 @@
 
 pub mod bylaw;
 pub mod mock;
+pub mod signed_extra;

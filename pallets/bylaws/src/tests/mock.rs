@@ -14,24 +14,31 @@
  * limitations under the License.
  */
 
-use crate::Trait;
-use frame_support::impl_outer_origin;
+use crate::{Bylaw, CheckBylaws, Trait};
+use codec::{Decode, Encode};
+use frame_support::{impl_outer_origin, parameter_types};
 pub use governance_os_runtime::Call;
-use governance_os_support::testing::{
-    primitives::AccountId, AvailableBlockRatio, BlockHashCount, MaximumBlockLength,
-    MaximumBlockWeight,
+use governance_os_support::{
+    rules::CallTagger,
+    testing::{
+        primitives::AccountId, AvailableBlockRatio, BlockHashCount, MaximumBlockLength,
+        MaximumBlockWeight,
+    },
 };
+use serde::{Deserialize, Serialize};
 use sp_core::H256;
 use sp_runtime::{
     testing::Header,
     traits::{BlakeTwo256, IdentityLookup},
+    RuntimeDebug,
 };
+use sp_std::{fmt::Debug, marker};
 
 impl_outer_origin! {
     pub enum Origin for Test {}
 }
 
-#[derive(Clone, Eq, PartialEq)]
+#[derive(Clone, Eq, PartialEq, Debug)]
 pub struct Test;
 
 impl frame_system::Trait for Test {
@@ -62,6 +69,52 @@ impl frame_system::Trait for Test {
     type SystemWeightInfo = ();
 }
 
+#[derive(Eq, PartialEq, RuntimeDebug, Encode, Decode, Copy, Clone, Serialize, Deserialize)]
+pub enum MockTags {
+    Test,
+    Misc,
+}
+
+pub struct MockTagger<T>(marker::PhantomData<T>);
+impl<T: Trait> CallTagger<AccountId, Call, MockTags> for MockTagger<T> {
+    fn tag(&self, _who: &AccountId, call: &Call) -> MockTags {
+        match matches!(call, Call::System(frame_system::Call::remark(..))) {
+            true => MockTags::Test,
+            false => MockTags::Misc,
+        }
+    }
+}
+
+parameter_types! {
+    pub const DefaultBylaw: Bylaw<Test> = Bylaw::Deny;
+}
+
 impl Trait for Test {
     type Event = ();
+    type Tag = MockTags;
+    type Tagger = MockTagger<Test>;
+    type DefaultBylaw = DefaultBylaw;
+}
+
+pub type System = frame_system::Module<Test>;
+pub type MockCheckBylaws = CheckBylaws<Test>;
+
+pub struct ExtBuilder;
+
+impl Default for ExtBuilder {
+    fn default() -> Self {
+        Self {}
+    }
+}
+
+impl ExtBuilder {
+    pub fn build(self) -> sp_io::TestExternalities {
+        let t = frame_system::GenesisConfig::default()
+            .build_storage::<Test>()
+            .unwrap();
+
+        let mut ext = sp_io::TestExternalities::new(t);
+        ext.execute_with(|| System::set_block_number(1));
+        ext
+    }
 }

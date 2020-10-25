@@ -17,6 +17,7 @@
 use crate::Trait;
 use governance_os_support::rules::Rule;
 use sp_runtime::traits::DispatchInfoOf;
+use sp_std::boxed::Box;
 
 /// We use the enum to create a Domain Specific Language used to decide
 /// wether an extrinsic should be accepted or not.
