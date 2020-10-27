@@ -16,9 +16,10 @@
 
 use crate::{Bylaw, CallTagger, CallTags, Event, Runtime};
 use frame_support::parameter_types;
+use sp_std::prelude::*;
 
 parameter_types! {
-    pub const DefaultBylaw: Bylaw = Bylaw::Allow;
+    pub DefaultBylaws: Vec<(CallTags, Bylaw)> = vec![(CallTags::Any, Bylaw::Allow)];
 }
 
 impl governance_os_pallet_bylaws::Trait for Runtime {
@@ -26,5 +27,5 @@ impl governance_os_pallet_bylaws::Trait for Runtime {
     type Tag = CallTags;
     type Tagger = CallTagger;
     type Bylaw = Bylaw;
-    type DefaultBylaw = DefaultBylaw;
+    type DefaultBylaws = DefaultBylaws;
 }

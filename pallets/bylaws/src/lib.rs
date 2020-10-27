@@ -23,13 +23,18 @@
 //!
 //! The bylaws pallet should typically be added to the `SignedExtra` of a
 //! runtime so that it could filter incoming calls.
+//!
+//! **NOTE**: this module is a bit specific in the sense that **no actual
+//! access control is performed on critical functions**, indeed, we expect
+//! the host runtime to create its own default bylaws to control those.
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use frame_support::{decl_error, decl_event, decl_module, decl_storage, traits::Get, Parameter};
 use frame_system::ensure_signed;
 use governance_os_support::rules::{CallTagger, Rule, SuperSetter};
-use sp_runtime::traits::{MaybeSerializeDeserialize, Member};
+use sp_runtime::traits::{MaybeSerializeDeserialize, Member, StaticLookup};
+use sp_std::prelude::Vec;
 
 mod signed_extra;
 #[cfg(test)]
@@ -45,15 +50,21 @@ pub trait Trait: frame_system::Trait {
     /// An object to link incoming calls to tags.
     type Tagger: CallTagger<Self::AccountId, Self::Call, Self::Tag>;
     /// How bylaws are represented inside the system.
-    type Bylaw: Parameter + Member + MaybeSerializeDeserialize + Rule<Self::AccountId, Self::Call>;
-    /// The default bylaw to apply to calls without a bylaw already, typically this would be
-    /// `Allow` for public networks and `Deny` for permissioned networks.
-    type DefaultBylaw: Get<Self::Bylaw>;
+    type Bylaw: Parameter
+        + Member
+        + MaybeSerializeDeserialize
+        + Clone
+        + Rule<Self::AccountId, Self::Call>;
+    /// The default bylaws to apply to calls without a bylaw already, typically this would be
+    /// `Allow` for public networks and `Deny` for permissioned networks. We take in a list
+    /// tag and bylaw in order to provide customization abilities.
+    type DefaultBylaws: Get<Vec<(Self::Tag, Self::Bylaw)>>;
 }
 
 decl_storage! {
     trait Store for Module<T: Trait> as Bylaws {
-        pub Sample get(fn sample): bool;
+        /// Links an account to a series of bylaws.
+        pub Bylaws get(fn bylaws): map hasher(blake2_128_concat) T::AccountId => Vec<(T::Tag, T::Bylaw)>;
     }
 }
 
@@ -61,8 +72,11 @@ decl_event!(
     pub enum Event<T>
     where
         AccountId = <T as frame_system::Trait>::AccountId,
+        Tag = <T as Trait>::Tag,
+        Bylaw = <T as Trait>::Bylaw,
     {
-        Sample(AccountId),
+        /// Somebody added a bylaw to the account. [source, account, tag, bylaw]
+        BylawAdded(AccountId, AccountId, Tag, Bylaw),
     }
 );
 
@@ -78,10 +92,15 @@ decl_module! {
 
         fn deposit_event() = default;
 
+        /// Add a `bylaw` to a given account `who` for a call matching `tag`.
         #[weight = 0]
-        fn sample_call(origin) {
+        fn add_bylaw(origin, who: <T::Lookup as StaticLookup>::Source, tag: T::Tag, bylaw: T::Bylaw) {
             let caller = ensure_signed(origin)?;
-            Self::deposit_event(RawEvent::Sample(caller));
+            let who_lookup = T::Lookup::lookup(who)?;
+
+            <Bylaws<T>>::mutate(&who_lookup, |vec| vec.push((tag, bylaw.clone())));
+
+            Self::deposit_event(RawEvent::BylawAdded(caller, who_lookup, tag, bylaw));
         }
     }
 }

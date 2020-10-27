@@ -14,6 +14,22 @@
  * limitations under the License.
  */
 
-pub mod dispatchable;
-pub mod mock;
-pub mod signed_extra;
+use super::mock::*;
+use frame_support::{assert_ok, storage::StorageMap};
+use governance_os_support::testing::ALICE;
+
+#[test]
+fn add_bylaw() {
+    ExtBuilder::default().build().execute_with(|| {
+        assert_ok!(Bylaws::add_bylaw(
+            Origin::signed(ALICE),
+            ALICE,
+            MockTags::Test,
+            Bylaw::Deny
+        ));
+
+        let all_bylaws = crate::Bylaws::<Test>::get(&ALICE);
+        assert_eq!(all_bylaws.len(), 1);
+        assert_eq!(all_bylaws[0], (MockTags::Test, Bylaw::Deny));
+    })
+}

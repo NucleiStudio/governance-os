@@ -43,7 +43,7 @@ impl governance_os_support::rules::SuperSetter for CallTags {
 
 pub struct CallTagger;
 impl governance_os_support::rules::CallTagger<AccountId, Call, CallTags> for CallTagger {
-    fn tag(&self, _who: &AccountId, call: &Call) -> CallTags {
+    fn tag(_who: &AccountId, call: &Call) -> CallTags {
         match call {
             Call::System(..)
             | Call::Timestamp(..)

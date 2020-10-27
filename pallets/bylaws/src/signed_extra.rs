@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-use crate::Trait;
+use crate::{Bylaws, Trait};
 use codec::{Decode, Encode};
 use frame_support::{
+    storage::StorageMap,
     traits::{Get, GetCallMetadata},
     weights::DispatchInfo,
 };
-use governance_os_support::rules::Rule;
+use governance_os_support::rules::{CallTagger, Rule, SuperSetter};
 use sp_runtime::{
     traits::{DispatchInfoOf, Dispatchable, SignedExtension},
     transaction_validity::{
@@ -60,13 +61,37 @@ where
         info: &DispatchInfoOf<Self::Call>,
         len: usize,
     ) -> TransactionValidity {
-        sp_runtime::print("🏛 CheckBylaws::validate");
+        let default_bylaws = T::DefaultBylaws::get();
+        let account_bylaws = Bylaws::<T>::get(who);
 
-        match T::DefaultBylaw::get().validate(who, call, info, len) {
-            true => Ok(ValidTransaction {
+        if default_bylaws.is_empty() && account_bylaws.is_empty() {
+            sp_runtime::print("ERROR in bylaws pallet: no bylaws are configured for the account and no default bylaws are set; skipping call filtering");
+            return Ok(ValidTransaction {
+                ..Default::default()
+            });
+        }
+
+        match default_bylaws
+            .iter()
+            .chain(account_bylaws.iter())
+            .cloned()
+            .filter(|(tag, _)| {
+                // We keep only the supersets, we assume that if
+                // tag_a == tag_b superset will return true.
+                tag.is_superset(&T::Tagger::tag(who, call))
+            })
+            .find(|(_, bylaw)| {
+                // At this stage we know that tag matches `call` and `who`,
+                // we simply need to check if a bylaw denies the call. If that's
+                // the case we stop looking would deny the call.
+                !bylaw.validate(who, call, info, len)
+            }) {
+            // No bylaws that would deny the call found
+            None => Ok(ValidTransaction {
                 ..Default::default()
             }),
-            false => Err(InvalidTransaction::Call.into()),
+            // We found at least one bylaw that would deny the call, error!
+            Some(..) => Err(InvalidTransaction::Call.into()),
         }
     }
 }

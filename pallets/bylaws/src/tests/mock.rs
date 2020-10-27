@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-use crate::{CheckBylaws, Trait};
+use crate::{CheckBylaws, Module, Trait};
 use codec::{Decode, Encode};
 use frame_support::{impl_outer_origin, parameter_types};
 pub use governance_os_runtime::Call;
@@ -77,16 +77,13 @@ pub enum MockTags {
 
 impl SuperSetter for MockTags {
     fn is_superset(&self, other: &Self) -> bool {
-        match (self, other) {
-            (x, y) if x == y => true,
-            _ => false,
-        }
+        self == other
     }
 }
 
 pub struct MockTagger<T>(marker::PhantomData<T>);
 impl<T: Trait> CallTagger<AccountId, Call, MockTags> for MockTagger<T> {
-    fn tag(&self, _who: &AccountId, call: &Call) -> MockTags {
+    fn tag(_who: &AccountId, call: &Call) -> MockTags {
         match matches!(call, Call::System(frame_system::Call::remark(..))) {
             true => MockTags::Test,
             false => MockTags::Misc,
@@ -118,18 +115,19 @@ impl Rule<AccountId, Call> for Bylaw {
 }
 
 parameter_types! {
-    pub const DefaultBylaw: Bylaw = Bylaw::Deny;
+    pub DefaultBylaws: Vec<(MockTags, Bylaw)> = vec![(MockTags::Test, Bylaw::Allow), (MockTags::Misc, Bylaw::Deny)];
 }
 
 impl Trait for Test {
     type Event = ();
     type Tag = MockTags;
     type Tagger = MockTagger<Test>;
-    type DefaultBylaw = DefaultBylaw;
+    type DefaultBylaws = DefaultBylaws;
     type Bylaw = Bylaw;
 }
 
 pub type System = frame_system::Module<Test>;
+pub type Bylaws = Module<Test>;
 pub type MockCheckBylaws = CheckBylaws<Test>;
 
 pub struct ExtBuilder;
