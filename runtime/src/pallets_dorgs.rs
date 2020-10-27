@@ -20,6 +20,7 @@ use sp_std::prelude::*;
 
 parameter_types! {
     pub DefaultBylaws: Vec<(CallTags, Bylaw)> = vec![(CallTags::Any, Bylaw::Allow)];
+    pub const MaxBylaws: u32 = 1_000;
 }
 
 impl governance_os_pallet_bylaws::Trait for Runtime {
@@ -28,4 +29,6 @@ impl governance_os_pallet_bylaws::Trait for Runtime {
     type Tagger = CallTagger;
     type Bylaw = Bylaw;
     type DefaultBylaws = DefaultBylaws;
+    type MaxBylaws = MaxBylaws;
+    type WeightInfo = ();
 }

@@ -56,15 +56,19 @@ impl Rule<AccountId, Call> for Bylaw {
         info: &DispatchInfoOf<Call>,
         len: usize,
     ) -> bool {
-        use Bylaw::*;
-
         match self {
-            Allow => true,
-            Deny => false,
-            And(left, right) => impl_combination!(left, right, &, who, call, info, len),
-            Or(left, right) => impl_combination!(left, right, |, who, call, info, len),
-            Xor(left, right) => impl_combination!(left, right, ^, who, call, info, len),
-            Not(bylaw) => !bylaw.validate(who, call, info, len),
+            Self::Allow => true,
+            Self::Deny => false,
+            Self::And(left, right) => impl_combination!(left, right, &, who, call, info, len),
+            Self::Or(left, right) => impl_combination!(left, right, |, who, call, info, len),
+            Self::Xor(left, right) => impl_combination!(left, right, ^, who, call, info, len),
+            Self::Not(bylaw) => !bylaw.validate(who, call, info, len),
         }
+    }
+}
+
+impl Default for Bylaw {
+    fn default() -> Self {
+        Self::Allow
     }
 }

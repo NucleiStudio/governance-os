@@ -15,7 +15,8 @@
  */
 
 use super::mock::*;
-use frame_support::{assert_ok, storage::StorageMap};
+use crate::Error;
+use frame_support::{assert_noop, assert_ok, storage::StorageMap};
 use governance_os_support::testing::ALICE;
 
 #[test]
@@ -31,6 +32,25 @@ fn add_bylaw() {
         let all_bylaws = crate::Bylaws::<Test>::get(&ALICE);
         assert_eq!(all_bylaws.len(), 1);
         assert_eq!(all_bylaws[0], (MockTags::Test, Bylaw::Deny));
+    })
+}
+
+#[test]
+fn add_bylaw_error_if_over_maximum() {
+    ExtBuilder::default().build().execute_with(|| {
+        for _ in 0..MaxBylaws::get() {
+            assert_ok!(Bylaws::add_bylaw(
+                Origin::signed(ALICE),
+                ALICE,
+                MockTags::Test,
+                Bylaw::Deny
+            ));
+        }
+
+        assert_noop!(
+            Bylaws::add_bylaw(Origin::signed(ALICE), ALICE, MockTags::Test, Bylaw::Deny),
+            Error::<Test>::TooManyBylaws
+        );
     })
 }
 

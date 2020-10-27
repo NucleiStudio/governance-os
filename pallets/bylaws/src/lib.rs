@@ -30,35 +30,58 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use frame_support::{decl_error, decl_event, decl_module, decl_storage, traits::Get, Parameter};
+use frame_support::{
+    decl_error, decl_event, decl_module, decl_storage, traits::Get, weights::Weight, Parameter,
+};
 use frame_system::ensure_signed;
 use governance_os_support::rules::{CallTagger, Rule, SuperSetter};
 use sp_runtime::traits::{MaybeSerializeDeserialize, Member, StaticLookup};
-use sp_std::prelude::Vec;
+use sp_std::{convert::TryFrom, prelude::Vec};
 
+#[cfg(feature = "runtime-benchmarks")]
+mod benchmarking;
+mod default_weights;
 mod signed_extra;
 #[cfg(test)]
 mod tests;
 
 pub use signed_extra::CheckBylaws;
 
+pub trait WeightInfo {
+    fn add_bylaw(b: u32) -> Weight;
+    fn remove_bylaw(b: u32) -> Weight;
+    fn reset_bylaws(b: u32) -> Weight;
+}
+
 pub trait Trait: frame_system::Trait {
     /// Because this pallet emits events, it depends on the runtime's definition of an event.
     type Event: From<Event<Self>> + Into<<Self as frame_system::Trait>::Event>;
+
     /// Tags are used to identify incoming calls and match them to some rules.
-    type Tag: Parameter + Member + Copy + MaybeSerializeDeserialize + SuperSetter;
+    type Tag: Parameter + Member + Copy + MaybeSerializeDeserialize + SuperSetter + Default;
+
     /// An object to link incoming calls to tags.
     type Tagger: CallTagger<Self::AccountId, Self::Call, Self::Tag>;
+
     /// How bylaws are represented inside the system.
     type Bylaw: Parameter
         + Member
         + MaybeSerializeDeserialize
         + Clone
-        + Rule<Self::AccountId, Self::Call>;
+        + Rule<Self::AccountId, Self::Call>
+        + Default;
+
     /// The default bylaws to apply to calls without a bylaw already, typically this would be
     /// `Allow` for public networks and `Deny` for permissioned networks. We take in a list
     /// tag and bylaw in order to provide customization abilities.
     type DefaultBylaws: Get<Vec<(Self::Tag, Self::Bylaw)>>;
+
+    /// Maximum number of bylaws for one account, this is used for weight calculation and enforced
+    /// by `add_bylaw`.
+    type MaxBylaws: Get<u32>;
+
+    /// Weight values for this pallet
+    type WeightInfo: WeightInfo;
 }
 
 decl_storage! {
@@ -88,6 +111,9 @@ decl_error! {
     pub enum Error for Module<T: Trait> {
         /// The couple of bylaw and tag you are looking for doesn't exist for this account.
         BylawNotFound,
+        /// You need to delete some bylaws from the target account before being able to add
+        /// new ones.
+        TooManyBylaws,
     }
 }
 
@@ -98,18 +124,25 @@ decl_module! {
         fn deposit_event() = default;
 
         /// Add a `bylaw` to a given account `who` for a call matching `tag`.
-        #[weight = 0]
+        #[weight = T::WeightInfo::add_bylaw(T::MaxBylaws::get())]
         fn add_bylaw(origin, who: <T::Lookup as StaticLookup>::Source, tag: T::Tag, bylaw: T::Bylaw) {
             let caller = ensure_signed(origin)?;
             let who_lookup = T::Lookup::lookup(who)?;
 
-            <Bylaws<T>>::mutate(&who_lookup, |vec| vec.push((tag, bylaw.clone())));
+            <Bylaws<T>>::try_mutate(&who_lookup, |vec| {
+                if vec.len() + 1 > usize::try_from(T::MaxBylaws::get()).expect("usize should always be a u32 and in some particular cases only a u16; qed") {
+                    return Err(Error::<T>::TooManyBylaws);
+                }
+
+                vec.push((tag, bylaw.clone()));
+                Ok(())
+            })?;
 
             Self::deposit_event(RawEvent::BylawAdded(caller, who_lookup, tag, bylaw));
         }
 
         /// Remove a `bylaw` from a given account `who` for a call matching `tag`.
-        #[weight = 0]
+        #[weight = T::WeightInfo::remove_bylaw(T::MaxBylaws::get())]
         fn remove_bylaw(origin, who: <T::Lookup as StaticLookup>::Source, tag: T::Tag, bylaw: T::Bylaw) {
             let caller = ensure_signed(origin)?;
             let who_lookup = T::Lookup::lookup(who)?;
@@ -127,7 +160,7 @@ decl_module! {
         }
 
         /// Clear all bylaws associated to `who`. Account will still have to comform to the default runtime bylaws.
-        #[weight = 0]
+        #[weight = T::WeightInfo::reset_bylaws(T::MaxBylaws::get())]
         fn reset_bylaws(origin, who: <T::Lookup as StaticLookup>::Source) {
             let caller = ensure_signed(origin)?;
             let who_lookup = T::Lookup::lookup(who)?;

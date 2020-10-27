@@ -81,6 +81,12 @@ impl SuperSetter for MockTags {
     }
 }
 
+impl Default for MockTags {
+    fn default() -> Self {
+        MockTags::Misc
+    }
+}
+
 pub struct MockTagger<T>(marker::PhantomData<T>);
 impl<T: Trait> CallTagger<AccountId, Call, MockTags> for MockTagger<T> {
     fn tag(_who: &AccountId, call: &Call) -> MockTags {
@@ -114,8 +120,17 @@ impl Rule<AccountId, Call> for Bylaw {
     }
 }
 
+impl Default for Bylaw {
+    fn default() -> Self {
+        Bylaw::Allow
+    }
+}
+
 parameter_types! {
     pub DefaultBylaws: Vec<(MockTags, Bylaw)> = vec![(MockTags::Test, Bylaw::Allow), (MockTags::Misc, Bylaw::Deny)];
+    // NOTE: we use a small number so that tests gives results in a short enough time.
+    // In production you'd probably want a higher value.
+    pub const MaxBylaws: u32 = 10;
 }
 
 impl Trait for Test {
@@ -124,6 +139,8 @@ impl Trait for Test {
     type Tagger = MockTagger<Test>;
     type DefaultBylaws = DefaultBylaws;
     type Bylaw = Bylaw;
+    type MaxBylaws = MaxBylaws;
+    type WeightInfo = ();
 }
 
 pub type System = frame_system::Module<Test>;

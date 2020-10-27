@@ -35,9 +35,15 @@ impl governance_os_support::rules::SuperSetter for CallTags {
     fn is_superset(&self, other: &Self) -> bool {
         match (self, other) {
             (x, y) if x == y => true,
-            (CallTags::Any, _) => true,
+            (Self::Any, _) => true,
             _ => false,
         }
+    }
+}
+
+impl Default for CallTags {
+    fn default() -> Self {
+        Self::Any
     }
 }
 

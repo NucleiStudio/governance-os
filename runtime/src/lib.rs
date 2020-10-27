@@ -256,6 +256,7 @@ impl_runtime_apis! {
             let params = (&config, &whitelist);
 
             add_benchmark!(params, batches, frame_system, SystemBench::<Runtime>);
+            add_benchmark!(params, batches, governance_os_pallet_bylaws, Bylaws);
             add_benchmark!(params, batches, governance_os_pallet_tokens, Tokens);
             add_benchmark!(params, batches, pallet_grandpa, Grandpa);
             add_benchmark!(params, batches, pallet_timestamp, Timestamp);
