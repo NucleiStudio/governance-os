@@ -77,12 +77,17 @@ decl_event!(
     {
         /// Somebody added a bylaw to the account. [source, account, tag, bylaw]
         BylawAdded(AccountId, AccountId, Tag, Bylaw),
+        /// Somebody deleted a bylaw from the account. [source, account, tag, bylaw]
+        BylawRemoved(AccountId, AccountId, Tag, Bylaw),
+        /// Somebody cleared the bylaws associated to an account. [source, account]
+        BylawsReset(AccountId, AccountId),
     }
 );
 
 decl_error! {
     pub enum Error for Module<T: Trait> {
-        SampleError,
+        /// The couple of bylaw and tag you are looking for doesn't exist for this account.
+        BylawNotFound,
     }
 }
 
@@ -101,6 +106,35 @@ decl_module! {
             <Bylaws<T>>::mutate(&who_lookup, |vec| vec.push((tag, bylaw.clone())));
 
             Self::deposit_event(RawEvent::BylawAdded(caller, who_lookup, tag, bylaw));
+        }
+
+        /// Remove a `bylaw` from a given account `who` for a call matching `tag`.
+        #[weight = 0]
+        fn remove_bylaw(origin, who: <T::Lookup as StaticLookup>::Source, tag: T::Tag, bylaw: T::Bylaw) {
+            let caller = ensure_signed(origin)?;
+            let who_lookup = T::Lookup::lookup(who)?;
+
+            // When it comes to removal we chose to delete bylaws by (tag, bylaw) and not by identifier
+            // as removing by id would mess things up in the event that calls to `remove_bylaw` are batched,
+            // indeed, removing one bylaw could substract one from all other bylaw ids.
+            let mut bylaws = <Bylaws<T>>::get(&who_lookup);
+            let location = bylaws.iter().cloned().position(|(inner_tag, inner_bylaw)| inner_tag == tag && inner_bylaw == bylaw).ok_or(Error::<T>::BylawNotFound)?;
+            bylaws.remove(location);
+
+            <Bylaws<T>>::mutate(&who_lookup, |v| *v = bylaws);
+
+            Self::deposit_event(RawEvent::BylawRemoved(caller, who_lookup, tag, bylaw));
+        }
+
+        /// Clear all bylaws associated to `who`. Account will still have to comform to the default runtime bylaws.
+        #[weight = 0]
+        fn reset_bylaws(origin, who: <T::Lookup as StaticLookup>::Source) {
+            let caller = ensure_signed(origin)?;
+            let who_lookup = T::Lookup::lookup(who)?;
+
+            <Bylaws<T>>::remove(&who_lookup);
+
+            Self::deposit_event(RawEvent::BylawsReset(caller, who_lookup));
         }
     }
 }

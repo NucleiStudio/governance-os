@@ -33,3 +33,48 @@ fn add_bylaw() {
         assert_eq!(all_bylaws[0], (MockTags::Test, Bylaw::Deny));
     })
 }
+
+#[test]
+fn remove_bylaw() {
+    ExtBuilder::default().build().execute_with(|| {
+        assert_ok!(Bylaws::add_bylaw(
+            Origin::signed(ALICE),
+            ALICE,
+            MockTags::Test,
+            Bylaw::Deny
+        ));
+
+        assert_ok!(Bylaws::remove_bylaw(
+            Origin::signed(ALICE),
+            ALICE,
+            MockTags::Test,
+            Bylaw::Deny
+        ));
+
+        let all_bylaws = crate::Bylaws::<Test>::get(&ALICE);
+        assert_eq!(all_bylaws.len(), 0);
+    })
+}
+
+#[test]
+fn reset_bylaws() {
+    ExtBuilder::default().build().execute_with(|| {
+        assert_ok!(Bylaws::add_bylaw(
+            Origin::signed(ALICE),
+            ALICE,
+            MockTags::Test,
+            Bylaw::Deny
+        ));
+        assert_ok!(Bylaws::add_bylaw(
+            Origin::signed(ALICE),
+            ALICE,
+            MockTags::Misc,
+            Bylaw::Deny
+        ));
+
+        assert_ok!(Bylaws::reset_bylaws(Origin::signed(ALICE), ALICE,));
+
+        let all_bylaws = crate::Bylaws::<Test>::get(&ALICE);
+        assert_eq!(all_bylaws.len(), 0);
+    })
+}
