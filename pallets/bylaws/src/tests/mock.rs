@@ -16,8 +16,7 @@
 
 use crate::{CheckBylaws, Module, Trait};
 use codec::{Decode, Encode};
-use frame_support::{impl_outer_origin, parameter_types};
-pub use governance_os_runtime::Call;
+use frame_support::{impl_outer_dispatch, impl_outer_origin, parameter_types};
 use governance_os_support::{
     rules::{CallTagger, Rule, SuperSetter},
     testing::{
@@ -36,6 +35,12 @@ use sp_std::{fmt::Debug, marker};
 
 impl_outer_origin! {
     pub enum Origin for Test {}
+}
+
+impl_outer_dispatch! {
+    pub enum Call for Test where origin: Origin {
+        frame_system::System,
+    }
 }
 
 #[derive(Clone, Eq, PartialEq, Debug)]
