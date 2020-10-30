@@ -106,9 +106,14 @@ mod tests {
         ExtBuilder::default().one_hundred_for_alice_n_bob().build()
     }
 
-    create_benchmarking_test! { new_test_ext, Test, create, test_benchmark_create }
-    create_benchmarking_test! { new_test_ext, Test, mint, test_benchmark_mint }
-    create_benchmarking_test! { new_test_ext, Test, burn, test_benchmark_burn }
-    create_benchmarking_test! { new_test_ext, Test, update_details, test_benchmark_update_details }
-    create_benchmarking_test! { new_test_ext, Test, transfer, test_benchmark_transfer }
+    create_benchmarking_test!(new_test_ext, Test, create, test_benchmark_create);
+    create_benchmarking_test!(new_test_ext, Test, mint, test_benchmark_mint);
+    create_benchmarking_test!(new_test_ext, Test, burn, test_benchmark_burn);
+    create_benchmarking_test!(
+        new_test_ext,
+        Test,
+        update_details,
+        test_benchmark_update_details
+    );
+    create_benchmarking_test!(new_test_ext, Test, transfer, test_benchmark_transfer);
 }

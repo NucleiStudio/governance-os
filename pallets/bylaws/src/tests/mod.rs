@@ -14,14 +14,6 @@
  * limitations under the License.
  */
 
-//! A compilation of traits and helpers for implementing the Governance OS
-
-#![cfg_attr(not(feature = "std"), no_std)]
-
-#[cfg(feature = "runtime-benchmarks")]
-pub mod benchmarking;
-pub mod currencies;
-pub mod rules;
-pub mod testing;
-
-pub use currencies::{Currencies, ReservableCurrencies};
+pub mod dispatchable;
+pub mod mock;
+pub mod signed_extra;

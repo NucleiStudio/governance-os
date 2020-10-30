@@ -1,0 +1,100 @@
+/*
+ * Copyright 2020 Nuclei Studio OÜ
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+use super::mock::*;
+use crate::Error;
+use frame_support::{assert_noop, assert_ok, storage::StorageMap};
+use governance_os_support::testing::ALICE;
+
+#[test]
+fn add_bylaw() {
+    ExtBuilder::default().build().execute_with(|| {
+        assert_ok!(Bylaws::add_bylaw(
+            Origin::signed(ALICE),
+            ALICE,
+            MockTags::Test,
+            Bylaw::Deny
+        ));
+
+        let all_bylaws = crate::Bylaws::<Test>::get(&ALICE);
+        assert_eq!(all_bylaws.len(), 1);
+        assert_eq!(all_bylaws[0], (MockTags::Test, Bylaw::Deny));
+    })
+}
+
+#[test]
+fn add_bylaw_error_if_over_maximum() {
+    ExtBuilder::default().build().execute_with(|| {
+        for _ in 0..MaxBylaws::get() {
+            assert_ok!(Bylaws::add_bylaw(
+                Origin::signed(ALICE),
+                ALICE,
+                MockTags::Test,
+                Bylaw::Deny
+            ));
+        }
+
+        assert_noop!(
+            Bylaws::add_bylaw(Origin::signed(ALICE), ALICE, MockTags::Test, Bylaw::Deny),
+            Error::<Test>::TooManyBylaws
+        );
+    })
+}
+
+#[test]
+fn remove_bylaw() {
+    ExtBuilder::default().build().execute_with(|| {
+        assert_ok!(Bylaws::add_bylaw(
+            Origin::signed(ALICE),
+            ALICE,
+            MockTags::Test,
+            Bylaw::Deny
+        ));
+
+        assert_ok!(Bylaws::remove_bylaw(
+            Origin::signed(ALICE),
+            ALICE,
+            MockTags::Test,
+            Bylaw::Deny
+        ));
+
+        let all_bylaws = crate::Bylaws::<Test>::get(&ALICE);
+        assert_eq!(all_bylaws.len(), 0);
+    })
+}
+
+#[test]
+fn reset_bylaws() {
+    ExtBuilder::default().build().execute_with(|| {
+        assert_ok!(Bylaws::add_bylaw(
+            Origin::signed(ALICE),
+            ALICE,
+            MockTags::Test,
+            Bylaw::Deny
+        ));
+        assert_ok!(Bylaws::add_bylaw(
+            Origin::signed(ALICE),
+            ALICE,
+            MockTags::Misc,
+            Bylaw::Deny
+        ));
+
+        assert_ok!(Bylaws::reset_bylaws(Origin::signed(ALICE), ALICE,));
+
+        let all_bylaws = crate::Bylaws::<Test>::get(&ALICE);
+        assert_eq!(all_bylaws.len(), 0);
+    })
+}

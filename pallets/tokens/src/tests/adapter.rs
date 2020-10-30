@@ -116,6 +116,7 @@ fn burn() {
             assert_eq!(TokensCurrencyAdapter::total_issuance(), 200);
         })
 }
+
 // Was lazy and didn't want to type two times the same test so we just make
 // a macro to do the job for us
 macro_rules! deposit_test {
@@ -132,8 +133,8 @@ macro_rules! deposit_test {
     };
 }
 
-deposit_test! { deposit_into_existing, deposit_into_existing }
-deposit_test! { deposit_into_creating, deposit_into_existing }
+deposit_test!(deposit_into_existing, deposit_into_existing);
+deposit_test!(deposit_into_creating, deposit_into_existing);
 
 #[test]
 fn transfer() {

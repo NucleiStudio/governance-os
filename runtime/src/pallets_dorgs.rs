@@ -14,14 +14,21 @@
  * limitations under the License.
  */
 
-//! A compilation of traits and helpers for implementing the Governance OS
+use crate::{Bylaw, CallTagger, CallTags, Event, Runtime};
+use frame_support::parameter_types;
+use sp_std::prelude::*;
 
-#![cfg_attr(not(feature = "std"), no_std)]
+parameter_types! {
+    pub DefaultBylaws: Vec<(CallTags, Bylaw)> = vec![(CallTags::Any, Bylaw::Allow)];
+    pub const MaxBylaws: u32 = 1_000;
+}
 
-#[cfg(feature = "runtime-benchmarks")]
-pub mod benchmarking;
-pub mod currencies;
-pub mod rules;
-pub mod testing;
-
-pub use currencies::{Currencies, ReservableCurrencies};
+impl governance_os_pallet_bylaws::Trait for Runtime {
+    type Event = Event;
+    type Tag = CallTags;
+    type Tagger = CallTagger;
+    type Bylaw = Bylaw;
+    type DefaultBylaws = DefaultBylaws;
+    type MaxBylaws = MaxBylaws;
+    type WeightInfo = ();
+}

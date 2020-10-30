@@ -42,13 +42,20 @@ use sp_runtime::{
 use sp_std::prelude::*;
 use sp_version::RuntimeVersion;
 
+mod bylaws;
+mod call_tags;
 mod constants;
 mod pallets_consensus;
 mod pallets_core;
+mod pallets_dorgs;
 mod pallets_economics;
+#[cfg(test)]
+mod tests;
 mod version;
 mod weights;
 
+pub use bylaws::Bylaw;
+pub use call_tags::{CallTagger, CallTags};
 pub use pallets_consensus::{AuraId, GrandpaId, SessionKeys};
 pub use pallets_economics::{NativeCurrency, NativeCurrencyId};
 #[cfg(feature = "std")]
@@ -74,6 +81,9 @@ construct_runtime!(
         // Economics
         Tokens: governance_os_pallet_tokens::{Module, Call, Storage, Config<T>, Event<T>},
         TransactionPayment: pallet_transaction_payment::{Module, Storage},
+
+        // dOrgs
+        Bylaws: governance_os_pallet_bylaws::{Module, Call, Storage, Event<T>},
     }
 );
 
@@ -103,6 +113,7 @@ pub type SignedExtra = (
     frame_system::CheckNonce<Runtime>,
     frame_system::CheckWeight<Runtime>,
     pallet_transaction_payment::ChargeTransactionPayment<Runtime>,
+    governance_os_pallet_bylaws::CheckBylaws<Runtime>,
 );
 
 impl_runtime_apis! {
@@ -245,6 +256,7 @@ impl_runtime_apis! {
             let params = (&config, &whitelist);
 
             add_benchmark!(params, batches, frame_system, SystemBench::<Runtime>);
+            add_benchmark!(params, batches, governance_os_pallet_bylaws, Bylaws);
             add_benchmark!(params, batches, governance_os_pallet_tokens, Tokens);
             add_benchmark!(params, batches, pallet_grandpa, Grandpa);
             add_benchmark!(params, batches, pallet_timestamp, Timestamp);
