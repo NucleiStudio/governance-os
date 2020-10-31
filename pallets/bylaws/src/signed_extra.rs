@@ -20,7 +20,7 @@ use frame_support::{
     traits::{Get, GetCallMetadata},
     weights::DispatchInfo,
 };
-use governance_os_support::acl::CallFilter;
+use governance_os_support::acl::{CallFilter, RoleManager};
 use sp_runtime::{
     traits::{DispatchInfoOf, Dispatchable, SignedExtension},
     transaction_validity::{

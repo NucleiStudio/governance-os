@@ -45,3 +45,19 @@ where
         len: usize,
     ) -> Vec<Role>;
 }
+
+/// This trait can be implemented by a pallet to expose an interface for other pallets to
+/// manage their own role based access control features.
+pub trait RoleManager<AccountId, Role> {
+    /// Should return `true` if `traget` has the role `role`. This can be the case
+    /// if the role was granted directly to the target or if it was granted to all accounts.
+    fn has_role(target: &AccountId, role: Role) -> bool;
+
+    /// Grants `target` the role `role`. If target is `None` then it should give the role to
+    /// every account that exists or may exists on the chain.
+    fn grant_role(target: Option<&AccountId>, role: Role);
+
+    /// Should revoke the role `role` for `target`. If the role wasn't granted to `target` this
+    /// should be a no op.
+    fn revoke_role(target: Option<&AccountId>, role: Role);
+}
