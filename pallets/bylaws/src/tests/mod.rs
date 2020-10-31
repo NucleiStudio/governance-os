@@ -15,5 +15,6 @@
  */
 
 pub mod dispatchable;
+pub mod genesis;
 pub mod mock;
 pub mod signed_extra;

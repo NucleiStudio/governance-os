@@ -20,47 +20,68 @@ use governance_os_support::testing::ALICE;
 use sp_runtime::{traits::SignedExtension, transaction_validity::InvalidTransaction};
 
 #[test]
-fn default_bylaw_if_no_bylaw_registered() {
+fn refuse_if_no_role_granted() {
     ExtBuilder::default().build().execute_with(|| {
-        let allowed_call = Call::System(frame_system::Call::remark(vec![]));
-        let denied_call = Call::System(frame_system::Call::suicide());
-
-        // By default only `remark` is allowed
-        assert_ok!(MockCheckBylaws::default().validate(
-            &ALICE,
-            &allowed_call,
-            &allowed_call.get_dispatch_info(),
-            0
-        ));
+        let call = Call::System(frame_system::Call::remark(vec![]));
         assert_noop!(
-            MockCheckBylaws::default().validate(
-                &ALICE,
-                &denied_call,
-                &denied_call.get_dispatch_info(),
-                0
-            ),
+            MockCheckRole::default().validate(&ALICE, &call, &call.get_dispatch_info(), 0),
             InvalidTransaction::Call
         );
     })
 }
 
 #[test]
-fn apply_bylaw_as_expected() {
-    // We are going to make the system deny calls to `remark`
+fn allow_if_no_roles_attached_to_call() {
     ExtBuilder::default().build().execute_with(|| {
-        assert_ok!(Bylaws::add_bylaw(
-            Origin::signed(ALICE),
-            ALICE,
-            MockTags::Test,
-            Bylaw::Deny
-        ));
-        let call = Call::System(frame_system::Call::remark(vec![]));
-
-        assert_eq!(
-            MockCheckBylaws::default()
-                .validate(&ALICE, &call, &call.get_dispatch_info(), 0)
-                .is_err(),
-            true
-        );
+        let call = Call::System(frame_system::Call::suicide());
+        assert_ok!(MockCheckRole::default().validate(&ALICE, &call, &call.get_dispatch_info(), 0));
     })
+}
+
+#[test]
+fn allow_if_role_granted_to_account() {
+    ExtBuilder::default()
+        .with_role(MockRoles::RemarkOnly, Some(ALICE))
+        .build()
+        .execute_with(|| {
+            let call = Call::System(frame_system::Call::remark(vec![]));
+            assert_ok!(MockCheckRole::default().validate(
+                &ALICE,
+                &call,
+                &call.get_dispatch_info(),
+                0
+            ));
+        })
+}
+
+#[test]
+fn allow_if_role_granted_everybody() {
+    ExtBuilder::default()
+        .with_role(MockRoles::RemarkOnly, None)
+        .build()
+        .execute_with(|| {
+            let call = Call::System(frame_system::Call::remark(vec![]));
+            assert_ok!(MockCheckRole::default().validate(
+                &ALICE,
+                &call,
+                &call.get_dispatch_info(),
+                0
+            ));
+        })
+}
+
+#[test]
+fn allow_if_root() {
+    ExtBuilder::default()
+        .alice_as_root()
+        .build()
+        .execute_with(|| {
+            let call = Call::System(frame_system::Call::remark(vec![]));
+            assert_ok!(MockCheckRole::default().validate(
+                &ALICE,
+                &call,
+                &call.get_dispatch_info(),
+                0
+            ));
+        })
 }

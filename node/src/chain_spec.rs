@@ -15,10 +15,10 @@
  */
 
 use governance_os_pallet_tokens::CurrencyDetails;
-use governance_os_primitives::{AccountId, CurrencyId, Signature};
+use governance_os_primitives::{AccountId, CurrencyId, Role, Signature};
 use governance_os_runtime::{
-    AuraConfig, AuraId, GenesisConfig, GrandpaConfig, GrandpaId, NativeCurrencyId, SystemConfig,
-    TokensConfig, WASM_BINARY,
+    AuraConfig, AuraId, BylawsConfig, GenesisConfig, GrandpaConfig, GrandpaId, NativeCurrencyId,
+    SystemConfig, TokensConfig, WASM_BINARY,
 };
 use sc_service::ChainType;
 use sp_core::{sr25519, Pair, Public};
@@ -55,6 +55,7 @@ fn testnet_genesis(
     initial_authorities: Vec<(AuraId, GrandpaId)>,
     endowed_accounts: Vec<AccountId>,
     currencies: Option<Vec<(CurrencyId, CurrencyDetails<AccountId>)>>,
+    roles: Option<Vec<(Role, Option<AccountId>)>>,
 ) -> GenesisConfig {
     let chain_currencies = currencies.unwrap_or(vec![(
         NativeCurrencyId::get(),
@@ -62,6 +63,13 @@ fn testnet_genesis(
             owner: get_account_id_from_seed::<sr25519::Public>("Alice"),
         },
     )]);
+    let chain_roles = roles.unwrap_or(vec![
+        (
+            Role::Root,
+            Some(get_account_id_from_seed::<sr25519::Public>("Alice")),
+        ),
+        (Role::CreateCurrencies, None),
+    ]);
 
     GenesisConfig {
         frame_system: Some(SystemConfig {
@@ -86,6 +94,7 @@ fn testnet_genesis(
                 .collect::<Vec<_>>(),
             currency_details: chain_currencies,
         }),
+        governance_os_pallet_bylaws: Some(BylawsConfig { roles: chain_roles }),
     }
 }
 
@@ -106,6 +115,7 @@ pub fn development_config() -> Result<ChainSpec, String> {
                     get_account_id_from_seed::<sr25519::Public>("Alice"),
                     get_account_id_from_seed::<sr25519::Public>("Bob"),
                 ],
+                None,
                 None,
             )
         },
@@ -140,6 +150,7 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
                     get_account_id_from_seed::<sr25519::Public>("Ferdie"),
                 ],
                 None,
+                None,
             )
         },
         vec![],
@@ -164,6 +175,7 @@ pub fn dummy_config() -> Result<ChainSpec, String> {
                 wasm_binary,
                 vec![authority_keys_from_seed("Alice")],
                 vec![],
+                Some(vec![]),
                 Some(vec![]),
             )
         },

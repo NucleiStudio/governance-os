@@ -18,10 +18,23 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
+pub mod acl;
 #[cfg(feature = "runtime-benchmarks")]
 pub mod benchmarking;
 pub mod currencies;
-pub mod rules;
 pub mod testing;
 
 pub use currencies::{Currencies, ReservableCurrencies};
+
+#[macro_export]
+/// Use this macro to easily implement `Default` for a given enum. This avoids
+/// having to type the same code everytime.
+macro_rules! impl_enum_default {
+    ($target:ident, $default:ident) => {
+        impl Default for $target {
+            fn default() -> Self {
+                Self::$default
+            }
+        }
+    };
+}

@@ -14,29 +14,18 @@
  * limitations under the License.
  */
 
-//! This pallet implements a bylaws system for account permissioning.
-//! A bylaw is typically made of a "tag" and a "rule". Tags represents
-//! the kinds of calls being filtered, for instance an hypothetic tag
-//! `Monetary` could refer to all extrinsics moving tokens. A rule is
-//! then a simple script implemented in a DSL (typically Rust enums)
-//! to help the system decide if the call should be approved or discarded.
-//!
-//! The bylaws pallet should typically be added to the `SignedExtra` of a
-//! runtime so that it could filter incoming calls.
-//!
-//! **NOTE**: this module is a bit specific in the sense that **no actual
-//! access control is performed on critical functions**, indeed, we expect
-//! the host runtime to create its own default bylaws to control those.
+//! This pallet implements an ACL system for account level permissioning.
+//! A role is the equivalent of a UNIX role, it can be granted either to
+//! one or many account or even to all the accounts within the system.
+//! We then link the pallet to a `CallFilter` that is in charge or associating
+//! incoming calls to expected roles.
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use frame_support::{
-    decl_error, decl_event, decl_module, decl_storage, traits::Get, weights::Weight, Parameter,
-};
-use frame_system::ensure_signed;
-use governance_os_support::rules::{CallTagger, Rule, SuperSetter};
-use sp_runtime::traits::{MaybeSerializeDeserialize, Member, StaticLookup};
-use sp_std::{convert::TryFrom, prelude::Vec};
+use frame_support::{decl_event, decl_module, decl_storage, traits::Get, weights::Weight};
+use frame_system::ensure_root;
+use governance_os_support::acl::{CallFilter, Role};
+use sp_runtime::traits::StaticLookup;
 
 #[cfg(feature = "runtime-benchmarks")]
 mod benchmarking;
@@ -45,49 +34,42 @@ mod signed_extra;
 #[cfg(test)]
 mod tests;
 
-pub use signed_extra::CheckBylaws;
+pub use signed_extra::CheckRole;
 
 pub trait WeightInfo {
-    fn add_bylaw(b: u32) -> Weight;
-    fn remove_bylaw(b: u32) -> Weight;
-    fn reset_bylaws(b: u32) -> Weight;
+    fn grant_role() -> Weight;
+    fn revoke_role() -> Weight;
 }
 
 pub trait Trait: frame_system::Trait {
     /// Because this pallet emits events, it depends on the runtime's definition of an event.
     type Event: From<Event<Self>> + Into<<Self as frame_system::Trait>::Event>;
 
-    /// Tags are used to identify incoming calls and match them to some rules.
-    type Tag: Parameter + Member + Copy + MaybeSerializeDeserialize + SuperSetter + Default;
+    /// Roles defines UNIX like roles that users must be granted before triggering certain calls.
+    type Role: Role + Default;
 
-    /// An object to link incoming calls to tags.
-    type Tagger: CallTagger<Self::AccountId, Self::Call, Self::Tag>;
+    /// This role would be the equivalent of a super role. If an account is granted it it can submit
+    /// any other calls.
+    type RootRole: Get<Self::Role>;
 
-    /// How bylaws are represented inside the system.
-    type Bylaw: Parameter
-        + Member
-        + MaybeSerializeDeserialize
-        + Clone
-        + Rule<Self::AccountId, Self::Call>
-        + Default;
+    /// The call filter is in charge of tagging incoming calls with roles that are needed.
+    type CallFilter: CallFilter<Self::AccountId, Self::Call, Self::Role>;
 
-    /// The default bylaws to apply to calls without a bylaw already, typically this would be
-    /// `Allow` for public networks and `Deny` for permissioned networks. We take in a list
-    /// tag and bylaw in order to provide customization abilities.
-    type DefaultBylaws: Get<Vec<(Self::Tag, Self::Bylaw)>>;
-
-    /// Maximum number of bylaws for one account, this is used for weight calculation and enforced
-    /// by `add_bylaw`.
-    type MaxBylaws: Get<u32>;
-
-    /// Weight values for this pallet
+    /// The weights for this pallet.
     type WeightInfo: WeightInfo;
 }
 
 decl_storage! {
     trait Store for Module<T: Trait> as Bylaws {
-        /// Links an account to a series of bylaws.
-        pub Bylaws get(fn bylaws): map hasher(blake2_128_concat) T::AccountId => Vec<(T::Tag, T::Bylaw)>;
+        /// Roles granted to the different accounts. If a role is granted to `None` this means
+        /// it is granted to all accounts from the runtime.
+        pub Roles get(fn roles): double_map hasher(blake2_128_concat) T::Role, hasher(blake2_128_concat) Option<T::AccountId> => bool;
+    }
+    add_extra_genesis {
+        config(roles): Vec<(T::Role, Option<T::AccountId>)>;
+        build(|config: &GenesisConfig<T>| {
+            config.roles.iter().for_each(|(role, target)| Module::<T>::set_role(target.as_ref(), *role));
+        })
     }
 }
 
@@ -95,79 +77,57 @@ decl_event!(
     pub enum Event<T>
     where
         AccountId = <T as frame_system::Trait>::AccountId,
-        Tag = <T as Trait>::Tag,
-        Bylaw = <T as Trait>::Bylaw,
+        Role = <T as Trait>::Role,
     {
-        /// Somebody added a bylaw to the account. [source, account, tag, bylaw]
-        BylawAdded(AccountId, AccountId, Tag, Bylaw),
-        /// Somebody deleted a bylaw from the account. [source, account, tag, bylaw]
-        BylawRemoved(AccountId, AccountId, Tag, Bylaw),
-        /// Somebody cleared the bylaws associated to an account. [source, account]
-        BylawsReset(AccountId, AccountId),
+        RoleGranted(Option<AccountId>, Role),
+        RoleRevoked(Option<AccountId>, Role),
     }
 );
 
-decl_error! {
-    pub enum Error for Module<T: Trait> {
-        /// The couple of bylaw and tag you are looking for doesn't exist for this account.
-        BylawNotFound,
-        /// You need to delete some bylaws from the target account before being able to add
-        /// new ones.
-        TooManyBylaws,
+decl_module! {
+    pub struct Module<T: Trait> for enum Call where origin: T::Origin {
+        fn deposit_event() = default;
+
+        /// Add a `role` to a given account `who`. If `who` is set to `None` this
+        /// means that the role is granted to all the accounts of the chain.
+        #[weight = T::WeightInfo::grant_role()]
+        fn grant_role(origin, who: Option<<T::Lookup as StaticLookup>::Source>, role: T::Role) {
+            ensure_root(origin)?;
+            let target = match who {
+                Some(lookmeup) => Some(T::Lookup::lookup(lookmeup)?),
+                None => None,
+            };
+
+            Self::set_role(target.as_ref(), role);
+            Self::deposit_event(RawEvent::RoleGranted(target, role));
+        }
+
+        /// Remove a `role` from a given account `who`. If `who` is set to `None` this means
+        /// that the role is revoked for all the accounts of the chain.
+        #[weight = T::WeightInfo::revoke_role()]
+        fn revoke_role(origin, who: Option<<T::Lookup as StaticLookup>::Source>, role: T::Role) {
+            ensure_root(origin)?;
+            let target = match who {
+                Some(lookmeup) => Some(T::Lookup::lookup(lookmeup)?),
+                None => None,
+            };
+
+            Self::unset_role(target.as_ref(), role);
+            Self::deposit_event(RawEvent::RoleRevoked(target, role));
+        }
     }
 }
 
-decl_module! {
-    pub struct Module<T: Trait> for enum Call where origin: T::Origin {
-        type Error = Error<T>;
+impl<T: Trait> Module<T> {
+    fn set_role(target: Option<&T::AccountId>, role: T::Role) {
+        Roles::<T>::mutate(role, target, |d| *d = true)
+    }
 
-        fn deposit_event() = default;
+    fn unset_role(target: Option<&T::AccountId>, role: T::Role) {
+        Roles::<T>::remove(role, target)
+    }
 
-        /// Add a `bylaw` to a given account `who` for a call matching `tag`.
-        #[weight = T::WeightInfo::add_bylaw(T::MaxBylaws::get())]
-        fn add_bylaw(origin, who: <T::Lookup as StaticLookup>::Source, tag: T::Tag, bylaw: T::Bylaw) {
-            let caller = ensure_signed(origin)?;
-            let who_lookup = T::Lookup::lookup(who)?;
-
-            <Bylaws<T>>::try_mutate(&who_lookup, |vec| {
-                if vec.len() + 1 > usize::try_from(T::MaxBylaws::get()).expect("usize should always be a u32 and in some particular cases only a u16; qed") {
-                    return Err(Error::<T>::TooManyBylaws);
-                }
-
-                vec.push((tag, bylaw.clone()));
-                Ok(())
-            })?;
-
-            Self::deposit_event(RawEvent::BylawAdded(caller, who_lookup, tag, bylaw));
-        }
-
-        /// Remove a `bylaw` from a given account `who` for a call matching `tag`.
-        #[weight = T::WeightInfo::remove_bylaw(T::MaxBylaws::get())]
-        fn remove_bylaw(origin, who: <T::Lookup as StaticLookup>::Source, tag: T::Tag, bylaw: T::Bylaw) {
-            let caller = ensure_signed(origin)?;
-            let who_lookup = T::Lookup::lookup(who)?;
-
-            // When it comes to removal we chose to delete bylaws by (tag, bylaw) and not by identifier
-            // as removing by id would mess things up in the event that calls to `remove_bylaw` are batched,
-            // indeed, removing one bylaw could substract one from all other bylaw ids.
-            let mut bylaws = <Bylaws<T>>::get(&who_lookup);
-            let location = bylaws.iter().cloned().position(|(inner_tag, inner_bylaw)| inner_tag == tag && inner_bylaw == bylaw).ok_or(Error::<T>::BylawNotFound)?;
-            bylaws.remove(location);
-
-            <Bylaws<T>>::mutate(&who_lookup, |v| *v = bylaws);
-
-            Self::deposit_event(RawEvent::BylawRemoved(caller, who_lookup, tag, bylaw));
-        }
-
-        /// Clear all bylaws associated to `who`. Account will still have to comform to the default runtime bylaws.
-        #[weight = T::WeightInfo::reset_bylaws(T::MaxBylaws::get())]
-        fn reset_bylaws(origin, who: <T::Lookup as StaticLookup>::Source) {
-            let caller = ensure_signed(origin)?;
-            let who_lookup = T::Lookup::lookup(who)?;
-
-            <Bylaws<T>>::remove(&who_lookup);
-
-            Self::deposit_event(RawEvent::BylawsReset(caller, who_lookup));
-        }
+    pub fn has_role(target: &T::AccountId, role: T::Role) -> bool {
+        Roles::<T>::get(role, Some(target)) || Roles::<T>::get(role, None as Option<&T::AccountId>)
     }
 }

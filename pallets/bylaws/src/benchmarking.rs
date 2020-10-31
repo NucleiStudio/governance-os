@@ -15,66 +15,36 @@
  */
 
 use crate::*;
-use frame_benchmarking::{account, benchmarks, whitelisted_caller};
+use frame_benchmarking::{account, benchmarks};
 use frame_system::RawOrigin;
 use governance_os_support::benchmarking::SEED;
 use sp_runtime::traits::StaticLookup;
-use sp_std::{
-    convert::{TryFrom, TryInto},
-    prelude::*,
-};
+use sp_std::prelude::*;
 
-fn prepare_benchmark<T: Trait>(
-    b: u32,
-) -> Result<
-    (
-        T::AccountId,
-        T::AccountId,
-        <T::Lookup as StaticLookup>::Source,
-    ),
-    &'static str,
-> {
-    let caller: T::AccountId = whitelisted_caller();
+fn prepare_benchmark<T: Trait>() -> (T::AccountId, <T::Lookup as StaticLookup>::Source, T::Role) {
     let target: T::AccountId = account("target", 0, SEED);
     let target_lookup: <T::Lookup as StaticLookup>::Source = T::Lookup::unlookup(target.clone());
+    let role = T::Role::default();
 
-    for _ in 0..b {
-        Module::<T>::add_bylaw(
-            RawOrigin::Signed(caller.clone()).into(),
-            target_lookup.clone(),
-            T::Tag::default(),
-            T::Bylaw::default(),
-        )?;
-    }
-
-    Ok((caller, target, target_lookup))
+    (target, target_lookup, role)
 }
 
 benchmarks! {
     _ { }
 
-    add_bylaw {
-        let b in 0 .. (T::MaxBylaws::get() - 1);
-        let (caller, target, target_lookup) = prepare_benchmark::<T>(b)?;
-    }: _(RawOrigin::Signed(caller.clone()), target_lookup, T::Tag::default(), T::Bylaw::default())
+    grant_role {
+        let (target, target_lookup, role) = prepare_benchmark::<T>();
+    }: _(RawOrigin::Root, Some(target_lookup), role)
     verify {
-        assert_eq!(Bylaws::<T>::get(&target).len(), usize::try_from(b + 1).unwrap());
+        assert_eq!(Module::<T>::has_role(&target, role), true);
     }
 
-    remove_bylaw {
-        let b in 1 .. T::MaxBylaws::get();
-        let (caller, target, target_lookup) = prepare_benchmark::<T>(b)?;
-    }: _(RawOrigin::Signed(caller.clone()), target_lookup, T::Tag::default(), T::Bylaw::default())
+    revoke_role {
+        let (target, target_lookup, role) = prepare_benchmark::<T>();
+        Module::<T>::set_role(Some(&target), role);
+    }: _(RawOrigin::Root, Some(target_lookup), role)
     verify {
-        assert_eq!(Bylaws::<T>::get(&target).len(), usize::try_from(b - 1).unwrap());
-    }
-
-    reset_bylaws {
-        let b in 0 .. T::MaxBylaws::get();
-        let (caller, target, target_lookup) = prepare_benchmark::<T>(b)?;
-    }: _(RawOrigin::Signed(caller.clone()), target_lookup)
-    verify {
-        assert_eq!(Bylaws::<T>::get(&target).len(), usize::try_from(0).unwrap());
+        assert_eq!(Module::<T>::has_role(&target, role), false);
     }
 }
 
@@ -89,17 +59,6 @@ mod tests {
         ExtBuilder::default().build()
     }
 
-    create_benchmarking_test!(new_test_ext, Test, add_bylaw, test_benchmark_add_bylaw);
-    create_benchmarking_test!(
-        new_test_ext,
-        Test,
-        remove_bylaw,
-        test_benchmark_remove_bylaw
-    );
-    create_benchmarking_test!(
-        new_test_ext,
-        Test,
-        reset_bylaws,
-        test_benchmark_reset_bylaws
-    );
+    create_benchmarking_test!(new_test_ext, Test, grant_role, test_benchmark_grant_role);
+    create_benchmarking_test!(new_test_ext, Test, revoke_role, test_benchmark_revoke_role);
 }

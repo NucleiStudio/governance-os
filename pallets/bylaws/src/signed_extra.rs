@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-use crate::{Bylaws, Trait};
+use crate::{Module, Trait};
 use codec::{Decode, Encode};
 use frame_support::{
-    storage::StorageMap,
     traits::{Get, GetCallMetadata},
     weights::DispatchInfo,
 };
-use governance_os_support::rules::{CallTagger, Rule, SuperSetter};
+use governance_os_support::acl::CallFilter;
 use sp_runtime::{
     traits::{DispatchInfoOf, Dispatchable, SignedExtension},
     transaction_validity::{
@@ -35,14 +34,14 @@ use sp_std::{fmt::Debug, marker, result};
 /// so that the pallet intercepts calls and apply them the registered bylaws.
 /// `T` should be a value implementing `crate::Trait`, normally a runtime.
 #[derive(Encode, Decode, Clone, Eq, PartialEq, RuntimeDebug)]
-pub struct CheckBylaws<T>(marker::PhantomData<T>);
+pub struct CheckRole<T>(marker::PhantomData<T>);
 
-impl<T> SignedExtension for CheckBylaws<T>
+impl<T> SignedExtension for CheckRole<T>
 where
     T: Trait + Send + Sync + Debug,
     T::Call: Dispatchable<Info = DispatchInfo> + GetCallMetadata,
 {
-    const IDENTIFIER: &'static str = "Bylaws";
+    const IDENTIFIER: &'static str = "BylawsRole";
     type AccountId = T::AccountId;
     type Call = T::Call;
     type AdditionalSigned = ();
@@ -61,46 +60,30 @@ where
         info: &DispatchInfoOf<Self::Call>,
         len: usize,
     ) -> TransactionValidity {
-        let default_bylaws = T::DefaultBylaws::get();
-        let account_bylaws = Bylaws::<T>::get(who);
-
-        if default_bylaws.is_empty() && account_bylaws.is_empty() {
-            sp_runtime::print("ERROR in bylaws pallet: no bylaws are configured for the account and no default bylaws are set; skipping call filtering");
+        let roles = T::CallFilter::roles_for(who, call, info, len);
+        // Either `who` is root either it has one of the roles needed.
+        if roles.is_empty()
+            || Module::<T>::has_role(who, T::RootRole::get())
+            || roles
+                .iter()
+                .cloned()
+                .find(|role| Module::<T>::has_role(who, *role))
+                .is_some()
+        {
             return Ok(ValidTransaction {
                 ..Default::default()
             });
         }
 
-        match default_bylaws
-            .iter()
-            .chain(account_bylaws.iter())
-            .cloned()
-            .filter(|(tag, _)| {
-                // We keep only the supersets, we assume that if
-                // tag_a == tag_b superset will return true.
-                tag.is_superset(&T::Tagger::tag(who, call))
-            })
-            .find(|(_, bylaw)| {
-                // At this stage we know that tag matches `call` and `who`,
-                // we simply need to check if a bylaw denies the call. If that's
-                // the case we stop looking would deny the call.
-                !bylaw.validate(who, call, info, len)
-            }) {
-            // No bylaws that would deny the call found
-            None => Ok(ValidTransaction {
-                ..Default::default()
-            }),
-            // We found at least one bylaw that would deny the call, error!
-            Some(..) => Err(InvalidTransaction::Call.into()),
-        }
+        Err(InvalidTransaction::Call.into())
     }
 }
 
 // For utility purposes, we support the `Default` constructor (mostly used in tests).
 #[cfg(test)]
-impl<T> Default for CheckBylaws<T> {
+impl<T> Default for CheckRole<T> {
     fn default() -> Self {
-        CheckBylaws {
+        CheckRole {
             0: marker::PhantomData,
         }
     }
