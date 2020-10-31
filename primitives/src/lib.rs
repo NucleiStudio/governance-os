@@ -66,3 +66,12 @@ pub type Hash = sp_core::H256;
 pub type Header = generic::Header<BlockNumber, BlakeTwo256>;
 /// Block type.
 pub type Block = generic::Block<Header, OpaqueExtrinsic>;
+
+/// The different roles supported by the runtime.
+#[derive(Encode, Decode, RuntimeDebug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
+pub enum Role {
+    CreateCurrencies,
+    Root,
+}
+impl governance_os_support::acl::Role for Role {}

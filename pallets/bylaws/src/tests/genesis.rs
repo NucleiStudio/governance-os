@@ -15,33 +15,25 @@
  */
 
 use super::mock::*;
-use frame_support::assert_ok;
-use frame_system::RawOrigin;
-use governance_os_support::testing::ALICE;
+use crate::Roles;
+use frame_support::storage::StorageDoubleMap;
+use governance_os_support::testing::{primitives::AccountId, ALICE, BOB};
 
 #[test]
-fn grant_role() {
-    ExtBuilder::default().build().execute_with(|| {
-        assert_ok!(Bylaws::grant_role(
-            RawOrigin::Root.into(),
-            Some(ALICE),
-            MockRoles::Root,
-        ));
-        assert_eq!(Bylaws::has_role(&ALICE, MockRoles::Root), true);
-    })
-}
-
-#[test]
-fn revoke_role() {
+fn register_role() {
     ExtBuilder::default()
+        .with_role(MockRoles::RemarkOnly, None)
         .with_role(MockRoles::Root, Some(ALICE))
         .build()
         .execute_with(|| {
-            assert_ok!(Bylaws::revoke_role(
-                RawOrigin::Root.into(),
-                Some(ALICE),
-                MockRoles::Root,
-            ));
-            assert_eq!(Bylaws::has_role(&ALICE, MockRoles::Root), false);
+            assert_eq!(
+                Roles::<Test>::get(MockRoles::RemarkOnly, None as Option<AccountId>),
+                true
+            );
+            assert_eq!(Roles::<Test>::get(MockRoles::Root, Some(ALICE)), true);
+            assert_eq!(Bylaws::has_role(&ALICE, MockRoles::Root), true);
+            assert_eq!(Bylaws::has_role(&BOB, MockRoles::Root), false);
+            assert_eq!(Bylaws::has_role(&ALICE, MockRoles::RemarkOnly), true);
+            assert_eq!(Bylaws::has_role(&BOB, MockRoles::RemarkOnly), true);
         })
 }

@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-use crate::{CheckBylaws, Module, Trait};
+use crate::{CheckRole, GenesisConfig, Module, Trait};
 use codec::{Decode, Encode};
 use frame_support::{impl_outer_dispatch, impl_outer_origin, parameter_types};
 use governance_os_support::{
-    rules::{CallTagger, Rule, SuperSetter},
+    acl::{CallFilter, Role},
     testing::{
         primitives::AccountId, AvailableBlockRatio, BlockHashCount, MaximumBlockLength,
-        MaximumBlockWeight,
+        MaximumBlockWeight, ALICE,
     },
 };
 use serde::{Deserialize, Serialize};
@@ -75,95 +75,70 @@ impl frame_system::Trait for Test {
 }
 
 #[derive(Eq, PartialEq, RuntimeDebug, Encode, Decode, Copy, Clone, Serialize, Deserialize)]
-pub enum MockTags {
-    Test,
-    Misc,
+pub enum MockRoles {
+    Root,
+    RemarkOnly,
 }
+impl Role for MockRoles {}
 
-impl SuperSetter for MockTags {
-    fn is_superset(&self, other: &Self) -> bool {
-        self == other
-    }
-}
-
-impl Default for MockTags {
-    fn default() -> Self {
-        MockTags::Misc
-    }
-}
-
-pub struct MockTagger<T>(marker::PhantomData<T>);
-impl<T: Trait> CallTagger<AccountId, Call, MockTags> for MockTagger<T> {
-    fn tag(_who: &AccountId, call: &Call) -> MockTags {
-        match matches!(call, Call::System(frame_system::Call::remark(..))) {
-            true => MockTags::Test,
-            false => MockTags::Misc,
-        }
-    }
-}
-
-#[derive(Clone, Eq, PartialEq, Encode, Decode, RuntimeDebug, Serialize, Deserialize)]
-pub enum Bylaw {
-    Allow,
-    Deny,
-}
-
-impl Rule<AccountId, Call> for Bylaw {
-    fn validate(
-        &self,
+pub struct MockCallFilter<T>(marker::PhantomData<T>);
+impl<T: Trait> CallFilter<AccountId, Call, MockRoles> for MockCallFilter<T> {
+    fn roles_for(
         _who: &AccountId,
-        _call: &Call,
+        call: &Call,
         _info: &DispatchInfoOf<Call>,
         _len: usize,
-    ) -> bool {
-        use Bylaw::*;
-
-        match self {
-            Allow => true,
-            Deny => false,
+    ) -> Vec<MockRoles> {
+        match call {
+            Call::System(frame_system::Call::remark(..)) => vec![MockRoles::RemarkOnly],
+            Call::System(frame_system::Call::suicide()) => vec![], // Everybody can call it
+            _ => vec![MockRoles::Root],
         }
-    }
-}
-
-impl Default for Bylaw {
-    fn default() -> Self {
-        Bylaw::Allow
     }
 }
 
 parameter_types! {
-    pub DefaultBylaws: Vec<(MockTags, Bylaw)> = vec![(MockTags::Test, Bylaw::Allow), (MockTags::Misc, Bylaw::Deny)];
-    // NOTE: we use a small number so that tests gives results in a short enough time.
-    // In production you'd probably want a higher value.
-    pub const MaxBylaws: u32 = 10;
+    pub const RootRole: MockRoles = MockRoles::Root;
 }
 
 impl Trait for Test {
     type Event = ();
-    type Tag = MockTags;
-    type Tagger = MockTagger<Test>;
-    type DefaultBylaws = DefaultBylaws;
-    type Bylaw = Bylaw;
-    type MaxBylaws = MaxBylaws;
-    type WeightInfo = ();
+    type Role = MockRoles;
+    type RootRole = RootRole;
+    type CallFilter = MockCallFilter<Test>;
 }
 
 pub type System = frame_system::Module<Test>;
 pub type Bylaws = Module<Test>;
-pub type MockCheckBylaws = CheckBylaws<Test>;
+pub type MockCheckRole = CheckRole<Test>;
 
-pub struct ExtBuilder;
+pub struct ExtBuilder {
+    roles: Vec<(MockRoles, Option<AccountId>)>,
+}
 
 impl Default for ExtBuilder {
     fn default() -> Self {
-        Self {}
+        Self { roles: vec![] }
     }
 }
 
 impl ExtBuilder {
+    pub fn alice_as_root(self) -> Self {
+        self.with_role(MockRoles::Root, Some(ALICE))
+    }
+
+    pub fn with_role(mut self, role: MockRoles, target: Option<AccountId>) -> Self {
+        self.roles.push((role, target));
+        self
+    }
+
     pub fn build(self) -> sp_io::TestExternalities {
-        let t = frame_system::GenesisConfig::default()
+        let mut t = frame_system::GenesisConfig::default()
             .build_storage::<Test>()
+            .unwrap();
+
+        GenesisConfig::<Test> { roles: self.roles }
+            .assimilate_storage(&mut t)
             .unwrap();
 
         let mut ext = sp_io::TestExternalities::new(t);

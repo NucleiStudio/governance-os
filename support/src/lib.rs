@@ -18,10 +18,10 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
+pub mod acl;
 #[cfg(feature = "runtime-benchmarks")]
 pub mod benchmarking;
 pub mod currencies;
-pub mod rules;
 pub mod testing;
 
 pub use currencies::{Currencies, ReservableCurrencies};
