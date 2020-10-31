@@ -47,4 +47,5 @@ impl governance_os_pallet_bylaws::Trait for Runtime {
     type Role = Role;
     type RootRole = RootRole;
     type CallFilter = CallFilter;
+    type WeightInfo = ();
 }

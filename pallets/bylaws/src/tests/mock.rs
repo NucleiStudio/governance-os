@@ -19,6 +19,7 @@ use codec::{Decode, Encode};
 use frame_support::{impl_outer_dispatch, impl_outer_origin, parameter_types};
 use governance_os_support::{
     acl::{CallFilter, Role},
+    impl_enum_default,
     testing::{
         primitives::AccountId, AvailableBlockRatio, BlockHashCount, MaximumBlockLength,
         MaximumBlockWeight, ALICE,
@@ -80,6 +81,7 @@ pub enum MockRoles {
     RemarkOnly,
 }
 impl Role for MockRoles {}
+impl_enum_default!(MockRoles, RemarkOnly);
 
 pub struct MockCallFilter<T>(marker::PhantomData<T>);
 impl<T: Trait> CallFilter<AccountId, Call, MockRoles> for MockCallFilter<T> {
@@ -106,6 +108,7 @@ impl Trait for Test {
     type Role = MockRoles;
     type RootRole = RootRole;
     type CallFilter = MockCallFilter<Test>;
+    type WeightInfo = ();
 }
 
 pub type System = frame_system::Module<Test>;

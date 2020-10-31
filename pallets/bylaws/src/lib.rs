@@ -22,25 +22,31 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use frame_support::{decl_event, decl_module, decl_storage, traits::Get};
+use frame_support::{decl_event, decl_module, decl_storage, traits::Get, weights::Weight};
 use frame_system::ensure_root;
 use governance_os_support::acl::{CallFilter, Role};
 use sp_runtime::traits::StaticLookup;
 
-// #[cfg(feature = "runtime-benchmarks")]
-// mod benchmarking;
+#[cfg(feature = "runtime-benchmarks")]
+mod benchmarking;
+mod default_weights;
 mod signed_extra;
 #[cfg(test)]
 mod tests;
 
 pub use signed_extra::CheckRole;
 
+pub trait WeightInfo {
+    fn grant_role() -> Weight;
+    fn revoke_role() -> Weight;
+}
+
 pub trait Trait: frame_system::Trait {
     /// Because this pallet emits events, it depends on the runtime's definition of an event.
     type Event: From<Event<Self>> + Into<<Self as frame_system::Trait>::Event>;
 
     /// Roles defines UNIX like roles that users must be granted before triggering certain calls.
-    type Role: Role;
+    type Role: Role + Default;
 
     /// This role would be the equivalent of a super role. If an account is granted it it can submit
     /// any other calls.
@@ -48,6 +54,9 @@ pub trait Trait: frame_system::Trait {
 
     /// The call filter is in charge of tagging incoming calls with roles that are needed.
     type CallFilter: CallFilter<Self::AccountId, Self::Call, Self::Role>;
+
+    /// The weights for this pallet.
+    type WeightInfo: WeightInfo;
 }
 
 decl_storage! {
@@ -81,7 +90,7 @@ decl_module! {
 
         /// Add a `role` to a given account `who`. If `who` is set to `None` this
         /// means that the role is granted to all the accounts of the chain.
-        #[weight = 0]
+        #[weight = T::WeightInfo::grant_role()]
         fn grant_role(origin, who: Option<<T::Lookup as StaticLookup>::Source>, role: T::Role) {
             ensure_root(origin)?;
             let target = match who {
@@ -95,7 +104,7 @@ decl_module! {
 
         /// Remove a `role` from a given account `who`. If `who` is set to `None` this means
         /// that the role is revoked for all the accounts of the chain.
-        #[weight = 0]
+        #[weight = T::WeightInfo::revoke_role()]
         fn revoke_role(origin, who: Option<<T::Lookup as StaticLookup>::Source>, role: T::Role) {
             ensure_root(origin)?;
             let target = match who {

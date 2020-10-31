@@ -19,6 +19,7 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use codec::{Decode, Encode};
+use governance_os_support::impl_enum_default;
 #[cfg(feature = "std")]
 use serde::{Deserialize, Serialize};
 use sp_runtime::{
@@ -75,3 +76,4 @@ pub enum Role {
     Root,
 }
 impl governance_os_support::acl::Role for Role {}
+impl_enum_default!(Role, Root);
