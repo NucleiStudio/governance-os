@@ -131,9 +131,9 @@ impl<T: Trait> RoleManager for Module<T> {
     }
 
     fn has_role(target: &Self::AccountId, role: Self::Role) -> bool {
-        Roles::<T>::get(role, Some(target))
-            || Roles::<T>::get(role, None as Option<&Self::AccountId>)
-            || Roles::<T>::get(T::RootRole::get(), Some(target))
-            || Roles::<T>::get(T::RootRole::get(), None as Option<&Self::AccountId>)
+        Roles::<T>::contains_key(role, Some(target))
+            || Roles::<T>::contains_key(role, None as Option<&Self::AccountId>)
+            || Roles::<T>::contains_key(T::RootRole::get(), Some(target))
+            || Roles::<T>::contains_key(T::RootRole::get(), None as Option<&Self::AccountId>)
     }
 }
