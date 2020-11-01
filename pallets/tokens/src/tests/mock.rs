@@ -19,7 +19,7 @@ use codec::{Decode, Encode};
 use frame_support::{impl_outer_dispatch, impl_outer_origin, parameter_types};
 pub use governance_os_support::{
     acl::{CallFilter, Role},
-    impl_enum_default,
+    impl_enum_default, mock_runtime,
     testing::{
         primitives::{AccountId, Balance, CurrencyId},
         AvailableBlockRatio, BlockHashCount, MaximumBlockLength, MaximumBlockWeight, ALICE, BOB,
@@ -36,56 +36,8 @@ use sp_runtime::{
 };
 use sp_std::marker;
 
-impl_outer_origin! {
-    pub enum Origin for Test {}
-}
+mock_runtime!(Test, crate::AccountData<CurrencyId, Balance>);
 
-#[derive(Clone, Eq, PartialEq)]
-pub struct Test;
-
-impl_outer_dispatch! {
-    pub enum Call for Test where origin: Origin {
-        frame_system::System,
-    }
-}
-
-impl frame_system::Trait for Test {
-    type BaseCallFilter = ();
-    type Origin = Origin;
-    type Call = Call;
-    type Index = u64;
-    type BlockNumber = u64;
-    type Hash = H256;
-    type Hashing = BlakeTwo256;
-    type AccountId = AccountId;
-    type Lookup = IdentityLookup<Self::AccountId>;
-    type Header = Header;
-    type Event = ();
-    type BlockHashCount = BlockHashCount;
-    type MaximumBlockWeight = MaximumBlockWeight;
-    type DbWeight = ();
-    type BlockExecutionWeight = ();
-    type ExtrinsicBaseWeight = ();
-    type MaximumExtrinsicWeight = MaximumBlockWeight;
-    type MaximumBlockLength = MaximumBlockLength;
-    type AvailableBlockRatio = AvailableBlockRatio;
-    type Version = ();
-    type PalletInfo = ();
-    type AccountData = crate::AccountData<CurrencyId, Balance>;
-    type OnNewAccount = ();
-    type OnKilledAccount = ();
-    type SystemWeightInfo = ();
-}
-
-#[derive(Eq, PartialEq, RuntimeDebug, Encode, Decode, Copy, Clone, Serialize, Deserialize)]
-pub enum MockRoles {
-    Root,
-    RemarkOnly,
-    TransferCurrency(CurrencyId),
-    ManageCurrency(CurrencyId),
-}
-impl Role for MockRoles {}
-impl_enum_default!(MockRoles, RemarkOnly);
 impl RoleBuilder for MockRoles {
     type CurrencyId = CurrencyId;
     type Role = Self;
@@ -97,34 +49,6 @@ impl RoleBuilder for MockRoles {
     fn manage_currency(id: CurrencyId) -> Self {
         Self::ManageCurrency(id)
     }
-}
-
-pub struct MockCallFilter<T>(marker::PhantomData<T>);
-impl<T: Trait> CallFilter<AccountId, Call, MockRoles> for MockCallFilter<T> {
-    fn roles_for(
-        _who: &AccountId,
-        call: &Call,
-        _info: &DispatchInfoOf<Call>,
-        _len: usize,
-    ) -> Vec<MockRoles> {
-        match call {
-            Call::System(frame_system::Call::remark(..)) => vec![MockRoles::RemarkOnly],
-            Call::System(frame_system::Call::suicide()) => vec![], // Everybody can call it
-            _ => vec![MockRoles::Root],
-        }
-    }
-}
-
-parameter_types! {
-    pub const RootRole: MockRoles = MockRoles::Root;
-}
-
-impl governance_os_pallet_bylaws::Trait for Test {
-    type Event = ();
-    type Role = MockRoles;
-    type RootRole = RootRole;
-    type CallFilter = MockCallFilter<Test>;
-    type WeightInfo = ();
 }
 
 impl Trait for Test {
@@ -141,8 +65,6 @@ parameter_types! {
     pub const GetTestTokenId: CurrencyId = TEST_TOKEN_ID;
 }
 
-pub type Bylaws = governance_os_pallet_bylaws::Module<Test>;
-pub type System = frame_system::Module<Test>;
 pub type Tokens = Module<Test>;
 pub type TokensCurrencyAdapter = NativeCurrencyAdapter<Test, GetTestTokenId>;
 

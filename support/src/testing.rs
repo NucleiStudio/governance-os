@@ -36,3 +36,98 @@ pub mod primitives {
     pub type Balance = u64;
     pub type CurrencyId = u8;
 }
+
+#[macro_export]
+/// This macro makes it easy to prepare a mock testing runtime. It also avoid
+/// the developer from duplicating mocking code. However, the developer is still
+/// expected to write the correct imports for now.
+/// The mock runtime is composed of the `system` and `bylaws` pallets as all the
+/// other pallets of the Governance OS project are supposed to depend on those; so
+/// better not write the same code twice.
+macro_rules! mock_runtime {
+    ($runtime:tt, $account_data:ty) => {
+        #[derive(Clone, Eq, PartialEq, RuntimeDebug)]
+        pub struct $runtime;
+
+        impl_outer_origin! {
+            pub enum Origin for $runtime {}
+        }
+
+        impl_outer_dispatch! {
+            pub enum Call for $runtime where origin: Origin {
+                frame_system::System,
+            }
+        }
+
+        impl frame_system::Trait for $runtime {
+            type BaseCallFilter = ();
+            type Origin = Origin;
+            type Call = Call;
+            type Index = u64;
+            type BlockNumber = u64;
+            type Hash = H256;
+            type Hashing = BlakeTwo256;
+            type AccountId = AccountId;
+            type Lookup = IdentityLookup<Self::AccountId>;
+            type Header = Header;
+            type Event = ();
+            type BlockHashCount = BlockHashCount;
+            type MaximumBlockWeight = MaximumBlockWeight;
+            type DbWeight = ();
+            type BlockExecutionWeight = ();
+            type ExtrinsicBaseWeight = ();
+            type MaximumExtrinsicWeight = MaximumBlockWeight;
+            type MaximumBlockLength = MaximumBlockLength;
+            type AvailableBlockRatio = AvailableBlockRatio;
+            type Version = ();
+            type PalletInfo = ();
+            type AccountData = $account_data;
+            type OnNewAccount = ();
+            type OnKilledAccount = ();
+            type SystemWeightInfo = ();
+        }
+
+        #[derive(
+            Eq, PartialEq, RuntimeDebug, Encode, Decode, Copy, Clone, Serialize, Deserialize,
+        )]
+        pub enum MockRoles {
+            Root,
+            RemarkOnly,
+            TransferCurrency(CurrencyId),
+            ManageCurrency(CurrencyId),
+        }
+        impl Role for MockRoles {}
+        impl_enum_default!(MockRoles, RemarkOnly);
+
+        pub struct MockCallFilter<T>(marker::PhantomData<T>);
+        impl<T: Trait> CallFilter<AccountId, Call, MockRoles> for MockCallFilter<T> {
+            fn roles_for(
+                _who: &AccountId,
+                call: &Call,
+                _info: &DispatchInfoOf<Call>,
+                _len: usize,
+            ) -> Vec<MockRoles> {
+                match call {
+                    Call::System(frame_system::Call::remark(..)) => vec![MockRoles::RemarkOnly],
+                    Call::System(frame_system::Call::suicide()) => vec![], // Everybody can call it
+                    _ => vec![MockRoles::Root],
+                }
+            }
+        }
+
+        parameter_types! {
+            pub const RootRole: MockRoles = MockRoles::Root;
+        }
+
+        impl governance_os_pallet_bylaws::Trait for $runtime {
+            type Event = ();
+            type Role = MockRoles;
+            type RootRole = RootRole;
+            type CallFilter = MockCallFilter<$runtime>;
+            type WeightInfo = ();
+        }
+
+        pub type Bylaws = governance_os_pallet_bylaws::Module<Test>;
+        pub type System = frame_system::Module<Test>;
+    };
+}
