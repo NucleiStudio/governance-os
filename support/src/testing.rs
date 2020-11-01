@@ -45,6 +45,10 @@ pub mod primitives {
 /// other pallets of the Governance OS project are supposed to depend on those; so
 /// better not write the same code twice.
 macro_rules! mock_runtime {
+    ($runtime:tt) => {
+        mock_runtime!($runtime, ());
+    };
+
     ($runtime:tt, $account_data:ty) => {
         #[derive(Clone, Eq, PartialEq, RuntimeDebug)]
         pub struct $runtime;

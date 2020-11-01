@@ -39,7 +39,7 @@ use sp_runtime::{
 };
 use sp_std::marker;
 
-mock_runtime!(Test, ());
+mock_runtime!(Test);
 
 pub type MockCheckRole = CheckRole<Test>;
 
