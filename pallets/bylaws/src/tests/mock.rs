@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 
-use crate::{CheckRole, GenesisConfig, Module, Trait};
+use crate::{
+    self as governance_os_pallet_bylaws, // compat with `mock_runtime`
+    CheckRole,
+    GenesisConfig,
+    Trait,
+};
 use codec::{Decode, Encode};
 use frame_support::{impl_outer_dispatch, impl_outer_origin, parameter_types};
 use governance_os_support::{
     acl::{CallFilter, Role},
-    impl_enum_default,
+    impl_enum_default, mock_runtime,
     testing::{
-        primitives::AccountId, AvailableBlockRatio, BlockHashCount, MaximumBlockLength,
-        MaximumBlockWeight, ALICE,
+        primitives::{AccountId, CurrencyId},
+        AvailableBlockRatio, BlockHashCount, MaximumBlockLength, MaximumBlockWeight, ALICE,
     },
 };
 use serde::{Deserialize, Serialize};
@@ -32,87 +37,10 @@ use sp_runtime::{
     traits::{BlakeTwo256, DispatchInfoOf, IdentityLookup},
     RuntimeDebug,
 };
-use sp_std::{fmt::Debug, marker};
+use sp_std::marker;
 
-impl_outer_origin! {
-    pub enum Origin for Test {}
-}
+mock_runtime!(Test);
 
-impl_outer_dispatch! {
-    pub enum Call for Test where origin: Origin {
-        frame_system::System,
-    }
-}
-
-#[derive(Clone, Eq, PartialEq, Debug)]
-pub struct Test;
-
-impl frame_system::Trait for Test {
-    type BaseCallFilter = ();
-    type Origin = Origin;
-    type Call = Call;
-    type Index = u64;
-    type BlockNumber = u64;
-    type Hash = H256;
-    type Hashing = BlakeTwo256;
-    type AccountId = AccountId;
-    type Lookup = IdentityLookup<Self::AccountId>;
-    type Header = Header;
-    type Event = ();
-    type BlockHashCount = BlockHashCount;
-    type MaximumBlockWeight = MaximumBlockWeight;
-    type DbWeight = ();
-    type BlockExecutionWeight = ();
-    type ExtrinsicBaseWeight = ();
-    type MaximumExtrinsicWeight = MaximumBlockWeight;
-    type MaximumBlockLength = MaximumBlockLength;
-    type AvailableBlockRatio = AvailableBlockRatio;
-    type Version = ();
-    type PalletInfo = ();
-    type AccountData = ();
-    type OnNewAccount = ();
-    type OnKilledAccount = ();
-    type SystemWeightInfo = ();
-}
-
-#[derive(Eq, PartialEq, RuntimeDebug, Encode, Decode, Copy, Clone, Serialize, Deserialize)]
-pub enum MockRoles {
-    Root,
-    RemarkOnly,
-}
-impl Role for MockRoles {}
-impl_enum_default!(MockRoles, RemarkOnly);
-
-pub struct MockCallFilter<T>(marker::PhantomData<T>);
-impl<T: Trait> CallFilter<AccountId, Call, MockRoles> for MockCallFilter<T> {
-    fn roles_for(
-        _who: &AccountId,
-        call: &Call,
-        _info: &DispatchInfoOf<Call>,
-        _len: usize,
-    ) -> Vec<MockRoles> {
-        match call {
-            Call::System(frame_system::Call::remark(..)) => vec![MockRoles::RemarkOnly],
-            Call::System(frame_system::Call::suicide()) => vec![], // Everybody can call it
-            _ => vec![MockRoles::Root],
-        }
-    }
-}
-
-parameter_types! {
-    pub const RootRole: MockRoles = MockRoles::Root;
-}
-
-impl Trait for Test {
-    type Event = ();
-    type Role = MockRoles;
-    type RootRole = RootRole;
-    type CallFilter = MockCallFilter<Test>;
-    type WeightInfo = ();
-}
-
-pub type System = frame_system::Module<Test>;
-pub type Bylaws = Module<Test>;
 pub type MockCheckRole = CheckRole<Test>;
 
 pub struct ExtBuilder {

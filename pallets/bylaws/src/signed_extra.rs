@@ -16,11 +16,8 @@
 
 use crate::{Module, Trait};
 use codec::{Decode, Encode};
-use frame_support::{
-    traits::{Get, GetCallMetadata},
-    weights::DispatchInfo,
-};
-use governance_os_support::acl::CallFilter;
+use frame_support::{traits::GetCallMetadata, weights::DispatchInfo};
+use governance_os_support::acl::{CallFilter, RoleManager};
 use sp_runtime::{
     traits::{DispatchInfoOf, Dispatchable, SignedExtension},
     transaction_validity::{
@@ -63,7 +60,6 @@ where
         let roles = T::CallFilter::roles_for(who, call, info, len);
         // Either `who` is root either it has one of the roles needed.
         if roles.is_empty()
-            || Module::<T>::has_role(who, T::RootRole::get())
             || roles
                 .iter()
                 .cloned()

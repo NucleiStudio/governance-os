@@ -85,6 +85,12 @@ impl<T: Trait> Currencies<T::AccountId> for Module<T> {
         who: &T::AccountId,
         amount: Self::Balance,
     ) -> DispatchResult {
+        // First verify permissions
+        if !RoleManagerOf::<T>::has_role(who, RoleBuilderOf::<T>::transfer_currency(currency_id)) {
+            return Err(Error::<T>::UnTransferableCurrency.into());
+        }
+
+        // Then balances
         let _new_balance = Self::free_balance(currency_id, who)
             .checked_sub(&amount)
             .ok_or(Error::<T>::BalanceTooLow)?;

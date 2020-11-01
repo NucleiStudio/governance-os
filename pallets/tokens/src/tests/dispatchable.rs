@@ -15,14 +15,40 @@
  */
 
 use super::mock::*;
-use crate::{CurrencyDetails, Error};
+use crate::{CurrencyDetails, Error, RoleBuilder};
 use frame_support::{assert_noop, assert_ok};
+use governance_os_support::{
+    acl::{AclError, RoleManager},
+    testing::ALICE,
+};
 
 #[test]
-fn create_works() {
+fn create_transferrable_works() {
     ExtBuilder::default().build().execute_with(|| {
-        assert_ok!(Tokens::create(Origin::signed(TEST_TOKEN_OWNER), 42));
-        assert_eq!(Tokens::details(42).owner, TEST_TOKEN_OWNER);
+        assert_ok!(Tokens::create(Origin::signed(TEST_TOKEN_OWNER), 42, true));
+        assert_eq!(
+            Bylaws::has_role(&TEST_TOKEN_OWNER, MockRoles::manage_currency(42)),
+            true
+        );
+        assert_eq!(
+            Bylaws::has_role(&ALICE, MockRoles::transfer_currency(42)),
+            true
+        );
+    })
+}
+
+#[test]
+fn create_non_transferable_works() {
+    ExtBuilder::default().build().execute_with(|| {
+        assert_ok!(Tokens::create(Origin::signed(TEST_TOKEN_OWNER), 42, false));
+        assert_eq!(
+            Bylaws::has_role(&TEST_TOKEN_OWNER, MockRoles::manage_currency(42)),
+            true
+        );
+        assert_eq!(
+            Bylaws::has_role(&ALICE, MockRoles::transfer_currency(42)),
+            false
+        );
     })
 }
 
@@ -30,7 +56,7 @@ fn create_works() {
 fn create_duplicate_currency_id_fails() {
     ExtBuilder::default().build().execute_with(|| {
         assert_noop!(
-            Tokens::create(Origin::signed(TEST_TOKEN_OWNER), TEST_TOKEN_ID),
+            Tokens::create(Origin::signed(TEST_TOKEN_OWNER), TEST_TOKEN_ID, true),
             Error::<Test>::CurrencyAlreadyExists
         );
     })
@@ -41,7 +67,7 @@ fn mint_fails_if_not_owner() {
     ExtBuilder::default().build().execute_with(|| {
         assert_noop!(
             Tokens::mint(Origin::signed(42), TEST_TOKEN_ID, ALICE, 100),
-            Error::<Test>::NotCurrencyOwner
+            AclError::MissingRole
         );
     })
 }
@@ -67,7 +93,7 @@ fn burn_fails_if_not_owner() {
         .execute_with(|| {
             assert_noop!(
                 Tokens::burn(Origin::signed(42), TEST_TOKEN_ID, ALICE, 100),
-                Error::<Test>::NotCurrencyOwner
+                AclError::MissingRole
             );
         })
 }
@@ -98,9 +124,12 @@ fn update_details_fails_if_not_owner() {
                 Tokens::update_details(
                     Origin::signed(42),
                     TEST_TOKEN_ID,
-                    CurrencyDetails { owner: ALICE }
+                    CurrencyDetails {
+                        owner: ALICE,
+                        transferable: true
+                    }
                 ),
-                Error::<Test>::NotCurrencyOwner
+                AclError::MissingRole
             );
         })
 }
@@ -114,9 +143,23 @@ fn update_details_works() {
             assert_ok!(Tokens::update_details(
                 Origin::signed(TEST_TOKEN_OWNER),
                 TEST_TOKEN_ID,
-                CurrencyDetails { owner: ALICE }
+                CurrencyDetails {
+                    owner: ALICE,
+                    transferable: false
+                }
             ));
-            assert_eq!(Tokens::details(TEST_TOKEN_ID).owner, ALICE);
+            assert_eq!(
+                Bylaws::has_role(&TEST_TOKEN_OWNER, MockRoles::manage_currency(TEST_TOKEN_ID)),
+                false
+            );
+            assert_eq!(
+                Bylaws::has_role(&ALICE, MockRoles::manage_currency(TEST_TOKEN_ID)),
+                true
+            );
+            assert_eq!(
+                Bylaws::has_role(&ALICE, MockRoles::transfer_currency(TEST_TOKEN_ID)),
+                false
+            );
         })
 }
 

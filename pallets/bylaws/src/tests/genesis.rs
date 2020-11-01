@@ -17,7 +17,10 @@
 use super::mock::*;
 use crate::Roles;
 use frame_support::storage::StorageDoubleMap;
-use governance_os_support::testing::{primitives::AccountId, ALICE, BOB};
+use governance_os_support::{
+    acl::RoleManager,
+    testing::{primitives::AccountId, ALICE, BOB},
+};
 
 #[test]
 fn register_role() {

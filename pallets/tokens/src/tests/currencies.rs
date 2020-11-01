@@ -293,3 +293,14 @@ fn repatriate_reserved_reserved_balance() {
             assert_eq!(Tokens::reserved_balance(TEST_TOKEN_ID, &BOB), 50);
         })
 }
+
+#[test]
+fn ensure_can_withdraw_refuse_if_non_transferable_currency() {
+    ExtBuilder::default().build().execute_with(|| {
+        assert_ok!(Tokens::create(Origin::signed(TEST_TOKEN_OWNER), 42, false));
+        assert_noop!(
+            <Tokens as Currencies<AccountId>>::transfer(42, &ALICE, &BOB, 50),
+            Error::<Test>::UnTransferableCurrency
+        );
+    })
+}

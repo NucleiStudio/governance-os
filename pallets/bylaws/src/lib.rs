@@ -24,7 +24,7 @@
 
 use frame_support::{decl_event, decl_module, decl_storage, traits::Get, weights::Weight};
 use frame_system::ensure_root;
-use governance_os_support::acl::{CallFilter, Role};
+use governance_os_support::acl::{CallFilter, Role, RoleManager};
 use sp_runtime::traits::StaticLookup;
 
 #[cfg(feature = "runtime-benchmarks")]
@@ -68,7 +68,7 @@ decl_storage! {
     add_extra_genesis {
         config(roles): Vec<(T::Role, Option<T::AccountId>)>;
         build(|config: &GenesisConfig<T>| {
-            config.roles.iter().for_each(|(role, target)| Module::<T>::set_role(target.as_ref(), *role));
+            config.roles.iter().for_each(|(role, target)| <Module<T> as RoleManager>::grant_role(target.as_ref(), *role));
         })
     }
 }
@@ -98,7 +98,7 @@ decl_module! {
                 None => None,
             };
 
-            Self::set_role(target.as_ref(), role);
+            <Self as RoleManager>::grant_role(target.as_ref(), role);
             Self::deposit_event(RawEvent::RoleGranted(target, role));
         }
 
@@ -112,22 +112,28 @@ decl_module! {
                 None => None,
             };
 
-            Self::unset_role(target.as_ref(), role);
+            <Self as RoleManager>::revoke_role(target.as_ref(), role);
             Self::deposit_event(RawEvent::RoleRevoked(target, role));
         }
     }
 }
 
-impl<T: Trait> Module<T> {
-    fn set_role(target: Option<&T::AccountId>, role: T::Role) {
+impl<T: Trait> RoleManager for Module<T> {
+    type AccountId = T::AccountId;
+    type Role = T::Role;
+
+    fn grant_role(target: Option<&Self::AccountId>, role: Self::Role) {
         Roles::<T>::mutate(role, target, |d| *d = true)
     }
 
-    fn unset_role(target: Option<&T::AccountId>, role: T::Role) {
+    fn revoke_role(target: Option<&Self::AccountId>, role: Self::Role) {
         Roles::<T>::remove(role, target)
     }
 
-    pub fn has_role(target: &T::AccountId, role: T::Role) -> bool {
-        Roles::<T>::get(role, Some(target)) || Roles::<T>::get(role, None as Option<&T::AccountId>)
+    fn has_role(target: &Self::AccountId, role: Self::Role) -> bool {
+        Roles::<T>::contains_key(role, Some(target))
+            || Roles::<T>::contains_key(role, None as Option<&Self::AccountId>)
+            || Roles::<T>::contains_key(T::RootRole::get(), Some(target))
+            || Roles::<T>::contains_key(T::RootRole::get(), None as Option<&Self::AccountId>)
     }
 }

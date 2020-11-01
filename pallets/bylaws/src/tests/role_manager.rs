@@ -15,33 +15,12 @@
  */
 
 use super::mock::*;
-use frame_support::assert_ok;
-use frame_system::RawOrigin;
 use governance_os_support::{acl::RoleManager, testing::ALICE};
 
 #[test]
-fn grant_role() {
-    ExtBuilder::default().build().execute_with(|| {
-        assert_ok!(Bylaws::grant_role(
-            RawOrigin::Root.into(),
-            Some(ALICE),
-            MockRoles::Root,
-        ));
-        assert_eq!(Bylaws::has_role(&ALICE, MockRoles::Root), true);
-    })
-}
-
-#[test]
-fn revoke_role() {
+fn root_has_all_roles() {
     ExtBuilder::default()
-        .with_role(MockRoles::Root, Some(ALICE))
+        .alice_as_root()
         .build()
-        .execute_with(|| {
-            assert_ok!(Bylaws::revoke_role(
-                RawOrigin::Root.into(),
-                Some(ALICE),
-                MockRoles::Root,
-            ));
-            assert_eq!(Bylaws::has_role(&ALICE, MockRoles::Root), false);
-        })
+        .execute_with(|| assert_eq!(Bylaws::has_role(&ALICE, MockRoles::RemarkOnly), true))
 }

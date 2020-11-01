@@ -17,7 +17,7 @@
 use crate::*;
 use frame_benchmarking::{account, benchmarks};
 use frame_system::RawOrigin;
-use governance_os_support::benchmarking::SEED;
+use governance_os_support::{acl::RoleManager, benchmarking::SEED};
 use sp_runtime::traits::StaticLookup;
 use sp_std::prelude::*;
 
@@ -41,7 +41,7 @@ benchmarks! {
 
     revoke_role {
         let (target, target_lookup, role) = prepare_benchmark::<T>();
-        Module::<T>::set_role(Some(&target), role);
+       <Module<T> as RoleManager>::grant_role(Some(&target), role);
     }: _(RawOrigin::Root, Some(target_lookup), role)
     verify {
         assert_eq!(Module::<T>::has_role(&target, role), false);

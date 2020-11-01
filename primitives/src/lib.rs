@@ -73,7 +73,21 @@ pub type Block = generic::Block<Header, OpaqueExtrinsic>;
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 pub enum Role {
     CreateCurrencies,
+    ManageCurrency(CurrencyId),
     Root,
+    TransferCurrency(CurrencyId),
 }
 impl governance_os_support::acl::Role for Role {}
 impl_enum_default!(Role, Root);
+impl governance_os_pallet_tokens::RoleBuilder for Role {
+    type CurrencyId = CurrencyId;
+    type Role = Role;
+
+    fn transfer_currency(id: CurrencyId) -> Role {
+        Role::TransferCurrency(id)
+    }
+
+    fn manage_currency(id: CurrencyId) -> Role {
+        Role::ManageCurrency(id)
+    }
+}
