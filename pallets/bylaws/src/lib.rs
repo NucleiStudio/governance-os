@@ -68,7 +68,7 @@ decl_storage! {
     add_extra_genesis {
         config(roles): Vec<(T::Role, Option<T::AccountId>)>;
         build(|config: &GenesisConfig<T>| {
-            config.roles.iter().for_each(|(role, target)| <Module<T> as RoleManager<T::AccountId, T::Role>>::grant_role(target.as_ref(), *role));
+            config.roles.iter().for_each(|(role, target)| <Module<T> as RoleManager>::grant_role(target.as_ref(), *role));
         })
     }
 }
@@ -98,7 +98,7 @@ decl_module! {
                 None => None,
             };
 
-            <Self as RoleManager<T::AccountId, T::Role>>::grant_role(target.as_ref(), role);
+            <Self as RoleManager>::grant_role(target.as_ref(), role);
             Self::deposit_event(RawEvent::RoleGranted(target, role));
         }
 
@@ -112,22 +112,26 @@ decl_module! {
                 None => None,
             };
 
-            <Self as RoleManager<T::AccountId, T::Role>>::revoke_role(target.as_ref(), role);
+            <Self as RoleManager>::revoke_role(target.as_ref(), role);
             Self::deposit_event(RawEvent::RoleRevoked(target, role));
         }
     }
 }
 
-impl<T: Trait> RoleManager<T::AccountId, T::Role> for Module<T> {
-    fn grant_role(target: Option<&T::AccountId>, role: T::Role) {
+impl<T: Trait> RoleManager for Module<T> {
+    type AccountId = T::AccountId;
+    type Role = T::Role;
+
+    fn grant_role(target: Option<&Self::AccountId>, role: Self::Role) {
         Roles::<T>::mutate(role, target, |d| *d = true)
     }
 
-    fn revoke_role(target: Option<&T::AccountId>, role: T::Role) {
+    fn revoke_role(target: Option<&Self::AccountId>, role: Self::Role) {
         Roles::<T>::remove(role, target)
     }
 
-    fn has_role(target: &T::AccountId, role: T::Role) -> bool {
-        Roles::<T>::get(role, Some(target)) || Roles::<T>::get(role, None as Option<&T::AccountId>)
+    fn has_role(target: &Self::AccountId, role: Self::Role) -> bool {
+        Roles::<T>::get(role, Some(target))
+            || Roles::<T>::get(role, None as Option<&Self::AccountId>)
     }
 }

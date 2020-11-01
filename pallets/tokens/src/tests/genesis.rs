@@ -15,6 +15,8 @@
  */
 
 use super::mock::*;
+use crate::RoleBuilder;
+use governance_os_support::acl::RoleManager;
 
 #[test]
 fn set_storage_correctly() {
@@ -38,8 +40,15 @@ fn does_not_set_balances_by_default() {
 }
 
 #[test]
-fn set_test_token_details_approprietaly() {
-    ExtBuilder::default()
-        .build()
-        .execute_with(|| assert_eq!(Tokens::details(TEST_TOKEN_ID).owner, TEST_TOKEN_OWNER))
+fn set_test_token_roles_approprietaly() {
+    ExtBuilder::default().build().execute_with(|| {
+        assert_eq!(
+            Bylaws::has_role(&TEST_TOKEN_OWNER, MockRoles::manage_currency(TEST_TOKEN_ID)),
+            true
+        );
+        assert_eq!(
+            Bylaws::has_role(&ALICE, MockRoles::transfer_currency(TEST_TOKEN_ID)),
+            true
+        );
+    })
 }

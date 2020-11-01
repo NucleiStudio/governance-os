@@ -41,7 +41,7 @@ benchmarks! {
 
     revoke_role {
         let (target, target_lookup, role) = prepare_benchmark::<T>();
-       <Module<T> as RoleManager<T::AccountId, T::Role>>::grant_role(Some(&target), role);
+       <Module<T> as RoleManager>::grant_role(Some(&target), role);
     }: _(RawOrigin::Root, Some(target_lookup), role)
     verify {
         assert_eq!(Module::<T>::has_role(&target, role), false);

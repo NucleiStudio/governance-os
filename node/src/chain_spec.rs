@@ -61,6 +61,7 @@ fn testnet_genesis(
         NativeCurrencyId::get(),
         CurrencyDetails {
             owner: get_account_id_from_seed::<sr25519::Public>("Alice"),
+            transferable: true,
         },
     )]);
     let chain_roles = roles.unwrap_or(vec![

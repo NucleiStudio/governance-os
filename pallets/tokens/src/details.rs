@@ -28,4 +28,8 @@ pub struct CurrencyDetails<AccountId> {
     /// The owner of the currency, typically it can mint or burn units of this
     /// currency.
     pub owner: AccountId,
+
+    /// Wether the currency is transferrable. If set to false no account will be
+    /// able to transfer the tokens to each other.
+    pub transferable: bool,
 }

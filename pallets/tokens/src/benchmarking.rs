@@ -27,10 +27,9 @@ benchmarks! {
     create {
         let token_id: T::CurrencyId = T::CurrencyId::default();
         let caller: T::AccountId = whitelisted_caller();
-    }: _(RawOrigin::Signed(caller.clone()), token_id)
+    }: _(RawOrigin::Signed(caller.clone()), token_id, true)
     verify {
-        assert_eq!(Details::<T>::contains_key(token_id), true);
-        assert_eq!(Details::<T>::get(token_id).owner, caller);
+        assert_eq!(TotalIssuances::<T>::contains_key(token_id), true);
     }
 
     mint {
@@ -38,7 +37,7 @@ benchmarks! {
         let coins_to_mint: T::Balance = 10_000_000.into();
         let caller: T::AccountId = whitelisted_caller();
 
-        let _ = Module::<T>::create(RawOrigin::Signed(caller.clone()).into(), token_id);
+        let _ = Module::<T>::create(RawOrigin::Signed(caller.clone()).into(), token_id, true);
 
         let to: T::AccountId = account("to", 0, SEED);
         let to_lookup: <T::Lookup as StaticLookup>::Source = T::Lookup::unlookup(to.clone());
@@ -56,7 +55,7 @@ benchmarks! {
         let to: T::AccountId = account("to", 0, SEED);
         let to_lookup: <T::Lookup as StaticLookup>::Source = T::Lookup::unlookup(to.clone());
 
-        let _ = Module::<T>::create(RawOrigin::Signed(caller.clone()).into(), token_id);
+        let _ = Module::<T>::create(RawOrigin::Signed(caller.clone()).into(), token_id, true);
         let _ = <Module<T> as Currencies<T::AccountId>>::mint(token_id, &to, coins_to_burn);
     }: _(RawOrigin::Signed(caller.clone()), token_id, to_lookup, coins_to_burn)
     verify {
@@ -68,15 +67,17 @@ benchmarks! {
         let token_id: T::CurrencyId = T::CurrencyId::default();
         let caller: T::AccountId = whitelisted_caller();
 
-        let _ = Module::<T>::create(RawOrigin::Signed(caller.clone()).into(), token_id);
+        let _ = Module::<T>::create(RawOrigin::Signed(caller.clone()).into(), token_id, true);
 
+        // Worst case scenario: owner is changed
         let new_owner: T::AccountId = account("owner", 0, SEED);
         let new_details = CurrencyDetails {
             owner: new_owner.clone(),
+            transferable: true,
         };
     }: _(RawOrigin::Signed(caller.clone()), token_id, new_details)
     verify {
-        assert_eq!(Details::<T>::get(token_id).owner, new_owner);
+        assert_eq!(RoleManagerOf::<T>::has_role(&new_owner, RoleBuilderOf::<T>::manage_currency(token_id)), true);
     }
 
     transfer {
@@ -84,6 +85,7 @@ benchmarks! {
         let coins_to_transfer: T::Balance = 10_000_000.into();
         let caller: T::AccountId = whitelisted_caller();
 
+        let _ = Module::<T>::create(RawOrigin::Signed(caller.clone()).into(), token_id, true);
         let _ = Module::<T>::set_free_balance(token_id, &caller, coins_to_transfer);
 
         let to: T::AccountId = account("to", 0, SEED);
