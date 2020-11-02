@@ -150,12 +150,20 @@ impl<T: Trait> RoleManager for Module<T> {
     }
 
     fn revoke_role(target: Option<&Self::AccountId>, role: Self::Role) -> DispatchResult {
-        Roles::<T>::try_mutate(target, |v| match v.binary_search(&role) {
-            Ok(index) => {
-                v.remove(index);
-                Ok(())
+        Roles::<T>::try_mutate_exists(target, |v| {
+            let mut vec = v.take().unwrap_or_default();
+            match vec.binary_search(&role) {
+                Ok(index) => {
+                    vec.remove(index);
+                    if vec.is_empty() {
+                        *v = None;
+                    } else {
+                        *v = Some(vec);
+                    }
+                    Ok(())
+                }
+                Err(_) => Err(Error::<T>::RoleNotFound.into()),
             }
-            Err(_) => Err(Error::<T>::RoleNotFound.into()),
         })
     }
 
