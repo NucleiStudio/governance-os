@@ -18,7 +18,7 @@ use crate::{CurrencyDetails, GenesisConfig, Module, NativeCurrencyAdapter, RoleB
 use codec::{Decode, Encode};
 use frame_support::{impl_outer_dispatch, impl_outer_origin, parameter_types};
 pub use governance_os_support::{
-    acl::{CallFilter, Role},
+    acl::Role,
     impl_enum_default, mock_runtime,
     testing::{
         primitives::{AccountId, Balance, CurrencyId},
@@ -31,10 +31,9 @@ use serde::{Deserialize, Serialize};
 use sp_core::H256;
 use sp_runtime::{
     testing::Header,
-    traits::{BlakeTwo256, DispatchInfoOf, IdentityLookup},
+    traits::{BlakeTwo256, IdentityLookup},
     RuntimeDebug,
 };
-use sp_std::marker;
 
 mock_runtime!(Test, crate::AccountData<CurrencyId, Balance>);
 
@@ -48,6 +47,10 @@ impl RoleBuilder for MockRoles {
 
     fn manage_currency(id: CurrencyId) -> Self {
         Self::ManageCurrency(id)
+    }
+
+    fn create_currencies() -> Self {
+        Self::CreateCurrencies
     }
 }
 
@@ -99,6 +102,12 @@ impl ExtBuilder {
         let mut t = frame_system::GenesisConfig::default()
             .build_storage::<Test>()
             .unwrap();
+
+        governance_os_pallet_bylaws::GenesisConfig::<Test> {
+            roles: vec![(MockRoles::CreateCurrencies, None)], // Everybody can create currencies
+        }
+        .assimilate_storage(&mut t)
+        .unwrap();
 
         GenesisConfig::<Test> {
             endowed_accounts: self.endowed_accounts,

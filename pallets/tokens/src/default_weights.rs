@@ -20,27 +20,27 @@ use frame_support::weights::{constants::RocksDbWeight as DbWeight, Weight};
 
 impl crate::WeightInfo for () {
     fn create() -> Weight {
-        (74_000_000 as Weight)
+        (123_000_000 as Weight)
             .saturating_add(DbWeight::get().reads(7 as Weight))
             .saturating_add(DbWeight::get().writes(5 as Weight))
     }
     fn mint() -> Weight {
-        (112_000_000 as Weight)
-            .saturating_add(DbWeight::get().reads(7 as Weight))
+        (118_000_000 as Weight)
+            .saturating_add(DbWeight::get().reads(8 as Weight))
             .saturating_add(DbWeight::get().writes(4 as Weight))
     }
     fn burn() -> Weight {
-        (113_000_000 as Weight)
-            .saturating_add(DbWeight::get().reads(7 as Weight))
+        (118_000_000 as Weight)
+            .saturating_add(DbWeight::get().reads(8 as Weight))
             .saturating_add(DbWeight::get().writes(4 as Weight))
     }
     fn update_details() -> Weight {
-        (90_000_000 as Weight)
+        (125_000_000 as Weight)
             .saturating_add(DbWeight::get().reads(7 as Weight))
-            .saturating_add(DbWeight::get().writes(5 as Weight))
+            .saturating_add(DbWeight::get().writes(4 as Weight))
     }
     fn transfer() -> Weight {
-        (160_000_000 as Weight)
+        (150_000_000 as Weight)
             .saturating_add(DbWeight::get().reads(7 as Weight))
             .saturating_add(DbWeight::get().writes(3 as Weight))
     }

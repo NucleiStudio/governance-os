@@ -19,6 +19,7 @@
 use frame_support::{parameter_types, weights::Weight};
 use sp_runtime::Perbill;
 
+pub const ROOT: primitives::AccountId = 0;
 pub const ALICE: primitives::AccountId = 1;
 pub const BOB: primitives::AccountId = 2;
 pub const TEST_TOKEN_ID: primitives::CurrencyId = 3;
@@ -92,43 +93,50 @@ macro_rules! mock_runtime {
         }
 
         #[derive(
-            Eq, PartialEq, RuntimeDebug, Encode, Decode, Copy, Clone, Serialize, Deserialize,
+            Eq,
+            PartialEq,
+            RuntimeDebug,
+            Encode,
+            Decode,
+            Copy,
+            Clone,
+            Serialize,
+            Deserialize,
+            Ord,
+            PartialOrd,
         )]
         pub enum MockRoles {
             Root,
             RemarkOnly,
+            CreateCurrencies,
             TransferCurrency(CurrencyId),
             ManageCurrency(CurrencyId),
         }
         impl Role for MockRoles {}
         impl_enum_default!(MockRoles, RemarkOnly);
+        impl governance_os_pallet_bylaws::RoleBuilder for MockRoles {
+            type Role = MockRoles;
 
-        pub struct MockCallFilter<T>(marker::PhantomData<T>);
-        impl<T: Trait> CallFilter<AccountId, Call, MockRoles> for MockCallFilter<T> {
-            fn roles_for(
-                _who: &AccountId,
-                call: &Call,
-                _info: &DispatchInfoOf<Call>,
-                _len: usize,
-            ) -> Vec<MockRoles> {
-                match call {
-                    Call::System(frame_system::Call::remark(..)) => vec![MockRoles::RemarkOnly],
-                    Call::System(frame_system::Call::suicide()) => vec![], // Everybody can call it
-                    _ => vec![MockRoles::Root],
-                }
+            fn manage_roles() -> MockRoles {
+                Self::root()
+            }
+
+            fn root() -> MockRoles {
+                MockRoles::Root
             }
         }
 
         parameter_types! {
             pub const RootRole: MockRoles = MockRoles::Root;
+            pub const MaxRoles: u32 = 5;
         }
 
         impl governance_os_pallet_bylaws::Trait for $runtime {
             type Event = ();
             type Role = MockRoles;
-            type RootRole = RootRole;
-            type CallFilter = MockCallFilter<$runtime>;
             type WeightInfo = ();
+            type MaxRoles = MaxRoles;
+            type RoleBuilder = MockRoles;
         }
 
         pub type Bylaws = governance_os_pallet_bylaws::Module<Test>;

@@ -17,28 +17,37 @@
 //! This pallet implements an ACL system for account level permissioning.
 //! A role is the equivalent of a UNIX role, it can be granted either to
 //! one or many account or even to all the accounts within the system.
-//! We then link the pallet to a `CallFilter` that is in charge or associating
-//! incoming calls to expected roles.
+//! Pallets can then use it to define custom role requirements.
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use frame_support::{decl_event, decl_module, decl_storage, traits::Get, weights::Weight};
-use frame_system::ensure_root;
-use governance_os_support::acl::{CallFilter, Role, RoleManager};
-use sp_runtime::traits::StaticLookup;
+use frame_support::{
+    decl_error, decl_event, decl_module, decl_storage, traits::Get, weights::Weight,
+};
+use governance_os_support::acl::{Role, RoleManager};
+use sp_runtime::{traits::StaticLookup, DispatchResult};
+use sp_std::prelude::Vec;
 
 #[cfg(feature = "runtime-benchmarks")]
 mod benchmarking;
 mod default_weights;
-mod signed_extra;
 #[cfg(test)]
 mod tests;
 
-pub use signed_extra::CheckRole;
-
 pub trait WeightInfo {
-    fn grant_role() -> Weight;
-    fn revoke_role() -> Weight;
+    fn grant_role(b: u32) -> Weight;
+    fn revoke_role(b: u32) -> Weight;
+}
+
+pub trait RoleBuilder {
+    type Role;
+
+    /// Give access to the functions `grant_role` and `revoke_role`.
+    fn manage_roles() -> Self::Role;
+
+    /// This role would be the equivalent of a super role. If an account is granted it it can submit
+    /// any other calls.
+    fn root() -> Self::Role;
 }
 
 pub trait Trait: frame_system::Trait {
@@ -48,27 +57,38 @@ pub trait Trait: frame_system::Trait {
     /// Roles defines UNIX like roles that users must be granted before triggering certain calls.
     type Role: Role + Default;
 
-    /// This role would be the equivalent of a super role. If an account is granted it it can submit
-    /// any other calls.
-    type RootRole: Get<Self::Role>;
-
-    /// The call filter is in charge of tagging incoming calls with roles that are needed.
-    type CallFilter: CallFilter<Self::AccountId, Self::Call, Self::Role>;
-
     /// The weights for this pallet.
     type WeightInfo: WeightInfo;
+
+    /// Only used for weight calculations: this is the highest number of roles we expect one account
+    /// to have.
+    type MaxRoles: Get<u32>;
+
+    /// Helper for the runtime to specify its custom roles.
+    type RoleBuilder: RoleBuilder<Role = Self::Role>;
+}
+
+type RoleBuilderOf<T> = <T as Trait>::RoleBuilder;
+
+decl_error! {
+    pub enum Error for Module<T: Trait> {
+        /// We were unable to find the indicated role. It was likely not granted to the target.
+        RoleNotFound,
+        /// Target was already granted this role.
+        RoleAlreadyExists,
+    }
 }
 
 decl_storage! {
     trait Store for Module<T: Trait> as Bylaws {
         /// Roles granted to the different accounts. If a role is granted to `None` this means
         /// it is granted to all accounts from the runtime.
-        pub Roles get(fn roles): double_map hasher(blake2_128_concat) T::Role, hasher(blake2_128_concat) Option<T::AccountId> => bool;
+        pub Roles get(fn roles): map hasher(blake2_128_concat) Option<T::AccountId> => Vec<T::Role>;
     }
     add_extra_genesis {
         config(roles): Vec<(T::Role, Option<T::AccountId>)>;
         build(|config: &GenesisConfig<T>| {
-            config.roles.iter().for_each(|(role, target)| <Module<T> as RoleManager>::grant_role(target.as_ref(), *role));
+            config.roles.iter().for_each(|(role, target)| drop(<Module<T> as RoleManager>::grant_role(target.as_ref(), *role)));
         })
     }
 }
@@ -90,30 +110,30 @@ decl_module! {
 
         /// Add a `role` to a given account `who`. If `who` is set to `None` this
         /// means that the role is granted to all the accounts of the chain.
-        #[weight = T::WeightInfo::grant_role()]
+        #[weight = T::WeightInfo::grant_role(T::MaxRoles::get())]
         fn grant_role(origin, who: Option<<T::Lookup as StaticLookup>::Source>, role: T::Role) {
-            ensure_root(origin)?;
+            Self::ensure_has_role(origin, RoleBuilderOf::<T>::manage_roles())?;
+
             let target = match who {
                 Some(lookmeup) => Some(T::Lookup::lookup(lookmeup)?),
                 None => None,
             };
 
-            <Self as RoleManager>::grant_role(target.as_ref(), role);
-            Self::deposit_event(RawEvent::RoleGranted(target, role));
+            <Self as RoleManager>::grant_role(target.as_ref(), role)?;
         }
 
         /// Remove a `role` from a given account `who`. If `who` is set to `None` this means
         /// that the role is revoked for all the accounts of the chain.
-        #[weight = T::WeightInfo::revoke_role()]
+        #[weight = T::WeightInfo::revoke_role(T::MaxRoles::get())]
         fn revoke_role(origin, who: Option<<T::Lookup as StaticLookup>::Source>, role: T::Role) {
-            ensure_root(origin)?;
+            Self::ensure_has_role(origin, RoleBuilderOf::<T>::manage_roles())?;
+
             let target = match who {
                 Some(lookmeup) => Some(T::Lookup::lookup(lookmeup)?),
                 None => None,
             };
 
-            <Self as RoleManager>::revoke_role(target.as_ref(), role);
-            Self::deposit_event(RawEvent::RoleRevoked(target, role));
+            <Self as RoleManager>::revoke_role(target.as_ref(), role)?;
         }
     }
 }
@@ -122,18 +142,50 @@ impl<T: Trait> RoleManager for Module<T> {
     type AccountId = T::AccountId;
     type Role = T::Role;
 
-    fn grant_role(target: Option<&Self::AccountId>, role: Self::Role) {
-        Roles::<T>::mutate(role, target, |d| *d = true)
+    fn grant_role(target: Option<&Self::AccountId>, role: Self::Role) -> DispatchResult {
+        Roles::<T>::try_mutate(target, |v| match v.binary_search(&role) {
+            Ok(_) => Err(Error::<T>::RoleAlreadyExists.into()),
+            Err(index) => {
+                v.insert(index, role);
+                Ok(())
+            }
+        })
+        .map(|result| {
+            Self::deposit_event(RawEvent::RoleGranted(target.cloned(), role));
+            result
+        })
     }
 
-    fn revoke_role(target: Option<&Self::AccountId>, role: Self::Role) {
-        Roles::<T>::remove(role, target)
+    fn revoke_role(target: Option<&Self::AccountId>, role: Self::Role) -> DispatchResult {
+        Roles::<T>::try_mutate_exists(target, |v| {
+            let mut vec = v.take().unwrap_or_default();
+            match vec.binary_search(&role) {
+                Ok(index) => {
+                    vec.remove(index);
+                    if vec.is_empty() {
+                        *v = None;
+                    } else {
+                        *v = Some(vec);
+                    }
+                    Ok(())
+                }
+                Err(_) => Err(Error::<T>::RoleNotFound.into()),
+            }
+        })
+        .map(|result| {
+            Self::deposit_event(RawEvent::RoleRevoked(target.cloned(), role));
+            result
+        })
     }
 
     fn has_role(target: &Self::AccountId, role: Self::Role) -> bool {
-        Roles::<T>::contains_key(role, Some(target))
-            || Roles::<T>::contains_key(role, None as Option<&Self::AccountId>)
-            || Roles::<T>::contains_key(T::RootRole::get(), Some(target))
-            || Roles::<T>::contains_key(T::RootRole::get(), None as Option<&Self::AccountId>)
+        Roles::<T>::get(Some(target))
+            .iter()
+            .chain(Roles::<T>::get(None as Option<T::AccountId>).iter())
+            .cloned()
+            .find(|r| {
+                return *r == role || *r == RoleBuilderOf::<T>::root();
+            })
+            .is_some()
     }
 }

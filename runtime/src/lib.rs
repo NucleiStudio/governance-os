@@ -107,7 +107,6 @@ pub type SignedExtra = (
     frame_system::CheckNonce<Runtime>,
     frame_system::CheckWeight<Runtime>,
     pallet_transaction_payment::ChargeTransactionPayment<Runtime>,
-    governance_os_pallet_bylaws::CheckRole<Runtime>,
 );
 
 impl_runtime_apis! {
