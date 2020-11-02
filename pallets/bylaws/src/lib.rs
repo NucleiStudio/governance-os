@@ -121,7 +121,6 @@ decl_module! {
             };
 
             <Self as RoleManager>::grant_role(target.as_ref(), role)?;
-            Self::deposit_event(RawEvent::RoleGranted(target, role));
         }
 
         /// Remove a `role` from a given account `who`. If `who` is set to `None` this means
@@ -136,7 +135,6 @@ decl_module! {
             };
 
             <Self as RoleManager>::revoke_role(target.as_ref(), role)?;
-            Self::deposit_event(RawEvent::RoleRevoked(target, role));
         }
     }
 }
@@ -152,6 +150,10 @@ impl<T: Trait> RoleManager for Module<T> {
                 v.insert(index, role);
                 Ok(())
             }
+        })
+        .map(|result| {
+            Self::deposit_event(RawEvent::RoleGranted(target.cloned(), role));
+            result
         })
     }
 
@@ -170,6 +172,10 @@ impl<T: Trait> RoleManager for Module<T> {
                 }
                 Err(_) => Err(Error::<T>::RoleNotFound.into()),
             }
+        })
+        .map(|result| {
+            Self::deposit_event(RawEvent::RoleRevoked(target.cloned(), role));
+            result
         })
     }
 
