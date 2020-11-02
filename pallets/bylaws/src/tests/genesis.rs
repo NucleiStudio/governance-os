@@ -29,11 +29,6 @@ fn register_role() {
         .with_role(MockRoles::Root, Some(ALICE))
         .build()
         .execute_with(|| {
-            assert_eq!(
-                Roles::<Test>::get(MockRoles::RemarkOnly, None as Option<AccountId>),
-                true
-            );
-            assert_eq!(Roles::<Test>::get(MockRoles::Root, Some(ALICE)), true);
             assert_eq!(Bylaws::has_role(&ALICE, MockRoles::Root), true);
             assert_eq!(Bylaws::has_role(&BOB, MockRoles::Root), false);
             assert_eq!(Bylaws::has_role(&ALICE, MockRoles::RemarkOnly), true);
