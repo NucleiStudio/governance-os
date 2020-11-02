@@ -107,6 +107,7 @@ macro_rules! mock_runtime {
         pub enum MockRoles {
             Root,
             RemarkOnly,
+            CreateCurrencies,
             TransferCurrency(CurrencyId),
             ManageCurrency(CurrencyId),
         }
@@ -115,7 +116,7 @@ macro_rules! mock_runtime {
 
         parameter_types! {
             pub const RootRole: MockRoles = MockRoles::Root;
-            pub const MaxRoles: u32 = 4;
+            pub const MaxRoles: u32 = 5;
         }
 
         impl governance_os_pallet_bylaws::Trait for $runtime {

@@ -92,4 +92,8 @@ impl governance_os_pallet_tokens::RoleBuilder for Role {
     fn manage_currency(id: CurrencyId) -> Role {
         Role::ManageCurrency(id)
     }
+
+    fn create_currencies() -> Role {
+        Role::CreateCurrencies
+    }
 }

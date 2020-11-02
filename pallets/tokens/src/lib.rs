@@ -76,6 +76,9 @@ pub trait RoleBuilder {
 
     /// Role for the account(s) that are allowed to `mint` or `burn` units of currency.
     fn manage_currency(id: Self::CurrencyId) -> Self::Role;
+
+    /// Role for creating currencies.
+    fn create_currencies() -> Self::Role;
 }
 
 pub trait Trait: frame_system::Trait {
@@ -205,7 +208,7 @@ decl_module! {
         /// `bylaws` pallet to restrict access to this dispatchable.
         #[weight = T::WeightInfo::create()]
         pub fn create(origin, currency_id: T::CurrencyId, transferable: bool) {
-            let who = ensure_signed(origin)?;
+            let who = RoleManagerOf::<T>::ensure_has_role(origin, RoleBuilderOf::<T>::create_currencies())?;
 
             Self::maybe_create_zero_issuance(currency_id)?;
 

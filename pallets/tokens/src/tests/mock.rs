@@ -48,6 +48,10 @@ impl RoleBuilder for MockRoles {
     fn manage_currency(id: CurrencyId) -> Self {
         Self::ManageCurrency(id)
     }
+
+    fn create_currencies() -> Self {
+        Self::CreateCurrencies
+    }
 }
 
 impl Trait for Test {
@@ -98,6 +102,12 @@ impl ExtBuilder {
         let mut t = frame_system::GenesisConfig::default()
             .build_storage::<Test>()
             .unwrap();
+
+        governance_os_pallet_bylaws::GenesisConfig::<Test> {
+            roles: vec![(MockRoles::CreateCurrencies, None)], // Everybody can create currencies
+        }
+        .assimilate_storage(&mut t)
+        .unwrap();
 
         GenesisConfig::<Test> {
             endowed_accounts: self.endowed_accounts,
