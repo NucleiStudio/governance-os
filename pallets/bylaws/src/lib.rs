@@ -22,10 +22,13 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use frame_support::{decl_event, decl_module, decl_storage, traits::Get, weights::Weight};
+use frame_support::{
+    decl_error, decl_event, decl_module, decl_storage, traits::Get, weights::Weight,
+};
 use frame_system::ensure_root;
 use governance_os_support::acl::{CallFilter, Role, RoleManager};
-use sp_runtime::traits::StaticLookup;
+use sp_runtime::{traits::StaticLookup, DispatchResult};
+use sp_std::prelude::Vec;
 
 #[cfg(feature = "runtime-benchmarks")]
 mod benchmarking;
@@ -57,18 +60,32 @@ pub trait Trait: frame_system::Trait {
 
     /// The weights for this pallet.
     type WeightInfo: WeightInfo;
+
+    /// Only used for weight calculations: this is the highest number of roles we expect one account
+    /// to have.
+    /// One should set this to the number of variants `T::Role` can take.
+    type MaxRoles: Get<u32>;
+}
+
+decl_error! {
+    pub enum Error for Module<T: Trait> {
+        /// We were unable to find the indicated role. It was likely not granted to the target.
+        RoleNotFound,
+        /// Target was already granted this role.
+        RoleAlreadyExists,
+    }
 }
 
 decl_storage! {
     trait Store for Module<T: Trait> as Bylaws {
         /// Roles granted to the different accounts. If a role is granted to `None` this means
         /// it is granted to all accounts from the runtime.
-        pub Roles get(fn roles): double_map hasher(blake2_128_concat) T::Role, hasher(blake2_128_concat) Option<T::AccountId> => bool;
+        pub Roles get(fn roles): map hasher(blake2_128_concat) Option<T::AccountId> => Vec<T::Role>;
     }
     add_extra_genesis {
         config(roles): Vec<(T::Role, Option<T::AccountId>)>;
         build(|config: &GenesisConfig<T>| {
-            config.roles.iter().for_each(|(role, target)| <Module<T> as RoleManager>::grant_role(target.as_ref(), *role));
+            config.roles.iter().for_each(|(role, target)| drop(<Module<T> as RoleManager>::grant_role(target.as_ref(), *role)));
         })
     }
 }
@@ -98,7 +115,7 @@ decl_module! {
                 None => None,
             };
 
-            <Self as RoleManager>::grant_role(target.as_ref(), role);
+            <Self as RoleManager>::grant_role(target.as_ref(), role)?;
             Self::deposit_event(RawEvent::RoleGranted(target, role));
         }
 
@@ -112,7 +129,7 @@ decl_module! {
                 None => None,
             };
 
-            <Self as RoleManager>::revoke_role(target.as_ref(), role);
+            <Self as RoleManager>::revoke_role(target.as_ref(), role)?;
             Self::deposit_event(RawEvent::RoleRevoked(target, role));
         }
     }
@@ -122,18 +139,34 @@ impl<T: Trait> RoleManager for Module<T> {
     type AccountId = T::AccountId;
     type Role = T::Role;
 
-    fn grant_role(target: Option<&Self::AccountId>, role: Self::Role) {
-        Roles::<T>::mutate(role, target, |d| *d = true)
+    fn grant_role(target: Option<&Self::AccountId>, role: Self::Role) -> DispatchResult {
+        Roles::<T>::try_mutate(target, |v| match v.binary_search(&role) {
+            Ok(_) => Err(Error::<T>::RoleAlreadyExists.into()),
+            Err(index) => {
+                v.insert(index, role);
+                Ok(())
+            }
+        })
     }
 
-    fn revoke_role(target: Option<&Self::AccountId>, role: Self::Role) {
-        Roles::<T>::remove(role, target)
+    fn revoke_role(target: Option<&Self::AccountId>, role: Self::Role) -> DispatchResult {
+        Roles::<T>::try_mutate(target, |v| match v.binary_search(&role) {
+            Ok(index) => {
+                v.remove(index);
+                Ok(())
+            }
+            Err(_) => Err(Error::<T>::RoleNotFound.into()),
+        })
     }
 
     fn has_role(target: &Self::AccountId, role: Self::Role) -> bool {
-        Roles::<T>::contains_key(role, Some(target))
-            || Roles::<T>::contains_key(role, None as Option<&Self::AccountId>)
-            || Roles::<T>::contains_key(T::RootRole::get(), Some(target))
-            || Roles::<T>::contains_key(T::RootRole::get(), None as Option<&Self::AccountId>)
+        Roles::<T>::get(Some(target))
+            .iter()
+            .chain(Roles::<T>::get(None as Option<T::AccountId>).iter())
+            .cloned()
+            .find(|r| {
+                return *r == role || *r == T::RootRole::get();
+            })
+            .is_some()
     }
 }

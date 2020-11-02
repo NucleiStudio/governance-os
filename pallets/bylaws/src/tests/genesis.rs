@@ -15,11 +15,9 @@
  */
 
 use super::mock::*;
-use crate::Roles;
-use frame_support::storage::StorageDoubleMap;
 use governance_os_support::{
     acl::RoleManager,
-    testing::{primitives::AccountId, ALICE, BOB},
+    testing::{ALICE, BOB},
 };
 
 #[test]

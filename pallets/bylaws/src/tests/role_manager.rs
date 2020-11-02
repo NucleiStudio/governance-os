@@ -15,7 +15,10 @@
  */
 
 use super::mock::*;
-use governance_os_support::{acl::RoleManager, testing::ALICE};
+use governance_os_support::{
+    acl::RoleManager,
+    testing::{ALICE, BOB},
+};
 
 #[test]
 fn root_has_all_roles() {
@@ -23,4 +26,15 @@ fn root_has_all_roles() {
         .alice_as_root()
         .build()
         .execute_with(|| assert_eq!(Bylaws::has_role(&ALICE, MockRoles::RemarkOnly), true))
+}
+
+#[test]
+fn has_role_works() {
+    ExtBuilder::default()
+        .with_role(MockRoles::RemarkOnly, Some(&ALICE))
+        .build()
+        .execute_with(|| {
+            assert_eq!(Bylaws::has_role(&ALICE, MockRoles::RemarkOnly), true);
+            assert_eq!(Bylaws::has_role(&BOB, MockRoles::RemarkOnly), false);
+        })
 }

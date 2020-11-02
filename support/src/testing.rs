@@ -92,7 +92,17 @@ macro_rules! mock_runtime {
         }
 
         #[derive(
-            Eq, PartialEq, RuntimeDebug, Encode, Decode, Copy, Clone, Serialize, Deserialize,
+            Eq,
+            PartialEq,
+            RuntimeDebug,
+            Encode,
+            Decode,
+            Copy,
+            Clone,
+            Serialize,
+            Deserialize,
+            Ord,
+            PartialOrd,
         )]
         pub enum MockRoles {
             Root,
@@ -121,6 +131,7 @@ macro_rules! mock_runtime {
 
         parameter_types! {
             pub const RootRole: MockRoles = MockRoles::Root;
+            pub const MaxRoles: u32 = 4;
         }
 
         impl governance_os_pallet_bylaws::Trait for $runtime {
@@ -129,6 +140,7 @@ macro_rules! mock_runtime {
             type RootRole = RootRole;
             type CallFilter = MockCallFilter<$runtime>;
             type WeightInfo = ();
+            type MaxRoles = MaxRoles;
         }
 
         pub type Bylaws = governance_os_pallet_bylaws::Module<Test>;

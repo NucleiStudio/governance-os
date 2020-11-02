@@ -40,6 +40,7 @@ impl governance_os_support::acl::CallFilter<AccountId, Call, Role> for CallFilte
 
 parameter_types! {
     pub const RootRole: Role = Role::Root;
+    pub const MaxRoles: u32 = 4;
 }
 
 impl governance_os_pallet_bylaws::Trait for Runtime {
@@ -48,4 +49,5 @@ impl governance_os_pallet_bylaws::Trait for Runtime {
     type RootRole = RootRole;
     type CallFilter = CallFilter;
     type WeightInfo = ();
+    type MaxRoles = MaxRoles;
 }

@@ -69,7 +69,7 @@ pub type Header = generic::Header<BlockNumber, BlakeTwo256>;
 pub type Block = generic::Block<Header, OpaqueExtrinsic>;
 
 /// The different roles supported by the runtime.
-#[derive(Encode, Decode, RuntimeDebug, Clone, Copy, PartialEq, Eq)]
+#[derive(Encode, Decode, RuntimeDebug, Clone, Copy, PartialEq, Eq, Ord, PartialOrd)]
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 pub enum Role {
     CreateCurrencies,
@@ -78,7 +78,9 @@ pub enum Role {
     TransferCurrency(CurrencyId),
 }
 impl governance_os_support::acl::Role for Role {}
-impl_enum_default!(Role, Root);
+// `Default` is used for benchmarks. We have to make sure the default role is not
+// root though.
+impl_enum_default!(Role, CreateCurrencies);
 impl governance_os_pallet_tokens::RoleBuilder for Role {
     type CurrencyId = CurrencyId;
     type Role = Role;

@@ -21,7 +21,7 @@ use frame_support::Parameter;
 use frame_system::{ensure_signed, RawOrigin};
 use sp_runtime::{
     traits::{DispatchInfoOf, Dispatchable, MaybeSerializeDeserialize, Member},
-    DispatchError,
+    DispatchError, DispatchResult,
 };
 use sp_std::{convert::Into, prelude::Vec};
 
@@ -41,7 +41,7 @@ impl Into<DispatchError> for AclError {
 
 /// This defines a role. Roles can be granted to any number of addresses, frozen
 /// (denied for anybody) and granted to everybody at once.
-pub trait Role: Parameter + Member + Copy + MaybeSerializeDeserialize {}
+pub trait Role: Parameter + Member + Copy + MaybeSerializeDeserialize + Ord {}
 
 /// This trait links a `call` to a suite of roles. If multiple roles are attached to a call
 /// the runtime should perform the equivalent of a boolean `or` operation on those; aka
@@ -76,11 +76,11 @@ pub trait RoleManager {
 
     /// Grants `target` the role `role`. If target is `None` then it should give the role to
     /// every account that exists or may exists on the chain.
-    fn grant_role(target: Option<&Self::AccountId>, role: Self::Role);
+    fn grant_role(target: Option<&Self::AccountId>, role: Self::Role) -> DispatchResult;
 
     /// Should revoke the role `role` for `target`. If the role wasn't granted to `target` this
-    /// should be a no op.
-    fn revoke_role(target: Option<&Self::AccountId>, role: Self::Role);
+    /// should error.
+    fn revoke_role(target: Option<&Self::AccountId>, role: Self::Role) -> DispatchResult;
 
     /// A helper function that will require the origin to have the `role` granted. We provide a
     /// default implementation for it.

@@ -317,27 +317,27 @@ impl<T: Trait> Module<T> {
     ) {
         if let Some(previous_owner) = maybe_no_longer_owner {
             if details.owner != previous_owner {
-                RoleManagerOf::<T>::revoke_role(
+                drop(RoleManagerOf::<T>::revoke_role(
                     Some(&previous_owner),
                     RoleBuilderOf::<T>::manage_currency(currency_id),
-                );
+                ));
             }
         }
-        RoleManagerOf::<T>::grant_role(
+        drop(RoleManagerOf::<T>::grant_role(
             Some(&details.owner),
             RoleBuilderOf::<T>::manage_currency(currency_id),
-        );
+        ));
 
         if details.transferable {
-            RoleManagerOf::<T>::grant_role(
+            drop(RoleManagerOf::<T>::grant_role(
                 None,
                 RoleBuilderOf::<T>::transfer_currency(currency_id),
-            );
+            ));
         } else {
-            RoleManagerOf::<T>::revoke_role(
+            drop(RoleManagerOf::<T>::revoke_role(
                 None,
                 RoleBuilderOf::<T>::transfer_currency(currency_id),
-            );
+            ));
         }
     }
 
