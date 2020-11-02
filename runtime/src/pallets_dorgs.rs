@@ -14,29 +14,9 @@
  * limitations under the License.
  */
 
-use crate::{Call, Event, Runtime};
+use crate::{Event, Runtime};
 use frame_support::parameter_types;
-use governance_os_primitives::{AccountId, Role};
-use sp_runtime::traits::DispatchInfoOf;
-use sp_std::prelude::*;
-
-pub struct CallFilter;
-impl governance_os_support::acl::CallFilter<AccountId, Call, Role> for CallFilter {
-    fn roles_for(
-        _who: &AccountId,
-        call: &Call,
-        _info: &DispatchInfoOf<Call>,
-        _len: usize,
-    ) -> Vec<Role> {
-        match call {
-            // TODO: add sudo module using the root bylaw
-            Call::Tokens(governance_os_pallet_tokens::Call::create(..)) => {
-                vec![Role::CreateCurrencies]
-            }
-            _ => vec![],
-        }
-    }
-}
+use governance_os_primitives::Role;
 
 parameter_types! {
     pub const RootRole: Role = Role::Root;
@@ -47,7 +27,6 @@ impl governance_os_pallet_bylaws::Trait for Runtime {
     type Event = Event;
     type Role = Role;
     type RootRole = RootRole;
-    type CallFilter = CallFilter;
     type WeightInfo = ();
     type MaxRoles = MaxRoles;
 }

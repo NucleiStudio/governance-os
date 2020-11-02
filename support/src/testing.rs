@@ -113,22 +113,6 @@ macro_rules! mock_runtime {
         impl Role for MockRoles {}
         impl_enum_default!(MockRoles, RemarkOnly);
 
-        pub struct MockCallFilter<T>(marker::PhantomData<T>);
-        impl<T: Trait> CallFilter<AccountId, Call, MockRoles> for MockCallFilter<T> {
-            fn roles_for(
-                _who: &AccountId,
-                call: &Call,
-                _info: &DispatchInfoOf<Call>,
-                _len: usize,
-            ) -> Vec<MockRoles> {
-                match call {
-                    Call::System(frame_system::Call::remark(..)) => vec![MockRoles::RemarkOnly],
-                    Call::System(frame_system::Call::suicide()) => vec![], // Everybody can call it
-                    _ => vec![MockRoles::Root],
-                }
-            }
-        }
-
         parameter_types! {
             pub const RootRole: MockRoles = MockRoles::Root;
             pub const MaxRoles: u32 = 4;
@@ -138,7 +122,6 @@ macro_rules! mock_runtime {
             type Event = ();
             type Role = MockRoles;
             type RootRole = RootRole;
-            type CallFilter = MockCallFilter<$runtime>;
             type WeightInfo = ();
             type MaxRoles = MaxRoles;
         }

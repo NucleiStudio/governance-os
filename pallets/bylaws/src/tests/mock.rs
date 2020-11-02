@@ -16,32 +16,27 @@
 
 use crate::{
     self as governance_os_pallet_bylaws, // compat with `mock_runtime`
-    CheckRole,
     GenesisConfig,
-    Trait,
 };
 use codec::{Decode, Encode};
 use frame_support::{impl_outer_dispatch, impl_outer_origin, parameter_types};
 use governance_os_support::{
-    acl::{CallFilter, Role},
+    acl::Role,
     impl_enum_default, mock_runtime,
     testing::{
         primitives::{AccountId, CurrencyId},
-        AvailableBlockRatio, BlockHashCount, MaximumBlockLength, MaximumBlockWeight, ALICE,
+        AvailableBlockRatio, BlockHashCount, MaximumBlockLength, MaximumBlockWeight,
     },
 };
 use serde::{Deserialize, Serialize};
 use sp_core::H256;
 use sp_runtime::{
     testing::Header,
-    traits::{BlakeTwo256, DispatchInfoOf, IdentityLookup},
+    traits::{BlakeTwo256, IdentityLookup},
     RuntimeDebug,
 };
-use sp_std::marker;
 
 mock_runtime!(Test);
-
-pub type MockCheckRole = CheckRole<Test>;
 
 pub struct ExtBuilder {
     roles: Vec<(MockRoles, Option<AccountId>)>,
@@ -54,10 +49,6 @@ impl Default for ExtBuilder {
 }
 
 impl ExtBuilder {
-    pub fn alice_as_root(self) -> Self {
-        self.with_role(MockRoles::Root, Some(ALICE))
-    }
-
     pub fn with_role(mut self, role: MockRoles, target: Option<AccountId>) -> Self {
         self.roles.push((role, target));
         self

@@ -20,10 +20,10 @@
 use frame_support::Parameter;
 use frame_system::{ensure_signed, RawOrigin};
 use sp_runtime::{
-    traits::{DispatchInfoOf, Dispatchable, MaybeSerializeDeserialize, Member},
+    traits::{MaybeSerializeDeserialize, Member},
     DispatchError, DispatchResult,
 };
-use sp_std::{convert::Into, prelude::Vec};
+use sp_std::convert::Into;
 
 pub enum AclError {
     MissingRole,
@@ -42,27 +42,6 @@ impl Into<DispatchError> for AclError {
 /// This defines a role. Roles can be granted to any number of addresses, frozen
 /// (denied for anybody) and granted to everybody at once.
 pub trait Role: Parameter + Member + Copy + MaybeSerializeDeserialize + Ord {}
-
-/// This trait links a `call` to a suite of roles. If multiple roles are attached to a call
-/// the runtime should perform the equivalent of a boolean `or` operation on those; aka
-/// at least one of the roles need to be granted to the caller for it to perform the call.
-pub trait CallFilter<AccountId, Call, Role>
-where
-    Call: Dispatchable,
-{
-    /// Shall return at least one role that `who` must have been granted before being able
-    /// to send the call. Additionally, if `who` as a role for which `is_root` returns `true`
-    /// we would let them perform the call as well.
-    ///
-    /// **NOTE**: the function return an empty vector we will assume that anybody can perform
-    /// the given call.
-    fn roles_for(
-        who: &AccountId,
-        call: &Call,
-        info: &DispatchInfoOf<Call>,
-        len: usize,
-    ) -> Vec<Role>;
-}
 
 /// This trait can be implemented by a pallet to expose an interface for other pallets to
 /// manage their own role based access control features.

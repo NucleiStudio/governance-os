@@ -17,8 +17,7 @@
 //! This pallet implements an ACL system for account level permissioning.
 //! A role is the equivalent of a UNIX role, it can be granted either to
 //! one or many account or even to all the accounts within the system.
-//! We then link the pallet to a `CallFilter` that is in charge or associating
-//! incoming calls to expected roles.
+//! Pallets can then use it to define custom role requirements.
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
@@ -26,18 +25,15 @@ use frame_support::{
     decl_error, decl_event, decl_module, decl_storage, traits::Get, weights::Weight,
 };
 use frame_system::ensure_root;
-use governance_os_support::acl::{CallFilter, Role, RoleManager};
+use governance_os_support::acl::{Role, RoleManager};
 use sp_runtime::{traits::StaticLookup, DispatchResult};
 use sp_std::prelude::Vec;
 
 #[cfg(feature = "runtime-benchmarks")]
 mod benchmarking;
 mod default_weights;
-mod signed_extra;
 #[cfg(test)]
 mod tests;
-
-pub use signed_extra::CheckRole;
 
 pub trait WeightInfo {
     fn grant_role() -> Weight;
@@ -54,9 +50,6 @@ pub trait Trait: frame_system::Trait {
     /// This role would be the equivalent of a super role. If an account is granted it it can submit
     /// any other calls.
     type RootRole: Get<Self::Role>;
-
-    /// The call filter is in charge of tagging incoming calls with roles that are needed.
-    type CallFilter: CallFilter<Self::AccountId, Self::Call, Self::Role>;
 
     /// The weights for this pallet.
     type WeightInfo: WeightInfo;
