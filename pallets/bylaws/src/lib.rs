@@ -35,8 +35,8 @@ mod default_weights;
 mod tests;
 
 pub trait WeightInfo {
-    fn grant_role() -> Weight;
-    fn revoke_role() -> Weight;
+    fn grant_role(b: u32) -> Weight;
+    fn revoke_role(b: u32) -> Weight;
 }
 
 pub trait RoleBuilder {
@@ -110,7 +110,7 @@ decl_module! {
 
         /// Add a `role` to a given account `who`. If `who` is set to `None` this
         /// means that the role is granted to all the accounts of the chain.
-        #[weight = T::WeightInfo::grant_role()]
+        #[weight = T::WeightInfo::grant_role(T::MaxRoles::get())]
         fn grant_role(origin, who: Option<<T::Lookup as StaticLookup>::Source>, role: T::Role) {
             Self::ensure_has_role(origin, RoleBuilderOf::<T>::manage_roles())?;
 
@@ -124,7 +124,7 @@ decl_module! {
 
         /// Remove a `role` from a given account `who`. If `who` is set to `None` this means
         /// that the role is revoked for all the accounts of the chain.
-        #[weight = T::WeightInfo::revoke_role()]
+        #[weight = T::WeightInfo::revoke_role(T::MaxRoles::get())]
         fn revoke_role(origin, who: Option<<T::Lookup as StaticLookup>::Source>, role: T::Role) {
             Self::ensure_has_role(origin, RoleBuilderOf::<T>::manage_roles())?;
 

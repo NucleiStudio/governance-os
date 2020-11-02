@@ -177,7 +177,7 @@ pub fn dummy_config() -> Result<ChainSpec, String> {
                 vec![authority_keys_from_seed("Alice")],
                 vec![],
                 Some(vec![]),
-                Some(vec![]),
+                None,
             )
         },
         vec![],
