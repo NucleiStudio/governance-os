@@ -19,7 +19,7 @@ use frame_support::parameter_types;
 use governance_os_primitives::Role;
 
 parameter_types! {
-    pub const MaxRoles: u32 = 5;
+    pub const MaxRoles: u32 = 50;
 }
 
 impl governance_os_pallet_bylaws::Trait for Runtime {

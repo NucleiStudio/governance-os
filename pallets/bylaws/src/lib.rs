@@ -62,7 +62,6 @@ pub trait Trait: frame_system::Trait {
 
     /// Only used for weight calculations: this is the highest number of roles we expect one account
     /// to have.
-    /// One should set this to the number of variants `T::Role` can take.
     type MaxRoles: Get<u32>;
 
     /// Helper for the runtime to specify its custom roles.
