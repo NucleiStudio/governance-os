@@ -74,6 +74,7 @@ pub type Block = generic::Block<Header, OpaqueExtrinsic>;
 pub enum Role {
     CreateCurrencies,
     ManageCurrency(CurrencyId),
+    ManageRoles,
     Root,
     TransferCurrency(CurrencyId),
 }
@@ -95,5 +96,16 @@ impl governance_os_pallet_tokens::RoleBuilder for Role {
 
     fn create_currencies() -> Role {
         Role::CreateCurrencies
+    }
+}
+impl governance_os_pallet_bylaws::RoleBuilder for Role {
+    type Role = Role;
+
+    fn manage_roles() -> Role {
+        Role::ManageRoles
+    }
+
+    fn root() -> Role {
+        Role::Root
     }
 }

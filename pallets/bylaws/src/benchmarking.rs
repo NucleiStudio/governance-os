@@ -15,7 +15,7 @@
  */
 
 use crate::*;
-use frame_benchmarking::{account, benchmarks};
+use frame_benchmarking::{account, benchmarks, whitelisted_caller};
 use frame_system::RawOrigin;
 use governance_os_support::{acl::RoleManager, benchmarking::SEED};
 use sp_runtime::traits::StaticLookup;
@@ -23,19 +23,29 @@ use sp_std::prelude::*;
 
 fn prepare_benchmark<T: Trait>(
     b: u32,
-) -> (T::AccountId, <T::Lookup as StaticLookup>::Source, T::Role) {
+) -> (
+    T::AccountId,
+    T::AccountId,
+    <T::Lookup as StaticLookup>::Source,
+    T::Role,
+) {
+    let root: T::AccountId = whitelisted_caller();
     let target: T::AccountId = account("target", b, SEED);
     let target_lookup: <T::Lookup as StaticLookup>::Source = T::Lookup::unlookup(target.clone());
     let role = T::Role::default();
 
     for _ in 0..b {
         // `grant_role` would avoid duplicates so we have set this manually. Note that for those
-        // benchmarks to be relevant `T::RootRole::get()` MUST be different from `T::Role::default()`.
+        // benchmarks to be relevant the root role MUST be different from `T::Role::default()`.
         // We are simply trying to force the maximum number of iterations (worst case scenario).
-        Roles::<T>::mutate(Some(&target), |v| v.push(T::RootRole::get()));
+        Roles::<T>::mutate(Some(&target), |v| v.push(RoleBuilderOf::<T>::root()));
     }
 
-    (target, target_lookup, role)
+    drop(<Module<T> as RoleManager>::grant_role(
+        Some(&root),
+        RoleBuilderOf::<T>::manage_roles(),
+    ));
+    (root, target, target_lookup, role)
 }
 
 benchmarks! {
@@ -44,8 +54,8 @@ benchmarks! {
     grant_role {
         let b in 0 .. T::MaxRoles::get();
 
-        let (target, target_lookup, role) = prepare_benchmark::<T>(b);
-    }: _(RawOrigin::Root, Some(target_lookup), role)
+        let (root, target, target_lookup, role) = prepare_benchmark::<T>(b);
+    }: _(RawOrigin::Signed(root), Some(target_lookup), role)
     verify {
         assert_eq!(Roles::<T>::get(Some(&target)).iter().any(|&r| r==role), true);
     }
@@ -53,9 +63,9 @@ benchmarks! {
     revoke_role {
         let b in 1 .. T::MaxRoles::get();
 
-        let (target, target_lookup, role) = prepare_benchmark::<T>(b - 1);
+        let (root, target, target_lookup, role) = prepare_benchmark::<T>(b - 1);
         drop(<Module<T> as RoleManager>::grant_role(Some(&target), role));
-    }: _(RawOrigin::Root, Some(target_lookup), role)
+    }: _(RawOrigin::Signed(root), Some(target_lookup), role)
     verify {
         assert_eq!(Roles::<T>::get(Some(&target)).iter().any(|&r| r==role), false);
     }

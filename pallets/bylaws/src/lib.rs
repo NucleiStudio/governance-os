@@ -24,7 +24,6 @@
 use frame_support::{
     decl_error, decl_event, decl_module, decl_storage, traits::Get, weights::Weight,
 };
-use frame_system::ensure_root;
 use governance_os_support::acl::{Role, RoleManager};
 use sp_runtime::{traits::StaticLookup, DispatchResult};
 use sp_std::prelude::Vec;
@@ -40,16 +39,23 @@ pub trait WeightInfo {
     fn revoke_role() -> Weight;
 }
 
+pub trait RoleBuilder {
+    type Role;
+
+    /// Give access to the functions `grant_role` and `revoke_role`.
+    fn manage_roles() -> Self::Role;
+
+    /// This role would be the equivalent of a super role. If an account is granted it it can submit
+    /// any other calls.
+    fn root() -> Self::Role;
+}
+
 pub trait Trait: frame_system::Trait {
     /// Because this pallet emits events, it depends on the runtime's definition of an event.
     type Event: From<Event<Self>> + Into<<Self as frame_system::Trait>::Event>;
 
     /// Roles defines UNIX like roles that users must be granted before triggering certain calls.
     type Role: Role + Default;
-
-    /// This role would be the equivalent of a super role. If an account is granted it it can submit
-    /// any other calls.
-    type RootRole: Get<Self::Role>;
 
     /// The weights for this pallet.
     type WeightInfo: WeightInfo;
@@ -58,7 +64,12 @@ pub trait Trait: frame_system::Trait {
     /// to have.
     /// One should set this to the number of variants `T::Role` can take.
     type MaxRoles: Get<u32>;
+
+    /// Helper for the runtime to specify its custom roles.
+    type RoleBuilder: RoleBuilder<Role = Self::Role>;
 }
+
+type RoleBuilderOf<T> = <T as Trait>::RoleBuilder;
 
 decl_error! {
     pub enum Error for Module<T: Trait> {
@@ -102,7 +113,8 @@ decl_module! {
         /// means that the role is granted to all the accounts of the chain.
         #[weight = T::WeightInfo::grant_role()]
         fn grant_role(origin, who: Option<<T::Lookup as StaticLookup>::Source>, role: T::Role) {
-            ensure_root(origin)?;
+            Self::ensure_has_role(origin, RoleBuilderOf::<T>::manage_roles())?;
+
             let target = match who {
                 Some(lookmeup) => Some(T::Lookup::lookup(lookmeup)?),
                 None => None,
@@ -116,7 +128,8 @@ decl_module! {
         /// that the role is revoked for all the accounts of the chain.
         #[weight = T::WeightInfo::revoke_role()]
         fn revoke_role(origin, who: Option<<T::Lookup as StaticLookup>::Source>, role: T::Role) {
-            ensure_root(origin)?;
+            Self::ensure_has_role(origin, RoleBuilderOf::<T>::manage_roles())?;
+
             let target = match who {
                 Some(lookmeup) => Some(T::Lookup::lookup(lookmeup)?),
                 None => None,
@@ -166,7 +179,7 @@ impl<T: Trait> RoleManager for Module<T> {
             .chain(Roles::<T>::get(None as Option<T::AccountId>).iter())
             .cloned()
             .find(|r| {
-                return *r == role || *r == T::RootRole::get();
+                return *r == role || *r == RoleBuilderOf::<T>::root();
             })
             .is_some()
     }

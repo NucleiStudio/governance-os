@@ -19,14 +19,13 @@ use frame_support::parameter_types;
 use governance_os_primitives::Role;
 
 parameter_types! {
-    pub const RootRole: Role = Role::Root;
-    pub const MaxRoles: u32 = 4;
+    pub const MaxRoles: u32 = 5;
 }
 
 impl governance_os_pallet_bylaws::Trait for Runtime {
     type Event = Event;
     type Role = Role;
-    type RootRole = RootRole;
     type WeightInfo = ();
     type MaxRoles = MaxRoles;
+    type RoleBuilder = Role;
 }

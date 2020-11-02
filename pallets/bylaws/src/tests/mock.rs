@@ -25,7 +25,7 @@ use governance_os_support::{
     impl_enum_default, mock_runtime,
     testing::{
         primitives::{AccountId, CurrencyId},
-        AvailableBlockRatio, BlockHashCount, MaximumBlockLength, MaximumBlockWeight,
+        AvailableBlockRatio, BlockHashCount, MaximumBlockLength, MaximumBlockWeight, ROOT,
     },
 };
 use serde::{Deserialize, Serialize};
@@ -44,7 +44,9 @@ pub struct ExtBuilder {
 
 impl Default for ExtBuilder {
     fn default() -> Self {
-        Self { roles: vec![] }
+        Self {
+            roles: vec![(MockRoles::Root, Some(ROOT))],
+        }
     }
 }
 

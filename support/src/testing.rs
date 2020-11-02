@@ -19,6 +19,7 @@
 use frame_support::{parameter_types, weights::Weight};
 use sp_runtime::Perbill;
 
+pub const ROOT: primitives::AccountId = 0;
 pub const ALICE: primitives::AccountId = 1;
 pub const BOB: primitives::AccountId = 2;
 pub const TEST_TOKEN_ID: primitives::CurrencyId = 3;
@@ -113,6 +114,17 @@ macro_rules! mock_runtime {
         }
         impl Role for MockRoles {}
         impl_enum_default!(MockRoles, RemarkOnly);
+        impl governance_os_pallet_bylaws::RoleBuilder for MockRoles {
+            type Role = MockRoles;
+
+            fn manage_roles() -> MockRoles {
+                Self::root()
+            }
+
+            fn root() -> MockRoles {
+                MockRoles::Root
+            }
+        }
 
         parameter_types! {
             pub const RootRole: MockRoles = MockRoles::Root;
@@ -122,9 +134,9 @@ macro_rules! mock_runtime {
         impl governance_os_pallet_bylaws::Trait for $runtime {
             type Event = ();
             type Role = MockRoles;
-            type RootRole = RootRole;
             type WeightInfo = ();
             type MaxRoles = MaxRoles;
+            type RoleBuilder = MockRoles;
         }
 
         pub type Bylaws = governance_os_pallet_bylaws::Module<Test>;
