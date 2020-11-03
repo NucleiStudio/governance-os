@@ -33,6 +33,9 @@ use governance_os_pallet_bylaws::RoleBuilder;
 use governance_os_support::acl::RoleManager;
 use sp_runtime::{traits::StaticLookup, DispatchResult};
 
+#[cfg(test)]
+mod tests;
+
 pub trait Trait: frame_system::Trait {
     /// Because this pallet emits events, it depends on the runtime's definition of an event.
     type Event: From<Event> + Into<<Self as frame_system::Trait>::Event>;
