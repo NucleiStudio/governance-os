@@ -66,6 +66,7 @@ construct_runtime!(
         // Core
         System: frame_system::{Module, Call, Config, Storage, Event<T>},
         RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Module, Call, Storage},
+        Compat: governance_os_pallet_compat::{Module, Call, Event},
 
         // Consensus
         Aura: pallet_aura::{Module, Config<T>, Inherent},
