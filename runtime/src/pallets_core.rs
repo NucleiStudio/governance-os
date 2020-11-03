@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-use crate::{weights, Call, Event, Origin, PalletInfo, Runtime, VERSION};
+use crate::{weights, Bylaws, Call, Event, Origin, PalletInfo, Runtime, VERSION};
 use frame_support::{
     parameter_types,
     weights::{
@@ -22,7 +22,7 @@ use frame_support::{
         Weight,
     },
 };
-use governance_os_primitives::{AccountId, Balance, BlockNumber, CurrencyId, Hash, Index};
+use governance_os_primitives::{AccountId, Balance, BlockNumber, CurrencyId, Hash, Index, Role};
 use sp_runtime::{
     generic,
     traits::{BlakeTwo256, IdentityLookup, Saturating},
@@ -74,4 +74,11 @@ impl frame_system::Trait for Runtime {
     type OnNewAccount = ();
     type OnKilledAccount = ();
     type SystemWeightInfo = weights::frame_system::WeightInfo;
+}
+
+impl governance_os_pallet_compat::Trait for Runtime {
+    type Event = Event;
+    type Call = Call;
+    type RoleBuilder = Role;
+    type RoleManager = Bylaws;
 }
