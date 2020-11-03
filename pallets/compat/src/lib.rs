@@ -26,7 +26,7 @@ use frame_support::{
     decl_event, decl_module, decl_storage,
     dispatch::DispatchResultWithPostInfo,
     traits::{Get, UnfilteredDispatchable},
-    weights::{GetDispatchInfo, Pays},
+    weights::{GetDispatchInfo, Pays, Weight},
     Parameter,
 };
 use governance_os_pallet_bylaws::RoleBuilder;
@@ -81,6 +81,14 @@ decl_module! {
 
             // Caller won't pay a fee.
             Ok(Pays::No.into())
+        }
+
+        /// A variant of the `sudo` dispatchable that will let caller specify its weight. This could be
+        /// useful when trying to push a runtime upgrade but should be used with parcimony.
+        #[weight = (*_weight, call.get_dispatch_info().class)]
+        fn sudo_custom_weight(origin, call: Box<<T as Trait>::Call>, _weight: Weight) -> DispatchResultWithPostInfo {
+            // Just proxy back to the `sudo` call
+            Self::sudo(origin, call)
         }
 
         // Dispatches the call with the origin set to `who`.
