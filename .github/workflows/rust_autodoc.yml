@@ -1,0 +1,25 @@
+name: Rust AutoDoc
+
+on: [push]
+  # - push:
+  #     branches: master
+
+jobs:
+
+  autodoc:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup toolchain
+      run: ./scripts/init.sh
+
+    - name: Build the docs
+      run: cargo doc --all
+    
+    - name: Deploy the docs
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./target/doc
