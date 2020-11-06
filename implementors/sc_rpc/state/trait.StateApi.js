@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["sc_rpc"] = [{"text":"impl&lt;Block, Client&gt; StateApi&lt;&lt;Block as Block&gt;::Hash&gt; for State&lt;Block, Client&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;Block: BlockT + 'static,<br>&nbsp;&nbsp;&nbsp;&nbsp;Client: Send + Sync + 'static,&nbsp;</span>","synthetic":false,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

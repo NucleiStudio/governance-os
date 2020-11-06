@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["libp2p"] = [{"text":"impl&lt;C, F, O, A, E&gt; OutboundUpgrade&lt;C&gt; for SimpleProtocol&lt;F&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;C: AsyncRead + AsyncWrite,<br>&nbsp;&nbsp;&nbsp;&nbsp;F: Fn(C) -&gt; O,<br>&nbsp;&nbsp;&nbsp;&nbsp;O: Future&lt;Output = Result&lt;A, E&gt;&gt;,&nbsp;</span>","synthetic":false,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

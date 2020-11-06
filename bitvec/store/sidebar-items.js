@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["BitStore","Generalizes over the fundamental types for use in `bitvec` data structures."]]});

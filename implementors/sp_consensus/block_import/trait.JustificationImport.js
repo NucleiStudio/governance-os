@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["sc_finality_grandpa"] = [{"text":"impl&lt;BE, Block:&nbsp;BlockT, Client, SC&gt; JustificationImport&lt;Block&gt; for GrandpaBlockImport&lt;BE, Block, Client, SC&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;NumberFor&lt;Block&gt;: BlockNumberOps,<br>&nbsp;&nbsp;&nbsp;&nbsp;DigestFor&lt;Block&gt;: Encode,<br>&nbsp;&nbsp;&nbsp;&nbsp;BE: Backend&lt;Block&gt;,<br>&nbsp;&nbsp;&nbsp;&nbsp;Client: ClientForGrandpa&lt;Block, BE&gt;,<br>&nbsp;&nbsp;&nbsp;&nbsp;SC: SelectChain&lt;Block&gt;,&nbsp;</span>","synthetic":false,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

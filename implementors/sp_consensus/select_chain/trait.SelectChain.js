@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["sc_consensus"] = [{"text":"impl&lt;B, Block&gt; SelectChain&lt;Block&gt; for LongestChain&lt;B, Block&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;B: Backend&lt;Block&gt;,<br>&nbsp;&nbsp;&nbsp;&nbsp;Block: BlockT,&nbsp;</span>","synthetic":false,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

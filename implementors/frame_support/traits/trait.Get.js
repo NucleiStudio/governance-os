@@ -1,0 +1,5 @@
+(function() {var implementors = {};
+implementors["frame_support"] = [];
+implementors["governance_os_runtime"] = [{"text":"impl&lt;I:&nbsp;From&lt;CurrencyId&gt;&gt; Get&lt;I&gt; for NativeCurrencyId","synthetic":false,"types":[]}];
+implementors["governance_os_support"] = [{"text":"impl&lt;I:&nbsp;From&lt;u64&gt;&gt; Get&lt;I&gt; for BlockHashCount","synthetic":false,"types":[]},{"text":"impl&lt;I:&nbsp;From&lt;Weight&gt;&gt; Get&lt;I&gt; for MaximumBlockWeight","synthetic":false,"types":[]},{"text":"impl&lt;I:&nbsp;From&lt;u32&gt;&gt; Get&lt;I&gt; for MaximumBlockLength","synthetic":false,"types":[]},{"text":"impl&lt;I:&nbsp;From&lt;Perbill&gt;&gt; Get&lt;I&gt; for AvailableBlockRatio","synthetic":false,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

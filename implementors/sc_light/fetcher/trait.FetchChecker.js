@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["sc_light"] = [{"text":"impl&lt;E, Block, H, S&gt; FetchChecker&lt;Block&gt; for LightDataChecker&lt;E, H, Block, S&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;Block: BlockT,<br>&nbsp;&nbsp;&nbsp;&nbsp;E: CodeExecutor + Clone + 'static,<br>&nbsp;&nbsp;&nbsp;&nbsp;H: Hasher,<br>&nbsp;&nbsp;&nbsp;&nbsp;H::Out: Ord + Codec + 'static,<br>&nbsp;&nbsp;&nbsp;&nbsp;S: BlockchainStorage&lt;Block&gt;,&nbsp;</span>","synthetic":false,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

@@ -1,0 +1,69 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `slog_scope` crate."><meta name="keywords" content="rust, rustlang, rust-lang, slog_scope"><title>slog_scope - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script src="../storage.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../slog_scope/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><p class='location'>Crate slog_scope</p><div class='block version'><p>Version 4.3.0</p></div><div class="sidebar-elems"><a id='all-types' href='all.html'><p>See all slog_scope's items</p></a><div class="block items"><ul><li><a href="#macros">Macros</a></li><li><a href="#structs">Structs</a></li><li><a href="#functions">Functions</a></li></ul></div><p class='location'></p><script>window.sidebarCurrent = {name: 'slog_scope', ty: 'mod', relpath: '../'};</script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
+                <a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../src/slog_scope/lib.rs.html#1-249' title='goto source code'>[src]</a></span><span class='in-band'>Crate <a class="mod" href=''>slog_scope</a></span></h1><div class='docblock'><p>Logging scopes for slog-rs</p>
+<p>Logging scopes are convenience functionality for slog-rs to free user from manually passing
+<code>Logger</code> objects around.</p>
+<p>Set of macros is also provided as an alternative to original <code>slog</code> crate macros, for logging
+directly to <code>Logger</code> of the current logging scope.</p>
+<h1 id="set-global-logger-upfront" class="section-header"><a href="#set-global-logger-upfront">Set global logger upfront</a></h1>
+<p><strong>Warning</strong>: Since <code>slog-scope</code> version 4.0.0, <code>slog-scope</code> defaults to
+panicking on logging if no scope or global logger was set. Because of it, it
+is advised to always set a global logger upfront with <code>set_global_logger</code>.</p>
+<h1 id="using-slog-scope-as-a-part-of-api-is-not-advised" class="section-header"><a href="#using-slog-scope-as-a-part-of-api-is-not-advised">Using <code>slog-scope</code> as a part of API is not advised</a></h1>
+<p>Part of a <code>slog</code> logging philosophy is ability to freely express logging contexts
+according to logical structure, rather than callstack structure. By using
+logging scopes the logging context is tied to code flow again, which is less
+expressive.</p>
+<p>It is generally advised <strong>NOT</strong> to use <code>slog_scope</code> in libraries. Read more in
+<a href="https://github.com/slog-rs/slog/wiki/FAQ#do-i-have-to-pass-logger-around">slog-rs FAQ</a></p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered">
+<span class="attribute">#[<span class="ident">macro_use</span>(<span class="ident">slog_o</span>, <span class="ident">slog_info</span>, <span class="ident">slog_log</span>, <span class="ident">slog_record</span>, <span class="ident">slog_record_static</span>, <span class="ident">slog_b</span>, <span class="ident">slog_kv</span>)]</span>
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">slog</span>;
+<span class="attribute">#[<span class="ident">macro_use</span>]</span>
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">slog_scope</span>;
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">slog_term</span>;
+
+<span class="kw">use</span> <span class="ident">slog</span>::<span class="ident">Drain</span>;
+
+<span class="kw">fn</span> <span class="ident">foo</span>() {
+    <span class="macro">slog_info</span><span class="macro">!</span>(<span class="ident">slog_scope</span>::<span class="ident">logger</span>(), <span class="string">&quot;foo&quot;</span>);
+    <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;foo&quot;</span>); <span class="comment">// Same as above, but more ergonomic and a bit faster</span>
+                  <span class="comment">// since it uses `with_logger`</span>
+}
+
+<span class="kw">fn</span> <span class="ident">main</span>() {
+    <span class="kw">let</span> <span class="ident">plain</span> <span class="op">=</span> <span class="ident">slog_term</span>::<span class="ident">PlainSyncDecorator</span>::<span class="ident">new</span>(<span class="ident">std</span>::<span class="ident">io</span>::<span class="ident">stdout</span>());
+    <span class="kw">let</span> <span class="ident">log</span> <span class="op">=</span> <span class="ident">slog</span>::<span class="ident">Logger</span>::<span class="ident">root</span>(
+        <span class="ident">slog_term</span>::<span class="ident">FullFormat</span>::<span class="ident">new</span>(<span class="ident">plain</span>)
+        .<span class="ident">build</span>().<span class="ident">fuse</span>(), <span class="macro">slog_o</span><span class="macro">!</span>()
+    );
+
+    <span class="comment">// Make sure to save the guard, see documentation for more information</span>
+    <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">slog_scope</span>::<span class="ident">set_global_logger</span>(<span class="ident">log</span>);
+    <span class="ident">slog_scope</span>::<span class="ident">scope</span>(<span class="kw-2">&amp;</span><span class="ident">slog_scope</span>::<span class="ident">logger</span>().<span class="ident">new</span>(<span class="macro">slog_o</span><span class="macro">!</span>(<span class="string">&quot;scope&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;1&quot;</span>)),
+        <span class="op">|</span><span class="op">|</span> <span class="ident">foo</span>()
+    );
+}</pre></div>
+</div><h2 id='macros' class='section-header'><a href="#macros">Macros</a></h2>
+<table><tr class='module-item'><td><a class="macro" href="macro.crit.html" title='slog_scope::crit macro'>crit</a></td><td class='docblock-short'><p>Log a critical level message using current scope logger</p>
+</td></tr><tr class='module-item'><td><a class="macro" href="macro.debug.html" title='slog_scope::debug macro'>debug</a></td><td class='docblock-short'><p>Log a debug level message using current scope logger</p>
+</td></tr><tr class='module-item'><td><a class="macro" href="macro.error.html" title='slog_scope::error macro'>error</a></td><td class='docblock-short'><p>Log a error level message using current scope logger</p>
+</td></tr><tr class='module-item'><td><a class="macro" href="macro.info.html" title='slog_scope::info macro'>info</a></td><td class='docblock-short'><p>Log a info level message using current scope logger</p>
+</td></tr><tr class='module-item'><td><a class="macro" href="macro.slog_crit.html" title='slog_scope::slog_crit macro'>slog_crit</a></td><td class='docblock-short'><p>Log critical level record (alias)</p>
+</td></tr><tr class='module-item'><td><a class="macro" href="macro.slog_debug.html" title='slog_scope::slog_debug macro'>slog_debug</a></td><td class='docblock-short'><p>Log debug level record (alias)</p>
+</td></tr><tr class='module-item'><td><a class="macro" href="macro.slog_error.html" title='slog_scope::slog_error macro'>slog_error</a></td><td class='docblock-short'><p>Log error level record</p>
+</td></tr><tr class='module-item'><td><a class="macro" href="macro.slog_info.html" title='slog_scope::slog_info macro'>slog_info</a></td><td class='docblock-short'><p>Log info level record (alias)</p>
+</td></tr><tr class='module-item'><td><a class="macro" href="macro.slog_trace.html" title='slog_scope::slog_trace macro'>slog_trace</a></td><td class='docblock-short'><p>Log trace level record (alias)</p>
+</td></tr><tr class='module-item'><td><a class="macro" href="macro.slog_warn.html" title='slog_scope::slog_warn macro'>slog_warn</a></td><td class='docblock-short'><p>Log warning level record (alias)</p>
+</td></tr><tr class='module-item'><td><a class="macro" href="macro.trace.html" title='slog_scope::trace macro'>trace</a></td><td class='docblock-short'><p>Log a trace level message using current scope logger</p>
+</td></tr><tr class='module-item'><td><a class="macro" href="macro.warn.html" title='slog_scope::warn macro'>warn</a></td><td class='docblock-short'><p>Log a warning level message using current scope logger</p>
+</td></tr></table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+<table><tr class='module-item'><td><a class="struct" href="struct.GlobalLoggerGuard.html" title='slog_scope::GlobalLoggerGuard struct'>GlobalLoggerGuard</a></td><td class='docblock-short'><p>Guard resetting global logger</p>
+</td></tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
+<table><tr class='module-item'><td><a class="fn" href="fn.logger.html" title='slog_scope::logger fn'>logger</a></td><td class='docblock-short'><p>Access the <code>Logger</code> for the current logging scope</p>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.scope.html" title='slog_scope::scope fn'>scope</a></td><td class='docblock-short'><p>Execute code in a logging scope</p>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.set_global_logger.html" title='slog_scope::set_global_logger fn'>set_global_logger</a></td><td class='docblock-short'><p>Set global <code>Logger</code> that is returned by calls like <code>logger()</code> outside of any logging scope.</p>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.with_logger.html" title='slog_scope::with_logger fn'>with_logger</a></td><td class='docblock-short'><p>Access the <code>Logger</code> for the current logging scope</p>
+</td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../";window.currentCrate = "slog_scope";</script><script src="../main.js"></script><script defer src="../search-index.js"></script></body></html>

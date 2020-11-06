@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["ABIBody","Trait implemented by an object that tracks ABI-related state (e.g., stack layout) and can generate code while emitting the body of a function."],["ABICall","Trait implemented by an object that tracks ABI-related state and can generate code while emitting a call to a function."]]});

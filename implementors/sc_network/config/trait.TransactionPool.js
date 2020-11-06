@@ -1,0 +1,4 @@
+(function() {var implementors = {};
+implementors["sc_network"] = [];
+implementors["sc_service"] = [{"text":"impl&lt;B, H, C, Pool, E&gt; TransactionPool&lt;H, B&gt; for TransactionPoolAdapter&lt;C, Pool&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;C: Client&lt;B&gt; + Send + Sync,<br>&nbsp;&nbsp;&nbsp;&nbsp;Pool: 'static + TransactionPool&lt;Block = B, Hash = H, Error = E&gt;,<br>&nbsp;&nbsp;&nbsp;&nbsp;B: BlockT,<br>&nbsp;&nbsp;&nbsp;&nbsp;H: Hash + Eq + Member + MaybeSerialize,<br>&nbsp;&nbsp;&nbsp;&nbsp;E: 'static + IntoPoolError + From&lt;Error&gt;,&nbsp;</span>","synthetic":false,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

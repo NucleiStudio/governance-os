@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["boxed","See the `Transport::boxed` method."]],"struct":[["Boxed","See the `Transport::boxed` method."]],"type":[["Dial",""],["Listener",""],["ListenerUpgrade",""]]});

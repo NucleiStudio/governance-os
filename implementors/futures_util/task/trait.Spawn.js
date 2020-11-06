@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["futures_util"] = [{"text":"impl&lt;'_&gt; Spawn for FuturesUnordered&lt;FutureObj&lt;'_, ()&gt;&gt;","synthetic":false,"types":[]},{"text":"impl&lt;Ex&gt; Spawn for Executor01As03&lt;Ex&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;Ex: Executor01&lt;Executor01Future&gt; + Clone + Send + 'static,&nbsp;</span>","synthetic":false,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

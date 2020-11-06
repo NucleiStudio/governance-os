@@ -1,0 +1,4 @@
+(function() {var implementors = {};
+implementors["libp2p_gossipsub"] = [{"text":"impl Encoder for GossipsubCodec","synthetic":false,"types":[]}];
+implementors["unsigned_varint"] = [{"text":"impl Encoder for Uvi&lt;u8&gt;","synthetic":false,"types":[]},{"text":"impl Encoder for Uvi&lt;u16&gt;","synthetic":false,"types":[]},{"text":"impl Encoder for Uvi&lt;u32&gt;","synthetic":false,"types":[]},{"text":"impl Encoder for Uvi&lt;u64&gt;","synthetic":false,"types":[]},{"text":"impl Encoder for Uvi&lt;u128&gt;","synthetic":false,"types":[]},{"text":"impl Encoder for Uvi&lt;usize&gt;","synthetic":false,"types":[]},{"text":"impl&lt;T:&nbsp;Buf&gt; Encoder for UviBytes&lt;T&gt;","synthetic":false,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

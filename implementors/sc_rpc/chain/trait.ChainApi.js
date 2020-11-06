@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["sc_rpc"] = [{"text":"impl&lt;Block, Client&gt; ChainApi&lt;&lt;&lt;Block as Block&gt;::Header as Header&gt;::Number, &lt;Block as Block&gt;::Hash, &lt;Block as Block&gt;::Header, SignedBlock&lt;Block&gt;&gt; for Chain&lt;Block, Client&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;Block: BlockT + 'static,<br>&nbsp;&nbsp;&nbsp;&nbsp;Client: HeaderBackend&lt;Block&gt; + BlockchainEvents&lt;Block&gt; + 'static,&nbsp;</span>","synthetic":false,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

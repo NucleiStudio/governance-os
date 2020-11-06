@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["nalgebra"] = [{"text":"impl&lt;N:&nbsp;RealField, D:&nbsp;DimName&gt; Translation&lt;Point&lt;N, D&gt;&gt; for Translation&lt;N, D&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;DefaultAllocator: Allocator&lt;N, D&gt;,&nbsp;</span>","synthetic":false,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

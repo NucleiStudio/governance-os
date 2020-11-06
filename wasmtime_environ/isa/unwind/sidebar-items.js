@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["UnwindInfo","Represents unwind information for a single function."]],"mod":[["systemv","System V ABI unwind information."],["winx64","Windows x64 ABI unwind information."]]});

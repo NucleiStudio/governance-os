@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Error","An error encountered while working with structured data."],["Slot","A value slot to fill using the `Fill` trait."],["Value","A value in a structured key-value pair."]],"trait":[["Fill","A type that requires extra work to convert into a `Value`."],["ToValue","A type that can be converted into a `Value`."]]});

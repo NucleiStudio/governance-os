@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["sc_rpc"] = [{"text":"impl&lt;P, Client&gt; AuthorApi&lt;&lt;P as TransactionPool&gt;::Hash, &lt;&lt;P as TransactionPool&gt;::Block as Block&gt;::Hash&gt; for Author&lt;P, Client&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;P: TransactionPool + Sync + Send + 'static,<br>&nbsp;&nbsp;&nbsp;&nbsp;Client: HeaderBackend&lt;P::Block&gt; + ProvideRuntimeApi&lt;P::Block&gt; + Send + Sync + 'static,<br>&nbsp;&nbsp;&nbsp;&nbsp;Client::Api: SessionKeys&lt;P::Block, Error = ClientError&gt;,&nbsp;</span>","synthetic":false,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

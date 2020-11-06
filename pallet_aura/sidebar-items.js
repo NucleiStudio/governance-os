@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Call","Dispatchable calls."]],"struct":[["Authorities","The current authorities"],["GenesisConfig","Genesis config for the module, allow to build genesis storage."],["Module",""]],"trait":[["Trait",""]],"type":[["AuraAuthorId","Find the authority ID of the Aura authority who authored the current block."]]});

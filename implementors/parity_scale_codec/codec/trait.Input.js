@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["sp_runtime"] = [{"text":"impl&lt;'a, T:&nbsp;Input&gt; Input for AppendZerosInput&lt;'a, T&gt;","synthetic":false,"types":[]},{"text":"impl&lt;'a&gt; Input for TrailingZeroInput&lt;'a&gt;","synthetic":false,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

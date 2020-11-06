@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["sc_light"] = [{"text":"impl&lt;Block, B, Local&gt; CallExecutor&lt;Block&gt; for GenesisCallExecutor&lt;B, Local&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;Block: BlockT,<br>&nbsp;&nbsp;&nbsp;&nbsp;B: RemoteBackend&lt;Block&gt;,<br>&nbsp;&nbsp;&nbsp;&nbsp;Local: CallExecutor&lt;Block&gt;,&nbsp;</span>","synthetic":false,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

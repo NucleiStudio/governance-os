@@ -1,0 +1,1 @@
+initSidebarItems({"type":[["AccountId",""],["Balance",""],["CurrencyId",""]]});

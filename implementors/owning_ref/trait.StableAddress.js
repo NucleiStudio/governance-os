@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["owning_ref"] = [{"text":"impl&lt;O, H&gt; StableDeref for OwningHandle&lt;O, H&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;O: StableAddress,<br>&nbsp;&nbsp;&nbsp;&nbsp;H: StableAddress,&nbsp;</span>","synthetic":false,"types":[]},{"text":"impl&lt;O, T:&nbsp;?Sized&gt; StableDeref for OwningRef&lt;O, T&gt;","synthetic":false,"types":[]},{"text":"impl&lt;O, T:&nbsp;?Sized&gt; StableDeref for OwningRefMut&lt;O, T&gt;","synthetic":false,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

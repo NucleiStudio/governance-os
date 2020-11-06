@@ -1,0 +1,13 @@
+(function() {var implementors = {};
+implementors["libp2p_core"] = [];
+implementors["libp2p_deflate"] = [{"text":"impl UpgradeInfo for DeflateConfig","synthetic":false,"types":[]}];
+implementors["libp2p_floodsub"] = [{"text":"impl UpgradeInfo for FloodsubProtocol","synthetic":false,"types":[]},{"text":"impl UpgradeInfo for FloodsubRpc","synthetic":false,"types":[]}];
+implementors["libp2p_gossipsub"] = [{"text":"impl UpgradeInfo for ProtocolConfig","synthetic":false,"types":[]}];
+implementors["libp2p_kad"] = [{"text":"impl UpgradeInfo for KademliaProtocolConfig","synthetic":false,"types":[]}];
+implementors["libp2p_mplex"] = [{"text":"impl UpgradeInfo for MplexConfig","synthetic":false,"types":[]}];
+implementors["libp2p_noise"] = [{"text":"impl UpgradeInfo for NoiseConfig&lt;IX, X25519&gt;","synthetic":false,"types":[]},{"text":"impl UpgradeInfo for NoiseConfig&lt;XX, X25519&gt;","synthetic":false,"types":[]},{"text":"impl&lt;R&gt; UpgradeInfo for NoiseConfig&lt;IK, X25519, R&gt;","synthetic":false,"types":[]},{"text":"impl UpgradeInfo for NoiseConfig&lt;XX, X25519Spec&gt;","synthetic":false,"types":[]},{"text":"impl UpgradeInfo for NoiseConfig&lt;IX, X25519Spec&gt;","synthetic":false,"types":[]},{"text":"impl&lt;R&gt; UpgradeInfo for NoiseConfig&lt;IK, X25519Spec, R&gt;","synthetic":false,"types":[]},{"text":"impl&lt;P, C:&nbsp;Zeroize, R&gt; UpgradeInfo for NoiseAuthenticated&lt;P, C, R&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;NoiseConfig&lt;P, C, R&gt;: UpgradeInfo,&nbsp;</span>","synthetic":false,"types":[]}];
+implementors["libp2p_ping"] = [{"text":"impl UpgradeInfo for Ping","synthetic":false,"types":[]}];
+implementors["libp2p_plaintext"] = [{"text":"impl UpgradeInfo for PlainText1Config","synthetic":false,"types":[]},{"text":"impl UpgradeInfo for PlainText2Config","synthetic":false,"types":[]}];
+implementors["libp2p_request_response"] = [{"text":"impl&lt;TCodec&gt; UpgradeInfo for ResponseProtocol&lt;TCodec&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;TCodec: RequestResponseCodec,&nbsp;</span>","synthetic":false,"types":[]},{"text":"impl&lt;TCodec&gt; UpgradeInfo for RequestProtocol&lt;TCodec&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;TCodec: RequestResponseCodec,&nbsp;</span>","synthetic":false,"types":[]}];
+implementors["libp2p_yamux"] = [{"text":"impl UpgradeInfo for Config","synthetic":false,"types":[]},{"text":"impl UpgradeInfo for LocalConfig","synthetic":false,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

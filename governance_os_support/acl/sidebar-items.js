@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["AclError",""]],"trait":[["Role","This defines a role. Roles can be granted to any number of addresses, frozen (denied for anybody) and granted to everybody at once."],["RoleManager","This trait can be implemented by a pallet to expose an interface for other pallets to manage their own role based access control features."]]});

@@ -1,0 +1,5 @@
+(function() {var implementors = {};
+implementors["sc_client_db"] = [{"text":"impl&lt;B:&nbsp;BlockT&gt; Backend&lt;&lt;&lt;B as Block&gt;::Header as Header&gt;::Hashing&gt; for BenchmarkingState&lt;B&gt;","synthetic":false,"types":[]},{"text":"impl&lt;B:&nbsp;BlockT&gt; Backend&lt;&lt;&lt;B as Block&gt;::Header as Header&gt;::Hashing&gt; for RefTrackingState&lt;B&gt;","synthetic":false,"types":[]}];
+implementors["sc_light"] = [{"text":"impl&lt;H:&nbsp;Hasher&gt; Backend&lt;H&gt; for GenesisOrUnavailableState&lt;H&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;H::Out: Ord + Codec,&nbsp;</span>","synthetic":false,"types":[]}];
+implementors["sp_state_machine"] = [];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

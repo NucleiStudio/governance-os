@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["BitIdx","Indicates a semantic index of a bit within a memory element."],["BitMask","Wrapper type indicating a one-hot encoding of a bit mask for an element."],["BitPos","Indicates a real electrical index within an element."]]});

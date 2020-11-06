@@ -1,0 +1,4 @@
+(function() {var implementors = {};
+implementors["futures_core"] = [];
+implementors["tokio_rustls"] = [{"text":"impl&lt;IO:&nbsp;AsyncRead + AsyncWrite + Unpin&gt; FusedFuture for Connect&lt;IO&gt;","synthetic":false,"types":[]},{"text":"impl&lt;IO:&nbsp;AsyncRead + AsyncWrite + Unpin&gt; FusedFuture for Accept&lt;IO&gt;","synthetic":false,"types":[]},{"text":"impl&lt;IO:&nbsp;AsyncRead + AsyncWrite + Unpin&gt; FusedFuture for FailableConnect&lt;IO&gt;","synthetic":false,"types":[]},{"text":"impl&lt;IO:&nbsp;AsyncRead + AsyncWrite + Unpin&gt; FusedFuture for FailableAccept&lt;IO&gt;","synthetic":false,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

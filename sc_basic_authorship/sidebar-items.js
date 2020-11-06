@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Proposer","The proposer logic."],["ProposerFactory","Proposer factory."]]});

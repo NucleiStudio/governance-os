@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["DenyUnsafe","Signifies whether a potentially unsafe RPC should be denied."]],"fn":[["create_full","Instantiate all RPC extensions for a full node."]],"struct":[["FullDeps","Full client dependencies."]]});

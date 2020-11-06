@@ -1,0 +1,4 @@
+(function() {var implementors = {};
+implementors["hash_db"] = [];
+implementors["memory_db"] = [{"text":"impl&lt;H, KF, T, M&gt; PlainDBRef&lt;&lt;H as Hasher&gt;::Out, T&gt; for MemoryDB&lt;H, KF, T, M&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;H: KeyHasher,<br>&nbsp;&nbsp;&nbsp;&nbsp;T: Default + PartialEq&lt;T&gt; + for&lt;'a&gt; From&lt;&amp;'a [u8]&gt; + Clone + Send + Sync,<br>&nbsp;&nbsp;&nbsp;&nbsp;KF: Send + Sync + KeyFunction&lt;H&gt;,<br>&nbsp;&nbsp;&nbsp;&nbsp;KF::Key: Borrow&lt;[u8]&gt; + for&lt;'a&gt; From&lt;&amp;'a [u8]&gt;,<br>&nbsp;&nbsp;&nbsp;&nbsp;M: MemTracker&lt;T&gt; + Send + Sync,&nbsp;</span>","synthetic":false,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

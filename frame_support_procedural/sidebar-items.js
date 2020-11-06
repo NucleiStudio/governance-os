@@ -1,0 +1,1 @@
+initSidebarItems({"attr":[["transactional","Execute the annotated function in a new storage transaction."]],"macro":[["construct_runtime","Construct a runtime, with the given name and the given modules."],["decl_storage","Declares strongly-typed wrappers around codec-compatible types in storage."]]});

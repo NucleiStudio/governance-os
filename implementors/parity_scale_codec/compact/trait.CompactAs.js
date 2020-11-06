@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["sp_arithmetic"] = [{"text":"impl CompactAs for Percent","synthetic":false,"types":[]},{"text":"impl CompactAs for PerU16","synthetic":false,"types":[]},{"text":"impl CompactAs for Permill","synthetic":false,"types":[]},{"text":"impl CompactAs for Perbill","synthetic":false,"types":[]},{"text":"impl CompactAs for Perquintill","synthetic":false,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

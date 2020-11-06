@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Call","Dispatchable calls."]],"struct":[["GenesisConfig","Genesis config for the module, allow to build genesis storage."],["Module",""],["Now","Current time for the current block."]],"trait":[["Trait","The module configuration trait"],["WeightInfo",""]]});

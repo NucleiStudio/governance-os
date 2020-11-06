@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["ShowWithRRU","A trait for printing instruction bits and pieces, with the the ability to take a contextualising RealRegUniverse that is used to give proper names to registers."]]});
