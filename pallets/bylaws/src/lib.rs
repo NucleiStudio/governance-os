@@ -99,7 +99,9 @@ decl_event!(
         AccountId = <T as frame_system::Trait>::AccountId,
         Role = <T as Trait>::Role,
     {
+        /// A role has been granted to an account. \[account, role\]
         RoleGranted(Option<AccountId>, Role),
+        /// A role has been revoked from an account. \[account, role\]
         RoleRevoked(Option<AccountId>, Role),
     }
 );
