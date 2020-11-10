@@ -60,9 +60,9 @@ decl_storage! {
 
 decl_event!(
     pub enum Event {
-        /// A sudo just took place. [result]
+        /// A sudo just took place. \[result\]
         CompatSudid(DispatchResult),
-        /// A root user just performed a call as someone else. [result]
+        /// A root user just performed a call as someone else. \[result\]
         CompatDidAs(DispatchResult),
     }
 );

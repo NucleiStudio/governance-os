@@ -160,15 +160,15 @@ decl_event!(
         CurrencyId = <T as Trait>::CurrencyId,
         CurrencyDetails = CurrencyDetails<<T as frame_system::Trait>::AccountId>,
     {
-        /// A new currency has been created. [currency id, details]
+        /// A new currency has been created. \[currency id, details\]
         CurrencyCreated(CurrencyId, CurrencyDetails),
-        /// Some units of currency were issued. [currency_id, dest, amount]
+        /// Some units of currency were issued. \[currency_id, dest, amount\]
         CurrencyMinted(CurrencyId, AccountId, Balance),
-        /// Some units of currency were destroyed. [currency_id, source, amount]
+        /// Some units of currency were destroyed. \[currency_id, source, amount\]
         CurrencyBurned(CurrencyId, AccountId, Balance),
-        /// Some details about a currency were changed. [currency_id, details]
+        /// Some details about a currency were changed. \[currency_id, details\]
         CurrencyDetailsChanged(CurrencyId, CurrencyDetails),
-        /// Some units of currency were transferred. [currency_id, source, dest, amount]
+        /// Some units of currency were transferred. \[currency_id, source, dest, amount\]
         CurrencyTransferred(CurrencyId, AccountId, AccountId, Balance),
     }
 );
