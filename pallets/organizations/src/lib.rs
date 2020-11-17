@@ -32,6 +32,8 @@ use sp_runtime::{traits::AccountIdConversion, DispatchResult, ModuleId};
 use sp_std::boxed::Box;
 
 mod details;
+#[cfg(test)]
+mod tests;
 use details::OrganizationDetails;
 
 pub trait RoleBuilder {

@@ -111,6 +111,8 @@ macro_rules! mock_runtime {
             CreateCurrencies,
             TransferCurrency(CurrencyId),
             ManageCurrency(CurrencyId),
+            CreateOrganizations,
+            ApplyAsOrganization(AccountId),
         }
         impl Role for MockRoles {}
         impl_enum_default!(MockRoles, RemarkOnly);
@@ -142,4 +144,41 @@ macro_rules! mock_runtime {
         pub type Bylaws = governance_os_pallet_bylaws::Module<Test>;
         pub type System = frame_system::Module<Test>;
     };
+}
+
+#[macro_export]
+/// This is an extension of the macro `mock_runtime` to add support for the `tokens` macro.
+macro_rules! mock_runtime_with_currencies {
+    ($runtime:tt) => {
+        mock_runtime!($runtime, governance_os_pallet_tokens::AccountData<CurrencyId, Balance>);
+
+        impl governance_os_pallet_tokens::RoleBuilder for MockRoles {
+            type CurrencyId = CurrencyId;
+            type Role = Self;
+
+            fn transfer_currency(id: CurrencyId) -> Self {
+                Self::TransferCurrency(id)
+            }
+
+            fn manage_currency(id: CurrencyId) -> Self {
+                Self::ManageCurrency(id)
+            }
+
+            fn create_currencies() -> Self {
+                Self::CreateCurrencies
+            }
+        }
+
+        impl governance_os_pallet_tokens::Trait for Test {
+            type Event = ();
+            type CurrencyId = CurrencyId;
+            type Balance = Balance;
+            type WeightInfo = ();
+            type AccountStore = System;
+            type RoleManager = Bylaws;
+            type RoleBuilder = MockRoles;
+        }
+
+        pub type Tokens = governance_os_pallet_tokens::Module<Test>;
+    }
 }
