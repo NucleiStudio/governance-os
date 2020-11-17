@@ -20,24 +20,9 @@ use crate::{
     GenesisConfig,
     NativeCurrencyAdapter,
 };
-use codec::{Decode, Encode};
-use frame_support::{impl_outer_dispatch, impl_outer_origin, parameter_types};
-pub use governance_os_support::{
-    acl::Role,
-    impl_enum_default, mock_runtime, mock_runtime_with_currencies,
-    testing::{
-        primitives::{AccountId, Balance, CurrencyId},
-        AvailableBlockRatio, BlockHashCount, MaximumBlockLength, MaximumBlockWeight, ALICE, BOB,
-        TEST_TOKEN_ID, TEST_TOKEN_OWNER,
-    },
-    Currencies, ReservableCurrencies,
-};
-use serde::{Deserialize, Serialize};
-use sp_core::H256;
-use sp_runtime::{
-    testing::Header,
-    traits::{BlakeTwo256, IdentityLookup},
-    RuntimeDebug,
+use governance_os_support::{
+    mock_runtime_with_currencies,
+    testing::{ALICE, BOB, TEST_TOKEN_ID, TEST_TOKEN_OWNER},
 };
 
 mock_runtime_with_currencies!(Test);

@@ -16,7 +16,11 @@
 
 use super::mock::*;
 use crate::RoleBuilder;
-use governance_os_support::acl::RoleManager;
+use governance_os_support::{
+    acl::RoleManager,
+    testing::{ALICE, BOB, TEST_TOKEN_ID, TEST_TOKEN_OWNER},
+    Currencies,
+};
 
 #[test]
 fn set_storage_correctly() {

@@ -20,6 +20,10 @@ use frame_support::{
     traits::BalanceStatus,
     {assert_noop, assert_ok},
 };
+use governance_os_support::{
+    testing::{primitives::AccountId, ALICE, BOB, TEST_TOKEN_ID, TEST_TOKEN_OWNER},
+    Currencies, ReservableCurrencies,
+};
 
 #[test]
 fn transfer_should_work() {

@@ -51,6 +51,24 @@ macro_rules! mock_runtime {
     };
 
     ($runtime:tt, $account_data:ty) => {
+        use codec::{Decode, Encode};
+        use frame_support::{impl_outer_dispatch, impl_outer_origin, parameter_types};
+        use governance_os_support::{
+            acl::Role,
+            impl_enum_default,
+            testing::{
+                primitives::{AccountId, CurrencyId},
+                AvailableBlockRatio, BlockHashCount, MaximumBlockLength, MaximumBlockWeight, ROOT,
+            },
+        };
+        use serde::{Deserialize, Serialize};
+        use sp_core::H256;
+        use sp_runtime::{
+            testing::Header,
+            traits::{BlakeTwo256, IdentityLookup},
+            RuntimeDebug,
+        };
+
         #[derive(Clone, Eq, PartialEq, RuntimeDebug)]
         pub struct $runtime;
 
@@ -150,6 +168,8 @@ macro_rules! mock_runtime {
 /// This is an extension of the macro `mock_runtime` to add support for the `tokens` macro.
 macro_rules! mock_runtime_with_currencies {
     ($runtime:tt) => {
+        use governance_os_support::{mock_runtime, testing::primitives::Balance};
+
         mock_runtime!($runtime, governance_os_pallet_tokens::AccountData<CurrencyId, Balance>);
 
         impl governance_os_pallet_tokens::RoleBuilder for MockRoles {
