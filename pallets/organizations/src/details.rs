@@ -18,11 +18,13 @@ use codec::{Decode, Encode};
 #[cfg(feature = "std")]
 use serde::{Deserialize, Serialize};
 use sp_runtime::RuntimeDebug;
+use sp_std::prelude::Vec;
 
 /// This structure is used to encode metadata about an organization.
 #[derive(Encode, Decode, Clone, PartialEq, Eq, Default, RuntimeDebug)]
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
-pub struct OrganizationDetails<CurrencyId> {
-    /// Which currency is used to represent voting shares.
-    pub voting_currency: CurrencyId,
+pub struct OrganizationDetails<AccountId> {
+    /// A set of accounts that have access to the `apply_as` function
+    /// of an organization.
+    pub executors: Vec<AccountId>,
 }

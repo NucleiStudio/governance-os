@@ -27,7 +27,7 @@ use frame_support::{
     dispatch::{Dispatchable, Parameter},
     weights::GetDispatchInfo,
 };
-use governance_os_support::{acl::RoleManager, Currencies};
+use governance_os_support::acl::RoleManager;
 use sp_runtime::{traits::AccountIdConversion, DispatchResult, ModuleId};
 use sp_std::boxed::Box;
 
@@ -55,10 +55,6 @@ pub trait Trait: frame_system::Trait {
     /// Calls triggered from an organization.
     type Call: Parameter + GetDispatchInfo + Dispatchable<Origin = Self::Origin>;
 
-    /// Since orgnizations can use different tokens to represent voting shares we need this
-    /// type to be specified so that we can access all of the runtime's currencies.
-    type Currencies: Currencies<Self::AccountId>;
-
     /// Pallet that is in charge of managing the roles based ACL.
     type RoleManager: RoleManager<AccountId = Self::AccountId>;
 
@@ -71,8 +67,6 @@ pub trait Trait: frame_system::Trait {
     >;
 }
 
-type CurrencyIdOf<T> =
-    <<T as Trait>::Currencies as Currencies<<T as frame_system::Trait>::AccountId>>::CurrencyId;
 type RoleBuilderOf<T> = <T as Trait>::RoleBuilder;
 type RoleManagerOf<T> = <T as Trait>::RoleManager;
 
@@ -88,7 +82,7 @@ decl_event!(
     pub enum Event<T>
     where
         AccountId = <T as frame_system::Trait>::AccountId,
-        OrganizationDetails = OrganizationDetails<CurrencyIdOf<T>>,
+        OrganizationDetails = OrganizationDetails<<T as frame_system::Trait>::AccountId>,
     {
         /// An organization was created with the following parameters. \[org. address, details\]
         OrganizationCreated(AccountId, OrganizationDetails),
@@ -112,15 +106,21 @@ decl_module! {
         /// Create an organization with the given parameters. An event will be triggered with
         /// the organization's address.
         #[weight = 0]
-        fn create(origin, details: OrganizationDetails<CurrencyIdOf<T>>) {
-            let who = RoleManagerOf::<T>::ensure_has_role(origin, RoleBuilderOf::<T>::create_organizations())?;
+        fn create(origin, details: OrganizationDetails<T::AccountId>) {
+            RoleManagerOf::<T>::ensure_has_role(origin, RoleBuilderOf::<T>::create_organizations())?;
 
             let counter = Self::created_organizations();
             let new_counter = counter.checked_add(1).ok_or(Error::<T>::CreatedOrganizationsOverflow)?;
             let org_id: T::AccountId = ORGS_MODULE_ID.into_sub_account(counter);
 
-            RoleManagerOf::<T>::grant_role(Some(&who), RoleBuilderOf::<T>::apply_as_organization(org_id.clone()))?;
+            // We first write the counter so that even if the calls below fail we will always regenerate a new and
+            // different organization id.
             CreatedOrganizations::put(new_counter);
+            details.executors
+                .iter()
+                .for_each(|account| {
+                    drop(RoleManagerOf::<T>::grant_role(Some(&account), RoleBuilderOf::<T>::apply_as_organization(org_id.clone())));
+                });
 
             Self::deposit_event(RawEvent::OrganizationCreated(org_id, details));
         }

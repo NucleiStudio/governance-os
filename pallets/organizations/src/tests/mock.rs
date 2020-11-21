@@ -15,9 +15,9 @@
  */
 
 use crate::{Module, RoleBuilder, Trait};
-use governance_os_support::mock_runtime_with_currencies;
+use governance_os_support::mock_runtime;
 
-mock_runtime_with_currencies!(Test);
+mock_runtime!(Test);
 
 impl Trait for Test {
     type Event = ();
