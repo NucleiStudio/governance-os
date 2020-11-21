@@ -28,7 +28,10 @@ use frame_support::{
     weights::GetDispatchInfo,
 };
 use governance_os_support::acl::RoleManager;
-use sp_runtime::{traits::AccountIdConversion, DispatchResult, ModuleId};
+use sp_runtime::{
+    traits::{AccountIdConversion, StaticLookup},
+    DispatchResult, ModuleId,
+};
 use sp_std::boxed::Box;
 
 mod details;
@@ -45,12 +48,12 @@ pub trait RoleBuilder {
 
     /// This role gives the ability to execute calls as if they came
     /// from the organization address.
-    fn apply_as_organization(org_id: Self::OrganizationId) -> Self::Role;
+    fn apply_as_organization(org_id: &Self::OrganizationId) -> Self::Role;
 
     /// This role give management access for a given organization. Typically
     /// this would imply the ability to add new executors (that get granted the
     /// `apply_as` role).
-    fn manage_organization(org_id: Self::OrganizationId) -> Self::Role;
+    fn manage_organization(org_id: &Self::OrganizationId) -> Self::Role;
 }
 
 pub trait Trait: frame_system::Trait {
@@ -131,49 +134,51 @@ decl_module! {
             details.executors
                 .iter()
                 .for_each(|account| {
-                    drop(RoleManagerOf::<T>::grant_role(Some(&account), RoleBuilderOf::<T>::apply_as_organization(org_id.clone())));
+                    drop(RoleManagerOf::<T>::grant_role(Some(&account), RoleBuilderOf::<T>::apply_as_organization(&org_id)));
                 });
             details.managers
                 .iter()
                 .for_each(|account| {
-                    drop(RoleManagerOf::<T>::grant_role(Some(&account), RoleBuilderOf::<T>::manage_organization(org_id.clone())));
+                    drop(RoleManagerOf::<T>::grant_role(Some(&account), RoleBuilderOf::<T>::manage_organization(&org_id)));
                 });
-            OrganizationsParameters::<T>::insert(org_id.clone(), details.clone());
+            OrganizationsParameters::<T>::insert(&org_id, details.clone());
 
             Self::deposit_event(RawEvent::OrganizationCreated(org_id, details));
         }
 
         /// Trigger a call as if it came from the organization itself.
         #[weight = 0]
-        fn apply_as(origin, org_id: T::AccountId, call: Box<<T as Trait>::Call>) {
-            RoleManagerOf::<T>::ensure_has_role(origin, RoleBuilderOf::<T>::apply_as_organization(org_id.clone()))?;
+        fn apply_as(origin, org_id: <T::Lookup as StaticLookup>::Source, call: Box<<T as Trait>::Call>) {
+            let target_org_id = T::Lookup::lookup(org_id)?;
+            RoleManagerOf::<T>::ensure_has_role(origin, RoleBuilderOf::<T>::apply_as_organization(&target_org_id))?;
 
-            let res = call.dispatch(frame_system::RawOrigin::Signed(org_id.clone()).into());
-            Self::deposit_event(RawEvent::OrganizationExecuted(org_id, res.map(|_| ()).map_err(|e| e.error)));
+            let res = call.dispatch(frame_system::RawOrigin::Signed(target_org_id.clone()).into());
+            Self::deposit_event(RawEvent::OrganizationExecuted(target_org_id, res.map(|_| ()).map_err(|e| e.error)));
         }
 
         /// Mutate an organization to use the new parameters.
         #[weight = 0]
-        fn mutate(origin, org_id: T::AccountId, new_details: OrganizationDetails<T::AccountId>) {
-            RoleManagerOf::<T>::ensure_has_role(origin, RoleBuilderOf::<T>::manage_organization(org_id.clone()))?;
+        fn mutate(origin, org_id: <T::Lookup as StaticLookup>::Source, new_details: OrganizationDetails<T::AccountId>) {
+            let target_org_id = T::Lookup::lookup(org_id)?;
+            RoleManagerOf::<T>::ensure_has_role(origin, RoleBuilderOf::<T>::manage_organization(&target_org_id))?;
 
             // Make sure everything is sorted for optimization purposes
             let mut new_details = new_details;
             new_details.sort();
-            let old_details = OrganizationsParameters::<T>::get(org_id.clone());
+            let old_details = OrganizationsParameters::<T>::get(&target_org_id);
 
             Self::run_on_changes(old_details.executors.as_slice(), new_details.executors.as_slice(), |old_account| {
-                drop(RoleManagerOf::<T>::revoke_role(Some(old_account), RoleBuilderOf::<T>::apply_as_organization(org_id.clone())));
+                drop(RoleManagerOf::<T>::revoke_role(Some(old_account), RoleBuilderOf::<T>::apply_as_organization(&target_org_id)));
             }, |new_account| {
-                drop(RoleManagerOf::<T>::grant_role(Some(new_account), RoleBuilderOf::<T>::apply_as_organization(org_id.clone())));
+                drop(RoleManagerOf::<T>::grant_role(Some(new_account), RoleBuilderOf::<T>::apply_as_organization(&target_org_id)));
             });
             Self::run_on_changes(old_details.managers.as_slice(), new_details.managers.as_slice(), |old_account| {
-                drop(RoleManagerOf::<T>::revoke_role(Some(old_account), RoleBuilderOf::<T>::manage_organization(org_id.clone())));
+                drop(RoleManagerOf::<T>::revoke_role(Some(old_account), RoleBuilderOf::<T>::manage_organization(&target_org_id)));
             }, |new_account| {
-                drop(RoleManagerOf::<T>::grant_role(Some(new_account), RoleBuilderOf::<T>::manage_organization(org_id.clone())));
+                drop(RoleManagerOf::<T>::grant_role(Some(new_account), RoleBuilderOf::<T>::manage_organization(&target_org_id)));
             });
 
-            Self::deposit_event(RawEvent::OrganizationMutated(org_id, old_details, new_details));
+            Self::deposit_event(RawEvent::OrganizationMutated(target_org_id, old_details, new_details));
         }
     }
 }
