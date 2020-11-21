@@ -24,7 +24,6 @@ impl Trait for Test {
     type Call = Call;
     type RoleManager = Bylaws;
     type RoleBuilder = MockRoles;
-    type Currencies = Tokens;
 }
 
 impl RoleBuilder for MockRoles {
@@ -37,6 +36,10 @@ impl RoleBuilder for MockRoles {
 
     fn apply_as_organization(org_id: Self::OrganizationId) -> Self::Role {
         MockRoles::ApplyAsOrganization(org_id)
+    }
+
+    fn manage_organization(org_id: Self::OrganizationId) -> Self::Role {
+        MockRoles::ManageOrganization(org_id)
     }
 }
 

@@ -20,10 +20,12 @@ use frame_support::{parameter_types, weights::Weight};
 use sp_runtime::Perbill;
 
 pub const ROOT: primitives::AccountId = 0;
-pub const ALICE: primitives::AccountId = 1;
-pub const BOB: primitives::AccountId = 2;
-pub const TEST_TOKEN_ID: primitives::CurrencyId = 3;
-pub const TEST_TOKEN_OWNER: primitives::AccountId = 4;
+pub const TEST_TOKEN_ID: primitives::CurrencyId = 1;
+pub const TEST_TOKEN_OWNER: primitives::AccountId = 2;
+pub const ALICE: primitives::AccountId = 3;
+pub const BOB: primitives::AccountId = 4;
+pub const CHARLIE: primitives::AccountId = 5;
+pub const EVE: primitives::AccountId = 6;
 
 parameter_types! {
     pub const BlockHashCount: u64 = 250;
@@ -131,6 +133,7 @@ macro_rules! mock_runtime {
             ManageCurrency(CurrencyId),
             CreateOrganizations,
             ApplyAsOrganization(AccountId),
+            ManageOrganization(AccountId),
         }
         impl Role for MockRoles {}
         impl_enum_default!(MockRoles, RemarkOnly);

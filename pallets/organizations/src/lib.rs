@@ -46,6 +46,11 @@ pub trait RoleBuilder {
     /// This role gives the ability to execute calls as if they came
     /// from the organization address.
     fn apply_as_organization(org_id: Self::OrganizationId) -> Self::Role;
+
+    /// This role give management access for a given organization. Typically
+    /// this would imply the ability to add new executors (that get granted the
+    /// `apply_as` role).
+    fn manage_organization(org_id: Self::OrganizationId) -> Self::Role;
 }
 
 pub trait Trait: frame_system::Trait {
@@ -75,6 +80,7 @@ const ORGS_MODULE_ID: ModuleId = ModuleId(*b"gos/orgs");
 decl_storage! {
     trait Store for Module<T: Trait> as Organizations {
         pub CreatedOrganizations get(fn created_organizations): u32 = 0;
+        pub OrganizationsParameters get(fn organizations_parameters): map hasher(blake2_128_concat) T::AccountId => OrganizationDetails<T::AccountId>;
     }
 }
 
@@ -88,6 +94,8 @@ decl_event!(
         OrganizationCreated(AccountId, OrganizationDetails),
         /// An organization executed a call. \[org. address, result\]
         OrganizationExecuted(AccountId, DispatchResult),
+        /// An organization parameters have been modified. \[org. address, old details, new details\]
+        OrganizationMutated(AccountId, OrganizationDetails, OrganizationDetails),
     }
 );
 
@@ -113,6 +121,10 @@ decl_module! {
             let new_counter = counter.checked_add(1).ok_or(Error::<T>::CreatedOrganizationsOverflow)?;
             let org_id: T::AccountId = ORGS_MODULE_ID.into_sub_account(counter);
 
+            // Sorting details allows us to be more efficient when updating them later on.
+            let mut details = details;
+            details.sort();
+
             // We first write the counter so that even if the calls below fail we will always regenerate a new and
             // different organization id.
             CreatedOrganizations::put(new_counter);
@@ -121,6 +133,12 @@ decl_module! {
                 .for_each(|account| {
                     drop(RoleManagerOf::<T>::grant_role(Some(&account), RoleBuilderOf::<T>::apply_as_organization(org_id.clone())));
                 });
+            details.managers
+                .iter()
+                .for_each(|account| {
+                    drop(RoleManagerOf::<T>::grant_role(Some(&account), RoleBuilderOf::<T>::manage_organization(org_id.clone())));
+                });
+            OrganizationsParameters::<T>::insert(org_id.clone(), details.clone());
 
             Self::deposit_event(RawEvent::OrganizationCreated(org_id, details));
         }
@@ -133,5 +151,53 @@ decl_module! {
             let res = call.dispatch(frame_system::RawOrigin::Signed(org_id.clone()).into());
             Self::deposit_event(RawEvent::OrganizationExecuted(org_id, res.map(|_| ()).map_err(|e| e.error)));
         }
+
+        /// Mutate an organization to use the new parameters.
+        #[weight = 0]
+        fn mutate(origin, org_id: T::AccountId, new_details: OrganizationDetails<T::AccountId>) {
+            RoleManagerOf::<T>::ensure_has_role(origin, RoleBuilderOf::<T>::manage_organization(org_id.clone()))?;
+
+            // Make sure everything is sorted for optimization purposes
+            let mut new_details = new_details;
+            new_details.sort();
+            let old_details = OrganizationsParameters::<T>::get(org_id.clone());
+
+            Self::run_on_changes(old_details.executors.as_slice(), new_details.executors.as_slice(), |old_account| {
+                drop(RoleManagerOf::<T>::revoke_role(Some(old_account), RoleBuilderOf::<T>::apply_as_organization(org_id.clone())));
+            }, |new_account| {
+                drop(RoleManagerOf::<T>::grant_role(Some(new_account), RoleBuilderOf::<T>::apply_as_organization(org_id.clone())));
+            });
+            Self::run_on_changes(old_details.managers.as_slice(), new_details.managers.as_slice(), |old_account| {
+                drop(RoleManagerOf::<T>::revoke_role(Some(old_account), RoleBuilderOf::<T>::manage_organization(org_id.clone())));
+            }, |new_account| {
+                drop(RoleManagerOf::<T>::grant_role(Some(new_account), RoleBuilderOf::<T>::manage_organization(org_id.clone())));
+            });
+
+            Self::deposit_event(RawEvent::OrganizationMutated(org_id, old_details, new_details));
+        }
+    }
+}
+
+impl<T: Trait> Module<T> {
+    /// A handy helper functions to run two functions on what elements were removed from a
+    /// slice and on the added elements. Should be pretty useful when trying to limit
+    /// database read and writes since we execute the functions only on the changed elements.
+    fn run_on_changes<Elem: Ord>(
+        old_vec: &[Elem],
+        new_vec: &[Elem],
+        on_old: impl Fn(&Elem),
+        on_new: impl Fn(&Elem),
+    ) {
+        Self::run_if_not_in_right(old_vec, new_vec, on_old);
+        Self::run_if_not_in_right(new_vec, old_vec, on_new);
+    }
+
+    /// Run `to_run` on every elent that is in `left` but not in `right`.
+    fn run_if_not_in_right<Elem: Ord>(left: &[Elem], right: &[Elem], to_run: impl Fn(&Elem)) {
+        left.into_iter().for_each(|elem| {
+            if right.binary_search(&elem).is_err() {
+                to_run(elem);
+            }
+        });
     }
 }
