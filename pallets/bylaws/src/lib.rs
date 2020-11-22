@@ -182,11 +182,10 @@ impl<T: Trait> RoleManager for Module<T> {
 
     fn has_role(target: &Self::AccountId, role: Self::Role) -> bool {
         Roles::<T>::get(Some(target))
-            .iter()
-            .chain(Roles::<T>::get(None as Option<T::AccountId>).iter())
-            .cloned()
-            .find(|r| {
-                return *r == role || *r == RoleBuilderOf::<T>::root();
+            .into_iter()
+            .chain(Roles::<T>::get(None as Option<T::AccountId>).into_iter())
+            .find(|&r| {
+                return r == role || r == RoleBuilderOf::<T>::root();
             })
             .is_some()
     }
