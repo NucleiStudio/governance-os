@@ -61,6 +61,16 @@ fn create_increments_counter_and_save_details_and_configure_roles() {
                 &EVE,
                 MockRoles::manage_organization(&org_id)
             ));
+
+            // Org ID is granted roles as well
+            assert!(Bylaws::has_role(
+                &org_id,
+                MockRoles::apply_as_organization(&org_id)
+            ));
+            assert!(Bylaws::has_role(
+                &org_id,
+                MockRoles::manage_organization(&org_id)
+            ));
         })
 }
 

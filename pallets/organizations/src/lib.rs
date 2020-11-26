@@ -218,6 +218,14 @@ impl<T: Trait> Module<T> {
                 RoleBuilderOf::<T>::manage_organization(&org_id),
             ));
         });
+        drop(RoleManagerOf::<T>::grant_role(
+            Some(&org_id),
+            RoleBuilderOf::<T>::apply_as_organization(&org_id),
+        ));
+        drop(RoleManagerOf::<T>::grant_role(
+            Some(&org_id),
+            RoleBuilderOf::<T>::manage_organization(&org_id),
+        ));
         Parameters::<T>::insert(&org_id, details.clone());
 
         Self::deposit_event(RawEvent::OrganizationCreated(org_id, details));
