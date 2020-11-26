@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-use crate::{Module, RoleBuilder, Trait};
-use governance_os_support::mock_runtime;
+use crate::{GenesisConfig, Module, OrganizationDetails, RoleBuilder, Trait};
+use governance_os_support::{mock_runtime, testing::ALICE};
 
 mock_runtime!(Test);
 
@@ -44,3 +44,57 @@ impl RoleBuilder for MockRoles {
 }
 
 pub type Organizations = Module<Test>;
+
+pub struct ExtBuilder {
+    can_create: Vec<AccountId>,
+    orgs: Vec<OrganizationDetails<AccountId>>,
+}
+
+impl Default for ExtBuilder {
+    fn default() -> Self {
+        Self {
+            can_create: vec![],
+            orgs: vec![],
+        }
+    }
+}
+
+impl ExtBuilder {
+    pub fn alice_can_create_orgs(mut self) -> Self {
+        self.can_create.push(ALICE);
+        self
+    }
+
+    pub fn with_default_orgs(mut self, nb: u32) -> Self {
+        for _ in 0..nb {
+            self.orgs.push(OrganizationDetails::<AccountId>::default());
+        }
+        self
+    }
+
+    pub fn build(self) -> sp_io::TestExternalities {
+        let mut t = frame_system::GenesisConfig::default()
+            .build_storage::<Test>()
+            .unwrap();
+
+        governance_os_pallet_bylaws::GenesisConfig::<Test> {
+            roles: self
+                .can_create
+                .into_iter()
+                .map(|account| (MockRoles::CreateOrganizations, Some(account)))
+                .collect::<Vec<_>>(),
+        }
+        .assimilate_storage(&mut t)
+        .unwrap();
+
+        GenesisConfig::<Test> {
+            organizations: self.orgs,
+        }
+        .assimilate_storage(&mut t)
+        .unwrap();
+
+        let mut ext = sp_io::TestExternalities::new(t);
+        ext.execute_with(|| System::set_block_number(1));
+        ext
+    }
+}

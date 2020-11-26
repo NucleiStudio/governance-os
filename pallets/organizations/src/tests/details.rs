@@ -15,11 +15,11 @@
  */
 
 use crate::OrganizationDetails;
-use governance_os_support::testing::{primitives::AccountId, ALICE, BOB};
+use governance_os_support::testing::{ALICE, BOB};
 
 #[test]
 fn sort() {
-    let details = OrganizationDetails {
+    let mut details = OrganizationDetails {
         executors: vec![BOB, ALICE],
         managers: vec![BOB, ALICE],
     };

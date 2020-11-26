@@ -82,8 +82,14 @@ const ORGS_MODULE_ID: ModuleId = ModuleId(*b"gos/orgs");
 
 decl_storage! {
     trait Store for Module<T: Trait> as Organizations {
-        pub CreatedOrganizations get(fn created_organizations): u32 = 0;
-        pub OrganizationsParameters get(fn organizations_parameters): map hasher(blake2_128_concat) T::AccountId => OrganizationDetails<T::AccountId>;
+        pub Counter get(fn counter): u32 = 0;
+        pub Parameters get(fn parameters): map hasher(blake2_128_concat) T::AccountId => OrganizationDetails<T::AccountId>;
+    }
+    add_extra_genesis {
+        config(organizations): Vec<OrganizationDetails<T::AccountId>>;
+        build(|config: &GenesisConfig<T>| {
+            config.organizations.iter().cloned().for_each(|params| drop(Module::<T>::do_create(params)))
+        })
     }
 }
 
@@ -106,7 +112,7 @@ decl_error! {
     pub enum Error for Module<T: Trait> {
         /// We have created the maximum number of organizations, a runtime upgrade may
         /// be necessary.
-        CreatedOrganizationsOverflow,
+        CounterOverflow,
     }
 }
 
@@ -119,31 +125,7 @@ decl_module! {
         #[weight = 0]
         fn create(origin, details: OrganizationDetails<T::AccountId>) {
             RoleManagerOf::<T>::ensure_has_role(origin, RoleBuilderOf::<T>::create_organizations())?;
-
-            let counter = Self::created_organizations();
-            let new_counter = counter.checked_add(1).ok_or(Error::<T>::CreatedOrganizationsOverflow)?;
-            let org_id: T::AccountId = ORGS_MODULE_ID.into_sub_account(counter);
-
-            // Sorting details allows us to be more efficient when updating them later on.
-            let mut details = details;
-            details.sort();
-
-            // We first write the counter so that even if the calls below fail we will always regenerate a new and
-            // different organization id.
-            CreatedOrganizations::put(new_counter);
-            details.executors
-                .iter()
-                .for_each(|account| {
-                    drop(RoleManagerOf::<T>::grant_role(Some(&account), RoleBuilderOf::<T>::apply_as_organization(&org_id)));
-                });
-            details.managers
-                .iter()
-                .for_each(|account| {
-                    drop(RoleManagerOf::<T>::grant_role(Some(&account), RoleBuilderOf::<T>::manage_organization(&org_id)));
-                });
-            OrganizationsParameters::<T>::insert(&org_id, details.clone());
-
-            Self::deposit_event(RawEvent::OrganizationCreated(org_id, details));
+            Self::do_create(details)?;
         }
 
         /// Trigger a call as if it came from the organization itself.
@@ -165,7 +147,7 @@ decl_module! {
             // Make sure everything is sorted for optimization purposes
             let mut new_details = new_details;
             new_details.sort();
-            let old_details = OrganizationsParameters::<T>::get(&target_org_id);
+            let old_details = Parameters::<T>::take(&target_org_id);
 
             Self::run_on_changes(old_details.executors.as_slice(), new_details.executors.as_slice(), |old_account| {
                 drop(RoleManagerOf::<T>::revoke_role(Some(old_account), RoleBuilderOf::<T>::apply_as_organization(&target_org_id)));
@@ -177,6 +159,7 @@ decl_module! {
             }, |new_account| {
                 drop(RoleManagerOf::<T>::grant_role(Some(new_account), RoleBuilderOf::<T>::manage_organization(&target_org_id)));
             });
+            Parameters::<T>::insert(&target_org_id, new_details.clone());
 
             Self::deposit_event(RawEvent::OrganizationMutated(target_org_id, old_details, new_details));
         }
@@ -204,5 +187,40 @@ impl<T: Trait> Module<T> {
                 to_run(elem);
             }
         });
+    }
+
+    /// Given any counter return the associated organization id
+    fn org_id_for(counter: u32) -> T::AccountId {
+        ORGS_MODULE_ID.into_sub_account(counter)
+    }
+
+    fn do_create(details: OrganizationDetails<T::AccountId>) -> DispatchResult {
+        let counter = Self::counter();
+        let new_counter = counter.checked_add(1).ok_or(Error::<T>::CounterOverflow)?;
+        let org_id = Self::org_id_for(counter);
+
+        // Sorting details allows us to be more efficient when updating them later on.
+        let mut details = details;
+        details.sort();
+
+        // We first write the counter so that even if the calls below fail we will always regenerate a new and
+        // different organization id.
+        Counter::put(new_counter);
+        details.executors.iter().for_each(|account| {
+            drop(RoleManagerOf::<T>::grant_role(
+                Some(&account),
+                RoleBuilderOf::<T>::apply_as_organization(&org_id),
+            ));
+        });
+        details.managers.iter().for_each(|account| {
+            drop(RoleManagerOf::<T>::grant_role(
+                Some(&account),
+                RoleBuilderOf::<T>::manage_organization(&org_id),
+            ));
+        });
+        Parameters::<T>::insert(&org_id, details.clone());
+
+        Self::deposit_event(RawEvent::OrganizationCreated(org_id, details));
+        Ok(())
     }
 }

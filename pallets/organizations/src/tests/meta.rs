@@ -14,8 +14,17 @@
  * limitations under the License.
  */
 
-pub mod details;
-pub mod dispatchable;
-pub mod genesis;
-pub mod meta;
-pub mod mock;
+use super::mock::Organizations;
+use sp_std::collections::btree_set::BTreeSet;
+
+#[test]
+fn org_ids_are_different() {
+    let mut all_ids = BTreeSet::new();
+
+    assert!(Organizations::org_id_for(1) != Organizations::org_id_for(2));
+    for i in 0..100 {
+        let id = Organizations::org_id_for(i);
+        assert!(!all_ids.contains(&id));
+        all_ids.insert(id);
+    }
+}
