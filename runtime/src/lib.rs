@@ -79,6 +79,7 @@ construct_runtime!(
 
         // dOrgs
         Bylaws: governance_os_pallet_bylaws::{Module, Call, Storage, Config<T>, Event<T>},
+        Organizations: governance_os_pallet_organizations::{Module, Call, Storage, Config<T>, Event<T>},
     }
 );
 

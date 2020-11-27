@@ -41,7 +41,7 @@ impl Into<DispatchError> for AclError {
 
 /// This defines a role. Roles can be granted to any number of addresses, frozen
 /// (denied for anybody) and granted to everybody at once.
-pub trait Role: Parameter + Member + Copy + MaybeSerializeDeserialize + Ord {}
+pub trait Role: Parameter + Member + MaybeSerializeDeserialize + Ord {}
 
 /// This trait can be implemented by a pallet to expose an interface for other pallets to
 /// manage their own role based access control features.

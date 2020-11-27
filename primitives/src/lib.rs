@@ -69,11 +69,14 @@ pub type Header = generic::Header<BlockNumber, BlakeTwo256>;
 pub type Block = generic::Block<Header, OpaqueExtrinsic>;
 
 /// The different roles supported by the runtime.
-#[derive(Encode, Decode, RuntimeDebug, Clone, Copy, PartialEq, Eq, Ord, PartialOrd)]
+#[derive(Encode, Decode, RuntimeDebug, Clone, PartialEq, Eq, Ord, PartialOrd)]
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 pub enum Role {
+    ApplyAsOrganization(AccountId),
     CreateCurrencies,
+    CreateOrganizations,
     ManageCurrency(CurrencyId),
+    ManageOrganization(AccountId),
     ManageRoles,
     Root,
     TransferCurrency(CurrencyId),
@@ -107,5 +110,21 @@ impl governance_os_pallet_bylaws::RoleBuilder for Role {
 
     fn root() -> Role {
         Role::Root
+    }
+}
+impl governance_os_pallet_organizations::RoleBuilder for Role {
+    type OrganizationId = AccountId;
+    type Role = Role;
+
+    fn create_organizations() -> Role {
+        Role::CreateOrganizations
+    }
+
+    fn apply_as_organization(org_id: &AccountId) -> Role {
+        Role::ApplyAsOrganization(org_id.clone())
+    }
+
+    fn manage_organization(org_id: &AccountId) -> Role {
+        Role::ManageOrganization(org_id.clone())
     }
 }
