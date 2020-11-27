@@ -18,7 +18,7 @@ use governance_os_pallet_tokens::CurrencyDetails;
 use governance_os_primitives::{AccountId, CurrencyId, Role, Signature};
 use governance_os_runtime::{
     AuraConfig, AuraId, BylawsConfig, GenesisConfig, GrandpaConfig, GrandpaId, NativeCurrencyId,
-    SystemConfig, TokensConfig, WASM_BINARY,
+    OrganizationsConfig, SystemConfig, TokensConfig, WASM_BINARY,
 };
 use sc_service::ChainType;
 use sp_core::{sr25519, Pair, Public};
@@ -96,6 +96,9 @@ fn testnet_genesis(
             currency_details: chain_currencies,
         }),
         governance_os_pallet_bylaws: Some(BylawsConfig { roles: chain_roles }),
+        governance_os_pallet_organizations: Some(OrganizationsConfig {
+            organizations: vec![],
+        }),
     }
 }
 
