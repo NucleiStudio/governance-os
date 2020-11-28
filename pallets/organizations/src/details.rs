@@ -27,15 +27,11 @@ pub struct OrganizationDetails<AccountId> {
     /// A set of accounts that have access to the `apply_as` function
     /// of an organization.
     pub executors: Vec<AccountId>,
-
-    /// A set of accounts that can change an organization's parameters.
-    pub managers: Vec<AccountId>,
 }
 
 impl<AccountId: Ord> OrganizationDetails<AccountId> {
     /// Sort all the vectors inside the strutcture.
     pub fn sort(&mut self) {
         self.executors.sort();
-        self.managers.sort();
     }
 }

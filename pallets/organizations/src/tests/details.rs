@@ -21,9 +21,7 @@ use governance_os_support::testing::{ALICE, BOB};
 fn sort() {
     let mut details = OrganizationDetails {
         executors: vec![BOB, ALICE],
-        managers: vec![BOB, ALICE],
     };
     details.sort();
     assert_eq!(details.executors, vec![ALICE, BOB]);
-    assert_eq!(details.managers, vec![ALICE, BOB]);
 }

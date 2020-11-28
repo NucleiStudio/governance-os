@@ -76,7 +76,6 @@ pub enum Role {
     CreateCurrencies,
     CreateOrganizations,
     ManageCurrency(CurrencyId),
-    ManageOrganization(AccountId),
     ManageRoles,
     Root,
     TransferCurrency(CurrencyId),
@@ -122,9 +121,5 @@ impl governance_os_pallet_organizations::RoleBuilder for Role {
 
     fn apply_as_organization(org_id: &AccountId) -> Role {
         Role::ApplyAsOrganization(org_id.clone())
-    }
-
-    fn manage_organization(org_id: &AccountId) -> Role {
-        Role::ManageOrganization(org_id.clone())
     }
 }

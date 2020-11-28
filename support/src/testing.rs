@@ -133,7 +133,6 @@ macro_rules! mock_runtime {
             ManageCurrency(CurrencyId),
             CreateOrganizations,
             ApplyAsOrganization(AccountId),
-            ManageOrganization(AccountId),
         }
         impl Role for MockRoles {}
         impl_enum_default!(MockRoles, RemarkOnly);

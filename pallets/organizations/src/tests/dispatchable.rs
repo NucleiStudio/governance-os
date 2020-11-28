@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-use super::mock::{Bylaws, Call, ExtBuilder, MockRoles, Organizations};
-use crate::{OrganizationDetails, RoleBuilder};
+use super::mock::{Bylaws, Call, ExtBuilder, MockRoles, Organizations, Test};
+use crate::{Error, OrganizationDetails, RoleBuilder};
 use frame_support::{assert_noop, assert_ok};
 use frame_system::RawOrigin;
 use governance_os_support::{
     acl::{AclError, RoleManager},
-    testing::{ALICE, BOB, CHARLIE, EVE},
+    testing::{ALICE, BOB, CHARLIE},
 };
 
 #[test]
@@ -34,7 +34,6 @@ fn create_increments_counter_and_save_details_and_configure_roles() {
                 OrganizationDetails {
                     // We intentionally make it unsorted for the test
                     executors: vec![CHARLIE, BOB],
-                    managers: vec![EVE, ALICE],
                 }
             ));
             assert_eq!(Organizations::counter(), 1);
@@ -43,7 +42,6 @@ fn create_increments_counter_and_save_details_and_configure_roles() {
 
             let params = Organizations::parameters(org_id);
             assert_eq!(params.executors.as_slice(), [BOB, CHARLIE]);
-            assert_eq!(params.managers.as_slice(), [ALICE, EVE]);
 
             assert!(Bylaws::has_role(
                 &CHARLIE,
@@ -52,24 +50,6 @@ fn create_increments_counter_and_save_details_and_configure_roles() {
             assert!(Bylaws::has_role(
                 &BOB,
                 MockRoles::apply_as_organization(&org_id)
-            ));
-            assert!(Bylaws::has_role(
-                &ALICE,
-                MockRoles::manage_organization(&org_id)
-            ));
-            assert!(Bylaws::has_role(
-                &EVE,
-                MockRoles::manage_organization(&org_id)
-            ));
-
-            // Org ID is granted roles as well
-            assert!(Bylaws::has_role(
-                &org_id,
-                MockRoles::apply_as_organization(&org_id)
-            ));
-            assert!(Bylaws::has_role(
-                &org_id,
-                MockRoles::manage_organization(&org_id)
             ));
         })
 }
@@ -84,7 +64,6 @@ fn apply_as() {
                 RawOrigin::Signed(ALICE).into(),
                 OrganizationDetails {
                     executors: vec![ALICE],
-                    managers: vec![],
                 }
             ));
             assert_ok!(Organizations::apply_as(
@@ -105,31 +84,23 @@ fn mutate_save_details_and_update_roles() {
                 RawOrigin::Signed(ALICE).into(),
                 OrganizationDetails {
                     executors: vec![ALICE, BOB],
-                    managers: vec![ALICE, BOB],
                 }
             ));
             let org_id = Organizations::org_id_for(0);
             assert_ok!(Organizations::mutate(
-                RawOrigin::Signed(ALICE).into(),
-                org_id,
+                RawOrigin::Signed(org_id).into(),
                 OrganizationDetails {
                     executors: vec![ALICE, CHARLIE],
-                    managers: vec![ALICE, CHARLIE]
                 },
             ));
 
             let params = Organizations::parameters(org_id);
             assert_eq!(params.executors.as_slice(), [ALICE, CHARLIE]);
-            assert_eq!(params.managers.as_slice(), [ALICE, CHARLIE]);
 
             // BOB lost permissions
             assert!(!Bylaws::has_role(
                 &BOB,
                 MockRoles::apply_as_organization(&org_id)
-            ));
-            assert!(!Bylaws::has_role(
-                &BOB,
-                MockRoles::manage_organization(&org_id)
             ));
 
             // ALICE kept them
@@ -137,19 +108,11 @@ fn mutate_save_details_and_update_roles() {
                 &ALICE,
                 MockRoles::apply_as_organization(&org_id)
             ));
-            assert!(Bylaws::has_role(
-                &ALICE,
-                MockRoles::manage_organization(&org_id)
-            ));
 
             // CHARLIE won them
             assert!(Bylaws::has_role(
                 &CHARLIE,
                 MockRoles::apply_as_organization(&org_id)
-            ));
-            assert!(Bylaws::has_role(
-                &CHARLIE,
-                MockRoles::manage_organization(&org_id)
             ));
         })
 }
@@ -185,7 +148,7 @@ fn apply_as_fail_if_not_correct_role() {
 }
 
 #[test]
-fn mutate_fail_if_not_correct_role() {
+fn mutate_fail_if_not_the_org_itself() {
     ExtBuilder::default()
         .with_default_orgs(1)
         .build()
@@ -193,10 +156,9 @@ fn mutate_fail_if_not_correct_role() {
             assert_noop!(
                 Organizations::mutate(
                     RawOrigin::Signed(ALICE).into(),
-                    Organizations::org_id_for(0),
                     OrganizationDetails::default()
                 ),
-                AclError::MissingRole
+                Error::<Test>::NotAnOrganization,
             );
         })
 }

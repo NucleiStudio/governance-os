@@ -37,10 +37,6 @@ impl RoleBuilder for MockRoles {
     fn apply_as_organization(org_id: &Self::OrganizationId) -> Self::Role {
         MockRoles::ApplyAsOrganization(*org_id)
     }
-
-    fn manage_organization(org_id: &Self::OrganizationId) -> Self::Role {
-        MockRoles::ManageOrganization(*org_id)
-    }
 }
 
 pub type Organizations = Module<Test>;

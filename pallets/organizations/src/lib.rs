@@ -27,10 +27,11 @@ use frame_support::{
     dispatch::{Dispatchable, Parameter},
     weights::GetDispatchInfo,
 };
+use frame_system::ensure_signed;
 use governance_os_support::acl::RoleManager;
 use sp_runtime::{
     traits::{AccountIdConversion, StaticLookup},
-    DispatchResult, ModuleId,
+    DispatchError, DispatchResult, ModuleId,
 };
 use sp_std::boxed::Box;
 
@@ -49,11 +50,6 @@ pub trait RoleBuilder {
     /// This role gives the ability to execute calls as if they came
     /// from the organization address.
     fn apply_as_organization(org_id: &Self::OrganizationId) -> Self::Role;
-
-    /// This role give management access for a given organization. Typically
-    /// this would imply the ability to add new executors (that get granted the
-    /// `apply_as` role).
-    fn manage_organization(org_id: &Self::OrganizationId) -> Self::Role;
 }
 
 pub trait Trait: frame_system::Trait {
@@ -113,6 +109,8 @@ decl_error! {
         /// We have created the maximum number of organizations, a runtime upgrade may
         /// be necessary.
         CounterOverflow,
+        /// This call can only be executed by an organization.
+        NotAnOrganization,
     }
 }
 
@@ -138,30 +136,24 @@ decl_module! {
             Self::deposit_event(RawEvent::OrganizationExecuted(target_org_id, res.map(|_| ()).map_err(|e| e.error)));
         }
 
-        /// Mutate an organization to use the new parameters.
+        /// Mutate an organization to use the new parameters. Only an organization can call this on itself.
         #[weight = 0]
-        fn mutate(origin, org_id: <T::Lookup as StaticLookup>::Source, new_details: OrganizationDetails<T::AccountId>) {
-            let target_org_id = T::Lookup::lookup(org_id)?;
-            RoleManagerOf::<T>::ensure_has_role(origin, RoleBuilderOf::<T>::manage_organization(&target_org_id))?;
+        fn mutate(origin, new_details: OrganizationDetails<T::AccountId>) {
+            let org_id = Self::ensure_org(origin)?;
 
             // Make sure everything is sorted for optimization purposes
             let mut new_details = new_details;
             new_details.sort();
-            let old_details = Parameters::<T>::take(&target_org_id);
+            let old_details = Parameters::<T>::take(&org_id);
 
             Self::run_on_changes(old_details.executors.as_slice(), new_details.executors.as_slice(), |old_account| {
-                drop(RoleManagerOf::<T>::revoke_role(Some(old_account), RoleBuilderOf::<T>::apply_as_organization(&target_org_id)));
+                drop(RoleManagerOf::<T>::revoke_role(Some(old_account), RoleBuilderOf::<T>::apply_as_organization(&org_id)));
             }, |new_account| {
-                drop(RoleManagerOf::<T>::grant_role(Some(new_account), RoleBuilderOf::<T>::apply_as_organization(&target_org_id)));
+                drop(RoleManagerOf::<T>::grant_role(Some(new_account), RoleBuilderOf::<T>::apply_as_organization(&org_id)));
             });
-            Self::run_on_changes(old_details.managers.as_slice(), new_details.managers.as_slice(), |old_account| {
-                drop(RoleManagerOf::<T>::revoke_role(Some(old_account), RoleBuilderOf::<T>::manage_organization(&target_org_id)));
-            }, |new_account| {
-                drop(RoleManagerOf::<T>::grant_role(Some(new_account), RoleBuilderOf::<T>::manage_organization(&target_org_id)));
-            });
-            Parameters::<T>::insert(&target_org_id, new_details.clone());
+            Parameters::<T>::insert(&org_id, new_details.clone());
 
-            Self::deposit_event(RawEvent::OrganizationMutated(target_org_id, old_details, new_details));
+            Self::deposit_event(RawEvent::OrganizationMutated(org_id, old_details, new_details));
         }
     }
 }
@@ -194,6 +186,15 @@ impl<T: Trait> Module<T> {
         ORGS_MODULE_ID.into_sub_account(counter)
     }
 
+    /// Makes sure that the `origin` is a registered organization
+    fn ensure_org(origin: T::Origin) -> Result<T::AccountId, DispatchError> {
+        match ensure_signed(origin) {
+            Err(e) => Err(e.into()),
+            Ok(maybe_org_id) if Parameters::<T>::contains_key(&maybe_org_id) => Ok(maybe_org_id),
+            _ => Err(Error::<T>::NotAnOrganization.into()),
+        }
+    }
+
     fn do_create(details: OrganizationDetails<T::AccountId>) -> DispatchResult {
         let counter = Self::counter();
         let new_counter = counter.checked_add(1).ok_or(Error::<T>::CounterOverflow)?;
@@ -212,20 +213,6 @@ impl<T: Trait> Module<T> {
                 RoleBuilderOf::<T>::apply_as_organization(&org_id),
             ));
         });
-        details.managers.iter().for_each(|account| {
-            drop(RoleManagerOf::<T>::grant_role(
-                Some(&account),
-                RoleBuilderOf::<T>::manage_organization(&org_id),
-            ));
-        });
-        drop(RoleManagerOf::<T>::grant_role(
-            Some(&org_id),
-            RoleBuilderOf::<T>::apply_as_organization(&org_id),
-        ));
-        drop(RoleManagerOf::<T>::grant_role(
-            Some(&org_id),
-            RoleBuilderOf::<T>::manage_organization(&org_id),
-        ));
         Parameters::<T>::insert(&org_id, details.clone());
 
         Self::deposit_event(RawEvent::OrganizationCreated(org_id, details));
