@@ -1,6 +1,7 @@
 (function() {var implementors = {};
 implementors["frame_system"] = [{"text":"impl&lt;T:&nbsp;Trait, __GeneratedInstance:&nbsp;Instance&gt; BuildModuleGenesisStorage&lt;T, __GeneratedInstance&gt; for GenesisConfig","synthetic":false,"types":[]}];
 implementors["governance_os_pallet_bylaws"] = [{"text":"impl&lt;T:&nbsp;Trait, __GeneratedInstance:&nbsp;Instance&gt; BuildModuleGenesisStorage&lt;T, __GeneratedInstance&gt; for GenesisConfig&lt;T&gt;","synthetic":false,"types":[]}];
+implementors["governance_os_pallet_organizations"] = [{"text":"impl&lt;T:&nbsp;Trait, __GeneratedInstance:&nbsp;Instance&gt; BuildModuleGenesisStorage&lt;T, __GeneratedInstance&gt; for GenesisConfig&lt;T&gt;","synthetic":false,"types":[]}];
 implementors["governance_os_pallet_tokens"] = [{"text":"impl&lt;T:&nbsp;Trait, __GeneratedInstance:&nbsp;Instance&gt; BuildModuleGenesisStorage&lt;T, __GeneratedInstance&gt; for GenesisConfig&lt;T&gt;","synthetic":false,"types":[]}];
 implementors["pallet_aura"] = [{"text":"impl&lt;T:&nbsp;Trait, __GeneratedInstance:&nbsp;Instance&gt; BuildModuleGenesisStorage&lt;T, __GeneratedInstance&gt; for GenesisConfig&lt;T&gt;","synthetic":false,"types":[]}];
 implementors["pallet_finality_tracker"] = [{"text":"impl&lt;T:&nbsp;Trait, __GeneratedInstance:&nbsp;Instance&gt; BuildModuleGenesisStorage&lt;T, __GeneratedInstance&gt; for GenesisConfig","synthetic":false,"types":[]}];

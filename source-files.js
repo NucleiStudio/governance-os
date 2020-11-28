@@ -146,6 +146,7 @@ sourcesIndex["globset"] = {"name":"","files":["glob.rs","lib.rs","pathutil.rs"]}
 sourcesIndex["governance_os_node"] = {"name":"","files":["chain_spec.rs","cli.rs","command.rs","executor.rs","main.rs","rpc.rs","service.rs"]};
 sourcesIndex["governance_os_pallet_bylaws"] = {"name":"","files":["default_weights.rs","lib.rs"]};
 sourcesIndex["governance_os_pallet_compat"] = {"name":"","files":["lib.rs"]};
+sourcesIndex["governance_os_pallet_organizations"] = {"name":"","files":["details.rs","lib.rs"]};
 sourcesIndex["governance_os_pallet_tokens"] = {"name":"","files":["account_data.rs","adapter.rs","currencies.rs","default_weights.rs","details.rs","imbalances.rs","lib.rs"]};
 sourcesIndex["governance_os_primitives"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["governance_os_runtime"] = {"name":"","dirs":[{"name":"weights","files":["frame_system.rs","mod.rs","pallet_grandpa.rs","pallet_timestamp.rs"]}],"files":["constants.rs","lib.rs","pallets_consensus.rs","pallets_core.rs","pallets_dorgs.rs","pallets_economics.rs","version.rs"]};

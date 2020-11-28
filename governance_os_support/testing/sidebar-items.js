@@ -1,1 +1,1 @@
-initSidebarItems({"constant":[["ALICE",""],["BOB",""],["ROOT",""],["TEST_TOKEN_ID",""],["TEST_TOKEN_OWNER",""]],"mod":[["primitives",""]],"struct":[["AvailableBlockRatio",""],["BlockHashCount",""],["MaximumBlockLength",""],["MaximumBlockWeight",""]]});
+initSidebarItems({"constant":[["ALICE",""],["BOB",""],["CHARLIE",""],["EVE",""],["ROOT",""],["TEST_TOKEN_ID",""],["TEST_TOKEN_OWNER",""]],"mod":[["primitives",""]],"struct":[["AvailableBlockRatio",""],["BlockHashCount",""],["MaximumBlockLength",""],["MaximumBlockWeight",""]]});

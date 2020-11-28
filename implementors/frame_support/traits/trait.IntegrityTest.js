@@ -3,6 +3,7 @@ implementors["frame_support"] = [];
 implementors["frame_system"] = [{"text":"impl&lt;T:&nbsp;Trait&gt; IntegrityTest for Module&lt;T&gt;","synthetic":false,"types":[]}];
 implementors["governance_os_pallet_bylaws"] = [{"text":"impl&lt;T:&nbsp;Trait&gt; IntegrityTest for Module&lt;T&gt;","synthetic":false,"types":[]}];
 implementors["governance_os_pallet_compat"] = [{"text":"impl&lt;T:&nbsp;Trait&gt; IntegrityTest for Module&lt;T&gt;","synthetic":false,"types":[]}];
+implementors["governance_os_pallet_organizations"] = [{"text":"impl&lt;T:&nbsp;Trait&gt; IntegrityTest for Module&lt;T&gt;","synthetic":false,"types":[]}];
 implementors["governance_os_pallet_tokens"] = [{"text":"impl&lt;T:&nbsp;Trait&gt; IntegrityTest for Module&lt;T&gt;","synthetic":false,"types":[]}];
 implementors["pallet_aura"] = [{"text":"impl&lt;T:&nbsp;Trait&gt; IntegrityTest for Module&lt;T&gt;","synthetic":false,"types":[]}];
 implementors["pallet_authorship"] = [{"text":"impl&lt;T:&nbsp;Trait&gt; IntegrityTest for Module&lt;T&gt;","synthetic":false,"types":[]}];
