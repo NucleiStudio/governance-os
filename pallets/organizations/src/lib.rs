@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-//! This pallet bundles together the `bylaws` and `tokens` ones to create and
-//! manage decentralized autonomous organizations.
-//! Note that we give an account id to every organization created, this opens up
-//! the possibility to send some funds to an organization and have it spend the funds
-//! itself with no additional logic.
+//! This pallets creates and manages a set of organizations. An organization is linked
+//! to a set of executors that can call its `apply_as` function to execute calls as if
+//! it came from it.
+//! For instance, a voting contract could be deployed and registered as an executor.
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
