@@ -14,61 +14,21 @@
  * limitations under the License.
  */
 
-use crate::{CurrencyDetails, GenesisConfig, Module, NativeCurrencyAdapter, RoleBuilder, Trait};
-use codec::{Decode, Encode};
-use frame_support::{impl_outer_dispatch, impl_outer_origin, parameter_types};
-pub use governance_os_support::{
-    acl::Role,
-    impl_enum_default, mock_runtime,
-    testing::{
-        primitives::{AccountId, Balance, CurrencyId},
-        AvailableBlockRatio, BlockHashCount, MaximumBlockLength, MaximumBlockWeight, ALICE, BOB,
-        TEST_TOKEN_ID, TEST_TOKEN_OWNER,
-    },
-    Currencies, ReservableCurrencies,
+use crate::{
+    self as governance_os_pallet_tokens, // Compat with the mock_runtime_with_currencies macro
+    CurrencyDetails,
+    GenesisConfig,
+    NativeCurrencyAdapter,
 };
-use serde::{Deserialize, Serialize};
-use sp_core::H256;
-use sp_runtime::{
-    testing::Header,
-    traits::{BlakeTwo256, IdentityLookup},
-    RuntimeDebug,
+use governance_os_support::{
+    mock_runtime_with_currencies,
+    testing::{ALICE, BOB, TEST_TOKEN_ID, TEST_TOKEN_OWNER},
 };
 
-mock_runtime!(Test, crate::AccountData<CurrencyId, Balance>);
-
-impl RoleBuilder for MockRoles {
-    type CurrencyId = CurrencyId;
-    type Role = Self;
-
-    fn transfer_currency(id: CurrencyId) -> Self {
-        Self::TransferCurrency(id)
-    }
-
-    fn manage_currency(id: CurrencyId) -> Self {
-        Self::ManageCurrency(id)
-    }
-
-    fn create_currencies() -> Self {
-        Self::CreateCurrencies
-    }
-}
-
-impl Trait for Test {
-    type Event = ();
-    type CurrencyId = CurrencyId;
-    type Balance = Balance;
-    type WeightInfo = ();
-    type AccountStore = System;
-    type RoleManager = Bylaws;
-    type RoleBuilder = MockRoles;
-}
-
+mock_runtime_with_currencies!(Test);
 parameter_types! {
     pub const GetTestTokenId: CurrencyId = TEST_TOKEN_ID;
 }
-
-pub type Tokens = Module<Test>;
 pub type TokensCurrencyAdapter = NativeCurrencyAdapter<Test, GetTestTokenId>;
 
 pub struct ExtBuilder {

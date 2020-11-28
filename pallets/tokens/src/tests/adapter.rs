@@ -23,6 +23,10 @@ use frame_support::{
         SignedImbalance, WithdrawReason,
     },
 };
+use governance_os_support::{
+    testing::{ALICE, BOB, TEST_TOKEN_ID},
+    Currencies, ReservableCurrencies,
+};
 
 #[test]
 fn total_issuance() {

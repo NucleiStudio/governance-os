@@ -30,7 +30,7 @@ fn grant_role() {
             Some(ALICE),
             MockRoles::RemarkOnly,
         ));
-        assert_eq!(Bylaws::has_role(&ALICE, MockRoles::RemarkOnly), true);
+        assert!(Bylaws::has_role(&ALICE, MockRoles::RemarkOnly));
     })
 }
 
@@ -45,6 +45,6 @@ fn revoke_role() {
                 Some(ALICE),
                 MockRoles::RemarkOnly,
             ));
-            assert_eq!(Bylaws::has_role(&ALICE, MockRoles::Root), false);
+            assert!(!Bylaws::has_role(&ALICE, MockRoles::Root));
         })
 }

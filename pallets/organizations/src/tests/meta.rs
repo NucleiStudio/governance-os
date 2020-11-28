@@ -14,25 +14,17 @@
  * limitations under the License.
  */
 
-use crate::{Bylaws, Call, Event, Runtime};
-use frame_support::parameter_types;
-use governance_os_primitives::Role;
+use super::mock::Organizations;
+use sp_std::collections::btree_set::BTreeSet;
 
-parameter_types! {
-    pub const MaxRoles: u32 = 50;
-}
+#[test]
+fn org_ids_are_different() {
+    let mut all_ids = BTreeSet::new();
 
-impl governance_os_pallet_bylaws::Trait for Runtime {
-    type Event = Event;
-    type Role = Role;
-    type WeightInfo = ();
-    type MaxRoles = MaxRoles;
-    type RoleBuilder = Role;
-}
-
-impl governance_os_pallet_organizations::Trait for Runtime {
-    type Event = Event;
-    type Call = Call;
-    type RoleManager = Bylaws;
-    type RoleBuilder = Role;
+    assert!(Organizations::org_id_for(1) != Organizations::org_id_for(2));
+    for i in 0..100 {
+        let id = Organizations::org_id_for(i);
+        assert!(!all_ids.contains(&id));
+        all_ids.insert(id);
+    }
 }

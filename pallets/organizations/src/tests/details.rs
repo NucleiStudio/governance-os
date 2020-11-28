@@ -14,25 +14,16 @@
  * limitations under the License.
  */
 
-use crate::{Bylaws, Call, Event, Runtime};
-use frame_support::parameter_types;
-use governance_os_primitives::Role;
+use crate::OrganizationDetails;
+use governance_os_support::testing::{ALICE, BOB};
 
-parameter_types! {
-    pub const MaxRoles: u32 = 50;
-}
-
-impl governance_os_pallet_bylaws::Trait for Runtime {
-    type Event = Event;
-    type Role = Role;
-    type WeightInfo = ();
-    type MaxRoles = MaxRoles;
-    type RoleBuilder = Role;
-}
-
-impl governance_os_pallet_organizations::Trait for Runtime {
-    type Event = Event;
-    type Call = Call;
-    type RoleManager = Bylaws;
-    type RoleBuilder = Role;
+#[test]
+fn sort() {
+    let mut details = OrganizationDetails {
+        executors: vec![BOB, ALICE],
+        managers: vec![BOB, ALICE],
+    };
+    details.sort();
+    assert_eq!(details.executors, vec![ALICE, BOB]);
+    assert_eq!(details.managers, vec![ALICE, BOB]);
 }

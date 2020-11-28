@@ -20,10 +20,12 @@ use frame_support::{parameter_types, weights::Weight};
 use sp_runtime::Perbill;
 
 pub const ROOT: primitives::AccountId = 0;
-pub const ALICE: primitives::AccountId = 1;
-pub const BOB: primitives::AccountId = 2;
-pub const TEST_TOKEN_ID: primitives::CurrencyId = 3;
-pub const TEST_TOKEN_OWNER: primitives::AccountId = 4;
+pub const TEST_TOKEN_ID: primitives::CurrencyId = 1;
+pub const TEST_TOKEN_OWNER: primitives::AccountId = 2;
+pub const ALICE: primitives::AccountId = 3;
+pub const BOB: primitives::AccountId = 4;
+pub const CHARLIE: primitives::AccountId = 5;
+pub const EVE: primitives::AccountId = 6;
 
 parameter_types! {
     pub const BlockHashCount: u64 = 250;
@@ -33,7 +35,7 @@ parameter_types! {
 }
 
 pub mod primitives {
-    pub type AccountId = u64;
+    pub type AccountId = u128;
     pub type Balance = u64;
     pub type CurrencyId = u8;
 }
@@ -51,6 +53,24 @@ macro_rules! mock_runtime {
     };
 
     ($runtime:tt, $account_data:ty) => {
+        use codec::{Decode, Encode};
+        use frame_support::{impl_outer_dispatch, impl_outer_origin, parameter_types};
+        use governance_os_support::{
+            acl::Role,
+            impl_enum_default,
+            testing::{
+                primitives::{AccountId, CurrencyId},
+                AvailableBlockRatio, BlockHashCount, MaximumBlockLength, MaximumBlockWeight, ROOT,
+            },
+        };
+        use serde::{Deserialize, Serialize};
+        use sp_core::H256;
+        use sp_runtime::{
+            testing::Header,
+            traits::{BlakeTwo256, IdentityLookup},
+            RuntimeDebug,
+        };
+
         #[derive(Clone, Eq, PartialEq, RuntimeDebug)]
         pub struct $runtime;
 
@@ -111,6 +131,9 @@ macro_rules! mock_runtime {
             CreateCurrencies,
             TransferCurrency(CurrencyId),
             ManageCurrency(CurrencyId),
+            CreateOrganizations,
+            ApplyAsOrganization(AccountId),
+            ManageOrganization(AccountId),
         }
         impl Role for MockRoles {}
         impl_enum_default!(MockRoles, RemarkOnly);
@@ -142,4 +165,43 @@ macro_rules! mock_runtime {
         pub type Bylaws = governance_os_pallet_bylaws::Module<Test>;
         pub type System = frame_system::Module<Test>;
     };
+}
+
+#[macro_export]
+/// This is an extension of the macro `mock_runtime` to add support for the `tokens` macro.
+macro_rules! mock_runtime_with_currencies {
+    ($runtime:tt) => {
+        use governance_os_support::{mock_runtime, testing::primitives::Balance};
+
+        mock_runtime!($runtime, governance_os_pallet_tokens::AccountData<CurrencyId, Balance>);
+
+        impl governance_os_pallet_tokens::RoleBuilder for MockRoles {
+            type CurrencyId = CurrencyId;
+            type Role = Self;
+
+            fn transfer_currency(id: CurrencyId) -> Self {
+                Self::TransferCurrency(id)
+            }
+
+            fn manage_currency(id: CurrencyId) -> Self {
+                Self::ManageCurrency(id)
+            }
+
+            fn create_currencies() -> Self {
+                Self::CreateCurrencies
+            }
+        }
+
+        impl governance_os_pallet_tokens::Trait for Test {
+            type Event = ();
+            type CurrencyId = CurrencyId;
+            type Balance = Balance;
+            type WeightInfo = ();
+            type AccountStore = System;
+            type RoleManager = Bylaws;
+            type RoleBuilder = MockRoles;
+        }
+
+        pub type Tokens = governance_os_pallet_tokens::Module<Test>;
+    }
 }

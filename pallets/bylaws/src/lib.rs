@@ -88,7 +88,7 @@ decl_storage! {
     add_extra_genesis {
         config(roles): Vec<(T::Role, Option<T::AccountId>)>;
         build(|config: &GenesisConfig<T>| {
-            config.roles.iter().for_each(|(role, target)| drop(<Module<T> as RoleManager>::grant_role(target.as_ref(), *role)));
+            config.roles.iter().for_each(|(role, target)| drop(<Module<T> as RoleManager>::grant_role(target.as_ref(), role.clone())));
         })
     }
 }
@@ -145,10 +145,10 @@ impl<T: Trait> RoleManager for Module<T> {
     type Role = T::Role;
 
     fn grant_role(target: Option<&Self::AccountId>, role: Self::Role) -> DispatchResult {
-        Roles::<T>::try_mutate(target, |v| match v.binary_search(&role) {
+        Roles::<T>::try_mutate(target, |v| match v.binary_search(&role.clone()) {
             Ok(_) => Err(Error::<T>::RoleAlreadyExists.into()),
             Err(index) => {
-                v.insert(index, role);
+                v.insert(index, role.clone());
                 Ok(())
             }
         })
@@ -182,9 +182,8 @@ impl<T: Trait> RoleManager for Module<T> {
 
     fn has_role(target: &Self::AccountId, role: Self::Role) -> bool {
         Roles::<T>::get(Some(target))
-            .iter()
-            .chain(Roles::<T>::get(None as Option<T::AccountId>).iter())
-            .cloned()
+            .into_iter()
+            .chain(Roles::<T>::get(None as Option<T::AccountId>).into_iter())
             .find(|r| {
                 return *r == role || *r == RoleBuilderOf::<T>::root();
             })

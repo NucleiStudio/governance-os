@@ -14,25 +14,8 @@
  * limitations under the License.
  */
 
-use crate::{Bylaws, Call, Event, Runtime};
-use frame_support::parameter_types;
-use governance_os_primitives::Role;
-
-parameter_types! {
-    pub const MaxRoles: u32 = 50;
-}
-
-impl governance_os_pallet_bylaws::Trait for Runtime {
-    type Event = Event;
-    type Role = Role;
-    type WeightInfo = ();
-    type MaxRoles = MaxRoles;
-    type RoleBuilder = Role;
-}
-
-impl governance_os_pallet_organizations::Trait for Runtime {
-    type Event = Event;
-    type Call = Call;
-    type RoleManager = Bylaws;
-    type RoleBuilder = Role;
-}
+pub mod details;
+pub mod dispatchable;
+pub mod genesis;
+pub mod meta;
+pub mod mock;

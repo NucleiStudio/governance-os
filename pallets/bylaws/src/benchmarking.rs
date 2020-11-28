@@ -55,19 +55,19 @@ benchmarks! {
         let b in 0 .. T::MaxRoles::get();
 
         let (root, target, target_lookup, role) = prepare_benchmark::<T>(b);
-    }: _(RawOrigin::Signed(root), Some(target_lookup), role)
+    }: _(RawOrigin::Signed(root), Some(target_lookup), role.clone())
     verify {
-        assert_eq!(Roles::<T>::get(Some(&target)).iter().any(|&r| r==role), true);
+        assert_eq!(Roles::<T>::get(Some(&target)).iter().any(|r| r.clone() == role), true);
     }
 
     revoke_role {
         let b in 1 .. T::MaxRoles::get();
 
         let (root, target, target_lookup, role) = prepare_benchmark::<T>(b - 1);
-        drop(<Module<T> as RoleManager>::grant_role(Some(&target), role));
-    }: _(RawOrigin::Signed(root), Some(target_lookup), role)
+        drop(<Module<T> as RoleManager>::grant_role(Some(&target), role.clone()));
+    }: _(RawOrigin::Signed(root), Some(target_lookup), role.clone())
     verify {
-        assert_eq!(Roles::<T>::get(Some(&target)).iter().any(|&r| r==role), false);
+        assert_eq!(Roles::<T>::get(Some(&target)).iter().any(|r| r.clone() == role), false);
     }
 }
 

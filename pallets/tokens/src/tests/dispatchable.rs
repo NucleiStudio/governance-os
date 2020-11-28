@@ -19,7 +19,8 @@ use crate::{CurrencyDetails, Error, RoleBuilder};
 use frame_support::{assert_noop, assert_ok};
 use governance_os_support::{
     acl::{AclError, RoleManager},
-    testing::ALICE,
+    testing::{ALICE, BOB, TEST_TOKEN_ID, TEST_TOKEN_OWNER},
+    Currencies,
 };
 
 #[test]

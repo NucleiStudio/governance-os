@@ -25,7 +25,7 @@ fn root_has_all_roles() {
     ExtBuilder::default()
         .alice_as_root()
         .build()
-        .execute_with(|| assert_eq!(Bylaws::has_role(&ALICE, MockRoles::RemarkOnly), true))
+        .execute_with(|| assert!(Bylaws::has_role(&ALICE, MockRoles::RemarkOnly)))
 }
 
 #[test]
@@ -34,7 +34,7 @@ fn has_role_works() {
         .with_role(MockRoles::RemarkOnly, Some(&ALICE))
         .build()
         .execute_with(|| {
-            assert_eq!(Bylaws::has_role(&ALICE, MockRoles::RemarkOnly), true);
-            assert_eq!(Bylaws::has_role(&BOB, MockRoles::RemarkOnly), false);
+            assert!(Bylaws::has_role(&ALICE, MockRoles::RemarkOnly));
+            assert!(!Bylaws::has_role(&BOB, MockRoles::RemarkOnly));
         })
 }
