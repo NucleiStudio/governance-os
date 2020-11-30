@@ -17,7 +17,7 @@
 use super::mock::{
     Bylaws, Call, ExtBuilder, MockRoles, MockVotingSystem, Organizations, Test, Tokens,
 };
-use crate::{Error, OrganizationDetails, Proposals, RoleBuilder};
+use crate::{Error, OrganizationDetails, Proposal, Proposals, RoleBuilder};
 use frame_support::{assert_noop, assert_ok, StorageMap};
 use frame_system::RawOrigin;
 use governance_os_support::{
@@ -176,11 +176,13 @@ fn mutate_fail_if_not_the_org_itself() {
 
 #[test]
 fn create_proposal_with_hook() {
+    let voting_system = MockVotingSystem::SimpleReserveWithCreationFee(TEST_TOKEN_ID, 2);
+
     ExtBuilder::default()
         .hundred_for_alice()
         .with_org(OrganizationDetails {
             executors: vec![],
-            voting: MockVotingSystem::SimpleReserveWithCreationFee(TEST_TOKEN_ID, 2),
+            voting: voting_system,
         })
         .build()
         .execute_with(|| {
@@ -196,7 +198,8 @@ fn create_proposal_with_hook() {
 
             assert_eq!(Tokens::reserved_balance(TEST_TOKEN_ID, &ALICE), 2);
             assert!(Proposals::<Test>::contains_key(proposal_id));
-            assert_eq!(Organizations::proposals(proposal_id).creator, ALICE);
+            assert_eq!(Organizations::proposals(proposal_id).org, org_id);
+            assert_eq!(Organizations::proposals(proposal_id).voting, voting_system);
         })
 }
 
@@ -241,7 +244,7 @@ fn create_same_proposal_later_works() {
 }
 
 #[test]
-fn create_proposal_fail_if_not_org() {
+fn create_proposal_fail_if_duplicate() {
     ExtBuilder::default()
         .hundred_for_alice()
         .with_org(OrganizationDetails {
@@ -268,7 +271,7 @@ fn create_proposal_fail_if_not_org() {
 }
 
 #[test]
-fn create_proposal_fail_if_duplicate_at_same_block() {
+fn create_proposal_fail_if_target_is_not_an_org() {
     ExtBuilder::default().build().execute_with(|| {
         assert_noop!(
             Organizations::create_proposal(
@@ -286,7 +289,6 @@ fn create_proposal_fail_if_hook_fail() {
     // A none voting system will return an error in our mocks.
 
     ExtBuilder::default()
-        .hundred_for_alice()
         .with_org(OrganizationDetails {
             executors: vec![],
             voting: MockVotingSystem::None,
@@ -302,6 +304,121 @@ fn create_proposal_fail_if_hook_fail() {
                     org_id,
                     proposal.clone()
                 ),
+                "none voting system"
+            );
+        })
+}
+
+// veto_proposal
+#[test]
+fn veto_proposal() {
+    ExtBuilder::default()
+        .hundred_for_alice()
+        .with_org(OrganizationDetails {
+            executors: vec![],
+            voting: MockVotingSystem::SimpleReserveWithCreationFee(TEST_TOKEN_ID, 2),
+        })
+        .build()
+        .execute_with(|| {
+            let org_id = Organizations::org_id_for(0);
+            let proposal = make_proposal();
+            let proposal_id = Organizations::proposal_id(&org_id, proposal.clone());
+
+            assert_ok!(Organizations::create_proposal(
+                RawOrigin::Signed(ALICE).into(),
+                org_id,
+                proposal
+            ));
+
+            assert_ok!(Organizations::veto_proposal(
+                RawOrigin::Signed(org_id).into(),
+                proposal_id
+            ));
+
+            assert_eq!(Tokens::reserved_balance(TEST_TOKEN_ID, &ALICE), 0); // Balance was freeed by the mock
+            assert!(!Proposals::<Test>::contains_key(proposal_id)); // Proposal was deleted
+        })
+}
+
+#[test]
+fn veto_proposal_fail_if_not_called_by_an_org() {
+    ExtBuilder::default().build().execute_with(|| {
+        assert_noop!(
+            Organizations::veto_proposal(
+                RawOrigin::Signed(ALICE).into(),
+                Organizations::proposal_id(&Organizations::org_id_for(0), make_proposal()),
+            ),
+            Error::<Test>::NotAnOrganization,
+        );
+    })
+}
+
+#[test]
+fn veto_proposal_fail_if_called_on_wrong_proposal() {
+    ExtBuilder::default()
+        .hundred_for_alice()
+        .with_org(OrganizationDetails {
+            executors: vec![],
+            voting: MockVotingSystem::SimpleReserveWithCreationFee(TEST_TOKEN_ID, 2),
+        })
+        // Need to create test organization to avoid the "NotAnOrganization" error
+        .with_org(OrganizationDetails {
+            executors: vec![],
+            voting: Default::default(),
+        })
+        .build()
+        .execute_with(|| {
+            let org_id = Organizations::org_id_for(0);
+            let proposal = make_proposal();
+            let proposal_id = Organizations::proposal_id(&org_id, proposal.clone());
+
+            assert_ok!(Organizations::create_proposal(
+                RawOrigin::Signed(ALICE).into(),
+                org_id,
+                proposal.clone()
+            ));
+
+            // Not the right org id
+            assert_noop!(
+                Organizations::veto_proposal(
+                    RawOrigin::Signed(Organizations::org_id_for(1)).into(),
+                    proposal_id
+                ),
+                Error::<Test>::ProposalNotForOrganization
+            );
+
+            // Proposal does not exists
+            assert_noop!(
+                Organizations::veto_proposal(
+                    RawOrigin::Signed(org_id).into(),
+                    Organizations::proposal_id(&Organizations::org_id_for(1), proposal)
+                ),
+                Error::<Test>::ProposalNotForOrganization
+            );
+        })
+}
+
+#[test]
+fn veto_proposal_fail_if_hook_fail() {
+    ExtBuilder::default()
+        .with_default_orgs(1)
+        .build()
+        .execute_with(|| {
+            let org_id = Organizations::org_id_for(0);
+            let proposal = make_proposal();
+            let proposal_id = Organizations::proposal_id(&org_id, proposal);
+
+            // We have to insert a fake proposal and bypass the hook for the `None` voting system
+            Proposals::<Test>::insert(
+                &proposal_id,
+                Proposal {
+                    org: org_id,
+                    ..Default::default()
+                },
+            );
+
+            assert_noop!(
+                Organizations::veto_proposal(RawOrigin::Signed(org_id).into(), proposal_id),
                 "none voting system"
             );
         })

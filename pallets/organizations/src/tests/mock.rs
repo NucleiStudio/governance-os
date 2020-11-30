@@ -34,12 +34,18 @@ pub enum MockVotingSystem {
 impl_enum_default!(MockVotingSystem, None);
 impl VotingSystem for MockVotingSystem {}
 
+#[derive(Default, Eq, PartialEq, RuntimeDebug, Encode, Decode, Clone, Serialize, Deserialize)]
+pub struct VotingSystemMetadata {
+    // A more efficient ways to store it would probably be a BTree
+    pub coins_locked: Vec<(AccountId, Balance)>,
+}
+
 impl VotingHooks for MockVotingSystem {
     type AccountId = AccountId;
     type OrganizationId = AccountId;
     type VotingSystem = Self;
     type Currencies = Tokens;
-    type Data = ();
+    type Data = VotingSystemMetadata;
 
     fn on_creating_proposal(
         voting_system: Self::VotingSystem,
@@ -48,9 +54,23 @@ impl VotingHooks for MockVotingSystem {
         match voting_system {
             Self::SimpleReserveWithCreationFee(currency_id, creation_fee) => (
                 Self::Currencies::reserve(currency_id, creator, creation_fee),
-                (),
+                VotingSystemMetadata {
+                    coins_locked: vec![(*creator, creation_fee)],
+                },
             ),
-            _ => (Err("none voting system".into()), ()),
+            _ => (Err("none voting system".into()), Default::default()),
+        }
+    }
+
+    fn on_veto_proposal(voting_system: Self::VotingSystem, data: Self::Data) -> DispatchResult {
+        match voting_system {
+            Self::SimpleReserveWithCreationFee(currency_id, _creation_fee) => {
+                data.coins_locked.iter().for_each(|(account, balance)| {
+                    drop(Self::Currencies::unreserve(currency_id, account, *balance));
+                });
+                Ok(())
+            }
+            _ => Err("none voting system".into()),
         }
     }
 }
@@ -62,7 +82,7 @@ impl Trait for Test {
     type RoleBuilder = MockRoles;
     type Currencies = Tokens;
     type VotingSystem = MockVotingSystem;
-    type ProposalMetadata = ();
+    type ProposalMetadata = VotingSystemMetadata;
     type VotingHooks = MockVotingSystem;
 }
 

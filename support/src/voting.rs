@@ -41,4 +41,8 @@ pub trait VotingHooks {
         voting_system: Self::VotingSystem,
         creator: &Self::AccountId,
     ) -> (DispatchResult, Self::Data);
+
+    /// A proposal is going to be vetoed. Called before any state changes. This is
+    /// where you have the possibility to free any funds reserved.
+    fn on_veto_proposal(voting_system: Self::VotingSystem, data: Self::Data) -> DispatchResult;
 }

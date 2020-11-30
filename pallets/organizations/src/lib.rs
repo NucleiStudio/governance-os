@@ -79,7 +79,9 @@ pub trait Trait: frame_system::Trait {
     /// Pallet handling currencies. Used to represent voting weights.
     type Currencies: ReservableCurrencies<Self::AccountId>;
 
-    /// The different kinds of voting system present inside the runtime
+    /// The different kinds of voting system present inside the runtime.
+    /// **NOTE**: The `Default` voting system will be the one used during benchmarks,
+    /// thus you should probably set the most expensive one as the default.
     type VotingSystem: VotingSystem + Default;
 
     /// Some arbitrary data that can be added to proposals
@@ -107,7 +109,7 @@ decl_storage! {
     trait Store for Module<T: Trait> as Organizations {
         pub Counter get(fn counter): u32 = 0;
         pub Parameters get(fn parameters): map hasher(blake2_128_concat) T::AccountId => OrganizationDetailsOf<T>;
-        pub Proposals get(fn proposals): map hasher(blake2_128_concat) ProposalIdOf<T> => Proposal<T::AccountId, Vec<u8>, T::ProposalMetadata>;
+        pub Proposals get(fn proposals): map hasher(blake2_128_concat) ProposalIdOf<T> => Proposal<Vec<u8>, T::ProposalMetadata, T::AccountId, T::VotingSystem>;
     }
     add_extra_genesis {
         config(organizations): Vec<OrganizationDetailsOf<T>>;
@@ -130,8 +132,10 @@ decl_event!(
         OrganizationExecuted(AccountId, DispatchResult),
         /// An organization parameters have been modified. \[org. address, old details, new details\]
         OrganizationMutated(AccountId, OrganizationDetails, OrganizationDetails),
-        /// A proposal has been submitted to an organization. \[proposer, org. address, proposal id\]
-        ProposalSubmitted(AccountId, AccountId, ProposalId),
+        /// A proposal has been submitted to an organization. \[org. address, proposal id\]
+        ProposalSubmitted(AccountId, ProposalId),
+        /// A proposal has been vetoed and removed from the queue of open proposals. \[org. address, proposal id\]
+        ProposalVetoed(AccountId, ProposalId),
     }
 );
 
@@ -144,6 +148,8 @@ decl_error! {
         NotAnOrganization,
         /// A similar proposal already exists.
         ProposalDuplicate,
+        /// The proposal is not linked to this organization.
+        ProposalNotForOrganization,
     }
 }
 
@@ -190,7 +196,7 @@ decl_module! {
         }
 
         /// Create a proposal for a given organization
-        #[weight = 0] // NOTE: We need to have an upper weight bound as different systems may have different weights
+        #[weight = 0]
         fn create_proposal(origin, org_id: <T::Lookup as StaticLookup>::Source, call: Box<<T as Trait>::Call>) {
             let who = ensure_signed(origin)?;
             let target_org_id = T::Lookup::lookup(org_id)?;
@@ -206,15 +212,33 @@ decl_module! {
             // If the hook returns an err this should stop the flow here
             maybe_hook_sucessful.and_then(|_| {
                 Proposals::<T>::insert(&proposal_id, Proposal{
-                    creator: who.clone(),
+                    org: target_org_id.clone(),
                     call: call.encode(),
-                    metadata: additional_data
+                    metadata: additional_data,
+                    // Not only does this save us future read weights but it also cover
+                    // the case where an org change voting systems but still has pending
+                    // proposals.
+                    voting: Self::parameters(&target_org_id).voting,
                 });
 
                 Ok(())
             })?;
 
-            Self::deposit_event(RawEvent::ProposalSubmitted(who, target_org_id, proposal_id));
+            Self::deposit_event(RawEvent::ProposalSubmitted(target_org_id, proposal_id));
+        }
+
+        /// Remove a proposal from the batch of active ones. Has to be called by the organization itself,
+        /// typically this could come from an 'apply_as' or a separate vote.
+        #[weight = 0]
+        fn veto_proposal(origin, proposal_id: ProposalIdOf<T>) {
+            let org_id = Self::ensure_org(origin)?;
+            let proposal = Self::proposals(proposal_id);
+            ensure!(proposal.org == org_id, Error::<T>::ProposalNotForOrganization);
+
+            T::VotingHooks::on_veto_proposal(proposal.voting, proposal.metadata)?;
+            Proposals::<T>::remove(proposal_id);
+
+            Self::deposit_event(RawEvent::ProposalVetoed(org_id, proposal_id));
         }
     }
 }
