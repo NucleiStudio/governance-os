@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+use super::mock::MockVotingSystem;
 use crate::OrganizationDetails;
 use governance_os_support::testing::{ALICE, BOB};
 
@@ -21,6 +22,7 @@ use governance_os_support::testing::{ALICE, BOB};
 fn sort() {
     let mut details = OrganizationDetails {
         executors: vec![BOB, ALICE],
+        voting: MockVotingSystem::None,
     };
     details.sort();
     assert_eq!(details.executors, vec![ALICE, BOB]);

@@ -23,6 +23,7 @@ pub mod acl;
 pub mod benchmarking;
 pub mod currencies;
 pub mod testing;
+pub mod voting;
 
 pub use currencies::{Currencies, ReservableCurrencies};
 

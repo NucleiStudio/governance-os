@@ -14,14 +14,21 @@
  * limitations under the License.
  */
 
-use super::mock::{Bylaws, Call, ExtBuilder, MockRoles, Organizations, Test};
-use crate::{Error, OrganizationDetails, RoleBuilder};
-use frame_support::{assert_noop, assert_ok};
+use super::mock::{
+    Bylaws, Call, ExtBuilder, MockRoles, MockVotingSystem, Organizations, Test, Tokens,
+};
+use crate::{Error, OrganizationDetails, Proposals, RoleBuilder};
+use frame_support::{assert_noop, assert_ok, StorageMap};
 use frame_system::RawOrigin;
 use governance_os_support::{
     acl::{AclError, RoleManager},
-    testing::{ALICE, BOB, CHARLIE},
+    testing::{ALICE, BOB, CHARLIE, TEST_TOKEN_ID},
+    ReservableCurrencies,
 };
+
+fn make_proposal() -> Box<Call> {
+    Box::new(Call::System(frame_system::Call::remark(vec![])))
+}
 
 #[test]
 fn create_increments_counter_and_save_details_and_configure_roles() {
@@ -34,6 +41,7 @@ fn create_increments_counter_and_save_details_and_configure_roles() {
                 OrganizationDetails {
                     // We intentionally make it unsorted for the test
                     executors: vec![CHARLIE, BOB],
+                    voting: Default::default(),
                 }
             ));
             assert_eq!(Organizations::counter(), 1);
@@ -64,12 +72,13 @@ fn apply_as() {
                 RawOrigin::Signed(ALICE).into(),
                 OrganizationDetails {
                     executors: vec![ALICE],
+                    voting: Default::default(),
                 }
             ));
             assert_ok!(Organizations::apply_as(
                 RawOrigin::Signed(ALICE).into(),
                 Organizations::org_id_for(0),
-                Box::new(Call::System(frame_system::Call::remark(vec![]))),
+                make_proposal(),
             ));
         })
 }
@@ -84,6 +93,7 @@ fn mutate_save_details_and_update_roles() {
                 RawOrigin::Signed(ALICE).into(),
                 OrganizationDetails {
                     executors: vec![ALICE, BOB],
+                    voting: Default::default(),
                 }
             ));
             let org_id = Organizations::org_id_for(0);
@@ -91,6 +101,7 @@ fn mutate_save_details_and_update_roles() {
                 RawOrigin::Signed(org_id).into(),
                 OrganizationDetails {
                     executors: vec![ALICE, CHARLIE],
+                    voting: Default::default(),
                 },
             ));
 
@@ -140,7 +151,7 @@ fn apply_as_fail_if_not_correct_role() {
                 Organizations::apply_as(
                     RawOrigin::Signed(ALICE).into(),
                     Organizations::org_id_for(0),
-                    Box::new(Call::System(frame_system::Call::remark(vec![])))
+                    make_proposal()
                 ),
                 AclError::MissingRole
             );
@@ -159,6 +170,139 @@ fn mutate_fail_if_not_the_org_itself() {
                     OrganizationDetails::default()
                 ),
                 Error::<Test>::NotAnOrganization,
+            );
+        })
+}
+
+#[test]
+fn create_proposal_with_hook() {
+    ExtBuilder::default()
+        .hundred_for_alice()
+        .with_org(OrganizationDetails {
+            executors: vec![],
+            voting: MockVotingSystem::SimpleReserveWithCreationFee(TEST_TOKEN_ID, 2),
+        })
+        .build()
+        .execute_with(|| {
+            let org_id = Organizations::org_id_for(0);
+            let proposal = make_proposal();
+            let proposal_id = Organizations::proposal_id(&org_id, proposal.clone());
+
+            assert_ok!(Organizations::create_proposal(
+                RawOrigin::Signed(ALICE).into(),
+                org_id,
+                proposal
+            ));
+
+            assert_eq!(Tokens::reserved_balance(TEST_TOKEN_ID, &ALICE), 2);
+            assert!(Proposals::<Test>::contains_key(proposal_id));
+            assert_eq!(Organizations::proposals(proposal_id).creator, ALICE);
+        })
+}
+
+#[test]
+fn create_same_proposal_later_works() {
+    ExtBuilder::default()
+        .hundred_for_alice()
+        .with_org(OrganizationDetails {
+            executors: vec![],
+            voting: MockVotingSystem::SimpleReserveWithCreationFee(TEST_TOKEN_ID, 2),
+        })
+        .build()
+        .execute_with(|| {
+            let org_id = Organizations::org_id_for(0);
+            let proposal = make_proposal();
+            let first_proposal_id = Organizations::proposal_id(&org_id, proposal.clone());
+
+            assert_ok!(Organizations::create_proposal(
+                RawOrigin::Signed(ALICE).into(),
+                org_id,
+                proposal.clone()
+            ));
+
+            // Change block numbers so that proposal IDs are different
+            frame_system::Module::<Test>::set_block_number(
+                frame_system::Module::<Test>::block_number() + 1,
+            );
+            let second_proposal_id = Organizations::proposal_id(&org_id, proposal.clone());
+            assert_ok!(Organizations::create_proposal(
+                RawOrigin::Signed(ALICE).into(),
+                org_id,
+                proposal.clone()
+            ));
+
+            assert!(first_proposal_id != second_proposal_id);
+            assert_eq!(
+                Organizations::proposals(first_proposal_id),
+                Organizations::proposals(second_proposal_id)
+            );
+            assert_eq!(Tokens::reserved_balance(TEST_TOKEN_ID, &ALICE), 4);
+        })
+}
+
+#[test]
+fn create_proposal_fail_if_not_org() {
+    ExtBuilder::default()
+        .hundred_for_alice()
+        .with_org(OrganizationDetails {
+            executors: vec![],
+            voting: MockVotingSystem::SimpleReserveWithCreationFee(TEST_TOKEN_ID, 2),
+        })
+        .build()
+        .execute_with(|| {
+            let org_id = Organizations::org_id_for(0);
+            let proposal = make_proposal();
+
+            assert_ok!(Organizations::create_proposal(
+                RawOrigin::Signed(ALICE).into(),
+                org_id,
+                proposal.clone()
+            ));
+
+            // Block number did not change so we'd end up generating the same hash
+            assert_noop!(
+                Organizations::create_proposal(RawOrigin::Signed(ALICE).into(), org_id, proposal),
+                Error::<Test>::ProposalDuplicate
+            );
+        })
+}
+
+#[test]
+fn create_proposal_fail_if_duplicate_at_same_block() {
+    ExtBuilder::default().build().execute_with(|| {
+        assert_noop!(
+            Organizations::create_proposal(
+                RawOrigin::Signed(ALICE).into(),
+                Organizations::org_id_for(0),
+                make_proposal()
+            ),
+            Error::<Test>::NotAnOrganization
+        );
+    })
+}
+
+#[test]
+fn create_proposal_fail_if_hook_fail() {
+    // A none voting system will return an error in our mocks.
+
+    ExtBuilder::default()
+        .hundred_for_alice()
+        .with_org(OrganizationDetails {
+            executors: vec![],
+            voting: MockVotingSystem::None,
+        })
+        .build()
+        .execute_with(|| {
+            let org_id = Organizations::org_id_for(0);
+            let proposal = make_proposal();
+
+            assert_noop!(
+                Organizations::create_proposal(
+                    RawOrigin::Signed(ALICE).into(),
+                    org_id,
+                    proposal.clone()
+                ),
+                "none voting system"
             );
         })
 }
