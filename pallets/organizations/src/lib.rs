@@ -100,6 +100,12 @@ pub trait Trait: frame_system::Trait {
 type OrganizationDetailsOf<T> =
     OrganizationDetails<<T as frame_system::Trait>::AccountId, <T as Trait>::VotingSystem>;
 type ProposalIdOf<T> = <T as frame_system::Trait>::Hash;
+type ProposalOf<T> = Proposal<
+    Vec<u8>,
+    <T as Trait>::ProposalMetadata,
+    <T as frame_system::Trait>::AccountId,
+    <T as Trait>::VotingSystem,
+>;
 type RoleBuilderOf<T> = <T as Trait>::RoleBuilder;
 type RoleManagerOf<T> = <T as Trait>::RoleManager;
 
@@ -109,7 +115,7 @@ decl_storage! {
     trait Store for Module<T: Trait> as Organizations {
         pub Counter get(fn counter): u32 = 0;
         pub Parameters get(fn parameters): map hasher(blake2_128_concat) T::AccountId => OrganizationDetailsOf<T>;
-        pub Proposals get(fn proposals): map hasher(blake2_128_concat) ProposalIdOf<T> => Proposal<Vec<u8>, T::ProposalMetadata, T::AccountId, T::VotingSystem>;
+        pub Proposals get(fn proposals): map hasher(blake2_128_concat) ProposalIdOf<T> => ProposalOf<T>;
     }
     add_extra_genesis {
         config(organizations): Vec<OrganizationDetailsOf<T>>;
