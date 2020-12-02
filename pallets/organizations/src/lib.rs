@@ -30,12 +30,10 @@ use frame_support::{
 };
 use frame_system::ensure_signed;
 use governance_os_support::{
-    acl::RoleManager,
-    voting::{VotingHooks, VotingSystem},
-    Currencies, ReservableCurrencies,
+    acl::RoleManager, voting::VotingHooks, Currencies, ReservableCurrencies,
 };
 use sp_runtime::{
-    traits::{AccountIdConversion, Hash, StaticLookup},
+    traits::{AccountIdConversion, Hash, MaybeSerializeDeserialize, Member, StaticLookup},
     DispatchError, DispatchResult, ModuleId,
 };
 use sp_std::{boxed::Box, prelude::Vec};
@@ -82,7 +80,7 @@ pub trait Trait: frame_system::Trait {
     /// The different kinds of voting system present inside the runtime.
     /// **NOTE**: The `Default` voting system will be the one used during benchmarks,
     /// thus you should probably set the most expensive one as the default.
-    type VotingSystem: VotingSystem + Default;
+    type VotingSystem: Parameter + Member + Copy + MaybeSerializeDeserialize + Default;
 
     /// Some arbitrary data that can be added to proposals
     type ProposalMetadata: Parameter + Default;

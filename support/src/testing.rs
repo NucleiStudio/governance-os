@@ -56,7 +56,6 @@ macro_rules! mock_runtime {
         use codec::{Decode, Encode};
         use frame_support::{impl_outer_dispatch, impl_outer_origin, parameter_types};
         use governance_os_support::{
-            acl::Role,
             impl_enum_default,
             testing::{
                 primitives::{AccountId, CurrencyId},
@@ -134,7 +133,6 @@ macro_rules! mock_runtime {
             CreateOrganizations,
             ApplyAsOrganization(AccountId),
         }
-        impl Role for MockRoles {}
         impl_enum_default!(MockRoles, RemarkOnly);
         impl governance_os_pallet_bylaws::RoleBuilder for MockRoles {
             type Role = MockRoles;

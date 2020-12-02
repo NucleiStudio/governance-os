@@ -22,10 +22,13 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use frame_support::{
-    decl_error, decl_event, decl_module, decl_storage, traits::Get, weights::Weight,
+    decl_error, decl_event, decl_module, decl_storage, traits::Get, weights::Weight, Parameter,
 };
-use governance_os_support::acl::{Role, RoleManager};
-use sp_runtime::{traits::StaticLookup, DispatchResult};
+use governance_os_support::acl::RoleManager;
+use sp_runtime::{
+    traits::{MaybeSerializeDeserialize, Member, StaticLookup},
+    DispatchResult,
+};
 use sp_std::prelude::Vec;
 
 #[cfg(feature = "runtime-benchmarks")]
@@ -55,7 +58,7 @@ pub trait Trait: frame_system::Trait {
     type Event: From<Event<Self>> + Into<<Self as frame_system::Trait>::Event>;
 
     /// Roles defines UNIX like roles that users must be granted before triggering certain calls.
-    type Role: Role + Default;
+    type Role: Parameter + Member + MaybeSerializeDeserialize + Ord + Default;
 
     /// The weights for this pallet.
     type WeightInfo: WeightInfo;

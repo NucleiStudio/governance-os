@@ -80,7 +80,6 @@ pub enum Role {
     Root,
     TransferCurrency(CurrencyId),
 }
-impl governance_os_support::acl::Role for Role {}
 // `Default` is used for benchmarks. We have to make sure the default role is not
 // root though.
 impl_enum_default!(Role, CreateCurrencies);

@@ -17,20 +17,14 @@
 //! A set of common traits to voting systems.
 
 use crate::{Currencies, ReservableCurrencies};
-use frame_support::Parameter;
-use sp_runtime::{
-    traits::{MaybeSerializeDeserialize, Member},
-    DispatchResult,
-};
-
-pub trait VotingSystem: Parameter + Member + Copy + MaybeSerializeDeserialize {}
+use sp_runtime::DispatchResult;
 
 /// Called by the host pallet to let the developer implement custom voting actions
 /// according to its own model.
 pub trait VotingHooks {
     type AccountId;
     type OrganizationId;
-    type VotingSystem: VotingSystem;
+    type VotingSystem;
     type Currencies: ReservableCurrencies<Self::AccountId>;
     type Data;
 

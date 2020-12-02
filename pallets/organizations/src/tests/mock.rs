@@ -19,7 +19,7 @@ use governance_os_pallet_tokens::CurrencyDetails;
 use governance_os_support::{
     mock_runtime_with_currencies,
     testing::{ALICE, TEST_TOKEN_ID, TEST_TOKEN_OWNER},
-    voting::{VotingHooks, VotingSystem},
+    voting::VotingHooks,
     Currencies, ReservableCurrencies,
 };
 use sp_runtime::DispatchResult;
@@ -32,7 +32,6 @@ pub enum MockVotingSystem {
     SimpleReserveWithCreationFee(CurrencyId, Balance),
 }
 impl_enum_default!(MockVotingSystem, None);
-impl VotingSystem for MockVotingSystem {}
 
 #[derive(Default, Eq, PartialEq, RuntimeDebug, Encode, Decode, Clone, Serialize, Deserialize)]
 pub struct VotingSystemMetadata {
