@@ -20,7 +20,7 @@ use governance_os_support::{
     mock_runtime_with_currencies,
     testing::{ALICE, TEST_TOKEN_ID, TEST_TOKEN_OWNER},
     voting::{VotingHooks, VotingSystem},
-    ReservableCurrencies,
+    Currencies, ReservableCurrencies,
 };
 use sp_runtime::DispatchResult;
 
@@ -38,6 +38,8 @@ impl VotingSystem for MockVotingSystem {}
 pub struct VotingSystemMetadata {
     // A more efficient ways to store it would probably be a BTree
     pub coins_locked: Vec<(AccountId, Balance)>,
+    pub in_favor: Balance,
+    pub in_opposition: Balance,
 }
 
 impl VotingHooks for MockVotingSystem {
@@ -56,6 +58,7 @@ impl VotingHooks for MockVotingSystem {
                 Self::Currencies::reserve(currency_id, creator, creation_fee),
                 VotingSystemMetadata {
                     coins_locked: vec![(*creator, creation_fee)],
+                    ..Default::default()
                 },
             ),
             _ => (Err("none voting system".into()), Default::default()),
@@ -71,6 +74,35 @@ impl VotingHooks for MockVotingSystem {
                 Ok(())
             }
             _ => Err("none voting system".into()),
+        }
+    }
+
+    fn on_decide_on_proposal(
+        voting_system: Self::VotingSystem,
+        data: Self::Data,
+        voter: &Self::AccountId,
+        power: <Self::Currencies as Currencies<Self::AccountId>>::Balance,
+        in_support: bool,
+    ) -> (DispatchResult, Self::Data) {
+        match voting_system {
+            // This implementation is super simple, for instance, voters cannot change their
+            // votes. Subsequent calls to this function will simply add more votes.
+            Self::SimpleReserveWithCreationFee(currency_id, _creation_fee) => {
+                let mut updated_data = data;
+                let res = Self::Currencies::reserve(currency_id, voter, power);
+                if res.is_err() {
+                    return (res, updated_data);
+                }
+                if in_support {
+                    updated_data.in_favor += power;
+                } else {
+                    updated_data.in_opposition += power;
+                }
+                updated_data.coins_locked.push((*voter, power));
+
+                (Ok(()), updated_data)
+            }
+            _ => (Err("none voting system".into()), data),
         }
     }
 }

@@ -423,3 +423,94 @@ fn veto_proposal_fail_if_hook_fail() {
             );
         })
 }
+
+#[test]
+fn decide_on_proposal_and_update_metadata() {
+    ExtBuilder::default()
+        .hundred_for_alice()
+        .with_org(OrganizationDetails {
+            executors: vec![],
+            voting: MockVotingSystem::SimpleReserveWithCreationFee(TEST_TOKEN_ID, 2),
+        })
+        .build()
+        .execute_with(|| {
+            let org_id = Organizations::org_id_for(0);
+            let proposal = make_proposal();
+            let proposal_id = Organizations::proposal_id(&org_id, proposal.clone());
+
+            assert_ok!(Organizations::create_proposal(
+                RawOrigin::Signed(ALICE).into(),
+                org_id,
+                proposal
+            ));
+
+            assert_ok!(Organizations::decide_on_proposal(
+                RawOrigin::Signed(ALICE).into(),
+                proposal_id,
+                10,
+                true
+            ));
+            assert_ok!(Organizations::decide_on_proposal(
+                RawOrigin::Signed(ALICE).into(),
+                proposal_id,
+                5,
+                false
+            ));
+
+            // Creation + votes
+            assert_eq!(Tokens::reserved_balance(TEST_TOKEN_ID, &ALICE), 2 + 10 + 5);
+
+            let metadata = Proposals::<Test>::get(proposal_id).metadata;
+            assert_eq!(metadata.in_favor, 10);
+            assert_eq!(metadata.in_opposition, 5);
+        })
+}
+
+#[test]
+fn decide_on_proposal_fails_if_does_not_exists() {
+    ExtBuilder::default().build().execute_with(|| {
+        let proposal_id =
+            Organizations::proposal_id(&Organizations::org_id_for(0), make_proposal());
+
+        assert_noop!(
+            Organizations::decide_on_proposal(
+                RawOrigin::Signed(ALICE).into(),
+                proposal_id,
+                10,
+                true
+            ),
+            Error::<Test>::ProposalNotFound
+        );
+    })
+}
+
+#[test]
+fn decide_on_proposal_fails_if_hook_fails() {
+    ExtBuilder::default()
+        .with_default_orgs(1)
+        .build()
+        .execute_with(|| {
+            let org_id = Organizations::org_id_for(0);
+            let proposal = make_proposal();
+            let proposal_id = Organizations::proposal_id(&org_id, proposal);
+
+            // We have to insert a fake proposal and bypass the hook for the `None` voting system
+            Proposals::<Test>::insert(
+                &proposal_id,
+                Proposal {
+                    org: org_id,
+                    ..Default::default()
+                },
+            );
+
+            assert_noop!(
+                Organizations::decide_on_proposal(
+                    RawOrigin::Signed(ALICE).into(),
+                    proposal_id,
+                    10,
+                    true
+                ),
+                "none voting system"
+            );
+        })
+}

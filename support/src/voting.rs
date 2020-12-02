@@ -16,14 +16,14 @@
 
 //! A set of common traits to voting systems.
 
-use crate::ReservableCurrencies;
+use crate::{Currencies, ReservableCurrencies};
 use frame_support::Parameter;
 use sp_runtime::{
     traits::{MaybeSerializeDeserialize, Member},
     DispatchResult,
 };
 
-pub trait VotingSystem: Parameter + Member + MaybeSerializeDeserialize {}
+pub trait VotingSystem: Parameter + Member + Copy + MaybeSerializeDeserialize {}
 
 /// Called by the host pallet to let the developer implement custom voting actions
 /// according to its own model.
@@ -45,4 +45,13 @@ pub trait VotingHooks {
     /// A proposal is going to be vetoed. Called before any state changes. This is
     /// where you have the possibility to free any funds reserved.
     fn on_veto_proposal(voting_system: Self::VotingSystem, data: Self::Data) -> DispatchResult;
+
+    /// Handle an incoming vote. Returns a result and some updated metadata.
+    fn on_decide_on_proposal(
+        voting_system: Self::VotingSystem,
+        data: Self::Data,
+        voter: &Self::AccountId,
+        power: <Self::Currencies as Currencies<Self::AccountId>>::Balance,
+        in_support: bool,
+    ) -> (DispatchResult, Self::Data);
 }

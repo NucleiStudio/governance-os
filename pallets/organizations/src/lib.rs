@@ -32,7 +32,7 @@ use frame_system::ensure_signed;
 use governance_os_support::{
     acl::RoleManager,
     voting::{VotingHooks, VotingSystem},
-    ReservableCurrencies,
+    Currencies, ReservableCurrencies,
 };
 use sp_runtime::{
     traits::{AccountIdConversion, Hash, StaticLookup},
@@ -97,6 +97,8 @@ pub trait Trait: frame_system::Trait {
     >;
 }
 
+type BalanceOf<T> =
+    <<T as Trait>::Currencies as Currencies<<T as frame_system::Trait>::AccountId>>::Balance;
 type OrganizationDetailsOf<T> =
     OrganizationDetails<<T as frame_system::Trait>::AccountId, <T as Trait>::VotingSystem>;
 type ProposalIdOf<T> = <T as frame_system::Trait>::Hash;
@@ -131,6 +133,7 @@ decl_event!(
         AccountId = <T as frame_system::Trait>::AccountId,
         OrganizationDetails = OrganizationDetailsOf<T>,
         ProposalId = ProposalIdOf<T>,
+        Balance = BalanceOf<T>,
     {
         /// An organization was created with the following parameters. \[org. address, details\]
         OrganizationCreated(AccountId, OrganizationDetails),
@@ -140,8 +143,10 @@ decl_event!(
         OrganizationMutated(AccountId, OrganizationDetails, OrganizationDetails),
         /// A proposal has been submitted to an organization. \[org. address, proposal id\]
         ProposalSubmitted(AccountId, ProposalId),
-        /// A proposal has been vetoed and removed from the queue of open proposals. \[org. address, proposal id\]
-        ProposalVetoed(AccountId, ProposalId),
+        /// A proposal has been vetoed and removed from the queue of open proposals. \[proposal id\]
+        ProposalVetoed(ProposalId),
+        /// Somebody just voted on a proposal. \[proposal id, voter, power, support\]
+        ProposalVoteCasted(ProposalId, AccountId, Balance, bool),
     }
 );
 
@@ -156,6 +161,8 @@ decl_error! {
         ProposalDuplicate,
         /// The proposal is not linked to this organization.
         ProposalNotForOrganization,
+        /// The proposal does not exists, maybe it was already closed.
+        ProposalNotFound,
     }
 }
 
@@ -227,10 +234,9 @@ decl_module! {
                     voting: Self::parameters(&target_org_id).voting,
                 });
 
+                Self::deposit_event(RawEvent::ProposalSubmitted(target_org_id, proposal_id));
                 Ok(())
             })?;
-
-            Self::deposit_event(RawEvent::ProposalSubmitted(target_org_id, proposal_id));
         }
 
         /// Remove a proposal from the batch of active ones. Has to be called by the organization itself,
@@ -244,7 +250,28 @@ decl_module! {
             T::VotingHooks::on_veto_proposal(proposal.voting, proposal.metadata)?;
             Proposals::<T>::remove(proposal_id);
 
-            Self::deposit_event(RawEvent::ProposalVetoed(org_id, proposal_id));
+            Self::deposit_event(RawEvent::ProposalVetoed(proposal_id));
+        }
+
+        /// Vote for or against a given proposal. The caller can choose how much voting power is dedicated
+        /// to it via the `power` parameter.
+        #[weight = 0]
+        fn decide_on_proposal(origin, proposal_id: ProposalIdOf<T>, power: BalanceOf<T>, in_support: bool) {
+            let voter = ensure_signed(origin)?;
+            let mut proposal = Self::proposals(proposal_id);
+            ensure!(proposal != Default::default(), Error::<T>::ProposalNotFound);
+
+            let (maybe_hook_sucessful, maybe_new_metadata) = T::VotingHooks::on_decide_on_proposal(proposal.clone().voting, proposal.clone().metadata, &voter, power, in_support);
+            maybe_hook_sucessful.and_then(|_| {
+                if maybe_new_metadata != proposal.metadata {
+                    // Save the new metadata, overwriting the previous one
+                    proposal.metadata = maybe_new_metadata;
+                    Proposals::<T>::insert(proposal_id, proposal);
+                }
+
+                Self::deposit_event(RawEvent::ProposalVoteCasted(proposal_id, voter, power, in_support));
+                Ok(())
+            })?;
         }
     }
 }
