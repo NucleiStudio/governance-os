@@ -80,7 +80,7 @@ pub trait Trait: frame_system::Trait {
     /// The different kinds of voting system present inside the runtime.
     /// **NOTE**: The `Default` voting system will be the one used during benchmarks,
     /// thus you should probably set the most expensive one as the default.
-    type VotingSystem: Parameter + Member + Copy + MaybeSerializeDeserialize + Default;
+    type VotingSystem: Parameter + Member + MaybeSerializeDeserialize + Default;
 
     /// Some arbitrary data that can be added to proposals
     type ProposalMetadata: Parameter + Default;
