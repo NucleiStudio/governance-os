@@ -54,4 +54,21 @@ pub trait VotingHooks {
         power: <Self::Currencies as Currencies<Self::AccountId>>::Balance,
         in_support: bool,
     ) -> (DispatchResult, Self::Data);
+
+    /// Return wether we should enable calls to closing the proposal. Closing a proposal
+    /// means executing it if it passed and then cleaning the storage.
+    fn can_close(voting_system: Self::VotingSystem, data: Self::Data) -> bool;
+
+    /// Return if a proposal is passing. If it is, it will likely be executed in the same
+    /// transaction and then closed.
+    fn passing(voting_system: Self::VotingSystem, data: Self::Data) -> bool;
+
+    /// Called before cleaning the storage related to a proposal but after its eventual
+    /// execution.
+    ///
+    /// **NOTE**: we do not allow this call to return a DispatchResult or potential error
+    /// as it happens after the proposal has been executed. Failing at this stage would
+    /// mean that there is a likelyhood for a proposal to be executed twice which is definitely
+    /// not something that we want.
+    fn on_close_proposal(voting_system: Self::VotingSystem, data: Self::Data, executed: bool);
 }

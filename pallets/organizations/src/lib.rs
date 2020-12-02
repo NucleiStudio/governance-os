@@ -21,7 +21,7 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use codec::Encode;
+use codec::{Decode, Encode};
 use frame_support::{
     decl_error, decl_event, decl_module, decl_storage,
     dispatch::{Dispatchable, Parameter},
@@ -147,6 +147,10 @@ decl_event!(
         ProposalVetoed(ProposalId),
         /// Somebody just voted on a proposal. \[proposal id, voter, power, support\]
         ProposalVoteCasted(ProposalId, AccountId, Balance, bool),
+        /// A proposal has been executed with the following result. \[proposal id, result\]
+        ProposalExecuted(ProposalId, DispatchResult),
+        /// A proposal was closed. \[proposal id, wether it passed or not\]
+        ProposalClosed(ProposalId, bool),
     }
 );
 
@@ -163,6 +167,11 @@ decl_error! {
         ProposalNotForOrganization,
         /// The proposal does not exists, maybe it was already closed.
         ProposalNotFound,
+        /// This proposal can not be closed yet. It probably needs to wait for more votes.
+        ProposalCanNotBeClosed,
+        /// The proposal code couldn't be decoded for some reason. This isn't expected to ever
+        /// happen and thus should be reported upstream.
+        ProposalDecodingFailure,
     }
 }
 
@@ -272,6 +281,28 @@ decl_module! {
                 Self::deposit_event(RawEvent::ProposalVoteCasted(proposal_id, voter, power, in_support));
                 Ok(())
             })?;
+        }
+
+        /// If a proposal passed or failed but is not longer awaiting or waiting for votes it can be closed. Closing
+        /// a proposal means executing it if it passed, freeing all funds locked and erasing it from the local storage.
+        #[weight = 0]
+        fn close_proposal(origin, proposal_id: ProposalIdOf<T>) {
+            let _ = ensure_signed(origin)?;
+            let proposal = Self::proposals(proposal_id);
+            ensure!(proposal != Default::default(), Error::<T>::ProposalNotFound);
+            ensure!(T::VotingHooks::can_close(proposal.clone().voting, proposal.clone().metadata), Error::<T>::ProposalCanNotBeClosed);
+
+            let passing = T::VotingHooks::passing(proposal.clone().voting, proposal.clone().metadata);
+            if passing {
+                let decoded_call = <T as Trait>::Call::decode(&mut &proposal.clone().call[..]).map_err(|_| Error::<T>::ProposalDecodingFailure)?;
+                let res = decoded_call.dispatch(frame_system::RawOrigin::Signed(proposal.clone().org).into());
+                Self::deposit_event(RawEvent::ProposalExecuted(proposal_id, res.map(|_| ()).map_err(|e| e.error)));
+            }
+
+            T::VotingHooks::on_close_proposal(proposal.clone().voting, proposal.clone().metadata, passing);
+            Proposals::<T>::remove(proposal_id);
+
+            Self::deposit_event(RawEvent::ProposalClosed(proposal_id, passing));
         }
     }
 }

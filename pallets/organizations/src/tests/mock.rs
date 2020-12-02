@@ -42,6 +42,10 @@ pub struct VotingSystemMetadata {
     pub in_opposition: Balance,
 }
 
+// /!\ WARNING /!\:
+// PLEASE DO NOT USE THIS IN PRODUCTION! THIS CODE IS RESERVED FOR MOCKS AND TESTS
+// AND WOULD NOT SURVIVE CONTACT WITH USERS AND MALICIOUS ATCORS IN A PRODUCTION
+// VOTING SYSTEM. ALSO IT IS SUPER UNOPTIMIZED.
 impl VotingHooks for MockVotingSystem {
     type AccountId = AccountId;
     type OrganizationId = AccountId;
@@ -104,6 +108,20 @@ impl VotingHooks for MockVotingSystem {
             }
             _ => (Err("none voting system".into()), data),
         }
+    }
+
+    fn on_close_proposal(voting_system: Self::VotingSystem, data: Self::Data, _executed: bool) {
+        // In our case the logic than when vetoing the proposal. Let's just call this and
+        // ignore the dispatch result.
+        drop(Self::on_veto_proposal(voting_system, data));
+    }
+
+    fn can_close(_voting_system: Self::VotingSystem, data: Self::Data) -> bool {
+        data.in_favor + data.in_opposition > 0
+    }
+
+    fn passing(_voting_system: Self::VotingSystem, data: Self::Data) -> bool {
+        data.in_favor > data.in_opposition
     }
 }
 

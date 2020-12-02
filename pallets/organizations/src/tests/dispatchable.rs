@@ -514,3 +514,92 @@ fn decide_on_proposal_fails_if_hook_fails() {
             );
         })
 }
+
+// DRY principle for testing the closing of proposals.
+// Basically generate two tests based on wether a proposal
+// should pass or not.
+// Also just wanted to write some cool macro code.
+macro_rules! test_close_proposal {
+    ($test_name:ident, $passing:tt) => {
+        #[test]
+        fn $test_name() {
+            ExtBuilder::default()
+                .hundred_for_alice()
+                .with_org(OrganizationDetails {
+                    executors: vec![],
+                    voting: MockVotingSystem::SimpleReserveWithCreationFee(TEST_TOKEN_ID, 2),
+                })
+                .build()
+                .execute_with(|| {
+                    let org_id = Organizations::org_id_for(0);
+                    let proposal = make_proposal();
+                    let proposal_id = Organizations::proposal_id(&org_id, proposal.clone());
+
+                    assert_ok!(Organizations::create_proposal(
+                        RawOrigin::Signed(ALICE).into(),
+                        org_id,
+                        proposal
+                    ));
+                    assert_ok!(Organizations::decide_on_proposal(
+                        RawOrigin::Signed(ALICE).into(),
+                        proposal_id,
+                        10,
+                        $passing
+                    ));
+
+                    assert_ok!(Organizations::close_proposal(
+                        RawOrigin::Signed(ALICE).into(),
+                        proposal_id,
+                    ));
+
+                    // Freed the funds
+                    assert_eq!(Tokens::reserved_balance(TEST_TOKEN_ID, &ALICE), 0);
+                    // Deleted the proposal
+                    assert!(!Proposals::<Test>::contains_key(proposal_id));
+                })
+        }
+    };
+}
+
+test_close_proposal!(close_passing_proposal, true);
+test_close_proposal!(close_failing_proposal, false);
+
+#[test]
+fn close_fails_if_proposal_does_not_exists() {
+    ExtBuilder::default().build().execute_with(|| {
+        let proposal_id =
+            Organizations::proposal_id(&Organizations::org_id_for(0), make_proposal());
+
+        assert_noop!(
+            Organizations::close_proposal(RawOrigin::Signed(ALICE).into(), proposal_id,),
+            Error::<Test>::ProposalNotFound
+        );
+    })
+}
+
+#[test]
+fn close_fails_if_proposal_still_needs_votes() {
+    ExtBuilder::default()
+        .hundred_for_alice()
+        .with_org(OrganizationDetails {
+            executors: vec![],
+            voting: MockVotingSystem::SimpleReserveWithCreationFee(TEST_TOKEN_ID, 2),
+        })
+        .build()
+        .execute_with(|| {
+            let org_id = Organizations::org_id_for(0);
+            let proposal = make_proposal();
+            let proposal_id = Organizations::proposal_id(&org_id, proposal.clone());
+
+            assert_ok!(Organizations::create_proposal(
+                RawOrigin::Signed(ALICE).into(),
+                org_id,
+                proposal
+            ));
+
+            assert_noop!(
+                Organizations::close_proposal(RawOrigin::Signed(ALICE).into(), proposal_id,),
+                Error::<Test>::ProposalCanNotBeClosed
+            );
+        })
+}
