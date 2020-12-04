@@ -142,7 +142,9 @@ decl_storage! {
         build(|config: &GenesisConfig<T>| {
             config.currency_details.iter().cloned().for_each(|(currency_id, currency_details)| {
                 Module::<T>::set_currency_acl(currency_id, currency_details, None);
-                drop(Module::<T>::maybe_create_zero_issuance(currency_id)); // Log the currency as created if needed
+                // If we have an error it means that the currency had some coins issued earlier in
+                // the genesis block, thus we ignore it.
+                drop(Module::<T>::maybe_create_zero_issuance(currency_id));
             });
 
             config.endowed_accounts.iter().for_each(|(currency_id, account_id, initial_balance)| {
@@ -288,7 +290,7 @@ impl<T: Trait> Module<T> {
             let result = f(&mut currency_data);
 
             if currency_data.total() == Zero::zero() {
-                drop(account_data.remove(&currency_id));
+                account_data.remove(&currency_id);
             }
 
             if account_data.is_empty() {
@@ -320,12 +322,21 @@ impl<T: Trait> Module<T> {
     ) {
         if let Some(previous_owner) = maybe_no_longer_owner {
             if details.owner != previous_owner {
+                // Typical error at this stage would be that the role is not granted to
+                // `previous_owner`. There are some edge cases where this is possible, for
+                // instance if a root user revoked is calling the functions. Thus, we prefer
+                // not to fail and drop the result.
                 drop(RoleManagerOf::<T>::revoke_role(
                     Some(&previous_owner),
                     RoleBuilderOf::<T>::manage_currency(currency_id),
                 ));
             }
         }
+
+        // We drop the results as it is possible that the current owner itself is calling the update
+        // function or that none of the acl parameters changed.
+        // Since it is cheaper to fail on `grant_role` rather than calling `has_role` before we drop.
+
         drop(RoleManagerOf::<T>::grant_role(
             Some(&details.owner),
             RoleBuilderOf::<T>::manage_currency(currency_id),
