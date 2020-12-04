@@ -23,17 +23,19 @@ use sp_runtime::DispatchResult;
 /// according to its own model.
 pub trait VotingHooks {
     type AccountId;
-    type OrganizationId;
-    type VotingSystem;
+    type BlockNumber;
     type Currencies: ReservableCurrencies<Self::AccountId>;
     type Data;
+    type OrganizationId;
+    type VotingSystem;
 
     /// Somebody is creating a proposal. Called before any state changes. This
     /// is where you have the ability to try and reserve a certain amount of coins
     /// for instance.
-    fn on_creating_proposal(
+    fn on_create_proposal(
         voting_system: Self::VotingSystem,
         creator: &Self::AccountId,
+        current_block: Self::BlockNumber,
     ) -> (DispatchResult, Self::Data);
 
     /// A proposal is going to be vetoed. Called before any state changes. This is
@@ -51,18 +53,21 @@ pub trait VotingHooks {
 
     /// Return wether we should enable calls to closing the proposal. Closing a proposal
     /// means executing it if it passed and then cleaning the storage.
-    fn can_close(voting_system: Self::VotingSystem, data: Self::Data) -> bool;
+    fn can_close(
+        voting_system: Self::VotingSystem,
+        data: Self::Data,
+        current_block: Self::BlockNumber,
+    ) -> bool;
 
     /// Return if a proposal is passing. If it is, it will likely be executed in the same
     /// transaction and then closed.
     fn passing(voting_system: Self::VotingSystem, data: Self::Data) -> bool;
 
-    /// Called before cleaning the storage related to a proposal but after its eventual
-    /// execution.
-    ///
-    /// **NOTE**: we do not allow this call to return a DispatchResult or potential error
-    /// as it happens after the proposal has been executed. Failing at this stage would
-    /// mean that there is a likelyhood for a proposal to be executed twice which is definitely
-    /// not something that we want.
-    fn on_close_proposal(voting_system: Self::VotingSystem, data: Self::Data, executed: bool);
+    /// Called before cleaning the storage related to a proposal and before its eventual
+    /// execution. Last chance to prevent it from running!
+    fn on_close_proposal(
+        voting_system: Self::VotingSystem,
+        data: Self::Data,
+        executed: bool,
+    ) -> DispatchResult;
 }

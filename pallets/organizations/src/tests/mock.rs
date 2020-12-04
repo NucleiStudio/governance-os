@@ -51,10 +51,12 @@ impl VotingHooks for MockVotingSystem {
     type VotingSystem = Self;
     type Currencies = Tokens;
     type Data = VotingSystemMetadata;
+    type BlockNumber = BlockNumber;
 
-    fn on_creating_proposal(
+    fn on_create_proposal(
         voting_system: Self::VotingSystem,
         creator: &Self::AccountId,
+        _current_block: Self::BlockNumber,
     ) -> (DispatchResult, Self::Data) {
         match voting_system {
             Self::SimpleReserveWithCreationFee(currency_id, creation_fee) => (
@@ -109,13 +111,21 @@ impl VotingHooks for MockVotingSystem {
         }
     }
 
-    fn on_close_proposal(voting_system: Self::VotingSystem, data: Self::Data, _executed: bool) {
+    fn on_close_proposal(
+        voting_system: Self::VotingSystem,
+        data: Self::Data,
+        _executed: bool,
+    ) -> DispatchResult {
         // In our case the logic than when vetoing the proposal. Let's just call this and
         // ignore the dispatch result.
-        drop(Self::on_veto_proposal(voting_system, data));
+        Self::on_veto_proposal(voting_system, data)
     }
 
-    fn can_close(_voting_system: Self::VotingSystem, data: Self::Data) -> bool {
+    fn can_close(
+        _voting_system: Self::VotingSystem,
+        data: Self::Data,
+        _block: Self::BlockNumber,
+    ) -> bool {
         data.in_favor + data.in_opposition > 0
     }
 

@@ -24,14 +24,36 @@ use codec::{Decode, Encode};
 use governance_os_support::{voting::VotingHooks, Currencies, ReservableCurrencies};
 #[cfg(feature = "std")]
 use serde::{Deserialize, Serialize};
-use sp_runtime::{DispatchResult, RuntimeDebug};
-use sp_std::{collections::btree_map::BTreeMap, marker};
+use sp_runtime::{
+    traits::{Saturating, Zero},
+    DispatchError, DispatchResult, Perbill, RuntimeDebug,
+};
+use sp_std::{cmp::PartialOrd, collections::btree_map::BTreeMap, marker};
+
+#[cfg(test)]
+mod tests;
+
+pub enum VotingErrors {
+    NotAVotingSystem,
+    UnderCreationFee,
+}
+
+impl Into<DispatchError> for VotingErrors {
+    fn into(self) -> DispatchError {
+        match self {
+            VotingErrors::NotAVotingSystem => DispatchError::Other("not a voting system"),
+            VotingErrors::UnderCreationFee => {
+                DispatchError::Other("new voting weight is under the creation fee")
+            }
+        }
+    }
+}
 
 /// Metadata used and managed by all our voting systems. Need to be passed to their functions and
 /// persisted in storage.
 #[derive(Eq, PartialEq, RuntimeDebug, Encode, Decode, Clone, Default)]
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
-pub struct ProposalMetadata<AccountId, Balance>
+pub struct ProposalMetadata<AccountId, Balance, BlockNumber>
 where
     AccountId: Ord,
 {
@@ -41,6 +63,12 @@ where
     pub favorable: Balance,
     /// Cached value of how many coins oppose the proposal
     pub against: Balance,
+    /// Account who create the proposal, useful to avoid an attack
+    /// where it would be possible to create a proposal paying the
+    /// fee but then creating a 0 vote to get it back.
+    pub creator: AccountId,
+    /// When the proposal should be considered expired.
+    pub expiry: BlockNumber,
 }
 
 /// This enum is in charge of representing and handling all existing voting systems.
@@ -66,6 +94,7 @@ pub enum VotingSystems<Balance, CurrencyId, BlockNumber, Currencies, AccountId> 
     /// We need this entry for accepting a `Currencies` and a `AccountId` type.
     _Phantom(marker::PhantomData<(AccountId, Currencies)>),
 }
+
 impl<Balance, CurrencyId, BlockNumber, Currencies, AccountId> Default
     for VotingSystems<Balance, CurrencyId, BlockNumber, Currencies, AccountId>
 {
@@ -84,10 +113,10 @@ pub struct CoinBasedVotingParameters<Balance, CurrencyId, BlockNumber> {
     pub creation_fee: Balance,
     /// What percentage of coins need to be in favor of a proposal for it to pass.
     /// We will then use it via a `perbill::from_percent` call.
-    pub min_quorum: Balance,
+    pub min_quorum: u32,
     /// What percentage of coins need to participate before a quorum is reached.
     /// We will then use it via a `perbill::from_percent` call.
-    pub min_participation: Balance,
+    pub min_participation: u32,
     /// After how many blocks will a proposal be considered failed if it doesn't reach
     /// a favorable outcome.
     pub ttl: BlockNumber,
@@ -96,45 +125,168 @@ pub struct CoinBasedVotingParameters<Balance, CurrencyId, BlockNumber> {
 impl<AccountId, BlockNumber, C> VotingHooks
     for VotingSystems<C::Balance, C::CurrencyId, BlockNumber, C, AccountId>
 where
-    AccountId: Ord,
+    AccountId: Ord + Default + Clone,
     C: ReservableCurrencies<AccountId> + Currencies<AccountId>,
+    C::Balance: Default,
+    BlockNumber: Default + Saturating + PartialOrd,
 {
     type AccountId = AccountId;
+    type BlockNumber = BlockNumber;
+    type Currencies = C;
+    type Data = ProposalMetadata<AccountId, C::Balance, Self::BlockNumber>;
     type OrganizationId = AccountId;
     type VotingSystem = Self;
-    type Currencies = C;
-    type Data = ProposalMetadata<AccountId, C::Balance>;
 
-    fn on_creating_proposal(
+    fn on_create_proposal(
         voting_system: Self::VotingSystem,
         creator: &Self::AccountId,
+        current_block: Self::BlockNumber,
     ) -> (DispatchResult, Self::Data) {
-        unimplemented!()
+        match voting_system {
+            VotingSystems::CoinBased(parameters) => {
+                let reserve_is_successful = Self::Currencies::reserve(
+                    parameters.voting_currency,
+                    creator,
+                    parameters.creation_fee,
+                );
+                let mut metadata = ProposalMetadata::<AccountId, C::Balance, Self::BlockNumber> {
+                    ..Default::default()
+                };
+
+                if reserve_is_successful.is_ok() {
+                    metadata.creator = (*creator).clone();
+                    metadata.favorable = metadata.favorable.saturating_add(parameters.creation_fee);
+                    metadata.expiry = current_block.saturating_add(parameters.ttl);
+                    metadata
+                        .votes
+                        .insert((*creator).clone(), (parameters.creation_fee, true));
+                }
+
+                (reserve_is_successful, metadata)
+            }
+            _ => (
+                Err(VotingErrors::NotAVotingSystem.into()),
+                Default::default(),
+            ),
+        }
     }
 
     fn on_veto_proposal(voting_system: Self::VotingSystem, data: Self::Data) -> DispatchResult {
-        unimplemented!()
+        // For now, vetoing is simply an early close which releases the funds. There are no punishments
+        // or anything else in place.
+        Self::on_close_proposal(voting_system, data, false)
     }
 
     fn on_decide_on_proposal(
         voting_system: Self::VotingSystem,
-        data: Self::Data,
+        mut data: Self::Data,
         voter: &Self::AccountId,
-        power: <Self::Currencies as Currencies<Self::AccountId>>::Balance,
-        in_support: bool,
+        new_weight: <Self::Currencies as Currencies<Self::AccountId>>::Balance,
+        new_support: bool,
     ) -> (DispatchResult, Self::Data) {
-        unimplemented!()
+        match voting_system {
+            VotingSystems::CoinBased(parameters) => {
+                // Prevent potential attack where a proposal creator manages to get his
+                // fee reimbursed by creating a vote with 0 weight.
+                if voter == &data.creator && new_weight < parameters.creation_fee {
+                    return (Err(VotingErrors::UnderCreationFee.into()), data);
+                }
+
+                let default_state = (Zero::zero(), true);
+                let old_state = data.votes.get(voter).unwrap_or(&default_state);
+                let old_weight = old_state.0;
+                let old_support = old_state.1;
+
+                if old_weight > new_weight {
+                    Self::Currencies::unreserve(
+                        parameters.voting_currency,
+                        voter,
+                        old_weight.saturating_sub(new_weight),
+                    );
+                } else if new_weight > old_weight {
+                    let res = Self::Currencies::reserve(
+                        parameters.voting_currency,
+                        voter,
+                        new_weight.saturating_sub(old_weight),
+                    );
+                    if res.is_err() {
+                        return (res, data);
+                    }
+                }
+
+                match (old_support, new_support) {
+                    (true, false) => {
+                        // Switching from favorable to against
+                        data.favorable = data.favorable.saturating_sub(old_weight);
+                        data.against = data.against.saturating_add(new_weight);
+                    }
+                    (false, true) => {
+                        // Switching from against to favorable
+                        data.against = data.favorable.saturating_sub(old_weight);
+                        data.favorable = data.against.saturating_add(new_weight);
+                    }
+                    (true, true) => {
+                        // Still favorable but weight change
+                        data.favorable = data
+                            .favorable
+                            .saturating_sub(old_weight)
+                            .saturating_add(new_weight);
+                    }
+                    (false, false) => {
+                        // Still against but weight change
+                        data.against = data
+                            .against
+                            .saturating_sub(old_weight)
+                            .saturating_add(new_weight);
+                    }
+                };
+
+                data.votes
+                    .insert((*voter).clone(), (new_weight, new_support));
+
+                (Ok(()), data)
+            }
+            _ => (Err(VotingErrors::NotAVotingSystem.into()), data),
+        }
     }
 
-    fn can_close(voting_system: Self::VotingSystem, data: Self::Data) -> bool {
-        unimplemented!()
+    fn can_close(
+        voting_system: Self::VotingSystem,
+        data: Self::Data,
+        current_block: Self::BlockNumber,
+    ) -> bool {
+        data.expiry < current_block || Self::passing(voting_system, data)
     }
 
     fn passing(voting_system: Self::VotingSystem, data: Self::Data) -> bool {
-        unimplemented!()
+        match voting_system {
+            VotingSystems::CoinBased(parameters) => {
+                let total_votes = data.favorable.saturating_add(data.against);
+                let min_votes_for_quorum =
+                    Perbill::from_percent(parameters.min_quorum) * total_votes;
+                let min_participating_tokens = Perbill::from_percent(parameters.min_participation)
+                    * Self::Currencies::total_issuance(parameters.voting_currency);
+
+                data.favorable > min_votes_for_quorum && total_votes > min_participating_tokens
+            }
+            _ => false,
+        }
     }
 
-    fn on_close_proposal(voting_system: Self::VotingSystem, data: Self::Data, executed: bool) {
-        unimplemented!()
+    fn on_close_proposal(
+        voting_system: Self::VotingSystem,
+        data: Self::Data,
+        _executed: bool, // Could be used for rewards / punishments later on
+    ) -> DispatchResult {
+        match voting_system {
+            VotingSystems::CoinBased(parameters) => {
+                data.votes.iter().for_each(|(account, (val, _support))| {
+                    Self::Currencies::unreserve(parameters.voting_currency, account, *val);
+                });
+
+                Ok(())
+            }
+            _ => Err(VotingErrors::NotAVotingSystem.into()),
+        }
     }
 }

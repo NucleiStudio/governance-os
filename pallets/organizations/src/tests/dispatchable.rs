@@ -16,6 +16,7 @@
 
 use super::mock::{
     Bylaws, Call, ExtBuilder, MockRoles, MockVotingSystem, Organizations, Test, Tokens,
+    VotingSystemMetadata,
 };
 use crate::{Error, OrganizationDetails, Proposal, Proposals, RoleBuilder};
 use frame_support::{assert_noop, assert_ok, StorageMap};
@@ -573,6 +574,33 @@ fn close_fails_if_proposal_does_not_exists() {
         assert_noop!(
             Organizations::close_proposal(RawOrigin::Signed(ALICE).into(), proposal_id,),
             Error::<Test>::ProposalNotFound
+        );
+    })
+}
+
+#[test]
+fn close_fails_if_hook_fails() {
+    ExtBuilder::default().build().execute_with(|| {
+        let org_id = Organizations::org_id_for(0);
+        let proposal = make_proposal();
+        let proposal_id = Organizations::proposal_id(&org_id, proposal);
+
+        // We have to insert a fake proposal and bypass the hook for the `None` voting system
+        Proposals::<Test>::insert(
+            &proposal_id,
+            Proposal {
+                org: org_id,
+                metadata: VotingSystemMetadata {
+                    in_favor: 1,
+                    ..Default::default()
+                },
+                ..Default::default()
+            },
+        );
+
+        assert_noop!(
+            Organizations::close_proposal(RawOrigin::Signed(ALICE).into(), proposal_id,),
+            "none voting system"
         );
     })
 }

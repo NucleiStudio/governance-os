@@ -87,11 +87,12 @@ pub trait Trait: frame_system::Trait {
 
     /// Various hooks as implemented for each voting system.
     type VotingHooks: VotingHooks<
-        VotingSystem = Self::VotingSystem,
         AccountId = Self::AccountId,
-        OrganizationId = Self::AccountId,
+        BlockNumber = Self::BlockNumber,
         Currencies = Self::Currencies,
         Data = Self::ProposalMetadata,
+        OrganizationId = Self::AccountId,
+        VotingSystem = Self::VotingSystem,
     >;
 }
 
@@ -228,7 +229,7 @@ decl_module! {
             }
 
             let details = Self::parameters(&target_org_id);
-            let (maybe_hook_sucessful, additional_data) = T::VotingHooks::on_creating_proposal(details.voting, &who);
+            let (maybe_hook_sucessful, additional_data) = T::VotingHooks::on_create_proposal(details.voting, &who, frame_system::Module::<T>::block_number());
             // If the hook returns an err this should stop the flow here
             maybe_hook_sucessful.and_then(|_| {
                 Proposals::<T>::insert(&proposal_id, Proposal{
@@ -288,16 +289,15 @@ decl_module! {
             let _ = ensure_signed(origin)?;
             let proposal = Self::proposals(proposal_id);
             ensure!(proposal != Default::default(), Error::<T>::ProposalNotFound);
-            ensure!(T::VotingHooks::can_close(proposal.clone().voting, proposal.clone().metadata), Error::<T>::ProposalCanNotBeClosed);
+            ensure!(T::VotingHooks::can_close(proposal.clone().voting, proposal.clone().metadata, frame_system::Module::<T>::block_number()), Error::<T>::ProposalCanNotBeClosed);
 
             let passing = T::VotingHooks::passing(proposal.clone().voting, proposal.clone().metadata);
+            T::VotingHooks::on_close_proposal(proposal.clone().voting, proposal.clone().metadata, passing)?;
             if passing {
                 let decoded_call = <T as Trait>::Call::decode(&mut &proposal.clone().call[..]).map_err(|_| Error::<T>::ProposalDecodingFailure)?;
                 let res = decoded_call.dispatch(frame_system::RawOrigin::Signed(proposal.clone().org).into());
                 Self::deposit_event(RawEvent::ProposalExecuted(proposal_id, res.map(|_| ()).map_err(|e| e.error)));
             }
-
-            T::VotingHooks::on_close_proposal(proposal.clone().voting, proposal.clone().metadata, passing);
             Proposals::<T>::remove(proposal_id);
 
             Self::deposit_event(RawEvent::ProposalClosed(proposal_id, passing));
