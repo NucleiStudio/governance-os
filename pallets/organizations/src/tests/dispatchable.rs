@@ -14,21 +14,35 @@
  * limitations under the License.
  */
 
-use super::mock::{
-    Bylaws, Call, ExtBuilder, MockRoles, MockVotingSystem, Organizations, Test, Tokens,
-    VotingSystemMetadata,
-};
+use super::mock::{Bylaws, Call, ExtBuilder, MockRoles, Organizations, Test, Tokens};
 use crate::{Error, OrganizationDetails, Proposal, Proposals, RoleBuilder};
 use frame_support::{assert_noop, assert_ok, StorageMap};
 use frame_system::RawOrigin;
 use governance_os_support::{
     acl::{AclError, RoleManager},
-    testing::{ALICE, BOB, CHARLIE, TEST_TOKEN_ID},
+    testing::{
+        primitives::{AccountId, Balance, BlockNumber, CurrencyId},
+        ALICE, BOB, CHARLIE, TEST_TOKEN_ID,
+    },
     ReservableCurrencies,
+};
+use governance_os_voting::{
+    CoinBasedVotingParameters, ProposalMetadata, VotingErrors, VotingSystems,
 };
 
 fn make_proposal() -> Box<Call> {
     Box::new(Call::System(frame_system::Call::remark(vec![])))
+}
+
+fn make_voting_system_with_creation_fee(
+) -> VotingSystems<Balance, CurrencyId, BlockNumber, Tokens, AccountId> {
+    VotingSystems::CoinBased(CoinBasedVotingParameters {
+        voting_currency: TEST_TOKEN_ID,
+        creation_fee: 2,
+        min_quorum: 0,
+        min_participation: 0,
+        ttl: 1,
+    })
 }
 
 #[test]
@@ -42,7 +56,7 @@ fn create_increments_counter_and_save_details_and_configure_roles() {
                 OrganizationDetails {
                     // We intentionally make it unsorted for the test
                     executors: vec![CHARLIE, BOB],
-                    voting: Default::default(),
+                    ..Default::default()
                 }
             ));
             assert_eq!(Organizations::counter(), 1);
@@ -73,7 +87,7 @@ fn apply_as() {
                 RawOrigin::Signed(ALICE).into(),
                 OrganizationDetails {
                     executors: vec![ALICE],
-                    voting: Default::default(),
+                    ..Default::default()
                 }
             ));
             assert_ok!(Organizations::apply_as(
@@ -94,7 +108,7 @@ fn mutate_save_details_and_update_roles() {
                 RawOrigin::Signed(ALICE).into(),
                 OrganizationDetails {
                     executors: vec![ALICE, BOB],
-                    voting: Default::default(),
+                    ..Default::default()
                 }
             ));
             let org_id = Organizations::org_id_for(0);
@@ -102,7 +116,7 @@ fn mutate_save_details_and_update_roles() {
                 RawOrigin::Signed(org_id).into(),
                 OrganizationDetails {
                     executors: vec![ALICE, CHARLIE],
-                    voting: Default::default(),
+                    ..Default::default()
                 },
             ));
 
@@ -177,13 +191,13 @@ fn mutate_fail_if_not_the_org_itself() {
 
 #[test]
 fn create_proposal_with_hook() {
-    let voting_system = MockVotingSystem::SimpleReserveWithCreationFee(TEST_TOKEN_ID, 2);
+    let voting_system = make_voting_system_with_creation_fee();
 
     ExtBuilder::default()
         .hundred_for_alice()
         .with_org(OrganizationDetails {
             executors: vec![],
-            voting: voting_system,
+            voting: voting_system.clone(),
         })
         .build()
         .execute_with(|| {
@@ -210,7 +224,7 @@ fn create_same_proposal_later_works() {
         .hundred_for_alice()
         .with_org(OrganizationDetails {
             executors: vec![],
-            voting: MockVotingSystem::SimpleReserveWithCreationFee(TEST_TOKEN_ID, 2),
+            voting: make_voting_system_with_creation_fee(),
         })
         .build()
         .execute_with(|| {
@@ -236,10 +250,6 @@ fn create_same_proposal_later_works() {
             ));
 
             assert!(first_proposal_id != second_proposal_id);
-            assert_eq!(
-                Organizations::proposals(first_proposal_id),
-                Organizations::proposals(second_proposal_id)
-            );
             assert_eq!(Tokens::reserved_balance(TEST_TOKEN_ID, &ALICE), 4);
         })
 }
@@ -250,7 +260,7 @@ fn create_proposal_fail_if_duplicate() {
         .hundred_for_alice()
         .with_org(OrganizationDetails {
             executors: vec![],
-            voting: MockVotingSystem::SimpleReserveWithCreationFee(TEST_TOKEN_ID, 2),
+            voting: make_voting_system_with_creation_fee(),
         })
         .build()
         .execute_with(|| {
@@ -292,7 +302,7 @@ fn create_proposal_fail_if_hook_fail() {
     ExtBuilder::default()
         .with_org(OrganizationDetails {
             executors: vec![],
-            voting: MockVotingSystem::None,
+            voting: VotingSystems::None,
         })
         .build()
         .execute_with(|| {
@@ -305,7 +315,7 @@ fn create_proposal_fail_if_hook_fail() {
                     org_id,
                     proposal.clone()
                 ),
-                "none voting system"
+                VotingErrors::NotAVotingSystem
             );
         })
 }
@@ -317,7 +327,7 @@ fn veto_proposal() {
         .hundred_for_alice()
         .with_org(OrganizationDetails {
             executors: vec![],
-            voting: MockVotingSystem::SimpleReserveWithCreationFee(TEST_TOKEN_ID, 2),
+            voting: make_voting_system_with_creation_fee(),
         })
         .build()
         .execute_with(|| {
@@ -360,12 +370,12 @@ fn veto_proposal_fail_if_called_on_wrong_proposal() {
         .hundred_for_alice()
         .with_org(OrganizationDetails {
             executors: vec![],
-            voting: MockVotingSystem::SimpleReserveWithCreationFee(TEST_TOKEN_ID, 2),
+            voting: make_voting_system_with_creation_fee(),
         })
         // Need to create test organization to avoid the "NotAnOrganization" error
         .with_org(OrganizationDetails {
             executors: vec![],
-            voting: Default::default(),
+            ..Default::default()
         })
         .build()
         .execute_with(|| {
@@ -420,7 +430,7 @@ fn veto_proposal_fail_if_hook_fail() {
 
             assert_noop!(
                 Organizations::veto_proposal(RawOrigin::Signed(org_id).into(), proposal_id),
-                "none voting system"
+                VotingErrors::NotAVotingSystem
             );
         })
 }
@@ -431,7 +441,7 @@ fn decide_on_proposal_and_update_metadata() {
         .hundred_for_alice()
         .with_org(OrganizationDetails {
             executors: vec![],
-            voting: MockVotingSystem::SimpleReserveWithCreationFee(TEST_TOKEN_ID, 2),
+            voting: make_voting_system_with_creation_fee(),
         })
         .build()
         .execute_with(|| {
@@ -445,25 +455,39 @@ fn decide_on_proposal_and_update_metadata() {
                 proposal
             ));
 
-            assert_ok!(Organizations::decide_on_proposal(
+            assert_ok!(Tokens::transfer(
                 RawOrigin::Signed(ALICE).into(),
+                TEST_TOKEN_ID,
+                BOB,
+                10
+            ));
+            assert_ok!(Tokens::transfer(
+                RawOrigin::Signed(ALICE).into(),
+                TEST_TOKEN_ID,
+                CHARLIE,
+                5
+            ));
+
+            assert_ok!(Organizations::decide_on_proposal(
+                RawOrigin::Signed(BOB).into(),
                 proposal_id,
                 10,
                 true
             ));
             assert_ok!(Organizations::decide_on_proposal(
-                RawOrigin::Signed(ALICE).into(),
+                RawOrigin::Signed(CHARLIE).into(),
                 proposal_id,
                 5,
                 false
             ));
 
-            // Creation + votes
-            assert_eq!(Tokens::reserved_balance(TEST_TOKEN_ID, &ALICE), 2 + 10 + 5);
+            assert_eq!(Tokens::reserved_balance(TEST_TOKEN_ID, &ALICE), 2);
+            assert_eq!(Tokens::reserved_balance(TEST_TOKEN_ID, &BOB), 10);
+            assert_eq!(Tokens::reserved_balance(TEST_TOKEN_ID, &CHARLIE), 5);
 
             let metadata = Proposals::<Test>::get(proposal_id).metadata;
-            assert_eq!(metadata.in_favor, 10);
-            assert_eq!(metadata.in_opposition, 5);
+            assert_eq!(metadata.favorable, 12);
+            assert_eq!(metadata.against, 5);
         })
 }
 
@@ -511,7 +535,7 @@ fn decide_on_proposal_fails_if_hook_fails() {
                     10,
                     true
                 ),
-                "none voting system"
+                VotingErrors::NotAVotingSystem
             );
         })
 }
@@ -528,7 +552,7 @@ macro_rules! test_close_proposal {
                 .hundred_for_alice()
                 .with_org(OrganizationDetails {
                     executors: vec![],
-                    voting: MockVotingSystem::SimpleReserveWithCreationFee(TEST_TOKEN_ID, 2),
+                    voting: make_voting_system_with_creation_fee(),
                 })
                 .build()
                 .execute_with(|| {
@@ -547,6 +571,11 @@ macro_rules! test_close_proposal {
                         10,
                         $passing
                     ));
+
+                    // Make sure we can close by making the proposal expire
+                    frame_system::Module::<Test>::set_block_number(
+                        frame_system::Module::<Test>::block_number() + 10,
+                    );
 
                     assert_ok!(Organizations::close_proposal(
                         RawOrigin::Signed(ALICE).into(),
@@ -590,8 +619,8 @@ fn close_fails_if_hook_fails() {
             &proposal_id,
             Proposal {
                 org: org_id,
-                metadata: VotingSystemMetadata {
-                    in_favor: 1,
+                metadata: ProposalMetadata {
+                    favorable: 1,
                     ..Default::default()
                 },
                 ..Default::default()
@@ -600,7 +629,7 @@ fn close_fails_if_hook_fails() {
 
         assert_noop!(
             Organizations::close_proposal(RawOrigin::Signed(ALICE).into(), proposal_id,),
-            "none voting system"
+            VotingErrors::NotAVotingSystem
         );
     })
 }
@@ -611,7 +640,13 @@ fn close_fails_if_proposal_still_needs_votes() {
         .hundred_for_alice()
         .with_org(OrganizationDetails {
             executors: vec![],
-            voting: MockVotingSystem::SimpleReserveWithCreationFee(TEST_TOKEN_ID, 2),
+            voting: VotingSystems::CoinBased(CoinBasedVotingParameters {
+                voting_currency: TEST_TOKEN_ID,
+                creation_fee: 2,
+                min_quorum: 0,
+                min_participation: 50,
+                ttl: 1,
+            }),
         })
         .build()
         .execute_with(|| {
@@ -626,7 +661,7 @@ fn close_fails_if_proposal_still_needs_votes() {
             ));
 
             assert_noop!(
-                Organizations::close_proposal(RawOrigin::Signed(ALICE).into(), proposal_id,),
+                Organizations::close_proposal(RawOrigin::Signed(ALICE).into(), proposal_id),
                 Error::<Test>::ProposalCanNotBeClosed
             );
         })

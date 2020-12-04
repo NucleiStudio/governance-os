@@ -19,120 +19,10 @@ use governance_os_pallet_tokens::CurrencyDetails;
 use governance_os_support::{
     mock_runtime_with_currencies,
     testing::{ALICE, TEST_TOKEN_ID, TEST_TOKEN_OWNER},
-    voting::VotingHooks,
-    Currencies, ReservableCurrencies,
 };
-use sp_runtime::DispatchResult;
+use governance_os_voting::{ProposalMetadata, VotingSystems};
 
 mock_runtime_with_currencies!(Test);
-
-#[derive(Eq, PartialEq, RuntimeDebug, Encode, Decode, Copy, Clone, Serialize, Deserialize)]
-pub enum MockVotingSystem {
-    None,
-    SimpleReserveWithCreationFee(CurrencyId, Balance),
-}
-impl_enum_default!(MockVotingSystem, None);
-
-#[derive(Default, Eq, PartialEq, RuntimeDebug, Encode, Decode, Clone, Serialize, Deserialize)]
-pub struct VotingSystemMetadata {
-    // A more efficient ways to store it would probably be a BTree
-    pub coins_locked: Vec<(AccountId, Balance)>,
-    pub in_favor: Balance,
-    pub in_opposition: Balance,
-}
-
-// /!\ WARNING /!\:
-// PLEASE DO NOT USE THIS IN PRODUCTION! THIS CODE IS RESERVED FOR MOCKS AND TESTS
-// AND WOULD NOT SURVIVE CONTACT WITH USERS AND MALICIOUS ATCORS IN A PRODUCTION
-// VOTING SYSTEM. ALSO IT IS SUPER UNOPTIMIZED.
-impl VotingHooks for MockVotingSystem {
-    type AccountId = AccountId;
-    type OrganizationId = AccountId;
-    type VotingSystem = Self;
-    type Currencies = Tokens;
-    type Data = VotingSystemMetadata;
-    type BlockNumber = BlockNumber;
-
-    fn on_create_proposal(
-        voting_system: Self::VotingSystem,
-        creator: &Self::AccountId,
-        _current_block: Self::BlockNumber,
-    ) -> (DispatchResult, Self::Data) {
-        match voting_system {
-            Self::SimpleReserveWithCreationFee(currency_id, creation_fee) => (
-                Self::Currencies::reserve(currency_id, creator, creation_fee),
-                VotingSystemMetadata {
-                    coins_locked: vec![(*creator, creation_fee)],
-                    ..Default::default()
-                },
-            ),
-            _ => (Err("none voting system".into()), Default::default()),
-        }
-    }
-
-    fn on_veto_proposal(voting_system: Self::VotingSystem, data: Self::Data) -> DispatchResult {
-        match voting_system {
-            Self::SimpleReserveWithCreationFee(currency_id, _creation_fee) => {
-                data.coins_locked.iter().for_each(|(account, balance)| {
-                    drop(Self::Currencies::unreserve(currency_id, account, *balance));
-                });
-                Ok(())
-            }
-            _ => Err("none voting system".into()),
-        }
-    }
-
-    fn on_decide_on_proposal(
-        voting_system: Self::VotingSystem,
-        data: Self::Data,
-        voter: &Self::AccountId,
-        power: <Self::Currencies as Currencies<Self::AccountId>>::Balance,
-        in_support: bool,
-    ) -> (DispatchResult, Self::Data) {
-        match voting_system {
-            // This implementation is super simple, for instance, voters cannot change their
-            // votes. Subsequent calls to this function will simply add more votes.
-            Self::SimpleReserveWithCreationFee(currency_id, _creation_fee) => {
-                let mut updated_data = data;
-                let res = Self::Currencies::reserve(currency_id, voter, power);
-                if res.is_err() {
-                    return (res, updated_data);
-                }
-                if in_support {
-                    updated_data.in_favor += power;
-                } else {
-                    updated_data.in_opposition += power;
-                }
-                updated_data.coins_locked.push((*voter, power));
-
-                (Ok(()), updated_data)
-            }
-            _ => (Err("none voting system".into()), data),
-        }
-    }
-
-    fn on_close_proposal(
-        voting_system: Self::VotingSystem,
-        data: Self::Data,
-        _executed: bool,
-    ) -> DispatchResult {
-        // In our case the logic than when vetoing the proposal. Let's just call this and
-        // ignore the dispatch result.
-        Self::on_veto_proposal(voting_system, data)
-    }
-
-    fn can_close(
-        _voting_system: Self::VotingSystem,
-        data: Self::Data,
-        _block: Self::BlockNumber,
-    ) -> bool {
-        data.in_favor + data.in_opposition > 0
-    }
-
-    fn passing(_voting_system: Self::VotingSystem, data: Self::Data) -> bool {
-        data.in_favor > data.in_opposition
-    }
-}
 
 impl Trait for Test {
     type Event = ();
@@ -140,9 +30,10 @@ impl Trait for Test {
     type RoleManager = Bylaws;
     type RoleBuilder = MockRoles;
     type Currencies = Tokens;
-    type VotingSystem = MockVotingSystem;
-    type ProposalMetadata = VotingSystemMetadata;
-    type VotingHooks = MockVotingSystem;
+    type VotingSystem =
+        VotingSystems<Balance, CurrencyId, BlockNumber, Self::Currencies, AccountId>;
+    type ProposalMetadata = ProposalMetadata<AccountId, Balance, BlockNumber>;
+    type VotingHooks = VotingSystems<Balance, CurrencyId, BlockNumber, Self::Currencies, AccountId>;
 }
 
 impl RoleBuilder for MockRoles {

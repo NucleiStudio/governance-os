@@ -39,6 +39,6 @@ impl governance_os_pallet_organizations::Trait for Runtime {
     type Currencies = Tokens;
     type VotingSystem =
         VotingSystems<Balance, CurrencyId, BlockNumber, Self::Currencies, AccountId>;
-    type ProposalMetadata = ProposalMetadata<AccountId, Balance>;
+    type ProposalMetadata = ProposalMetadata<AccountId, Balance, BlockNumber>;
     type VotingHooks = VotingSystems<Balance, CurrencyId, BlockNumber, Self::Currencies, AccountId>;
 }
