@@ -22,7 +22,7 @@ use frame_support::{
 };
 use governance_os_support::{
     testing::{primitives::AccountId, ALICE, BOB, TEST_TOKEN_ID, TEST_TOKEN_OWNER},
-    Currencies, ReservableCurrencies,
+    traits::{Currencies, ReservableCurrencies},
 };
 
 #[test]

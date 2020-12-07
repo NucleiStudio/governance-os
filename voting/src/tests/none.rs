@@ -22,7 +22,7 @@ use governance_os_support::{
         primitives::{AccountId, Balance, BlockNumber},
         ALICE,
     },
-    voting::VotingHooks,
+    traits::VotingHooks,
 };
 
 #[test]

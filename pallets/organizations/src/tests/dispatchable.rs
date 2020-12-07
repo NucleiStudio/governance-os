@@ -19,12 +19,12 @@ use crate::{Error, OrganizationDetails, Proposal, Proposals, RoleBuilder};
 use frame_support::{assert_noop, assert_ok, StorageMap};
 use frame_system::RawOrigin;
 use governance_os_support::{
-    acl::{AclError, RoleManager},
+    errors::AclError,
     testing::{
         primitives::{AccountId, Balance, BlockNumber, CurrencyId},
         ALICE, BOB, CHARLIE, TEST_TOKEN_ID,
     },
-    ReservableCurrencies,
+    traits::{ReservableCurrencies, RoleManager},
 };
 use governance_os_voting::{
     CoinBasedVotingParameters, ProposalMetadata, VotingErrors, VotingSystems,

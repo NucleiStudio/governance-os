@@ -22,8 +22,7 @@ use governance_os_support::{
         primitives::{AccountId, Balance, BlockNumber, CurrencyId},
         ALICE, BOB, CHARLIE, TEST_TOKEN_ID,
     },
-    voting::VotingHooks,
-    Currencies, ReservableCurrencies,
+    traits::{Currencies, ReservableCurrencies, VotingHooks},
 };
 
 fn mock_system() -> MockVotingSystems {

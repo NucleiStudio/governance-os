@@ -30,7 +30,8 @@ use frame_support::{
 };
 use frame_system::ensure_signed;
 use governance_os_support::{
-    acl::RoleManager, ensure_not_err, voting::VotingHooks, Currencies, ReservableCurrencies,
+    ensure_not_err,
+    traits::{Currencies, ReservableCurrencies, RoleManager, VotingHooks},
 };
 use sp_runtime::{
     traits::{AccountIdConversion, Hash, MaybeSerializeDeserialize, Member, StaticLookup},

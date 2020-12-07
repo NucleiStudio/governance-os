@@ -16,7 +16,7 @@
 
 use crate::*;
 use frame_support::traits::BalanceStatus;
-use governance_os_support::{Currencies, ReservableCurrencies};
+use governance_os_support::traits::{Currencies, ReservableCurrencies};
 use sp_runtime::{
     traits::{CheckedAdd, CheckedSub, Saturating},
     DispatchError, DispatchResult,

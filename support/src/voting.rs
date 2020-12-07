@@ -16,7 +16,7 @@
 
 //! A set of common traits to voting systems.
 
-use crate::{Currencies, ReservableCurrencies};
+use crate::traits::{Currencies, ReservableCurrencies};
 use sp_runtime::DispatchResult;
 
 /// Called by the host pallet to let the developer implement custom voting actions

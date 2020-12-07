@@ -14,22 +14,6 @@
  * limitations under the License.
  */
 
-use super::mock::*;
-use governance_os_support::{
-    testing::{ALICE, BOB},
-    traits::RoleManager,
-};
-
-#[test]
-fn register_role() {
-    ExtBuilder::default()
-        .with_role(MockRoles::RemarkOnly, None)
-        .with_role(MockRoles::Root, Some(ALICE))
-        .build()
-        .execute_with(|| {
-            assert!(Bylaws::has_role(&ALICE, MockRoles::Root));
-            assert!(!Bylaws::has_role(&BOB, MockRoles::Root));
-            assert!(Bylaws::has_role(&ALICE, MockRoles::RemarkOnly));
-            assert!(Bylaws::has_role(&BOB, MockRoles::RemarkOnly));
-        })
-}
+pub use crate::acl::RoleManager;
+pub use crate::currencies::{Currencies, ReservableCurrencies};
+pub use crate::voting::VotingHooks;

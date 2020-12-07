@@ -25,7 +25,7 @@ use frame_support::{
 };
 use governance_os_support::{
     testing::{ALICE, BOB, TEST_TOKEN_ID},
-    Currencies, ReservableCurrencies,
+    traits::{Currencies, ReservableCurrencies},
 };
 
 #[test]

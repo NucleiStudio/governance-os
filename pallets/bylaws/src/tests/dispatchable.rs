@@ -18,8 +18,8 @@ use super::mock::*;
 use frame_support::assert_ok;
 use frame_system::RawOrigin;
 use governance_os_support::{
-    acl::RoleManager,
     testing::{ALICE, ROOT},
+    traits::RoleManager,
 };
 
 #[test]

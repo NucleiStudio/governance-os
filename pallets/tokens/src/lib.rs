@@ -29,7 +29,7 @@ use frame_support::{
     Parameter,
 };
 use frame_system::ensure_signed;
-use governance_os_support::{acl::RoleManager, Currencies};
+use governance_os_support::traits::{Currencies, RoleManager};
 use sp_runtime::{
     traits::{
         AtLeast32BitUnsigned, CheckedAdd, MaybeSerializeDeserialize, Member, StaticLookup, Zero,

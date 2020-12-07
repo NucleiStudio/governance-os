@@ -19,7 +19,7 @@ use frame_support::traits::{
     BalanceStatus, Currency, ExistenceRequirement, Get, Imbalance, ReservableCurrency,
     SignedImbalance, WithdrawReasons,
 };
-use governance_os_support::{Currencies, ReservableCurrencies};
+use governance_os_support::traits::{Currencies, ReservableCurrencies};
 use imbalances::{NegativeImbalance, PositiveImbalance};
 use sp_runtime::{
     traits::{Bounded, CheckedAdd, CheckedSub, Zero},

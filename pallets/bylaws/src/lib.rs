@@ -24,7 +24,7 @@
 use frame_support::{
     decl_error, decl_event, decl_module, decl_storage, traits::Get, weights::Weight, Parameter,
 };
-use governance_os_support::acl::RoleManager;
+use governance_os_support::traits::RoleManager;
 use sp_runtime::{
     traits::{MaybeSerializeDeserialize, Member, StaticLookup},
     DispatchResult,

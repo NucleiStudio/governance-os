@@ -21,7 +21,7 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use codec::{Decode, Encode};
-use governance_os_support::{voting::VotingHooks, Currencies, ReservableCurrencies};
+use governance_os_support::traits::{Currencies, ReservableCurrencies, VotingHooks};
 #[cfg(feature = "std")]
 use serde::{Deserialize, Serialize};
 use sp_runtime::{
