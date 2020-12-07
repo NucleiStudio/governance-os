@@ -30,7 +30,7 @@ use frame_support::{
     Parameter,
 };
 use governance_os_pallet_bylaws::RoleBuilder;
-use governance_os_support::acl::RoleManager;
+use governance_os_support::traits::RoleManager;
 use sp_runtime::{traits::StaticLookup, DispatchResult};
 use sp_std::boxed::Box;
 

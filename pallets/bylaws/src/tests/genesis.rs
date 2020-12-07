@@ -16,8 +16,8 @@
 
 use super::mock::*;
 use governance_os_support::{
-    acl::RoleManager,
     testing::{ALICE, BOB},
+    traits::RoleManager,
 };
 
 #[test]

@@ -14,20 +14,6 @@
  * limitations under the License.
  */
 
-use super::mock::Tokens;
-use crate::OrganizationDetails;
-use governance_os_support::testing::{
-    primitives::{AccountId, Balance, BlockNumber, CurrencyId},
-    ALICE, BOB,
-};
-use governance_os_voting::VotingSystems;
-
-#[test]
-fn sort() {
-    let mut details = OrganizationDetails {
-        executors: vec![BOB, ALICE],
-        voting: VotingSystems::<Balance, CurrencyId, BlockNumber, Tokens, AccountId>::None,
-    };
-    details.sort();
-    assert_eq!(details.executors, vec![ALICE, BOB]);
-}
+pub use crate::acl::RoleManager;
+pub use crate::currencies::{Currencies, ReservableCurrencies};
+pub use crate::voting::VotingHooks;

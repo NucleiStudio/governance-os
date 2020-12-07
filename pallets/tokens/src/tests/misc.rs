@@ -19,7 +19,7 @@ use frame_support::{assert_ok, StorageMap};
 use frame_system::Account;
 use governance_os_support::{
     testing::{primitives::AccountId, ALICE, BOB, TEST_TOKEN_ID},
-    Currencies,
+    traits::Currencies,
 };
 
 #[test]

@@ -14,16 +14,28 @@
  * limitations under the License.
  */
 
-use crate::{GenesisConfig, Module, OrganizationDetails, RoleBuilder, Trait};
-use governance_os_support::{mock_runtime, testing::ALICE};
+use crate::{
+    GenesisConfig, Module, OrganizationDetails, OrganizationDetailsOf, RoleBuilder, Trait,
+};
+use governance_os_pallet_tokens::CurrencyDetails;
+use governance_os_support::{
+    mock_runtime_with_currencies,
+    testing::{ALICE, TEST_TOKEN_ID, TEST_TOKEN_OWNER},
+};
+use governance_os_voting::{ProposalMetadata, VotingSystems};
 
-mock_runtime!(Test);
+mock_runtime_with_currencies!(Test);
 
 impl Trait for Test {
     type Event = ();
     type Call = Call;
     type RoleManager = Bylaws;
     type RoleBuilder = MockRoles;
+    type Currencies = Tokens;
+    type VotingSystem =
+        VotingSystems<Balance, CurrencyId, BlockNumber, Self::Currencies, AccountId>;
+    type ProposalMetadata = ProposalMetadata<AccountId, Balance, BlockNumber>;
+    type VotingHooks = VotingSystems<Balance, CurrencyId, BlockNumber, Self::Currencies, AccountId>;
 }
 
 impl RoleBuilder for MockRoles {
@@ -37,17 +49,14 @@ impl RoleBuilder for MockRoles {
     fn apply_as_organization(org_id: &Self::OrganizationId) -> Self::Role {
         MockRoles::ApplyAsOrganization(*org_id)
     }
-
-    fn manage_organization(org_id: &Self::OrganizationId) -> Self::Role {
-        MockRoles::ManageOrganization(*org_id)
-    }
 }
 
 pub type Organizations = Module<Test>;
 
 pub struct ExtBuilder {
     can_create: Vec<AccountId>,
-    orgs: Vec<OrganizationDetails<AccountId>>,
+    orgs: Vec<OrganizationDetailsOf<Test>>,
+    endowed_accounts: Vec<(CurrencyId, AccountId, Balance)>,
 }
 
 impl Default for ExtBuilder {
@@ -55,6 +64,7 @@ impl Default for ExtBuilder {
         Self {
             can_create: vec![],
             orgs: vec![],
+            endowed_accounts: vec![],
         }
     }
 }
@@ -65,10 +75,23 @@ impl ExtBuilder {
         self
     }
 
+    pub fn with_org(mut self, org: OrganizationDetailsOf<Test>) -> Self {
+        self.orgs.push(org);
+        self
+    }
+
     pub fn with_default_orgs(mut self, nb: u32) -> Self {
         for _ in 0..nb {
-            self.orgs.push(OrganizationDetails::<AccountId>::default());
+            self.orgs.push(OrganizationDetails {
+                executors: vec![],
+                voting: VotingSystems::None,
+            });
         }
+        self
+    }
+
+    pub fn hundred_for_alice(mut self) -> Self {
+        self.endowed_accounts.push((TEST_TOKEN_ID, ALICE, 100));
         self
     }
 
@@ -83,6 +106,19 @@ impl ExtBuilder {
                 .into_iter()
                 .map(|account| (MockRoles::CreateOrganizations, Some(account)))
                 .collect::<Vec<_>>(),
+        }
+        .assimilate_storage(&mut t)
+        .unwrap();
+
+        governance_os_pallet_tokens::GenesisConfig::<Test> {
+            endowed_accounts: self.endowed_accounts,
+            currency_details: vec![(
+                TEST_TOKEN_ID,
+                CurrencyDetails {
+                    owner: TEST_TOKEN_OWNER,
+                    transferable: true,
+                },
+            )],
         }
         .assimilate_storage(&mut t)
         .unwrap();

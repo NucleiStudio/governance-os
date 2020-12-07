@@ -14,30 +14,36 @@
  * limitations under the License.
  */
 
-//! This pallet bundles together the `bylaws` and `tokens` ones to create and
-//! manage decentralized autonomous organizations.
-//! Note that we give an account id to every organization created, this opens up
-//! the possibility to send some funds to an organization and have it spend the funds
-//! itself with no additional logic.
+//! This pallets creates and manages a set of organizations. An organization is linked
+//! to a set of executors that can call its `apply_as` function to execute calls as if
+//! it came from it.
+//! For instance, a voting contract could be deployed and registered as an executor.
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
+use codec::{Decode, Encode};
 use frame_support::{
     decl_error, decl_event, decl_module, decl_storage,
     dispatch::{Dispatchable, Parameter},
+    ensure,
     weights::GetDispatchInfo,
 };
-use governance_os_support::acl::RoleManager;
-use sp_runtime::{
-    traits::{AccountIdConversion, StaticLookup},
-    DispatchResult, ModuleId,
+use frame_system::ensure_signed;
+use governance_os_support::{
+    ensure_not_err,
+    traits::{Currencies, ReservableCurrencies, RoleManager, VotingHooks},
 };
-use sp_std::boxed::Box;
+use sp_runtime::{
+    traits::{AccountIdConversion, Hash, MaybeSerializeDeserialize, Member, StaticLookup},
+    DispatchError, DispatchResult, ModuleId,
+};
+use sp_std::{boxed::Box, prelude::Vec};
 
 mod details;
 #[cfg(test)]
 mod tests;
-use details::OrganizationDetails;
+
+use details::{OrganizationDetails, Proposal};
 
 pub trait RoleBuilder {
     type OrganizationId;
@@ -49,11 +55,6 @@ pub trait RoleBuilder {
     /// This role gives the ability to execute calls as if they came
     /// from the organization address.
     fn apply_as_organization(org_id: &Self::OrganizationId) -> Self::Role;
-
-    /// This role give management access for a given organization. Typically
-    /// this would imply the ability to add new executors (that get granted the
-    /// `apply_as` role).
-    fn manage_organization(org_id: &Self::OrganizationId) -> Self::Role;
 }
 
 pub trait Trait: frame_system::Trait {
@@ -73,8 +74,39 @@ pub trait Trait: frame_system::Trait {
         OrganizationId = Self::AccountId,
         Role = <RoleManagerOf<Self> as RoleManager>::Role,
     >;
+
+    /// Pallet handling currencies. Used to represent voting weights.
+    type Currencies: ReservableCurrencies<Self::AccountId>;
+
+    /// The different kinds of voting system present inside the runtime.
+    type VotingSystem: Parameter + Member + MaybeSerializeDeserialize;
+
+    /// Some arbitrary data that can be added to proposals
+    type ProposalMetadata: Parameter;
+
+    /// Various hooks as implemented for each voting system.
+    type VotingHooks: VotingHooks<
+        AccountId = Self::AccountId,
+        BlockNumber = Self::BlockNumber,
+        Currencies = Self::Currencies,
+        Data = Self::ProposalMetadata,
+        OrganizationId = Self::AccountId,
+        VotingSystem = Self::VotingSystem,
+    >;
 }
 
+type BalanceOf<T> =
+    <<T as Trait>::Currencies as Currencies<<T as frame_system::Trait>::AccountId>>::Balance;
+type OrganizationDetailsOf<T> =
+    OrganizationDetails<<T as frame_system::Trait>::AccountId, <T as Trait>::VotingSystem>;
+pub type OrganizationsCounter = u32;
+type ProposalIdOf<T> = <T as frame_system::Trait>::Hash;
+type ProposalOf<T> = Proposal<
+    Vec<u8>,
+    <T as Trait>::ProposalMetadata,
+    <T as frame_system::Trait>::AccountId,
+    <T as Trait>::VotingSystem,
+>;
 type RoleBuilderOf<T> = <T as Trait>::RoleBuilder;
 type RoleManagerOf<T> = <T as Trait>::RoleManager;
 
@@ -82,13 +114,17 @@ const ORGS_MODULE_ID: ModuleId = ModuleId(*b"gos/orgs");
 
 decl_storage! {
     trait Store for Module<T: Trait> as Organizations {
-        pub Counter get(fn counter): u32 = 0;
-        pub Parameters get(fn parameters): map hasher(blake2_128_concat) T::AccountId => OrganizationDetails<T::AccountId>;
+        pub Counter get(fn counter): OrganizationsCounter = 0;
+        pub Parameters get(fn parameters): map hasher(blake2_128_concat) T::AccountId => Option<OrganizationDetailsOf<T>>;
+        pub Proposals get(fn proposals): map hasher(blake2_128_concat) ProposalIdOf<T> => Option<ProposalOf<T>>;
     }
     add_extra_genesis {
-        config(organizations): Vec<OrganizationDetails<T::AccountId>>;
+        config(organizations): Vec<OrganizationDetailsOf<T>>;
         build(|config: &GenesisConfig<T>| {
-            config.organizations.iter().cloned().for_each(|params| drop(Module::<T>::do_create(params)))
+            config.organizations.iter().cloned().for_each(|params| {
+                Module::<T>::do_create(params)
+                    .expect("org creation in genesis block shall not fail")
+            })
         })
     }
 }
@@ -97,7 +133,9 @@ decl_event!(
     pub enum Event<T>
     where
         AccountId = <T as frame_system::Trait>::AccountId,
-        OrganizationDetails = OrganizationDetails<<T as frame_system::Trait>::AccountId>,
+        OrganizationDetails = OrganizationDetailsOf<T>,
+        ProposalId = ProposalIdOf<T>,
+        Balance = BalanceOf<T>,
     {
         /// An organization was created with the following parameters. \[org. address, details\]
         OrganizationCreated(AccountId, OrganizationDetails),
@@ -105,6 +143,16 @@ decl_event!(
         OrganizationExecuted(AccountId, DispatchResult),
         /// An organization parameters have been modified. \[org. address, old details, new details\]
         OrganizationMutated(AccountId, OrganizationDetails, OrganizationDetails),
+        /// A proposal has been submitted to an organization. \[org. address, proposal id\]
+        ProposalSubmitted(AccountId, ProposalId),
+        /// A proposal has been vetoed and removed from the queue of open proposals. \[proposal id\]
+        ProposalVetoed(ProposalId),
+        /// Somebody just voted on a proposal. \[proposal id, voter, power, support\]
+        ProposalVoteCasted(ProposalId, AccountId, Balance, bool),
+        /// A proposal has been executed with the following result. \[proposal id, result\]
+        ProposalExecuted(ProposalId, DispatchResult),
+        /// A proposal was closed. \[proposal id, wether it passed or not\]
+        ProposalClosed(ProposalId, bool),
     }
 );
 
@@ -113,6 +161,19 @@ decl_error! {
         /// We have created the maximum number of organizations, a runtime upgrade may
         /// be necessary.
         CounterOverflow,
+        /// This call can only be executed by an organization.
+        NotAnOrganization,
+        /// A similar proposal already exists.
+        ProposalDuplicate,
+        /// The proposal is not linked to this organization.
+        ProposalNotForOrganization,
+        /// The proposal does not exists, maybe it was already closed.
+        ProposalNotFound,
+        /// This proposal can not be closed yet. It probably needs to wait for more votes.
+        ProposalCanNotBeClosed,
+        /// The proposal code couldn't be decoded for some reason. This isn't expected to ever
+        /// happen and thus should be reported upstream.
+        ProposalDecodingFailure,
     }
 }
 
@@ -123,7 +184,7 @@ decl_module! {
         /// Create an organization with the given parameters. An event will be triggered with
         /// the organization's address.
         #[weight = 0]
-        fn create(origin, details: OrganizationDetails<T::AccountId>) {
+        fn create(origin, details: OrganizationDetailsOf<T>) {
             RoleManagerOf::<T>::ensure_has_role(origin, RoleBuilderOf::<T>::create_organizations())?;
             Self::do_create(details)?;
         }
@@ -138,30 +199,101 @@ decl_module! {
             Self::deposit_event(RawEvent::OrganizationExecuted(target_org_id, res.map(|_| ()).map_err(|e| e.error)));
         }
 
-        /// Mutate an organization to use the new parameters.
+        /// Mutate an organization to use the new parameters. Only an organization can call this on itself.
         #[weight = 0]
-        fn mutate(origin, org_id: <T::Lookup as StaticLookup>::Source, new_details: OrganizationDetails<T::AccountId>) {
-            let target_org_id = T::Lookup::lookup(org_id)?;
-            RoleManagerOf::<T>::ensure_has_role(origin, RoleBuilderOf::<T>::manage_organization(&target_org_id))?;
+        fn mutate(origin, new_details: OrganizationDetailsOf<T>) {
+            let (org_id, old_details) = Self::ensure_org(origin)?;
 
             // Make sure everything is sorted for optimization purposes
             let mut new_details = new_details;
             new_details.sort();
-            let old_details = Parameters::<T>::take(&target_org_id);
 
-            Self::run_on_changes(old_details.executors.as_slice(), new_details.executors.as_slice(), |old_account| {
-                drop(RoleManagerOf::<T>::revoke_role(Some(old_account), RoleBuilderOf::<T>::apply_as_organization(&target_org_id)));
+            Self::try_run_on_changes(old_details.executors.as_slice(), new_details.executors.as_slice(), |old_account| {
+                RoleManagerOf::<T>::revoke_role(Some(old_account), RoleBuilderOf::<T>::apply_as_organization(&org_id))
             }, |new_account| {
-                drop(RoleManagerOf::<T>::grant_role(Some(new_account), RoleBuilderOf::<T>::apply_as_organization(&target_org_id)));
-            });
-            Self::run_on_changes(old_details.managers.as_slice(), new_details.managers.as_slice(), |old_account| {
-                drop(RoleManagerOf::<T>::revoke_role(Some(old_account), RoleBuilderOf::<T>::manage_organization(&target_org_id)));
-            }, |new_account| {
-                drop(RoleManagerOf::<T>::grant_role(Some(new_account), RoleBuilderOf::<T>::manage_organization(&target_org_id)));
-            });
-            Parameters::<T>::insert(&target_org_id, new_details.clone());
+                RoleManagerOf::<T>::grant_role(Some(new_account), RoleBuilderOf::<T>::apply_as_organization(&org_id))
+            })?;
+            Parameters::<T>::insert(&org_id, new_details.clone());
 
-            Self::deposit_event(RawEvent::OrganizationMutated(target_org_id, old_details, new_details));
+            Self::deposit_event(RawEvent::OrganizationMutated(org_id, old_details, new_details));
+        }
+
+        /// Create a proposal for a given organization
+        #[weight = 0]
+        fn create_proposal(origin, org_id: <T::Lookup as StaticLookup>::Source, call: Box<<T as Trait>::Call>) {
+            let who = ensure_signed(origin)?;
+            let target_org_id = T::Lookup::lookup(org_id)?;
+            let details = Self::try_get_parameters(&target_org_id)?;
+            let proposal_id = Self::proposal_id(&target_org_id, call.clone());
+            if Proposals::<T>::contains_key(proposal_id) {
+                return Err(Error::<T>::ProposalDuplicate.into());
+            }
+
+            let (maybe_hook_sucessful, additional_data) = T::VotingHooks::on_create_proposal(details.clone().voting, &who, frame_system::Module::<T>::block_number());
+            ensure_not_err!(maybe_hook_sucessful);
+
+            Proposals::<T>::insert(&proposal_id, Proposal{
+                org: target_org_id.clone(),
+                call: call.encode(),
+                metadata: additional_data,
+                // Not only does this save us future read weights but it also cover
+                // the case where an org change voting systems but still has pending
+                // proposals.
+                voting: details.voting,
+            });
+
+            Self::deposit_event(RawEvent::ProposalSubmitted(target_org_id, proposal_id));
+        }
+
+        /// Remove a proposal from the batch of active ones. Has to be called by the organization itself,
+        /// typically this could come from an 'apply_as' or a separate vote.
+        #[weight = 0]
+        fn veto_proposal(origin, proposal_id: ProposalIdOf<T>) {
+            let (org_id, _details) = Self::ensure_org(origin)?;
+            let proposal = Self::try_get_proposal(proposal_id)?;
+            ensure!(proposal.org == org_id, Error::<T>::ProposalNotForOrganization);
+
+            T::VotingHooks::on_veto_proposal(proposal.voting, proposal.metadata)?;
+            Proposals::<T>::remove(proposal_id);
+
+            Self::deposit_event(RawEvent::ProposalVetoed(proposal_id));
+        }
+
+        /// Vote for or against a given proposal. The caller can choose how much voting power is dedicated
+        /// to it via the `power` parameter.
+        #[weight = 0]
+        fn decide_on_proposal(origin, proposal_id: ProposalIdOf<T>, power: BalanceOf<T>, in_support: bool) {
+            let voter = ensure_signed(origin)?;
+            let mut proposal = Self::try_get_proposal(proposal_id)?;
+            let (maybe_hook_sucessful, maybe_new_metadata) = T::VotingHooks::on_decide_on_proposal(proposal.clone().voting, proposal.clone().metadata, &voter, power, in_support);
+            ensure_not_err!(maybe_hook_sucessful);
+            if maybe_new_metadata != proposal.metadata {
+                // Save the new metadata, overwriting the previous one
+                proposal.metadata = maybe_new_metadata;
+                Proposals::<T>::insert(proposal_id, proposal);
+            }
+
+            Self::deposit_event(RawEvent::ProposalVoteCasted(proposal_id, voter, power, in_support));
+        }
+
+        /// If a proposal passed or failed but is not longer awaiting or waiting for votes it can be closed. Closing
+        /// a proposal means executing it if it passed, freeing all funds locked and erasing it from the local storage.
+        #[weight = 0]
+        fn close_proposal(origin, proposal_id: ProposalIdOf<T>) {
+            let _ = ensure_signed(origin)?;
+            let proposal = Self::try_get_proposal(proposal_id)?;
+            ensure!(T::VotingHooks::can_close(proposal.clone().voting, proposal.clone().metadata, frame_system::Module::<T>::block_number()), Error::<T>::ProposalCanNotBeClosed);
+
+            let passing = T::VotingHooks::passing(proposal.clone().voting, proposal.clone().metadata);
+            T::VotingHooks::on_close_proposal(proposal.clone().voting, proposal.clone().metadata, passing)?;
+            if passing {
+                let decoded_call = <T as Trait>::Call::decode(&mut &proposal.clone().call[..]).map_err(|_| Error::<T>::ProposalDecodingFailure)?;
+                let res = decoded_call.dispatch(frame_system::RawOrigin::Signed(proposal.clone().org).into());
+                Self::deposit_event(RawEvent::ProposalExecuted(proposal_id, res.map(|_| ()).map_err(|e| e.error)));
+            }
+            Proposals::<T>::remove(proposal_id);
+
+            Self::deposit_event(RawEvent::ProposalClosed(proposal_id, passing));
         }
     }
 }
@@ -170,23 +302,29 @@ impl<T: Trait> Module<T> {
     /// A handy helper functions to run two functions on what elements were removed from a
     /// slice and on the added elements. Should be pretty useful when trying to limit
     /// database read and writes since we execute the functions only on the changed elements.
-    fn run_on_changes<Elem: Ord>(
+    fn try_run_on_changes<Elem: Ord>(
         old_vec: &[Elem],
         new_vec: &[Elem],
-        on_old: impl Fn(&Elem),
-        on_new: impl Fn(&Elem),
-    ) {
-        Self::run_if_not_in_right(old_vec, new_vec, on_old);
-        Self::run_if_not_in_right(new_vec, old_vec, on_new);
+        on_old: impl Fn(&Elem) -> DispatchResult,
+        on_new: impl Fn(&Elem) -> DispatchResult,
+    ) -> DispatchResult {
+        Self::try_run_if_not_in_right(old_vec, new_vec, on_old)
+            .and_then(|_| Self::try_run_if_not_in_right(new_vec, old_vec, on_new))
     }
 
     /// Run `to_run` on every elent that is in `left` but not in `right`.
-    fn run_if_not_in_right<Elem: Ord>(left: &[Elem], right: &[Elem], to_run: impl Fn(&Elem)) {
-        left.into_iter().for_each(|elem| {
+    fn try_run_if_not_in_right<Elem: Ord>(
+        left: &[Elem],
+        right: &[Elem],
+        to_run: impl Fn(&Elem) -> DispatchResult,
+    ) -> DispatchResult {
+        left.into_iter().try_for_each(|elem| {
             if right.binary_search(&elem).is_err() {
-                to_run(elem);
+                return to_run(elem);
             }
-        });
+
+            Ok(())
+        })
     }
 
     /// Given any counter return the associated organization id
@@ -194,7 +332,47 @@ impl<T: Trait> Module<T> {
         ORGS_MODULE_ID.into_sub_account(counter)
     }
 
-    fn do_create(details: OrganizationDetails<T::AccountId>) -> DispatchResult {
+    /// Makes sure that the `origin` is a registered organization
+    fn ensure_org(
+        origin: T::Origin,
+    ) -> Result<(T::AccountId, OrganizationDetailsOf<T>), DispatchError> {
+        match ensure_signed(origin) {
+            Err(e) => Err(e.into()),
+            Ok(maybe_org_id) => Ok((
+                maybe_org_id.clone(),
+                Self::try_get_parameters(&maybe_org_id)?,
+            )),
+        }
+    }
+
+    /// Fetch an org details or error
+    fn try_get_parameters(
+        org_id: &T::AccountId,
+    ) -> Result<OrganizationDetailsOf<T>, DispatchError> {
+        match Parameters::<T>::get(org_id) {
+            Some(details) => Ok(details),
+            None => Err(Error::<T>::NotAnOrganization.into()),
+        }
+    }
+
+    /// Fetch a proposal details or error
+    fn try_get_proposal(proposal_id: ProposalIdOf<T>) -> Result<ProposalOf<T>, DispatchError> {
+        match Proposals::<T>::get(proposal_id) {
+            Some(proposal) => Ok(proposal),
+            None => Err(Error::<T>::ProposalNotFound.into()),
+        }
+    }
+
+    /// Hash the block number, org id and proposal together to generate its id
+    fn proposal_id(org_id: &T::AccountId, proposal: Box<<T as Trait>::Call>) -> ProposalIdOf<T> {
+        T::Hashing::hash_of(&[
+            frame_system::Module::<T>::block_number().encode(),
+            org_id.encode(),
+            proposal.encode(),
+        ])
+    }
+
+    fn do_create(details: OrganizationDetailsOf<T>) -> DispatchResult {
         let counter = Self::counter();
         let new_counter = counter.checked_add(1).ok_or(Error::<T>::CounterOverflow)?;
         let org_id = Self::org_id_for(counter);
@@ -205,27 +383,13 @@ impl<T: Trait> Module<T> {
 
         // We first write the counter so that even if the calls below fail we will always regenerate a new and
         // different organization id.
-        Counter::put(new_counter);
-        details.executors.iter().for_each(|account| {
-            drop(RoleManagerOf::<T>::grant_role(
+        details.executors.iter().try_for_each(|account| {
+            RoleManagerOf::<T>::grant_role(
                 Some(&account),
                 RoleBuilderOf::<T>::apply_as_organization(&org_id),
-            ));
-        });
-        details.managers.iter().for_each(|account| {
-            drop(RoleManagerOf::<T>::grant_role(
-                Some(&account),
-                RoleBuilderOf::<T>::manage_organization(&org_id),
-            ));
-        });
-        drop(RoleManagerOf::<T>::grant_role(
-            Some(&org_id),
-            RoleBuilderOf::<T>::apply_as_organization(&org_id),
-        ));
-        drop(RoleManagerOf::<T>::grant_role(
-            Some(&org_id),
-            RoleBuilderOf::<T>::manage_organization(&org_id),
-        ));
+            )
+        })?;
+        Counter::put(new_counter);
         Parameters::<T>::insert(&org_id, details.clone());
 
         Self::deposit_event(RawEvent::OrganizationCreated(org_id, details));

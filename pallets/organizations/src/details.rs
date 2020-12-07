@@ -23,19 +23,29 @@ use sp_std::prelude::Vec;
 /// This structure is used to encode metadata about an organization.
 #[derive(Encode, Decode, Clone, PartialEq, Eq, Default, RuntimeDebug)]
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
-pub struct OrganizationDetails<AccountId> {
+pub struct OrganizationDetails<AccountId, VotingSystem> {
     /// A set of accounts that have access to the `apply_as` function
     /// of an organization.
     pub executors: Vec<AccountId>,
 
-    /// A set of accounts that can change an organization's parameters.
-    pub managers: Vec<AccountId>,
+    /// Which voting system is in place. `executors` do not need to go
+    /// through it due to their higher privilege permission.
+    pub voting: VotingSystem,
 }
 
-impl<AccountId: Ord> OrganizationDetails<AccountId> {
+impl<AccountId: Ord, VotingSystem> OrganizationDetails<AccountId, VotingSystem> {
     /// Sort all the vectors inside the strutcture.
     pub fn sort(&mut self) {
         self.executors.sort();
-        self.managers.sort();
     }
+}
+
+/// Represent a proposal as stored by the pallet.
+#[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug)]
+#[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
+pub struct Proposal<Call, Metadata, OrganizationId, VotingSystem> {
+    pub org: OrganizationId,
+    pub call: Call,
+    pub metadata: Metadata,
+    pub voting: VotingSystem,
 }

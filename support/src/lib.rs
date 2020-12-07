@@ -18,13 +18,15 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
-pub mod acl;
+mod acl;
+mod currencies;
+mod voting;
+
 #[cfg(feature = "runtime-benchmarks")]
 pub mod benchmarking;
-pub mod currencies;
+pub mod errors;
 pub mod testing;
-
-pub use currencies::{Currencies, ReservableCurrencies};
+pub mod traits;
 
 #[macro_export]
 /// Use this macro to easily implement `Default` for a given enum. This avoids
@@ -35,6 +37,19 @@ macro_rules! impl_enum_default {
             fn default() -> Self {
                 Self::$default
             }
+        }
+    };
+}
+
+#[macro_export]
+/// This macro makes it easy to check a result from a function and returning it
+/// if it is an error.
+/// Useful when `?` is not usable, for instance if a function returns a tuple of
+/// a result and something else.
+macro_rules! ensure_not_err {
+    ($res:tt) => {
+        if $res.is_err() {
+            return $res;
         }
     };
 }

@@ -18,9 +18,9 @@ use super::mock::*;
 use crate::{CurrencyDetails, Error, RoleBuilder};
 use frame_support::{assert_noop, assert_ok};
 use governance_os_support::{
-    acl::{AclError, RoleManager},
+    errors::AclError,
     testing::{ALICE, BOB, TEST_TOKEN_ID, TEST_TOKEN_OWNER},
-    Currencies,
+    traits::{Currencies, RoleManager},
 };
 
 #[test]

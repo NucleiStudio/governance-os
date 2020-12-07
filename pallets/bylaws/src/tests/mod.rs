@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-pub mod dispatchable;
-pub mod genesis;
+mod dispatchable;
+mod genesis;
 pub mod mock;

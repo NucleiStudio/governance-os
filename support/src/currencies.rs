@@ -37,7 +37,7 @@ use sp_std::{
 /// runtime.
 pub trait Currencies<AccountId> {
     /// The type used to identify currencies
-    type CurrencyId: FullCodec + Eq + PartialEq + Copy + MaybeSerializeDeserialize + Debug;
+    type CurrencyId: FullCodec + Eq + PartialEq + Copy + MaybeSerializeDeserialize + Debug + Default;
 
     /// The balance of an account.
     type Balance: AtLeast32BitUnsigned

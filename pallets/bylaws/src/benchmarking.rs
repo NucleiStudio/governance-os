@@ -17,7 +17,7 @@
 use crate::*;
 use frame_benchmarking::{account, benchmarks, whitelisted_caller};
 use frame_system::RawOrigin;
-use governance_os_support::{acl::RoleManager, benchmarking::SEED};
+use governance_os_support::{benchmarking::SEED, traits::RoleManager};
 use sp_runtime::traits::StaticLookup;
 use sp_std::prelude::*;
 

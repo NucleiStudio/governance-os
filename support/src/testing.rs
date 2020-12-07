@@ -38,6 +38,7 @@ pub mod primitives {
     pub type AccountId = u128;
     pub type Balance = u64;
     pub type CurrencyId = u8;
+    pub type BlockNumber = u64;
 }
 
 #[macro_export]
@@ -56,10 +57,9 @@ macro_rules! mock_runtime {
         use codec::{Decode, Encode};
         use frame_support::{impl_outer_dispatch, impl_outer_origin, parameter_types};
         use governance_os_support::{
-            acl::Role,
             impl_enum_default,
             testing::{
-                primitives::{AccountId, CurrencyId},
+                primitives::{AccountId, BlockNumber, CurrencyId},
                 AvailableBlockRatio, BlockHashCount, MaximumBlockLength, MaximumBlockWeight, ROOT,
             },
         };
@@ -89,7 +89,7 @@ macro_rules! mock_runtime {
             type Origin = Origin;
             type Call = Call;
             type Index = u64;
-            type BlockNumber = u64;
+            type BlockNumber = BlockNumber;
             type Hash = H256;
             type Hashing = BlakeTwo256;
             type AccountId = AccountId;
@@ -133,9 +133,7 @@ macro_rules! mock_runtime {
             ManageCurrency(CurrencyId),
             CreateOrganizations,
             ApplyAsOrganization(AccountId),
-            ManageOrganization(AccountId),
         }
-        impl Role for MockRoles {}
         impl_enum_default!(MockRoles, RemarkOnly);
         impl governance_os_pallet_bylaws::RoleBuilder for MockRoles {
             type Role = MockRoles;
