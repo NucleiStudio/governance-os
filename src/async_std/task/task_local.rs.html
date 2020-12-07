@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/async-std-1.6.5/src/task/task_local.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>task_local.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/async-std-1.7.0/src/task/task_local.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>task_local.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
 <link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../async_std/index.html'><div class='logo-container'><img src='https://async.rs/images/logo--hero.svg' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
                 <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
@@ -222,10 +222,10 @@
 
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">task</span>::<span class="ident">TaskLocalsWrapper</span>;
 
-<span class="doccomment">/// The key for accessing a task-local value.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Every task-local value is lazily initialized on first access and destroyed when the task</span>
-<span class="doccomment">/// completes.</span>
+<span class="doccomment">/// The key for accessing a task-local value.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Every task-local value is lazily initialized on first access and destroyed when the task</span>
+<span class="doccomment">/// completes.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LocalKey</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
@@ -236,39 +236,39 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="ident">LocalKey</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Gets a reference to the task-local value with this key.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The passed closure receives a reference to the task-local value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The task-local value will be lazily initialized if this task has not accessed it before.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function will panic if not called within the context of a task created by</span>
-    <span class="doccomment">/// [`block_on`], [`spawn`], or [`Builder::spawn`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`block_on`]: fn.block_on.html</span>
-    <span class="doccomment">/// [`spawn`]: fn.spawn.html</span>
-    <span class="doccomment">/// [`Builder::spawn`]: struct.Builder.html#method.spawn</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use std::cell::Cell;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// use async_std::task;</span>
-    <span class="doccomment">/// use async_std::prelude::*;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// task_local! {</span>
-    <span class="doccomment">///     static NUMBER: Cell&lt;u32&gt; = Cell::new(5);</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// task::block_on(async {</span>
-    <span class="doccomment">///     let v = NUMBER.with(|c| c.get());</span>
-    <span class="doccomment">///     assert_eq!(v, 5);</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Gets a reference to the task-local value with this key.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The passed closure receives a reference to the task-local value.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The task-local value will be lazily initialized if this task has not accessed it before.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Panics</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This function will panic if not called within the context of a task created by</span>
+    <span class="doccomment">/// [`block_on`], [`spawn`], or [`Builder::spawn`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`block_on`]: fn.block_on.html</span>
+    <span class="doccomment">/// [`spawn`]: fn.spawn.html</span>
+    <span class="doccomment">/// [`Builder::spawn`]: struct.Builder.html#method.spawn</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use std::cell::Cell;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// use async_std::task;</span>
+    <span class="doccomment">/// use async_std::prelude::*;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// task_local! {</span>
+    <span class="doccomment">///     static NUMBER: Cell&lt;u32&gt; = Cell::new(5);</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// task::block_on(async {</span>
+    <span class="doccomment">///     let v = NUMBER.with(|c| c.get());</span>
+    <span class="doccomment">///     assert_eq!(v, 5);</span>
+    <span class="doccomment">/// });</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>,
@@ -277,59 +277,59 @@
             .<span class="ident">expect</span>(<span class="string">&quot;`LocalKey::with` called outside the context of a task&quot;</span>)
     }
 
-    <span class="doccomment">/// Attempts to get a reference to the task-local value with this key.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The passed closure receives a reference to the task-local value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The task-local value will be lazily initialized if this task has not accessed it before.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function returns an error if not called within the context of a task created by</span>
-    <span class="doccomment">/// [`block_on`], [`spawn`], or [`Builder::spawn`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`block_on`]: fn.block_on.html</span>
-    <span class="doccomment">/// [`spawn`]: fn.spawn.html</span>
-    <span class="doccomment">/// [`Builder::spawn`]: struct.Builder.html#method.spawn</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use std::cell::Cell;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// use async_std::task;</span>
-    <span class="doccomment">/// use async_std::prelude::*;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// task_local! {</span>
-    <span class="doccomment">///     static VAL: Cell&lt;u32&gt; = Cell::new(5);</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// task::block_on(async {</span>
-    <span class="doccomment">///     let v = VAL.try_with(|c| c.get());</span>
-    <span class="doccomment">///     assert_eq!(v, Ok(5));</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Returns an error because not called within the context of a task.</span>
-    <span class="doccomment">/// assert!(VAL.try_with(|c| c.get()).is_err());</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Attempts to get a reference to the task-local value with this key.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The passed closure receives a reference to the task-local value.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The task-local value will be lazily initialized if this task has not accessed it before.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This function returns an error if not called within the context of a task created by</span>
+    <span class="doccomment">/// [`block_on`], [`spawn`], or [`Builder::spawn`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`block_on`]: fn.block_on.html</span>
+    <span class="doccomment">/// [`spawn`]: fn.spawn.html</span>
+    <span class="doccomment">/// [`Builder::spawn`]: struct.Builder.html#method.spawn</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use std::cell::Cell;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// use async_std::task;</span>
+    <span class="doccomment">/// use async_std::prelude::*;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// task_local! {</span>
+    <span class="doccomment">///     static VAL: Cell&lt;u32&gt; = Cell::new(5);</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// task::block_on(async {</span>
+    <span class="doccomment">///     let v = VAL.try_with(|c| c.get());</span>
+    <span class="doccomment">///     assert_eq!(v, Ok(5));</span>
+    <span class="doccomment">/// });</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // Returns an error because not called within the context of a task.</span>
+    <span class="doccomment">/// assert!(VAL.try_with(|c| c.get()).is_err());</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_with</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">AccessError</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>,
     {
         <span class="ident">TaskLocalsWrapper</span>::<span class="ident">get_current</span>(<span class="op">|</span><span class="ident">task</span><span class="op">|</span> <span class="kw">unsafe</span> {
-            <span class="comment">// Prepare the numeric key, initialization function, and the map of task-locals.</span>
+            <span class="comment">// Prepare the numeric key, initialization function, and the map of task-locals.</span>
             <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">key</span>();
             <span class="kw">let</span> <span class="ident">init</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> <span class="ident">Box</span>::<span class="ident">new</span>((<span class="self">self</span>.<span class="ident">__init</span>)()) <span class="kw">as</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Send</span><span class="op">&gt;</span>;
 
-            <span class="comment">// Get the value in the map of task-locals, or initialize and insert one.</span>
+            <span class="comment">// Get the value in the map of task-locals, or initialize and insert one.</span>
             <span class="kw">let</span> <span class="ident">value</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">dyn</span> <span class="ident">Send</span> <span class="op">=</span> <span class="ident">task</span>.<span class="ident">locals</span>().<span class="ident">get_or_insert</span>(<span class="ident">key</span>, <span class="ident">init</span>);
 
-            <span class="comment">// Call the closure with the value passed as an argument.</span>
+            <span class="comment">// Call the closure with the value passed as an argument.</span>
             <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">value</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T</span>))
         })
         .<span class="ident">ok_or</span>(<span class="ident">AccessError</span> { <span class="ident">_private</span>: () })
     }
 
-    <span class="doccomment">/// Returns the numeric key associated with this task-local.</span>
+    <span class="doccomment">/// Returns the numeric key associated with this task-local.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
         <span class="attribute">#[<span class="ident">cold</span>]</span>
@@ -354,9 +354,9 @@
     }
 }
 
-<span class="doccomment">/// An error returned by [`LocalKey::try_with`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`LocalKey::try_with`]: struct.LocalKey.html#method.try_with</span>
+<span class="doccomment">/// An error returned by [`LocalKey::try_with`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [`LocalKey::try_with`]: struct.LocalKey.html#method.try_with</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AccessError</span> {
     <span class="ident">_private</span>: (),
@@ -376,30 +376,30 @@
 
 <span class="kw">impl</span> <span class="ident">Error</span> <span class="kw">for</span> <span class="ident">AccessError</span> {}
 
-<span class="doccomment">/// A key-value entry in a map of task-locals.</span>
+<span class="doccomment">/// A key-value entry in a map of task-locals.</span>
 <span class="kw">struct</span> <span class="ident">Entry</span> {
-    <span class="doccomment">/// Key identifying the task-local variable.</span>
+    <span class="doccomment">/// Key identifying the task-local variable.</span>
     <span class="ident">key</span>: <span class="ident">u32</span>,
 
-    <span class="doccomment">/// Value stored in this entry.</span>
+    <span class="doccomment">/// Value stored in this entry.</span>
     <span class="ident">value</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Send</span><span class="op">&gt;</span>,
 }
 
-<span class="doccomment">/// A map that holds task-locals.</span>
+<span class="doccomment">/// A map that holds task-locals.</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">LocalsMap</span> {
-    <span class="doccomment">/// A list of key-value entries sorted by the key.</span>
+    <span class="doccomment">/// A list of key-value entries sorted by the key.</span>
     <span class="ident">entries</span>: <span class="ident">UnsafeCell</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Entry</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">LocalsMap</span> {
-    <span class="doccomment">/// Creates an empty map of task-locals.</span>
+    <span class="doccomment">/// Creates an empty map of task-locals.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">LocalsMap</span> {
         <span class="ident">LocalsMap</span> {
             <span class="ident">entries</span>: <span class="ident">UnsafeCell</span>::<span class="ident">new</span>(<span class="prelude-val">Some</span>(<span class="ident">Vec</span>::<span class="ident">new</span>())),
         }
     }
 
-    <span class="doccomment">/// Returns a task-local value associated with `key` or inserts one constructed by `init`.</span>
+    <span class="doccomment">/// Returns a task-local value associated with `key` or inserts one constructed by `init`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_or_insert</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="ident">u32</span>, <span class="ident">init</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Send</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">dyn</span> <span class="ident">Send</span> {
         <span class="kw">match</span> <span class="kw">unsafe</span> { (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">entries</span>.<span class="ident">get</span>()).<span class="ident">as_mut</span>() } {
@@ -418,12 +418,12 @@
         }
     }
 
-    <span class="doccomment">/// Clears the map and drops all task-locals.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method is only safe to call at the end of the task.</span>
+    <span class="doccomment">/// Clears the map and drops all task-locals.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This method is only safe to call at the end of the task.</span>
     <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="comment">// Since destructors may attempt to access task-locals, we musnt&#39;t hold a mutable reference</span>
-        <span class="comment">// to the `Vec` while dropping them. Instead, we first take the `Vec` out and then drop it.</span>
+        <span class="comment">// Since destructors may attempt to access task-locals, we musnt&#39;t hold a mutable reference</span>
+        <span class="comment">// to the `Vec` while dropping them. Instead, we first take the `Vec` out and then drop it.</span>
         <span class="kw">let</span> <span class="ident">entries</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">entries</span>.<span class="ident">get</span>()).<span class="ident">take</span>();
         <span class="ident">drop</span>(<span class="ident">entries</span>);
     }

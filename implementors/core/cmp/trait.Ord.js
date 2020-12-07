@@ -42,7 +42,7 @@ implementors["owning_ref"] = [{"text":"impl&lt;O, T:&nbsp;?Sized&gt; Ord for Own
 implementors["pallet_grandpa"] = [{"text":"impl Ord for GrandpaTimeSlot","synthetic":false,"types":[]}];
 implementors["parity_multiaddr"] = [{"text":"impl Ord for Multiaddr","synthetic":false,"types":[]}];
 implementors["parity_scale_codec"] = [{"text":"impl&lt;T:&nbsp;Ord&gt; Ord for Compact&lt;T&gt;","synthetic":false,"types":[]}];
-implementors["primitive_types"] = [{"text":"impl Ord for U128","synthetic":false,"types":[]},{"text":"impl Ord for U256","synthetic":false,"types":[]},{"text":"impl Ord for U512","synthetic":false,"types":[]},{"text":"impl Ord for H160","synthetic":false,"types":[]},{"text":"impl Ord for H256","synthetic":false,"types":[]},{"text":"impl Ord for H512","synthetic":false,"types":[]}];
+implementors["primitive_types"] = [{"text":"impl Ord for U128","synthetic":false,"types":[]},{"text":"impl Ord for U256","synthetic":false,"types":[]},{"text":"impl Ord for U512","synthetic":false,"types":[]},{"text":"impl Ord for H128","synthetic":false,"types":[]},{"text":"impl Ord for H160","synthetic":false,"types":[]},{"text":"impl Ord for H256","synthetic":false,"types":[]},{"text":"impl Ord for H512","synthetic":false,"types":[]}];
 implementors["proc_macro2"] = [{"text":"impl Ord for Ident","synthetic":false,"types":[]}];
 implementors["prometheus"] = [{"text":"impl Ord for LabelPair","synthetic":false,"types":[]}];
 implementors["pwasm_utils"] = [{"text":"impl Ord for InstructionType","synthetic":false,"types":[]}];
@@ -64,7 +64,7 @@ implementors["sp_storage"] = [{"text":"impl Ord for StorageKey","synthetic":fals
 implementors["string"] = [{"text":"impl&lt;T:&nbsp;Ord&gt; Ord for String&lt;T&gt;","synthetic":false,"types":[]}];
 implementors["syn"] = [{"text":"impl Ord for Lifetime","synthetic":false,"types":[]}];
 implementors["time"] = [{"text":"impl Ord for Duration","synthetic":false,"types":[]},{"text":"impl Ord for Timespec","synthetic":false,"types":[]},{"text":"impl Ord for SteadyTime","synthetic":false,"types":[]},{"text":"impl Ord for Tm","synthetic":false,"types":[]}];
-implementors["tinyvec"] = [{"text":"impl&lt;A:&nbsp;Array&gt; Ord for ArrayVec&lt;A&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;A::Item: Ord,&nbsp;</span>","synthetic":false,"types":[]},{"text":"impl&lt;A:&nbsp;Array&gt; Ord for TinyVec&lt;A&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;A::Item: Ord,&nbsp;</span>","synthetic":false,"types":[]}];
+implementors["tinyvec"] = [{"text":"impl&lt;A:&nbsp;Array&gt; Ord for ArrayVec&lt;A&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;A::Item: Ord,&nbsp;</span>","synthetic":false,"types":[]},{"text":"impl&lt;'s, T&gt; Ord for SliceVec&lt;'s, T&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: Ord,&nbsp;</span>","synthetic":false,"types":[]},{"text":"impl&lt;A:&nbsp;Array&gt; Ord for TinyVec&lt;A&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;A::Item: Ord,&nbsp;</span>","synthetic":false,"types":[]}];
 implementors["tokio"] = [{"text":"impl Ord for Instant","synthetic":false,"types":[]}];
 implementors["tokio_codec"] = [{"text":"impl Ord for BytesCodec","synthetic":false,"types":[]},{"text":"impl Ord for LinesCodec","synthetic":false,"types":[]}];
 implementors["tokio_io"] = [{"text":"impl&lt;T:&nbsp;Ord&gt; Ord for AllowStdIo&lt;T&gt;","synthetic":false,"types":[]}];

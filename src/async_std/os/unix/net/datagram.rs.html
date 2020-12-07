@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/async-std-1.6.5/src/os/unix/net/datagram.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>datagram.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled ><script src="../../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/async-std-1.7.0/src/os/unix/net/datagram.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>datagram.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled ><script src="../../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png">
 <link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../../../async_std/index.html'><div class='logo-container'><img src='https://async.rs/images/logo--hero.svg' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
                 <a id="settings-menu" href="../../../../../settings.html"><img src="../../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
@@ -334,7 +334,7 @@
 <span id="331">331</span>
 <span id="332">332</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="doccomment">//! Unix-specific networking extensions.</span>
+<span class="doccomment">//! Unix-specific networking extensions.</span>
 
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">net</span>::<span class="ident">Shutdown</span>;
@@ -347,34 +347,34 @@
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">os</span>::<span class="ident">unix</span>::<span class="ident">io</span>::{<span class="ident">AsRawFd</span>, <span class="ident">FromRawFd</span>, <span class="ident">IntoRawFd</span>, <span class="ident">RawFd</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">path</span>::<span class="ident">Path</span>;
 
-<span class="doccomment">/// A Unix datagram socket.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// After creating a `UnixDatagram` by [`bind`]ing it to a path, data can be [sent to] and</span>
-<span class="doccomment">/// [received from] any other socket address.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This type is an async version of [`std::os::unix::net::UnixDatagram`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`std::os::unix::net::UnixDatagram`]:</span>
-<span class="doccomment">/// https://doc.rust-lang.org/std/os/unix/net/struct.UnixDatagram.html</span>
-<span class="doccomment">/// [`bind`]: #method.bind</span>
-<span class="doccomment">/// [received from]: #method.recv_from</span>
-<span class="doccomment">/// [sent to]: #method.send_to</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```no_run</span>
-<span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// use async_std::os::unix::net::UnixDatagram;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let socket = UnixDatagram::bind(&quot;/tmp/socket1&quot;).await?;</span>
-<span class="doccomment">/// socket.send_to(b&quot;hello world&quot;, &quot;/tmp/socket2&quot;).await?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut buf = vec![0u8; 1024];</span>
-<span class="doccomment">/// let (n, peer) = socket.recv_from(&amp;mut buf).await?;</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # Ok(()) }) }</span>
-<span class="doccomment">/// ```</span>
+<span class="doccomment">/// A Unix datagram socket.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// After creating a `UnixDatagram` by [`bind`]ing it to a path, data can be [sent to] and</span>
+<span class="doccomment">/// [received from] any other socket address.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This type is an async version of [`std::os::unix::net::UnixDatagram`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [`std::os::unix::net::UnixDatagram`]:</span>
+<span class="doccomment">/// https://doc.rust-lang.org/std/os/unix/net/struct.UnixDatagram.html</span>
+<span class="doccomment">/// [`bind`]: #method.bind</span>
+<span class="doccomment">/// [received from]: #method.recv_from</span>
+<span class="doccomment">/// [sent to]: #method.send_to</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ## Examples</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```no_run</span>
+<span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// use async_std::os::unix::net::UnixDatagram;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let socket = UnixDatagram::bind(&quot;/tmp/socket1&quot;).await?;</span>
+<span class="doccomment">/// socket.send_to(b&quot;hello world&quot;, &quot;/tmp/socket2&quot;).await?;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let mut buf = vec![0u8; 1024];</span>
+<span class="doccomment">/// let (n, peer) = socket.recv_from(&amp;mut buf).await?;</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// # Ok(()) }) }</span>
+<span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UnixDatagram</span> {
     <span class="ident">watcher</span>: <span class="ident">Async</span><span class="op">&lt;</span><span class="ident">StdUnixDatagram</span><span class="op">&gt;</span>,
 }
@@ -386,58 +386,58 @@
         }
     }
 
-    <span class="doccomment">/// Creates a Unix datagram socket bound to the given path.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::os::unix::net::UnixDatagram;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let socket = UnixDatagram::bind(&quot;/tmp/socket&quot;).await?;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # Ok(()) }) }</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Creates a Unix datagram socket bound to the given path.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```no_run</span>
+    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::os::unix::net::UnixDatagram;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let socket = UnixDatagram::bind(&quot;/tmp/socket&quot;).await?;</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # Ok(()) }) }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">bind</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">path</span>: <span class="ident">P</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">UnixDatagram</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">as_ref</span>().<span class="ident">to_owned</span>();
         <span class="kw">let</span> <span class="ident">socket</span> <span class="op">=</span> <span class="ident">Async</span>::<span class="op">&lt;</span><span class="ident">StdUnixDatagram</span><span class="op">&gt;</span>::<span class="ident">bind</span>(<span class="ident">path</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">UnixDatagram</span> { <span class="ident">watcher</span>: <span class="ident">socket</span> })
     }
 
-    <span class="doccomment">/// Creates a Unix datagram which is not bound to any address.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::os::unix::net::UnixDatagram;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let socket = UnixDatagram::unbound()?;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # Ok(()) }) }</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Creates a Unix datagram which is not bound to any address.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```no_run</span>
+    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::os::unix::net::UnixDatagram;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let socket = UnixDatagram::unbound()?;</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # Ok(()) }) }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unbound</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">UnixDatagram</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">socket</span> <span class="op">=</span> <span class="ident">StdUnixDatagram</span>::<span class="ident">unbound</span>()<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">UnixDatagram</span>::<span class="ident">new</span>(<span class="ident">socket</span>))
     }
 
-    <span class="doccomment">/// Creates an unnamed pair of connected sockets.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns two sockets which are connected to each other.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::os::unix::net::UnixDatagram;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let (socket1, socket2) = UnixDatagram::pair()?;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # Ok(()) }) }</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Creates an unnamed pair of connected sockets.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns two sockets which are connected to each other.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```no_run</span>
+    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::os::unix::net::UnixDatagram;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let (socket1, socket2) = UnixDatagram::pair()?;</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # Ok(()) }) }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pair</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">UnixDatagram</span>, <span class="ident">UnixDatagram</span>)<span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">a</span>, <span class="ident">b</span>) <span class="op">=</span> <span class="ident">StdUnixDatagram</span>::<span class="ident">pair</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">UnixDatagram</span>::<span class="ident">new</span>(<span class="ident">a</span>);
@@ -445,177 +445,177 @@
         <span class="prelude-val">Ok</span>((<span class="ident">a</span>, <span class="ident">b</span>))
     }
 
-    <span class="doccomment">/// Connects the socket to the specified address.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The [`send`] method may be used to send data to the specified address. [`recv`] and</span>
-    <span class="doccomment">/// [`recv_from`] will only receive data from that address.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`send`]: #method.send</span>
-    <span class="doccomment">/// [`recv`]: #method.recv</span>
-    <span class="doccomment">/// [`recv_from`]: #method.recv_from</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::os::unix::net::UnixDatagram;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let socket = UnixDatagram::unbound()?;</span>
-    <span class="doccomment">/// socket.connect(&quot;/tmp/socket&quot;).await?;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # Ok(()) }) }</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Connects the socket to the specified address.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The [`send`] method may be used to send data to the specified address. [`recv`] and</span>
+    <span class="doccomment">/// [`recv_from`] will only receive data from that address.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`send`]: #method.send</span>
+    <span class="doccomment">/// [`recv`]: #method.recv</span>
+    <span class="doccomment">/// [`recv_from`]: #method.recv_from</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```no_run</span>
+    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::os::unix::net::UnixDatagram;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let socket = UnixDatagram::unbound()?;</span>
+    <span class="doccomment">/// socket.connect(&quot;/tmp/socket&quot;).await?;</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # Ok(()) }) }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">connect</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">path</span>: <span class="ident">P</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="comment">// TODO(stjepang): Connect the socket on a blocking pool.</span>
+        <span class="comment">// TODO(stjepang): Connect the socket on a blocking pool.</span>
         <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">as_ref</span>();
         <span class="self">self</span>.<span class="ident">watcher</span>.<span class="ident">get_ref</span>().<span class="ident">connect</span>(<span class="ident">p</span>)
     }
 
-    <span class="doccomment">/// Returns the address of this socket.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::os::unix::net::UnixDatagram;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let socket = UnixDatagram::bind(&quot;/tmp/socket&quot;).await?;</span>
-    <span class="doccomment">/// let addr = socket.local_addr()?;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # Ok(()) }) }</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Returns the address of this socket.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```no_run</span>
+    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::os::unix::net::UnixDatagram;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let socket = UnixDatagram::bind(&quot;/tmp/socket&quot;).await?;</span>
+    <span class="doccomment">/// let addr = socket.local_addr()?;</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # Ok(()) }) }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">local_addr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">watcher</span>.<span class="ident">get_ref</span>().<span class="ident">local_addr</span>()
     }
 
-    <span class="doccomment">/// Returns the address of this socket&#39;s peer.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The [`connect`] method will connect the socket to a peer.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`connect`]: #method.connect</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::os::unix::net::UnixDatagram;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let socket = UnixDatagram::unbound()?;</span>
-    <span class="doccomment">/// socket.connect(&quot;/tmp/socket&quot;).await?;</span>
-    <span class="doccomment">/// let peer = socket.peer_addr()?;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # Ok(()) }) }</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Returns the address of this socket&#39;s peer.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The [`connect`] method will connect the socket to a peer.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`connect`]: #method.connect</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```no_run</span>
+    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::os::unix::net::UnixDatagram;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let socket = UnixDatagram::unbound()?;</span>
+    <span class="doccomment">/// socket.connect(&quot;/tmp/socket&quot;).await?;</span>
+    <span class="doccomment">/// let peer = socket.peer_addr()?;</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # Ok(()) }) }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">peer_addr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">watcher</span>.<span class="ident">get_ref</span>().<span class="ident">peer_addr</span>()
     }
 
-    <span class="doccomment">/// Receives data from the socket.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// On success, returns the number of bytes read and the address from where the data came.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::os::unix::net::UnixDatagram;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let socket = UnixDatagram::unbound()?;</span>
-    <span class="doccomment">/// let mut buf = vec![0; 1024];</span>
-    <span class="doccomment">/// let (n, peer) = socket.recv_from(&amp;mut buf).await?;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # Ok(()) }) }</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Receives data from the socket.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// On success, returns the number of bytes read and the address from where the data came.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```no_run</span>
+    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::os::unix::net::UnixDatagram;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let socket = UnixDatagram::unbound()?;</span>
+    <span class="doccomment">/// let mut buf = vec![0; 1024];</span>
+    <span class="doccomment">/// let (n, peer) = socket.recv_from(&amp;mut buf).await?;</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # Ok(()) }) }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">recv_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">SocketAddr</span>)<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">watcher</span>.<span class="ident">recv_from</span>(<span class="ident">buf</span>).<span class="ident">await</span>
     }
 
-    <span class="doccomment">/// Receives data from the socket.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// On success, returns the number of bytes read.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::os::unix::net::UnixDatagram;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let socket = UnixDatagram::bind(&quot;/tmp/socket&quot;).await?;</span>
-    <span class="doccomment">/// let mut buf = vec![0; 1024];</span>
-    <span class="doccomment">/// let n = socket.recv(&amp;mut buf).await?;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # Ok(()) }) }</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Receives data from the socket.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// On success, returns the number of bytes read.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```no_run</span>
+    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::os::unix::net::UnixDatagram;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let socket = UnixDatagram::bind(&quot;/tmp/socket&quot;).await?;</span>
+    <span class="doccomment">/// let mut buf = vec![0; 1024];</span>
+    <span class="doccomment">/// let n = socket.recv(&amp;mut buf).await?;</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # Ok(()) }) }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">recv</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">watcher</span>.<span class="ident">recv</span>(<span class="ident">buf</span>).<span class="ident">await</span>
     }
 
-    <span class="doccomment">/// Sends data on the socket to the specified address.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// On success, returns the number of bytes written.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::os::unix::net::UnixDatagram;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let socket = UnixDatagram::unbound()?;</span>
-    <span class="doccomment">/// socket.send_to(b&quot;hello world&quot;, &quot;/tmp/socket&quot;).await?;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # Ok(()) }) }</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Sends data on the socket to the specified address.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// On success, returns the number of bytes written.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```no_run</span>
+    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::os::unix::net::UnixDatagram;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let socket = UnixDatagram::unbound()?;</span>
+    <span class="doccomment">/// socket.send_to(b&quot;hello world&quot;, &quot;/tmp/socket&quot;).await?;</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # Ok(()) }) }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">send_to</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">path</span>: <span class="ident">P</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">watcher</span>.<span class="ident">send_to</span>(<span class="ident">buf</span>, <span class="ident">path</span>.<span class="ident">as_ref</span>()).<span class="ident">await</span>
     }
 
-    <span class="doccomment">/// Sends data on the socket to the socket&#39;s peer.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// On success, returns the number of bytes written.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::os::unix::net::UnixDatagram;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let socket = UnixDatagram::unbound()?;</span>
-    <span class="doccomment">/// socket.connect(&quot;/tmp/socket&quot;).await?;</span>
-    <span class="doccomment">/// socket.send(b&quot;hello world&quot;).await?;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # Ok(()) }) }</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Sends data on the socket to the socket&#39;s peer.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// On success, returns the number of bytes written.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```no_run</span>
+    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::os::unix::net::UnixDatagram;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let socket = UnixDatagram::unbound()?;</span>
+    <span class="doccomment">/// socket.connect(&quot;/tmp/socket&quot;).await?;</span>
+    <span class="doccomment">/// socket.send(b&quot;hello world&quot;).await?;</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # Ok(()) }) }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">send</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">watcher</span>.<span class="ident">send</span>(<span class="ident">buf</span>).<span class="ident">await</span>
     }
 
-    <span class="doccomment">/// Shut down the read, write, or both halves of this connection.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function will cause all pending and future I/O calls on the specified portions to</span>
-    <span class="doccomment">/// immediately return with an appropriate value (see the documentation of [`Shutdown`]).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Shutdown`]: https://doc.rust-lang.org/std/net/enum.Shutdown.html</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::os::unix::net::UnixDatagram;</span>
-    <span class="doccomment">/// use std::net::Shutdown;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let socket = UnixDatagram::unbound()?;</span>
-    <span class="doccomment">/// socket.shutdown(Shutdown::Both)?;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # Ok(()) }) }</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Shut down the read, write, or both halves of this connection.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This function will cause all pending and future I/O calls on the specified portions to</span>
+    <span class="doccomment">/// immediately return with an appropriate value (see the documentation of [`Shutdown`]).</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Shutdown`]: https://doc.rust-lang.org/std/net/enum.Shutdown.html</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ## Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```no_run</span>
+    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::os::unix::net::UnixDatagram;</span>
+    <span class="doccomment">/// use std::net::Shutdown;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let socket = UnixDatagram::unbound()?;</span>
+    <span class="doccomment">/// socket.shutdown(Shutdown::Both)?;</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # Ok(()) }) }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shutdown</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">how</span>: <span class="ident">Shutdown</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">watcher</span>.<span class="ident">get_ref</span>().<span class="ident">shutdown</span>(<span class="ident">how</span>)
     }
@@ -639,7 +639,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">StdUnixDatagram</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UnixDatagram</span> {
-    <span class="doccomment">/// Converts a `std::os::unix::net::UnixDatagram` into its asynchronous equivalent.</span>
+    <span class="doccomment">/// Converts a `std::os::unix::net::UnixDatagram` into its asynchronous equivalent.</span>
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">datagram</span>: <span class="ident">StdUnixDatagram</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UnixDatagram</span> {
         <span class="ident">UnixDatagram</span> {
             <span class="ident">watcher</span>: <span class="ident">Async</span>::<span class="ident">new</span>(<span class="ident">datagram</span>).<span class="ident">expect</span>(<span class="string">&quot;UnixDatagram is known to be good&quot;</span>),

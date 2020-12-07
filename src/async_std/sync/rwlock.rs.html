@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/async-std-1.6.5/src/sync/rwlock.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>rwlock.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/async-std-1.7.0/src/sync/rwlock.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>rwlock.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
 <link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../async_std/index.html'><div class='logo-container'><img src='https://async.rs/images/logo--hero.svg' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
                 <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
@@ -470,45 +470,45 @@
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">sync</span>::<span class="ident">WakerSet</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
 
-<span class="doccomment">/// Set if a write lock is held.</span>
+<span class="doccomment">/// Set if a write lock is held.</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">identity_op</span>)]</span>
 <span class="kw">const</span> <span class="ident">WRITE_LOCK</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">0</span>;
 
-<span class="doccomment">/// The value of a single blocked read contributing to the read count.</span>
+<span class="doccomment">/// The value of a single blocked read contributing to the read count.</span>
 <span class="kw">const</span> <span class="ident">ONE_READ</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>;
 
-<span class="doccomment">/// The bits in which the read count is stored.</span>
+<span class="doccomment">/// The bits in which the read count is stored.</span>
 <span class="kw">const</span> <span class="ident">READ_COUNT_MASK</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="op">!</span>(<span class="ident">ONE_READ</span> <span class="op">-</span> <span class="number">1</span>);
 
-<span class="doccomment">/// A reader-writer lock for protecting shared data.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This type is an async version of [`std::sync::RwLock`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`std::sync::RwLock`]: https://doc.rust-lang.org/std/sync/struct.RwLock.html</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # async_std::task::block_on(async {</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// use async_std::sync::RwLock;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let lock = RwLock::new(5);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Multiple read locks can be held at a time.</span>
-<span class="doccomment">/// let r1 = lock.read().await;</span>
-<span class="doccomment">/// let r2 = lock.read().await;</span>
-<span class="doccomment">/// assert_eq!(*r1, 5);</span>
-<span class="doccomment">/// assert_eq!(*r2, 5);</span>
-<span class="doccomment">/// drop((r1, r2));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Only one write locks can be held at a time.</span>
-<span class="doccomment">/// let mut w = lock.write().await;</span>
-<span class="doccomment">/// *w += 1;</span>
-<span class="doccomment">/// assert_eq!(*w, 6);</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # })</span>
-<span class="doccomment">/// ```</span>
+<span class="doccomment">/// A reader-writer lock for protecting shared data.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This type is an async version of [`std::sync::RwLock`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [`std::sync::RwLock`]: https://doc.rust-lang.org/std/sync/struct.RwLock.html</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Examples</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// # async_std::task::block_on(async {</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// use async_std::sync::RwLock;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let lock = RwLock::new(5);</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// // Multiple read locks can be held at a time.</span>
+<span class="doccomment">/// let r1 = lock.read().await;</span>
+<span class="doccomment">/// let r2 = lock.read().await;</span>
+<span class="doccomment">/// assert_eq!(*r1, 5);</span>
+<span class="doccomment">/// assert_eq!(*r2, 5);</span>
+<span class="doccomment">/// drop((r1, r2));</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// // Only one write locks can be held at a time.</span>
+<span class="doccomment">/// let mut w = lock.write().await;</span>
+<span class="doccomment">/// *w += 1;</span>
+<span class="doccomment">/// assert_eq!(*w, 6);</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// # })</span>
+<span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> {
     <span class="ident">state</span>: <span class="ident">AtomicUsize</span>,
     <span class="ident">read_wakers</span>: <span class="ident">WakerSet</span>,
@@ -520,15 +520,15 @@
 <span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Creates a new reader-writer lock.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use async_std::sync::RwLock;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let lock = RwLock::new(0);</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Creates a new reader-writer lock.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use async_std::sync::RwLock;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let lock = RwLock::new(0);</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">t</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">RwLock</span> {
             <span class="ident">state</span>: <span class="ident">AtomicUsize</span>::<span class="ident">new</span>(<span class="number">0</span>),
@@ -540,26 +540,26 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Acquires a read lock.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns a guard that releases the lock when dropped.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::sync::RwLock;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let lock = RwLock::new(1);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let n = lock.read().await;</span>
-    <span class="doccomment">/// assert_eq!(*n, 1);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert!(lock.try_read().is_some());</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # })</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Acquires a read lock.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns a guard that releases the lock when dropped.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::sync::RwLock;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let lock = RwLock::new(1);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let n = lock.read().await;</span>
+    <span class="doccomment">/// assert_eq!(*n, 1);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert!(lock.try_read().is_some());</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # })</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ReadFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> {
             <span class="ident">lock</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
@@ -571,19 +571,19 @@
 
             <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Output</span><span class="op">&gt;</span> {
                 <span class="kw">loop</span> {
-                    <span class="comment">// If the current task is in the set, remove it.</span>
+                    <span class="comment">// If the current task is in the set, remove it.</span>
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">key</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">opt_key</span>.<span class="ident">take</span>() {
                         <span class="self">self</span>.<span class="ident">lock</span>.<span class="ident">read_wakers</span>.<span class="ident">remove</span>(<span class="ident">key</span>);
                     }
 
-                    <span class="comment">// Try acquiring a read lock.</span>
+                    <span class="comment">// Try acquiring a read lock.</span>
                     <span class="kw">match</span> <span class="self">self</span>.<span class="ident">lock</span>.<span class="ident">try_read</span>() {
                         <span class="prelude-val">Some</span>(<span class="ident">guard</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="ident">guard</span>),
                         <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
-                            <span class="comment">// Insert this lock operation.</span>
+                            <span class="comment">// Insert this lock operation.</span>
                             <span class="self">self</span>.<span class="ident">opt_key</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">lock</span>.<span class="ident">read_wakers</span>.<span class="ident">insert</span>(<span class="ident">cx</span>));
 
-                            <span class="comment">// If the lock is still acquired for writing, return.</span>
+                            <span class="comment">// If the lock is still acquired for writing, return.</span>
                             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">lock</span>.<span class="ident">state</span>.<span class="ident">load</span>(<span class="ident">Ordering</span>::<span class="ident">SeqCst</span>) <span class="op">&amp;</span> <span class="ident">WRITE_LOCK</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
                                 <span class="kw">return</span> <span class="ident">Poll</span>::<span class="ident">Pending</span>;
                             }
@@ -595,12 +595,12 @@
 
         <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">ReadFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
             <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-                <span class="comment">// If the current task is still in the set, that means it is being cancelled now.</span>
+                <span class="comment">// If the current task is still in the set, that means it is being cancelled now.</span>
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">key</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">opt_key</span> {
                     <span class="self">self</span>.<span class="ident">lock</span>.<span class="ident">read_wakers</span>.<span class="ident">cancel</span>(<span class="ident">key</span>);
 
-                    <span class="comment">// If there are no active readers, notify a blocked writer if none were</span>
-                    <span class="comment">// notified already.</span>
+                    <span class="comment">// If there are no active readers, notify a blocked writer if none were</span>
+                    <span class="comment">// notified already.</span>
                     <span class="kw">if</span> <span class="self">self</span>.<span class="ident">lock</span>.<span class="ident">state</span>.<span class="ident">load</span>(<span class="ident">Ordering</span>::<span class="ident">SeqCst</span>) <span class="op">&amp;</span> <span class="ident">READ_COUNT_MASK</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
                         <span class="self">self</span>.<span class="ident">lock</span>.<span class="ident">write_wakers</span>.<span class="ident">notify_any</span>();
                     }
@@ -615,44 +615,44 @@
         .<span class="ident">await</span>
     }
 
-    <span class="doccomment">/// Attempts to acquire a read lock.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If a read lock could not be acquired at this time, then [`None`] is returned. Otherwise, a</span>
-    <span class="doccomment">/// guard is returned that releases the lock when dropped.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`None`]: https://doc.rust-lang.org/std/option/enum.Option.html#variant.None</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::sync::RwLock;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let lock = RwLock::new(1);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let n = lock.read().await;</span>
-    <span class="doccomment">/// assert_eq!(*n, 1);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert!(lock.try_read().is_some());</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # })</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Attempts to acquire a read lock.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If a read lock could not be acquired at this time, then [`None`] is returned. Otherwise, a</span>
+    <span class="doccomment">/// guard is returned that releases the lock when dropped.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`None`]: https://doc.rust-lang.org/std/option/enum.Option.html#variant.None</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::sync::RwLock;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let lock = RwLock::new(1);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let n = lock.read().await;</span>
+    <span class="doccomment">/// assert_eq!(*n, 1);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert!(lock.try_read().is_some());</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # })</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_read</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">load</span>(<span class="ident">Ordering</span>::<span class="ident">SeqCst</span>);
 
         <span class="kw">loop</span> {
-            <span class="comment">// If a write lock is currently held, then a read lock cannot be acquired.</span>
+            <span class="comment">// If a write lock is currently held, then a read lock cannot be acquired.</span>
             <span class="kw">if</span> <span class="ident">state</span> <span class="op">&amp;</span> <span class="ident">WRITE_LOCK</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
                 <span class="kw">return</span> <span class="prelude-val">None</span>;
             }
 
-            <span class="comment">// Make sure the number of readers doesn&#39;t overflow.</span>
+            <span class="comment">// Make sure the number of readers doesn&#39;t overflow.</span>
             <span class="kw">if</span> <span class="ident">state</span> <span class="op">&gt;</span> <span class="ident">isize</span>::<span class="ident">MAX</span> <span class="kw">as</span> <span class="ident">usize</span> {
                 <span class="ident">process</span>::<span class="ident">abort</span>();
             }
 
-            <span class="comment">// Increment the number of active reads.</span>
+            <span class="comment">// Increment the number of active reads.</span>
             <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">compare_exchange_weak</span>(
                 <span class="ident">state</span>,
                 <span class="ident">state</span> <span class="op">+</span> <span class="ident">ONE_READ</span>,
@@ -665,26 +665,26 @@
         }
     }
 
-    <span class="doccomment">/// Acquires a write lock.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns a guard that releases the lock when dropped.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::sync::RwLock;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let lock = RwLock::new(1);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut n = lock.write().await;</span>
-    <span class="doccomment">/// *n = 2;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert!(lock.try_read().is_none());</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # })</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Acquires a write lock.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns a guard that releases the lock when dropped.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::sync::RwLock;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let lock = RwLock::new(1);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let mut n = lock.write().await;</span>
+    <span class="doccomment">/// *n = 2;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert!(lock.try_read().is_none());</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # })</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RwLockWriteGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WriteFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> {
             <span class="ident">lock</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
@@ -696,19 +696,19 @@
 
             <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Output</span><span class="op">&gt;</span> {
                 <span class="kw">loop</span> {
-                    <span class="comment">// If the current task is in the set, remove it.</span>
+                    <span class="comment">// If the current task is in the set, remove it.</span>
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">key</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">opt_key</span>.<span class="ident">take</span>() {
                         <span class="self">self</span>.<span class="ident">lock</span>.<span class="ident">write_wakers</span>.<span class="ident">remove</span>(<span class="ident">key</span>);
                     }
 
-                    <span class="comment">// Try acquiring a write lock.</span>
+                    <span class="comment">// Try acquiring a write lock.</span>
                     <span class="kw">match</span> <span class="self">self</span>.<span class="ident">lock</span>.<span class="ident">try_write</span>() {
                         <span class="prelude-val">Some</span>(<span class="ident">guard</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="ident">guard</span>),
                         <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
-                            <span class="comment">// Insert this lock operation.</span>
+                            <span class="comment">// Insert this lock operation.</span>
                             <span class="self">self</span>.<span class="ident">opt_key</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">lock</span>.<span class="ident">write_wakers</span>.<span class="ident">insert</span>(<span class="ident">cx</span>));
 
-                            <span class="comment">// If the lock is still acquired for reading or writing, return.</span>
+                            <span class="comment">// If the lock is still acquired for reading or writing, return.</span>
                             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">lock</span>.<span class="ident">state</span>.<span class="ident">load</span>(<span class="ident">Ordering</span>::<span class="ident">SeqCst</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
                                 <span class="kw">return</span> <span class="ident">Poll</span>::<span class="ident">Pending</span>;
                             }
@@ -720,10 +720,10 @@
 
         <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">WriteFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
             <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-                <span class="comment">// If the current task is still in the set, that means it is being cancelled now.</span>
+                <span class="comment">// If the current task is still in the set, that means it is being cancelled now.</span>
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">key</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">opt_key</span> {
                     <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">lock</span>.<span class="ident">write_wakers</span>.<span class="ident">cancel</span>(<span class="ident">key</span>) {
-                        <span class="comment">// If no other blocked reader was notified, notify all readers.</span>
+                        <span class="comment">// If no other blocked reader was notified, notify all readers.</span>
                         <span class="self">self</span>.<span class="ident">lock</span>.<span class="ident">read_wakers</span>.<span class="ident">notify_all</span>();
                     }
                 }
@@ -737,29 +737,29 @@
         .<span class="ident">await</span>
     }
 
-    <span class="doccomment">/// Attempts to acquire a write lock.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If a write lock could not be acquired at this time, then [`None`] is returned. Otherwise, a</span>
-    <span class="doccomment">/// guard is returned that releases the lock when dropped.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`None`]: https://doc.rust-lang.org/std/option/enum.Option.html#variant.None</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::sync::RwLock;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let lock = RwLock::new(1);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let n = lock.read().await;</span>
-    <span class="doccomment">/// assert_eq!(*n, 1);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert!(lock.try_write().is_none());</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # })</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Attempts to acquire a write lock.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If a write lock could not be acquired at this time, then [`None`] is returned. Otherwise, a</span>
+    <span class="doccomment">/// guard is returned that releases the lock when dropped.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`None`]: https://doc.rust-lang.org/std/option/enum.Option.html#variant.None</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::sync::RwLock;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let lock = RwLock::new(1);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let n = lock.read().await;</span>
+    <span class="doccomment">/// assert_eq!(*n, 1);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert!(lock.try_write().is_none());</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # })</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_write</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RwLockWriteGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">compare_and_swap</span>(<span class="number">0</span>, <span class="ident">WRITE_LOCK</span>, <span class="ident">Ordering</span>::<span class="ident">SeqCst</span>) <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
             <span class="prelude-val">Some</span>(<span class="ident">RwLockWriteGuard</span>(<span class="self">self</span>))
@@ -768,38 +768,38 @@
         }
     }
 
-    <span class="doccomment">/// Consumes the lock, returning the underlying data.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use async_std::sync::RwLock;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let lock = RwLock::new(10);</span>
-    <span class="doccomment">/// assert_eq!(lock.into_inner(), 10);</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Consumes the lock, returning the underlying data.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use async_std::sync::RwLock;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let lock = RwLock::new(10);</span>
+    <span class="doccomment">/// assert_eq!(lock.into_inner(), 10);</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span> <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Sized</span> {
         <span class="self">self</span>.<span class="ident">value</span>.<span class="ident">into_inner</span>()
     }
 
-    <span class="doccomment">/// Returns a mutable reference to the underlying data.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Since this call borrows the lock mutably, no actual locking takes place -- the mutable</span>
-    <span class="doccomment">/// borrow statically guarantees no locks exist.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::sync::RwLock;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut lock = RwLock::new(0);</span>
-    <span class="doccomment">/// *lock.get_mut() = 10;</span>
-    <span class="doccomment">/// assert_eq!(*lock.write().await, 10);</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # })</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Returns a mutable reference to the underlying data.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Since this call borrows the lock mutably, no actual locking takes place -- the mutable</span>
+    <span class="doccomment">/// borrow statically guarantees no locks exist.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::sync::RwLock;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let mut lock = RwLock::new(0);</span>
+    <span class="doccomment">/// *lock.get_mut() = 10;</span>
+    <span class="doccomment">/// assert_eq!(*lock.write().await, 10);</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # })</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span> {
         <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">value</span>.<span class="ident">get</span>() }
     }
@@ -833,7 +833,7 @@
     }
 }
 
-<span class="doccomment">/// A guard that releases the read lock when dropped.</span>
+<span class="doccomment">/// A guard that releases the read lock when dropped.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
 
 <span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">RwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {}
@@ -843,7 +843,7 @@
     <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
         <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">state</span>.<span class="ident">fetch_sub</span>(<span class="ident">ONE_READ</span>, <span class="ident">Ordering</span>::<span class="ident">SeqCst</span>);
 
-        <span class="comment">// If this was the last reader, notify a blocked writer if none were notified already.</span>
+        <span class="comment">// If this was the last reader, notify a blocked writer if none were notified already.</span>
         <span class="kw">if</span> <span class="ident">state</span> <span class="op">&amp;</span> <span class="ident">READ_COUNT_MASK</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ONE_READ</span> {
             <span class="self">self</span>.<span class="number">0</span>.<span class="ident">write_wakers</span>.<span class="ident">notify_any</span>();
         }
@@ -870,7 +870,7 @@
     }
 }
 
-<span class="doccomment">/// A guard that releases the write lock when dropped.</span>
+<span class="doccomment">/// A guard that releases the write lock when dropped.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RwLockWriteGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
 
 <span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">RwLockWriteGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {}
@@ -880,10 +880,10 @@
     <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">state</span>.<span class="ident">store</span>(<span class="number">0</span>, <span class="ident">Ordering</span>::<span class="ident">SeqCst</span>);
 
-        <span class="comment">// Notify all blocked readers.</span>
+        <span class="comment">// Notify all blocked readers.</span>
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">read_wakers</span>.<span class="ident">notify_all</span>() {
-            <span class="comment">// If there were no blocked readers, notify a blocked writer if none were notified</span>
-            <span class="comment">// already.</span>
+            <span class="comment">// If there were no blocked readers, notify a blocked writer if none were notified</span>
+            <span class="comment">// already.</span>
             <span class="self">self</span>.<span class="number">0</span>.<span class="ident">write_wakers</span>.<span class="ident">notify_any</span>();
         }
     }

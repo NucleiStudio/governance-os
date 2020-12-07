@@ -1,1 +1,1 @@
-initSidebarItems({"type":[["AccountId",""],["Balance",""],["CurrencyId",""]]});
+initSidebarItems({"type":[["AccountId",""],["Balance",""],["BlockNumber",""],["CurrencyId",""]]});

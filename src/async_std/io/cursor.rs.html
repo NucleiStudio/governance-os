@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/async-std-1.6.5/src/io/cursor.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>cursor.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/async-std-1.7.0/src/io/cursor.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>cursor.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
 <link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../async_std/index.html'><div class='logo-container'><img src='https://async.rs/images/logo--hero.svg' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
                 <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
@@ -268,149 +268,149 @@
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">io</span>::{<span class="self">self</span>, <span class="ident">BufRead</span>, <span class="ident">IoSlice</span>, <span class="ident">IoSliceMut</span>, <span class="ident">Read</span>, <span class="ident">Seek</span>, <span class="ident">SeekFrom</span>, <span class="ident">Write</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
 
-<span class="doccomment">/// A `Cursor` wraps an in-memory buffer and provides it with a</span>
-<span class="doccomment">/// [`Seek`] implementation.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `Cursor`s are used with in-memory buffers, anything implementing</span>
-<span class="doccomment">/// `AsRef&lt;[u8]&gt;`, to allow them to implement [`Read`] and/or [`Write`],</span>
-<span class="doccomment">/// allowing these buffers to be used anywhere you might use a reader or writer</span>
-<span class="doccomment">/// that does actual I/O.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The standard library implements some I/O traits on various types which</span>
-<span class="doccomment">/// are commonly used as a buffer, like `Cursor&lt;`[`Vec`]`&lt;u8&gt;&gt;` and</span>
-<span class="doccomment">/// `Cursor&lt;`[`&amp;[u8]`][bytes]`&gt;`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Seek`]: trait.Seek.html</span>
-<span class="doccomment">/// [`Read`]: trait.Read.html</span>
-<span class="doccomment">/// [`Write`]: trait.Write.html</span>
-<span class="doccomment">/// [`Vec`]: https://doc.rust-lang.org/std/vec/struct.Vec.html</span>
-<span class="doccomment">/// [bytes]: https://doc.rust-lang.org/std/primitive.slice.html</span>
-<span class="doccomment">/// [`File`]: struct.File.html</span>
+<span class="doccomment">/// A `Cursor` wraps an in-memory buffer and provides it with a</span>
+<span class="doccomment">/// [`Seek`] implementation.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// `Cursor`s are used with in-memory buffers, anything implementing</span>
+<span class="doccomment">/// `AsRef&lt;[u8]&gt;`, to allow them to implement [`Read`] and/or [`Write`],</span>
+<span class="doccomment">/// allowing these buffers to be used anywhere you might use a reader or writer</span>
+<span class="doccomment">/// that does actual I/O.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The standard library implements some I/O traits on various types which</span>
+<span class="doccomment">/// are commonly used as a buffer, like `Cursor&lt;`[`Vec`]`&lt;u8&gt;&gt;` and</span>
+<span class="doccomment">/// `Cursor&lt;`[`&amp;[u8]`][bytes]`&gt;`.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [`Seek`]: trait.Seek.html</span>
+<span class="doccomment">/// [`Read`]: trait.Read.html</span>
+<span class="doccomment">/// [`Write`]: trait.Write.html</span>
+<span class="doccomment">/// [`Vec`]: https://doc.rust-lang.org/std/vec/struct.Vec.html</span>
+<span class="doccomment">/// [bytes]: https://doc.rust-lang.org/std/primitive.slice.html</span>
+<span class="doccomment">/// [`File`]: struct.File.html</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="ident">inner</span>: <span class="ident">std</span>::<span class="ident">io</span>::<span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Creates a new cursor wrapping the provided underlying in-memory buffer.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Cursor initial position is `0` even if underlying buffer (e.g., `Vec`)</span>
-    <span class="doccomment">/// is not empty. So writing to cursor starts with overwriting `Vec`</span>
-    <span class="doccomment">/// content, not with appending to it.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use async_std::io::Cursor;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let buff = Cursor::new(Vec::new());</span>
-    <span class="doccomment">/// # fn force_inference(_: &amp;Cursor&lt;Vec&lt;u8&gt;&gt;) {}</span>
-    <span class="doccomment">/// # force_inference(&amp;buff);</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Creates a new cursor wrapping the provided underlying in-memory buffer.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Cursor initial position is `0` even if underlying buffer (e.g., `Vec`)</span>
+    <span class="doccomment">/// is not empty. So writing to cursor starts with overwriting `Vec`</span>
+    <span class="doccomment">/// content, not with appending to it.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use async_std::io::Cursor;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let buff = Cursor::new(Vec::new());</span>
+    <span class="doccomment">/// # fn force_inference(_: &amp;Cursor&lt;Vec&lt;u8&gt;&gt;) {}</span>
+    <span class="doccomment">/// # force_inference(&amp;buff);</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">Cursor</span> {
             <span class="ident">inner</span>: <span class="ident">std</span>::<span class="ident">io</span>::<span class="ident">Cursor</span>::<span class="ident">new</span>(<span class="ident">inner</span>),
         }
     }
 
-    <span class="doccomment">/// Consumes this cursor, returning the underlying value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use async_std::io::Cursor;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let buff = Cursor::new(Vec::new());</span>
-    <span class="doccomment">/// # fn force_inference(_: &amp;Cursor&lt;Vec&lt;u8&gt;&gt;) {}</span>
-    <span class="doccomment">/// # force_inference(&amp;buff);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let vec = buff.into_inner();</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Consumes this cursor, returning the underlying value.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use async_std::io::Cursor;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let buff = Cursor::new(Vec::new());</span>
+    <span class="doccomment">/// # fn force_inference(_: &amp;Cursor&lt;Vec&lt;u8&gt;&gt;) {}</span>
+    <span class="doccomment">/// # force_inference(&amp;buff);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let vec = buff.into_inner();</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">into_inner</span>()
     }
 
-    <span class="doccomment">/// Gets a reference to the underlying value in this cursor.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use async_std::io::Cursor;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let buff = Cursor::new(Vec::new());</span>
-    <span class="doccomment">/// # fn force_inference(_: &amp;Cursor&lt;Vec&lt;u8&gt;&gt;) {}</span>
-    <span class="doccomment">/// # force_inference(&amp;buff);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let reference = buff.get_ref();</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Gets a reference to the underlying value in this cursor.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use async_std::io::Cursor;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let buff = Cursor::new(Vec::new());</span>
+    <span class="doccomment">/// # fn force_inference(_: &amp;Cursor&lt;Vec&lt;u8&gt;&gt;) {}</span>
+    <span class="doccomment">/// # force_inference(&amp;buff);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let reference = buff.get_ref();</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">T</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_ref</span>()
     }
 
-    <span class="doccomment">/// Gets a mutable reference to the underlying value in this cursor.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Care should be taken to avoid modifying the internal I/O state of the</span>
-    <span class="doccomment">/// underlying value as it may corrupt this cursor&#39;s position.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use async_std::io::Cursor;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buff = Cursor::new(Vec::new());</span>
-    <span class="doccomment">/// # fn force_inference(_: &amp;Cursor&lt;Vec&lt;u8&gt;&gt;) {}</span>
-    <span class="doccomment">/// # force_inference(&amp;buff);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let reference = buff.get_mut();</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Gets a mutable reference to the underlying value in this cursor.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Care should be taken to avoid modifying the internal I/O state of the</span>
+    <span class="doccomment">/// underlying value as it may corrupt this cursor&#39;s position.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use async_std::io::Cursor;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let mut buff = Cursor::new(Vec::new());</span>
+    <span class="doccomment">/// # fn force_inference(_: &amp;Cursor&lt;Vec&lt;u8&gt;&gt;) {}</span>
+    <span class="doccomment">/// # force_inference(&amp;buff);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let reference = buff.get_mut();</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_mut</span>()
     }
 
-    <span class="doccomment">/// Returns the current position of this cursor.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::io::Cursor;</span>
-    <span class="doccomment">/// use async_std::io::prelude::*;</span>
-    <span class="doccomment">/// use async_std::io::SeekFrom;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buff = Cursor::new(vec![1, 2, 3, 4, 5]);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(buff.position(), 0);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// buff.seek(SeekFrom::Current(2)).await?;</span>
-    <span class="doccomment">/// assert_eq!(buff.position(), 2);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// buff.seek(SeekFrom::Current(-1)).await?;</span>
-    <span class="doccomment">/// assert_eq!(buff.position(), 1);</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # Ok(()) }) }</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Returns the current position of this cursor.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::io::Cursor;</span>
+    <span class="doccomment">/// use async_std::io::prelude::*;</span>
+    <span class="doccomment">/// use async_std::io::SeekFrom;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let mut buff = Cursor::new(vec![1, 2, 3, 4, 5]);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(buff.position(), 0);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// buff.seek(SeekFrom::Current(2)).await?;</span>
+    <span class="doccomment">/// assert_eq!(buff.position(), 2);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// buff.seek(SeekFrom::Current(-1)).await?;</span>
+    <span class="doccomment">/// assert_eq!(buff.position(), 1);</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # Ok(()) }) }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">position</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">position</span>()
     }
 
-    <span class="doccomment">/// Sets the position of this cursor.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use async_std::io::Cursor;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buff = Cursor::new(vec![1, 2, 3, 4, 5]);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(buff.position(), 0);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// buff.set_position(2);</span>
-    <span class="doccomment">/// assert_eq!(buff.position(), 2);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// buff.set_position(4);</span>
-    <span class="doccomment">/// assert_eq!(buff.position(), 4);</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Sets the position of this cursor.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use async_std::io::Cursor;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let mut buff = Cursor::new(vec![1, 2, 3, 4, 5]);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(buff.position(), 0);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// buff.set_position(2);</span>
+    <span class="doccomment">/// assert_eq!(buff.position(), 2);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// buff.set_position(4);</span>
+    <span class="doccomment">/// assert_eq!(buff.position(), 4);</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_position</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">pos</span>: <span class="ident">u64</span>) {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">set_position</span>(<span class="ident">pos</span>)
     }

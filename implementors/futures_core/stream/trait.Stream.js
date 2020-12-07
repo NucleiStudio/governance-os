@@ -1,5 +1,6 @@
 (function() {var implementors = {};
 implementors["async_channel"] = [{"text":"impl&lt;T&gt; Stream for Receiver&lt;T&gt;","synthetic":false,"types":[]}];
+implementors["async_io"] = [{"text":"impl Stream for Timer","synthetic":false,"types":[]}];
 implementors["blocking"] = [{"text":"impl&lt;T:&nbsp;Iterator + Send + 'static&gt; Stream for Unblock&lt;T&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T::Item: Send + 'static,&nbsp;</span>","synthetic":false,"types":[]}];
 implementors["futures_channel"] = [{"text":"impl&lt;T&gt; Stream for Receiver&lt;T&gt;","synthetic":false,"types":[]},{"text":"impl&lt;T&gt; Stream for UnboundedReceiver&lt;T&gt;","synthetic":false,"types":[]}];
 implementors["futures_codec"] = [{"text":"impl&lt;T, U&gt; Stream for Framed&lt;T, U&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: AsyncRead + Unpin,<br>&nbsp;&nbsp;&nbsp;&nbsp;U: Decoder,&nbsp;</span>","synthetic":false,"types":[]},{"text":"impl&lt;T, D&gt; Stream for FramedRead&lt;T, D&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: AsyncRead + Unpin,<br>&nbsp;&nbsp;&nbsp;&nbsp;D: Decoder,&nbsp;</span>","synthetic":false,"types":[]}];

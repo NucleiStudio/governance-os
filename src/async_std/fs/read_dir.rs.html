@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/async-std-1.6.5/src/fs/read_dir.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>read_dir.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/async-std-1.7.0/src/fs/read_dir.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>read_dir.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
 <link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../async_std/index.html'><div class='logo-container'><img src='https://async.rs/images/logo--hero.svg' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
                 <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
@@ -124,42 +124,42 @@
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">task</span>::{<span class="ident">spawn_blocking</span>, <span class="ident">Context</span>, <span class="ident">JoinHandle</span>, <span class="ident">Poll</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">utils</span>::<span class="ident">Context</span> <span class="kw">as</span> <span class="kw">_</span>;
 
-<span class="doccomment">/// Returns a stream of entries in a directory.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The stream yields items of type [`io::Result`]`&lt;`[`DirEntry`]`&gt;`. Note that I/O errors can</span>
-<span class="doccomment">/// occur while reading from the stream.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This function is an async version of [`std::fs::read_dir`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`io::Result`]: ../io/type.Result.html</span>
-<span class="doccomment">/// [`DirEntry`]: struct.DirEntry.html</span>
-<span class="doccomment">/// [`std::fs::read_dir`]: https://doc.rust-lang.org/std/fs/fn.read_dir.html</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Errors</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// An error will be returned in the following situations:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * `path` does not point to an existing directory.</span>
-<span class="doccomment">/// * The current process lacks permissions to read the contents of the directory.</span>
-<span class="doccomment">/// * Some other I/O error occurred.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```no_run</span>
-<span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// use async_std::fs;</span>
-<span class="doccomment">/// use async_std::prelude::*;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut entries = fs::read_dir(&quot;.&quot;).await?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// while let Some(res) = entries.next().await {</span>
-<span class="doccomment">///     let entry = res?;</span>
-<span class="doccomment">///     println!(&quot;{}&quot;, entry.file_name().to_string_lossy());</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # Ok(()) }) }</span>
-<span class="doccomment">/// ```</span>
+<span class="doccomment">/// Returns a stream of entries in a directory.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The stream yields items of type [`io::Result`]`&lt;`[`DirEntry`]`&gt;`. Note that I/O errors can</span>
+<span class="doccomment">/// occur while reading from the stream.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This function is an async version of [`std::fs::read_dir`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [`io::Result`]: ../io/type.Result.html</span>
+<span class="doccomment">/// [`DirEntry`]: struct.DirEntry.html</span>
+<span class="doccomment">/// [`std::fs::read_dir`]: https://doc.rust-lang.org/std/fs/fn.read_dir.html</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Errors</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// An error will be returned in the following situations:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// * `path` does not point to an existing directory.</span>
+<span class="doccomment">/// * The current process lacks permissions to read the contents of the directory.</span>
+<span class="doccomment">/// * Some other I/O error occurred.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Examples</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```no_run</span>
+<span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// use async_std::fs;</span>
+<span class="doccomment">/// use async_std::prelude::*;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let mut entries = fs::read_dir(&quot;.&quot;).await?;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// while let Some(res) = entries.next().await {</span>
+<span class="doccomment">///     let entry = res?;</span>
+<span class="doccomment">///     println!(&quot;{}&quot;, entry.file_name().to_string_lossy());</span>
+<span class="doccomment">/// }</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// # Ok(()) }) }</span>
+<span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">read_dir</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">path</span>: <span class="ident">P</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ReadDir</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">as_ref</span>().<span class="ident">to_owned</span>();
     <span class="ident">spawn_blocking</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
@@ -170,24 +170,24 @@
     .<span class="ident">map</span>(<span class="ident">ReadDir</span>::<span class="ident">new</span>)
 }
 
-<span class="doccomment">/// A stream of entries in a directory.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This stream is returned by [`read_dir`] and yields items of type</span>
-<span class="doccomment">/// [`io::Result`]`&lt;`[`DirEntry`]`&gt;`. Each [`DirEntry`] can then retrieve information like entry&#39;s</span>
-<span class="doccomment">/// path or metadata.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This type is an async version of [`std::fs::ReadDir`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`read_dir`]: fn.read_dir.html</span>
-<span class="doccomment">/// [`io::Result`]: ../io/type.Result.html</span>
-<span class="doccomment">/// [`DirEntry`]: struct.DirEntry.html</span>
-<span class="doccomment">/// [`std::fs::ReadDir`]: https://doc.rust-lang.org/std/fs/struct.ReadDir.html</span>
+<span class="doccomment">/// A stream of entries in a directory.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This stream is returned by [`read_dir`] and yields items of type</span>
+<span class="doccomment">/// [`io::Result`]`&lt;`[`DirEntry`]`&gt;`. Each [`DirEntry`] can then retrieve information like entry&#39;s</span>
+<span class="doccomment">/// path or metadata.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This type is an async version of [`std::fs::ReadDir`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [`read_dir`]: fn.read_dir.html</span>
+<span class="doccomment">/// [`io::Result`]: ../io/type.Result.html</span>
+<span class="doccomment">/// [`DirEntry`]: struct.DirEntry.html</span>
+<span class="doccomment">/// [`std::fs::ReadDir`]: https://doc.rust-lang.org/std/fs/struct.ReadDir.html</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ReadDir</span>(<span class="ident">State</span>);
 
-<span class="doccomment">/// The state of an asynchronous `ReadDir`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The `ReadDir` can be either idle or busy performing an asynchronous operation.</span>
+<span class="doccomment">/// The state of an asynchronous `ReadDir`.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The `ReadDir` can be either idle or busy performing an asynchronous operation.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">enum</span> <span class="ident">State</span> {
     <span class="ident">Idle</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">std</span>::<span class="ident">fs</span>::<span class="ident">ReadDir</span><span class="op">&gt;</span>),
@@ -195,7 +195,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ReadDir</span> {
-    <span class="doccomment">/// Creates an asynchronous `ReadDir` from a synchronous handle.</span>
+    <span class="doccomment">/// Creates an asynchronous `ReadDir` from a synchronous handle.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">std</span>::<span class="ident">fs</span>::<span class="ident">ReadDir</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ReadDir</span> {
         <span class="ident">ReadDir</span>(<span class="ident">State</span>::<span class="ident">Idle</span>(<span class="prelude-val">Some</span>(<span class="ident">inner</span>)))
     }
@@ -210,13 +210,13 @@
                 <span class="ident">State</span>::<span class="ident">Idle</span>(<span class="ident">opt</span>) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">opt</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>();
 
-                    <span class="comment">// Start the operation asynchronously.</span>
+                    <span class="comment">// Start the operation asynchronously.</span>
                     <span class="self">self</span>.<span class="number">0</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">Busy</span>(<span class="ident">spawn_blocking</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
                         <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">next</span>();
                         (<span class="ident">inner</span>, <span class="ident">next</span>)
                     }));
                 }
-                <span class="comment">// Poll the asynchronous operation the file is currently blocked on.</span>
+                <span class="comment">// Poll the asynchronous operation the file is currently blocked on.</span>
                 <span class="ident">State</span>::<span class="ident">Busy</span>(<span class="ident">task</span>) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="kw">let</span> (<span class="ident">inner</span>, <span class="ident">opt</span>) <span class="op">=</span> <span class="ident">futures_core</span>::<span class="macro">ready</span><span class="macro">!</span>(<span class="ident">Pin</span>::<span class="ident">new</span>(<span class="ident">task</span>).<span class="ident">poll</span>(<span class="ident">cx</span>));
                     <span class="self">self</span>.<span class="number">0</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">Idle</span>(<span class="prelude-val">Some</span>(<span class="ident">inner</span>));

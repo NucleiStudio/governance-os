@@ -19,7 +19,7 @@ implementors["crossbeam_channel"] = [{"text":"impl&lt;T&gt; Drop for Sender&lt;T
 implementors["crossbeam_deque"] = [{"text":"impl&lt;T&gt; Drop for Injector&lt;T&gt;","synthetic":false,"types":[]}];
 implementors["crossbeam_epoch"] = [{"text":"impl&lt;T:&nbsp;?Sized + Pointable&gt; Drop for Owned&lt;T&gt;","synthetic":false,"types":[]},{"text":"impl Drop for LocalHandle","synthetic":false,"types":[]},{"text":"impl Drop for Guard","synthetic":false,"types":[]}];
 implementors["crossbeam_queue"] = [{"text":"impl&lt;T&gt; Drop for ArrayQueue&lt;T&gt;","synthetic":false,"types":[]},{"text":"impl&lt;T&gt; Drop for SegQueue&lt;T&gt;","synthetic":false,"types":[]}];
-implementors["crossbeam_utils"] = [{"text":"impl&lt;T:&nbsp;?Sized, '_&gt; Drop for ShardedLockWriteGuard&lt;'_, T&gt;","synthetic":false,"types":[]},{"text":"impl Drop for WaitGroup","synthetic":false,"types":[]}];
+implementors["crossbeam_utils"] = [{"text":"impl&lt;'a, T:&nbsp;?Sized&gt; Drop for ShardedLockWriteGuard&lt;'a, T&gt;","synthetic":false,"types":[]},{"text":"impl Drop for WaitGroup","synthetic":false,"types":[]}];
 implementors["ed25519_dalek"] = [{"text":"impl Drop for SecretKey","synthetic":false,"types":[]},{"text":"impl Drop for ExpandedSecretKey","synthetic":false,"types":[]}];
 implementors["event_listener"] = [{"text":"impl Drop for Event","synthetic":false,"types":[]},{"text":"impl Drop for EventListener","synthetic":false,"types":[]}];
 implementors["flate2"] = [{"text":"impl&lt;W:&nbsp;Write&gt; Drop for GzEncoder&lt;W&gt;","synthetic":false,"types":[]}];
@@ -84,7 +84,7 @@ implementors["syn"] = [{"text":"impl&lt;'a&gt; Drop for ParseBuffer&lt;'a&gt;","
 implementors["take_mut"] = [{"text":"impl&lt;'c, 'm, T:&nbsp;'m, F:&nbsp;FnOnce() -&gt; T&gt; Drop for Hole&lt;'c, 'm, T, F&gt;","synthetic":false,"types":[]}];
 implementors["tempfile"] = [{"text":"impl Drop for TempDir","synthetic":false,"types":[]},{"text":"impl Drop for TempPath","synthetic":false,"types":[]}];
 implementors["thread_local"] = [{"text":"impl&lt;T:&nbsp;Send&gt; Drop for ThreadLocal&lt;T&gt;","synthetic":false,"types":[]}];
-implementors["tinyvec"] = [{"text":"impl&lt;'p, A:&nbsp;Array&gt; Drop for ArrayVecDrain&lt;'p, A&gt;","synthetic":false,"types":[]},{"text":"impl&lt;'p, A:&nbsp;Array&gt; Drop for TinyVecDrain&lt;'p, A&gt;","synthetic":false,"types":[]}];
+implementors["tinyvec"] = [{"text":"impl&lt;'p, A:&nbsp;Array, I:&nbsp;Iterator&lt;Item = A::Item&gt;&gt; Drop for ArrayVecSplice&lt;'p, A, I&gt;","synthetic":false,"types":[]},{"text":"impl&lt;'p, 's, T:&nbsp;Default&gt; Drop for SliceVecDrain&lt;'p, 's, T&gt;","synthetic":false,"types":[]},{"text":"impl&lt;'p, A:&nbsp;Array, I:&nbsp;Iterator&lt;Item = A::Item&gt;&gt; Drop for TinyVecSplice&lt;'p, A, I&gt;","synthetic":false,"types":[]}];
 implementors["tokio"] = [{"text":"impl Drop for Runtime","synthetic":false,"types":[]}];
 implementors["tokio_current_thread"] = [{"text":"impl&lt;P:&nbsp;Park&gt; Drop for CurrentThread&lt;P&gt;","synthetic":false,"types":[]}];
 implementors["tokio_executor"] = [{"text":"impl Drop for Enter","synthetic":false,"types":[]}];

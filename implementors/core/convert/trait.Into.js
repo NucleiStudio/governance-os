@@ -13,6 +13,7 @@ implementors["generic_array"] = [{"text":"impl&lt;T&gt; Into&lt;[T; 1]&gt; for G
 implementors["gimli"] = [{"text":"impl Into&lt;u64&gt; for Pointer","synthetic":false,"types":[]},{"text":"impl&lt;'input, Endian&gt; Into&lt;&amp;'input [u8]&gt; for EndianSlice&lt;'input, Endian&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;Endian: Endianity,&nbsp;</span>","synthetic":false,"types":[]}];
 implementors["governance_os_runtime"] = [{"text":"impl Into&lt;Result&lt;RawOrigin&lt;&lt;Runtime as Trait&gt;::AccountId&gt;, Origin&gt;&gt; for Origin","synthetic":false,"types":[]}];
 implementors["governance_os_support"] = [{"text":"impl Into&lt;DispatchError&gt; for AclError","synthetic":false,"types":[]}];
+implementors["governance_os_voting"] = [{"text":"impl Into&lt;DispatchError&gt; for VotingErrors","synthetic":false,"types":[]}];
 implementors["humantime"] = [{"text":"impl Into&lt;Duration&gt; for Duration","synthetic":false,"types":[]},{"text":"impl Into&lt;SystemTime&gt; for Timestamp","synthetic":false,"types":[]}];
 implementors["itertools"] = [{"text":"impl&lt;A, B&gt; Into&lt;Option&lt;Either&lt;A, B&gt;&gt;&gt; for EitherOrBoth&lt;A, B&gt;","synthetic":false,"types":[]}];
 implementors["jsonrpc_pubsub"] = [{"text":"impl&lt;T:&nbsp;PubSubMetadata, S:&nbsp;Middleware&lt;T&gt;&gt; Into&lt;MetaIoHandler&lt;T, S&gt;&gt; for PubSubHandler&lt;T, S&gt;","synthetic":false,"types":[]}];

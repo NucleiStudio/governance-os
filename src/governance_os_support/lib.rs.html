@@ -41,6 +41,21 @@
 <span id="38">38</span>
 <span id="39">39</span>
 <span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">/*
  * Copyright 2020 Nuclei Studio OÜ
@@ -62,13 +77,15 @@
 
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>), <span class="ident">no_std</span>)]</span>
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">acl</span>;
+<span class="kw">mod</span> <span class="ident">acl</span>;
+<span class="kw">mod</span> <span class="ident">currencies</span>;
+<span class="kw">mod</span> <span class="ident">voting</span>;
+
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime-benchmarks&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">benchmarking</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">currencies</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">errors</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">testing</span>;
-
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">currencies</span>::{<span class="ident">Currencies</span>, <span class="ident">ReservableCurrencies</span>};
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">traits</span>;
 
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="doccomment">/// Use this macro to easily implement `Default` for a given enum. This avoids</span>
@@ -79,6 +96,19 @@
             <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
                 <span class="self">Self</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">default</span>
             }
+        }
+    };
+}
+
+<span class="attribute">#[<span class="ident">macro_export</span>]</span>
+<span class="doccomment">/// This macro makes it easy to check a result from a function and returning it</span>
+<span class="doccomment">/// if it is an error.</span>
+<span class="doccomment">/// Useful when `?` is not usable, for instance if a function returns a tuple of</span>
+<span class="doccomment">/// a result and something else.</span>
+<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">ensure_not_err</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>:<span class="ident">tt</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>.<span class="ident">is_err</span>() {
+            <span class="kw">return</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>;
         }
     };
 }

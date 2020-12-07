@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/async-std-1.6.5/src/io/buf_writer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>buf_writer.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/async-std-1.7.0/src/io/buf_writer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>buf_writer.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
 <link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../async_std/index.html'><div class='logo-container'><img src='https://async.rs/images/logo--hero.svg' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
                 <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
@@ -363,79 +363,79 @@
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>, <span class="ident">ready</span>};
 
 <span class="macro">pin_project</span><span class="macro">!</span> {
-    <span class="doccomment">/// Wraps a writer and buffers its output.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// It can be excessively inefficient to work directly with something that</span>
-    <span class="doccomment">/// implements [`Write`]. For example, every call to</span>
-    <span class="doccomment">/// [`write`][`TcpStream::write`] on [`TcpStream`] results in a system call. A</span>
-    <span class="doccomment">/// `BufWriter` keeps an in-memory buffer of data and writes it to an underlying</span>
-    <span class="doccomment">/// writer in large, infrequent batches.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `BufWriter` can improve the speed of programs that make *small* and</span>
-    <span class="doccomment">/// *repeated* write calls to the same file or network socket. It does not</span>
-    <span class="doccomment">/// help when writing very large amounts at once, or writing just one or a few</span>
-    <span class="doccomment">/// times. It also provides no advantage when writing to a destination that is</span>
-    <span class="doccomment">/// in memory, like a `Vec&lt;u8&gt;`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Unlike the `BufWriter` type in `std`, this type does not write out the</span>
-    <span class="doccomment">/// contents of its buffer when it is dropped. Therefore, it is absolutely</span>
-    <span class="doccomment">/// critical that users explicitly flush the buffer before dropping a</span>
-    <span class="doccomment">/// `BufWriter`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This type is an async version of [`std::io::BufWriter`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`std::io::BufWriter`]: https://doc.rust-lang.org/std/io/struct.BufWriter.html</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Let&#39;s write the numbers one through ten to a [`TcpStream`]:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-    <span class="doccomment">/// use async_std::net::TcpStream;</span>
-    <span class="doccomment">/// use async_std::prelude::*;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut stream = TcpStream::connect(&quot;127.0.0.1:34254&quot;).await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// for i in 0..10 {</span>
-    <span class="doccomment">///     let arr = [i+1];</span>
-    <span class="doccomment">///     stream.write(&amp;arr).await?;</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # Ok(()) }) }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Because we&#39;re not buffering, we write each one in turn, incurring the</span>
-    <span class="doccomment">/// overhead of a system call per byte written. We can fix this with a</span>
-    <span class="doccomment">/// `BufWriter`:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-    <span class="doccomment">/// use async_std::io::BufWriter;</span>
-    <span class="doccomment">/// use async_std::net::TcpStream;</span>
-    <span class="doccomment">/// use async_std::prelude::*;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut stream = BufWriter::new(TcpStream::connect(&quot;127.0.0.1:34254&quot;).await?);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// for i in 0..10 {</span>
-    <span class="doccomment">///     let arr = [i+1];</span>
-    <span class="doccomment">///     stream.write(&amp;arr).await?;</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// stream.flush().await?;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # Ok(()) }) }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// By wrapping the stream with a `BufWriter`, these ten writes are all grouped</span>
-    <span class="doccomment">/// together by the buffer, and will all be written out in one system call when</span>
-    <span class="doccomment">/// `stream.flush()` completes. (As mentioned above, dropping a `BufWriter`</span>
-    <span class="doccomment">/// does not flush its buffers, so a `flush` call is essential.)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Write`]: trait.Write.html</span>
-    <span class="doccomment">/// [`TcpStream::write`]: ../net/struct.TcpStream.html#method.write</span>
-    <span class="doccomment">/// [`TcpStream`]: ../net/struct.TcpStream.html</span>
-    <span class="doccomment">/// [`flush`]: trait.Write.html#tymethod.flush</span>
+    <span class="doccomment">/// Wraps a writer and buffers its output.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// It can be excessively inefficient to work directly with something that</span>
+    <span class="doccomment">/// implements [`Write`]. For example, every call to</span>
+    <span class="doccomment">/// [`write`][`TcpStream::write`] on [`TcpStream`] results in a system call. A</span>
+    <span class="doccomment">/// `BufWriter` keeps an in-memory buffer of data and writes it to an underlying</span>
+    <span class="doccomment">/// writer in large, infrequent batches.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// `BufWriter` can improve the speed of programs that make *small* and</span>
+    <span class="doccomment">/// *repeated* write calls to the same file or network socket. It does not</span>
+    <span class="doccomment">/// help when writing very large amounts at once, or writing just one or a few</span>
+    <span class="doccomment">/// times. It also provides no advantage when writing to a destination that is</span>
+    <span class="doccomment">/// in memory, like a `Vec&lt;u8&gt;`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Unlike the `BufWriter` type in `std`, this type does not write out the</span>
+    <span class="doccomment">/// contents of its buffer when it is dropped. Therefore, it is absolutely</span>
+    <span class="doccomment">/// critical that users explicitly flush the buffer before dropping a</span>
+    <span class="doccomment">/// `BufWriter`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This type is an async version of [`std::io::BufWriter`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`std::io::BufWriter`]: https://doc.rust-lang.org/std/io/struct.BufWriter.html</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Let&#39;s write the numbers one through ten to a [`TcpStream`]:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```no_run</span>
+    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+    <span class="doccomment">/// use async_std::net::TcpStream;</span>
+    <span class="doccomment">/// use async_std::prelude::*;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let mut stream = TcpStream::connect(&quot;127.0.0.1:34254&quot;).await?;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// for i in 0..10 {</span>
+    <span class="doccomment">///     let arr = [i+1];</span>
+    <span class="doccomment">///     stream.write(&amp;arr).await?;</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # Ok(()) }) }</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Because we&#39;re not buffering, we write each one in turn, incurring the</span>
+    <span class="doccomment">/// overhead of a system call per byte written. We can fix this with a</span>
+    <span class="doccomment">/// `BufWriter`:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```no_run</span>
+    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+    <span class="doccomment">/// use async_std::io::BufWriter;</span>
+    <span class="doccomment">/// use async_std::net::TcpStream;</span>
+    <span class="doccomment">/// use async_std::prelude::*;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let mut stream = BufWriter::new(TcpStream::connect(&quot;127.0.0.1:34254&quot;).await?);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// for i in 0..10 {</span>
+    <span class="doccomment">///     let arr = [i+1];</span>
+    <span class="doccomment">///     stream.write(&amp;arr).await?;</span>
+    <span class="doccomment">/// };</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// stream.flush().await?;</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # Ok(()) }) }</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// By wrapping the stream with a `BufWriter`, these ten writes are all grouped</span>
+    <span class="doccomment">/// together by the buffer, and will all be written out in one system call when</span>
+    <span class="doccomment">/// `stream.flush()` completes. (As mentioned above, dropping a `BufWriter`</span>
+    <span class="doccomment">/// does not flush its buffers, so a `flush` call is essential.)</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Write`]: trait.Write.html</span>
+    <span class="doccomment">/// [`TcpStream::write`]: ../net/struct.TcpStream.html#method.write</span>
+    <span class="doccomment">/// [`TcpStream`]: ../net/struct.TcpStream.html</span>
+    <span class="doccomment">/// [`flush`]: trait.Write.html#tymethod.flush</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BufWriter</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">pin</span>]</span>
         <span class="ident">inner</span>: <span class="ident">W</span>,
@@ -444,70 +444,70 @@
     }
 }
 
-<span class="doccomment">/// An error returned by `into_inner` which combines an error that</span>
-<span class="doccomment">/// happened while writing out the buffer, and the buffered writer object</span>
-<span class="doccomment">/// which may be used to recover from the condition.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```no_run</span>
-<span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-<span class="doccomment">/// use async_std::io::BufWriter;</span>
-<span class="doccomment">/// use async_std::net::TcpStream;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let buf_writer = BufWriter::new(TcpStream::connect(&quot;127.0.0.1:34251&quot;).await?);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // unwrap the TcpStream and flush the buffer</span>
-<span class="doccomment">/// let stream = match buf_writer.into_inner().await {</span>
-<span class="doccomment">///     Ok(s) =&gt; s,</span>
-<span class="doccomment">///     Err(e) =&gt; {</span>
-<span class="doccomment">///         // Here, e is an IntoInnerError</span>
-<span class="doccomment">///         panic!(&quot;An error occurred&quot;);</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// };</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # Ok(()) }) }</span>
-<span class="doccomment">///```</span>
+<span class="doccomment">/// An error returned by `into_inner` which combines an error that</span>
+<span class="doccomment">/// happened while writing out the buffer, and the buffered writer object</span>
+<span class="doccomment">/// which may be used to recover from the condition.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Examples</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```no_run</span>
+<span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+<span class="doccomment">/// use async_std::io::BufWriter;</span>
+<span class="doccomment">/// use async_std::net::TcpStream;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let buf_writer = BufWriter::new(TcpStream::connect(&quot;127.0.0.1:34251&quot;).await?);</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// // unwrap the TcpStream and flush the buffer</span>
+<span class="doccomment">/// let stream = match buf_writer.into_inner().await {</span>
+<span class="doccomment">///     Ok(s) =&gt; s,</span>
+<span class="doccomment">///     Err(e) =&gt; {</span>
+<span class="doccomment">///         // Here, e is an IntoInnerError</span>
+<span class="doccomment">///         panic!(&quot;An error occurred&quot;);</span>
+<span class="doccomment">///     }</span>
+<span class="doccomment">/// };</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// # Ok(()) }) }</span>
+<span class="doccomment">///```</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IntoInnerError</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span>(<span class="ident">W</span>, <span class="kw">crate</span>::<span class="ident">io</span>::<span class="ident">Error</span>);
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Write</span><span class="op">&gt;</span> <span class="ident">BufWriter</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Creates a new `BufWriter` with a default buffer capacity. The default is currently 8 KB,</span>
-    <span class="doccomment">/// but may change in the future.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # #![allow(unused_mut)]</span>
-    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-    <span class="doccomment">/// use async_std::io::BufWriter;</span>
-    <span class="doccomment">/// use async_std::net::TcpStream;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buffer = BufWriter::new(TcpStream::connect(&quot;127.0.0.1:34254&quot;).await?);</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # Ok(()) }) }</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Creates a new `BufWriter` with a default buffer capacity. The default is currently 8 KB,</span>
+    <span class="doccomment">/// but may change in the future.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```no_run</span>
+    <span class="doccomment">/// # #![allow(unused_mut)]</span>
+    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+    <span class="doccomment">/// use async_std::io::BufWriter;</span>
+    <span class="doccomment">/// use async_std::net::TcpStream;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let mut buffer = BufWriter::new(TcpStream::connect(&quot;127.0.0.1:34254&quot;).await?);</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # Ok(()) }) }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">W</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BufWriter</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span> {
         <span class="ident">BufWriter</span>::<span class="ident">with_capacity</span>(<span class="ident">DEFAULT_BUF_SIZE</span>, <span class="ident">inner</span>)
     }
 
-    <span class="doccomment">/// Creates a new `BufWriter` with the specified buffer capacity.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Creating a buffer with a buffer of a hundred bytes.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # #![allow(unused_mut)]</span>
-    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-    <span class="doccomment">/// use async_std::io::BufWriter;</span>
-    <span class="doccomment">/// use async_std::net::TcpStream;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let stream = TcpStream::connect(&quot;127.0.0.1:34254&quot;).await?;</span>
-    <span class="doccomment">/// let mut buffer = BufWriter::with_capacity(100, stream);</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # Ok(()) }) }</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Creates a new `BufWriter` with the specified buffer capacity.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Creating a buffer with a buffer of a hundred bytes.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```no_run</span>
+    <span class="doccomment">/// # #![allow(unused_mut)]</span>
+    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+    <span class="doccomment">/// use async_std::io::BufWriter;</span>
+    <span class="doccomment">/// use async_std::net::TcpStream;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let stream = TcpStream::connect(&quot;127.0.0.1:34254&quot;).await?;</span>
+    <span class="doccomment">/// let mut buffer = BufWriter::with_capacity(100, stream);</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # Ok(()) }) }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">capacity</span>: <span class="ident">usize</span>, <span class="ident">inner</span>: <span class="ident">W</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BufWriter</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span> {
         <span class="ident">BufWriter</span> {
             <span class="ident">inner</span>,
@@ -516,76 +516,76 @@
         }
     }
 
-    <span class="doccomment">/// Gets a reference to the underlying writer.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # #![allow(unused_mut)]</span>
-    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-    <span class="doccomment">/// use async_std::io::BufWriter;</span>
-    <span class="doccomment">/// use async_std::net::TcpStream;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buffer = BufWriter::new(TcpStream::connect(&quot;127.0.0.1:34254&quot;).await?);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // We can use reference just like buffer</span>
-    <span class="doccomment">/// let reference = buffer.get_ref();</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # Ok(()) }) }</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Gets a reference to the underlying writer.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```no_run</span>
+    <span class="doccomment">/// # #![allow(unused_mut)]</span>
+    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+    <span class="doccomment">/// use async_std::io::BufWriter;</span>
+    <span class="doccomment">/// use async_std::net::TcpStream;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let mut buffer = BufWriter::new(TcpStream::connect(&quot;127.0.0.1:34254&quot;).await?);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // We can use reference just like buffer</span>
+    <span class="doccomment">/// let reference = buffer.get_ref();</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # Ok(()) }) }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">W</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>
     }
 
-    <span class="doccomment">/// Gets a mutable reference to the underlying writer.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// It is inadvisable to directly write to the underlying writer.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-    <span class="doccomment">/// use async_std::io::BufWriter;</span>
-    <span class="doccomment">/// use async_std::net::TcpStream;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buffer = BufWriter::new(TcpStream::connect(&quot;127.0.0.1:34254&quot;).await?);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // We can use reference just like buffer</span>
-    <span class="doccomment">/// let reference = buffer.get_mut();</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # Ok(()) }) }</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Gets a mutable reference to the underlying writer.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// It is inadvisable to directly write to the underlying writer.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```no_run</span>
+    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+    <span class="doccomment">/// use async_std::io::BufWriter;</span>
+    <span class="doccomment">/// use async_std::net::TcpStream;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let mut buffer = BufWriter::new(TcpStream::connect(&quot;127.0.0.1:34254&quot;).await?);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // We can use reference just like buffer</span>
+    <span class="doccomment">/// let reference = buffer.get_mut();</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # Ok(()) }) }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">W</span> {
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">inner</span>
     }
 
-    <span class="doccomment">/// Gets a pinned mutable reference to the underlying writer.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// It is inadvisable to directly write to the underlying writer.</span>
+    <span class="doccomment">/// Gets a pinned mutable reference to the underlying writer.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// It is inadvisable to directly write to the underlying writer.</span>
     <span class="kw">fn</span> <span class="ident">get_pin_mut</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">W</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">inner</span>
     }
 
-    <span class="doccomment">/// Consumes BufWriter, returning the underlying writer</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method will not write leftover data, it will be lost.</span>
-    <span class="doccomment">/// For method that will attempt to write before returning the writer see [`poll_into_inner`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`poll_into_inner`]: #method.poll_into_inner</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-    <span class="doccomment">/// use async_std::io::BufWriter;</span>
-    <span class="doccomment">/// use async_std::net::TcpStream;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let buf_writer = BufWriter::new(TcpStream::connect(&quot;127.0.0.1:34251&quot;).await?);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // unwrap the TcpStream and flush the buffer</span>
-    <span class="doccomment">/// let stream = buf_writer.into_inner().await.unwrap();</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # Ok(()) }) }</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Consumes BufWriter, returning the underlying writer</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This method will not write leftover data, it will be lost.</span>
+    <span class="doccomment">/// For method that will attempt to write before returning the writer see [`poll_into_inner`]</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`poll_into_inner`]: #method.poll_into_inner</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```no_run</span>
+    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+    <span class="doccomment">/// use async_std::io::BufWriter;</span>
+    <span class="doccomment">/// use async_std::net::TcpStream;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let buf_writer = BufWriter::new(TcpStream::connect(&quot;127.0.0.1:34251&quot;).await?);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // unwrap the TcpStream and flush the buffer</span>
+    <span class="doccomment">/// let stream = buf_writer.into_inner().await.unwrap();</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # Ok(()) }) }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">W</span>, <span class="ident">IntoInnerError</span><span class="op">&lt;</span><span class="ident">BufWriter</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">Unpin</span>,
@@ -596,31 +596,31 @@
         }
     }
 
-    <span class="doccomment">/// Returns a reference to the internally buffered data.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-    <span class="doccomment">/// use async_std::io::BufWriter;</span>
-    <span class="doccomment">/// use async_std::net::TcpStream;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let buf_writer = BufWriter::new(TcpStream::connect(&quot;127.0.0.1:34251&quot;).await?);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // See how many bytes are currently buffered</span>
-    <span class="doccomment">/// let bytes_buffered = buf_writer.buffer().len();</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # Ok(()) }) }</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Returns a reference to the internally buffered data.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```no_run</span>
+    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+    <span class="doccomment">/// use async_std::io::BufWriter;</span>
+    <span class="doccomment">/// use async_std::net::TcpStream;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let buf_writer = BufWriter::new(TcpStream::connect(&quot;127.0.0.1:34251&quot;).await?);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // See how many bytes are currently buffered</span>
+    <span class="doccomment">/// let bytes_buffered = buf_writer.buffer().len();</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # Ok(()) }) }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">buffer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">buf</span>
     }
 
-    <span class="doccomment">/// Poll buffer flushing until completion</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is used in types that wrap around BufWrite, one such example: [`LineWriter`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`LineWriter`]: struct.LineWriter.html</span>
+    <span class="doccomment">/// Poll buffer flushing until completion</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This is used in types that wrap around BufWrite, one such example: [`LineWriter`]</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`LineWriter`]: struct.LineWriter.html</span>
     <span class="kw">fn</span> <span class="ident">poll_flush_buf</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">buf</span>.<span class="ident">len</span>();
@@ -692,9 +692,9 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Write</span> <span class="op">+</span> <span class="ident">Seek</span><span class="op">&gt;</span> <span class="ident">Seek</span> <span class="kw">for</span> <span class="ident">BufWriter</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Seek to the offset, in bytes, in the underlying writer.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Seeking always writes out the internal buffer before seeking.</span>
+    <span class="doccomment">/// Seek to the offset, in bytes, in the underlying writer.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Seeking always writes out the internal buffer before seeking.</span>
     <span class="kw">fn</span> <span class="ident">poll_seek</span>(
         <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
         <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,

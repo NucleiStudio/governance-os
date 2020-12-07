@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["governance_os_voting"] = [{"text":"impl&lt;AccountId, BlockNumber, C&gt; VotingHooks for VotingSystems&lt;C::Balance, C::CurrencyId, BlockNumber, C, AccountId&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;AccountId: Ord + Default + Clone,<br>&nbsp;&nbsp;&nbsp;&nbsp;C: ReservableCurrencies&lt;AccountId&gt; + Currencies&lt;AccountId&gt;,<br>&nbsp;&nbsp;&nbsp;&nbsp;C::Balance: Default,<br>&nbsp;&nbsp;&nbsp;&nbsp;BlockNumber: Default + Saturating + PartialOrd,&nbsp;</span>","synthetic":false,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

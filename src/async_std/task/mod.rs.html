@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/async-std-1.6.5/src/task/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/async-std-1.7.0/src/task/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
 <link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../async_std/index.html'><div class='logo-container'><img src='https://async.rs/images/logo--hero.svg' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
                 <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
@@ -178,124 +178,124 @@
 <span id="175">175</span>
 <span id="176">176</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="doccomment">//! Types and traits for working with asynchronous tasks.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This module is similar to [`std::thread`], except it uses asynchronous tasks in place of</span>
-<span class="doccomment">//! threads.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`std::thread`]: https://doc.rust-lang.org/std/thread</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## The task model</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! An executing asynchronous Rust program consists of a collection of native OS threads, on top of</span>
-<span class="doccomment">//! which multiple stackless coroutines are multiplexed. We refer to these as &quot;tasks&quot;.  Tasks can</span>
-<span class="doccomment">//! be named, and provide some built-in support for synchronization.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Communication between tasks can be done through channels, Rust&#39;s message-passing types, along</span>
-<span class="doccomment">//! with [other forms of tasks synchronization](../sync/index.html) and shared-memory data</span>
-<span class="doccomment">//! structures. In particular, types that are guaranteed to be threadsafe are easily shared between</span>
-<span class="doccomment">//! tasks using the atomically-reference-counted container, [`Arc`].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Fatal logic errors in Rust cause *thread panic*, during which a thread will unwind the stack,</span>
-<span class="doccomment">//! running destructors and freeing owned resources. If a panic occurs inside a task, there is no</span>
-<span class="doccomment">//! meaningful way of recovering, so the panic will propagate through any thread boundaries all the</span>
-<span class="doccomment">//! way to the root task. This is also known as a &quot;panic = abort&quot; model.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Spawning a task</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! A new task can be spawned using the [`task::spawn`][`spawn`] function:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```no_run</span>
-<span class="doccomment">//! use async_std::task;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! task::spawn(async {</span>
-<span class="doccomment">//!     // some work here</span>
-<span class="doccomment">//! });</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! In this example, the spawned task is &quot;detached&quot; from the current task. This means that it can</span>
-<span class="doccomment">//! outlive its parent (the task that spawned it), unless this parent is the root task.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The root task can also wait on the completion of the child task; a call to [`spawn`] produces a</span>
-<span class="doccomment">//! [`JoinHandle`], which implements `Future` and can be `await`ed:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! use async_std::task;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # async_std::task::block_on(async {</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! let child = task::spawn(async {</span>
-<span class="doccomment">//!     // some work here</span>
-<span class="doccomment">//! });</span>
-<span class="doccomment">//! // some work here</span>
-<span class="doccomment">//! let res = child.await;</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # })</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The `await` operator returns the final value produced by the child task.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Configuring tasks</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! A new task can be configured before it is spawned via the [`Builder`] type,</span>
-<span class="doccomment">//! which currently allows you to set the name for the child task:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # #![allow(unused_must_use)]</span>
-<span class="doccomment">//! use async_std::task;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # async_std::task::block_on(async {</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! task::Builder::new().name(&quot;child1&quot;.to_string()).spawn(async {</span>
-<span class="doccomment">//!     println!(&quot;Hello, world!&quot;);</span>
-<span class="doccomment">//! });</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # })</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## The `Task` type</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Tasks are represented via the [`Task`] type, which you can get in one of</span>
-<span class="doccomment">//! two ways:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! * By spawning a new task, e.g., using the [`task::spawn`][`spawn`]</span>
-<span class="doccomment">//!   function, and calling [`task`][`JoinHandle::task`] on the [`JoinHandle`].</span>
-<span class="doccomment">//! * By requesting the current task, using the [`task::current`] function.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Task-local storage</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This module also provides an implementation of task-local storage for Rust</span>
-<span class="doccomment">//! programs. Task-local storage is a method of storing data into a global</span>
-<span class="doccomment">//! variable that each task in the program will have its own copy of.</span>
-<span class="doccomment">//! Tasks do not share this data, so accesses do not need to be synchronized.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! A task-local key owns the value it contains and will destroy the value when the</span>
-<span class="doccomment">//! task exits. It is created with the [`task_local!`] macro and can contain any</span>
-<span class="doccomment">//! value that is `&#39;static` (no borrowed pointers). It provides an accessor function,</span>
-<span class="doccomment">//! [`with`], that yields a shared reference to the value to the specified</span>
-<span class="doccomment">//! closure. Task-local keys allow only shared access to values, as there would be no</span>
-<span class="doccomment">//! way to guarantee uniqueness if mutable borrows were allowed.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Naming tasks</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Tasks are able to have associated names for identification purposes. By default, spawned</span>
-<span class="doccomment">//! tasks are unnamed. To specify a name for a task, build the task with [`Builder`] and pass</span>
-<span class="doccomment">//! the desired task name to [`Builder::name`]. To retrieve the task name from within the</span>
-<span class="doccomment">//! task, use [`Task::name`].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`Arc`]: ../gsync/struct.Arc.html</span>
-<span class="doccomment">//! [`spawn`]: fn.spawn.html</span>
-<span class="doccomment">//! [`JoinHandle`]: struct.JoinHandle.html</span>
-<span class="doccomment">//! [`JoinHandle::task`]: struct.JoinHandle.html#method.task</span>
-<span class="doccomment">//! [`join`]: struct.JoinHandle.html#method.join</span>
-<span class="doccomment">//! [`panic!`]: https://doc.rust-lang.org/std/macro.panic.html</span>
-<span class="doccomment">//! [`Builder`]: struct.Builder.html</span>
-<span class="doccomment">//! [`Builder::name`]: struct.Builder.html#method.name</span>
-<span class="doccomment">//! [`task::current`]: fn.current.html</span>
-<span class="doccomment">//! [`Task`]: struct.Task.html</span>
-<span class="doccomment">//! [`Task::name`]: struct.Task.html#method.name</span>
-<span class="doccomment">//! [`task_local!`]: ../macro.task_local.html</span>
-<span class="doccomment">//! [`with`]: struct.LocalKey.html#method.with</span>
+<span class="doccomment">//! Types and traits for working with asynchronous tasks.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! This module is similar to [`std::thread`], except it uses asynchronous tasks in place of</span>
+<span class="doccomment">//! threads.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! [`std::thread`]: https://doc.rust-lang.org/std/thread</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## The task model</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! An executing asynchronous Rust program consists of a collection of native OS threads, on top of</span>
+<span class="doccomment">//! which multiple stackless coroutines are multiplexed. We refer to these as &quot;tasks&quot;.  Tasks can</span>
+<span class="doccomment">//! be named, and provide some built-in support for synchronization.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Communication between tasks can be done through channels, Rust&#39;s message-passing types, along</span>
+<span class="doccomment">//! with [other forms of tasks synchronization](../sync/index.html) and shared-memory data</span>
+<span class="doccomment">//! structures. In particular, types that are guaranteed to be threadsafe are easily shared between</span>
+<span class="doccomment">//! tasks using the atomically-reference-counted container, [`Arc`].</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Fatal logic errors in Rust cause *thread panic*, during which a thread will unwind the stack,</span>
+<span class="doccomment">//! running destructors and freeing owned resources. If a panic occurs inside a task, there is no</span>
+<span class="doccomment">//! meaningful way of recovering, so the panic will propagate through any thread boundaries all the</span>
+<span class="doccomment">//! way to the root task. This is also known as a &quot;panic = abort&quot; model.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Spawning a task</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! A new task can be spawned using the [`task::spawn`][`spawn`] function:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```no_run</span>
+<span class="doccomment">//! use async_std::task;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! task::spawn(async {</span>
+<span class="doccomment">//!     // some work here</span>
+<span class="doccomment">//! });</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! In this example, the spawned task is &quot;detached&quot; from the current task. This means that it can</span>
+<span class="doccomment">//! outlive its parent (the task that spawned it), unless this parent is the root task.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The root task can also wait on the completion of the child task; a call to [`spawn`] produces a</span>
+<span class="doccomment">//! [`JoinHandle`], which implements `Future` and can be `await`ed:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! use async_std::task;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # async_std::task::block_on(async {</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! let child = task::spawn(async {</span>
+<span class="doccomment">//!     // some work here</span>
+<span class="doccomment">//! });</span>
+<span class="doccomment">//! // some work here</span>
+<span class="doccomment">//! let res = child.await;</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! # })</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The `await` operator returns the final value produced by the child task.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Configuring tasks</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! A new task can be configured before it is spawned via the [`Builder`] type,</span>
+<span class="doccomment">//! which currently allows you to set the name for the child task:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! # #![allow(unused_must_use)]</span>
+<span class="doccomment">//! use async_std::task;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # async_std::task::block_on(async {</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! task::Builder::new().name(&quot;child1&quot;.to_string()).spawn(async {</span>
+<span class="doccomment">//!     println!(&quot;Hello, world!&quot;);</span>
+<span class="doccomment">//! });</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! # })</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## The `Task` type</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Tasks are represented via the [`Task`] type, which you can get in one of</span>
+<span class="doccomment">//! two ways:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! * By spawning a new task, e.g., using the [`task::spawn`][`spawn`]</span>
+<span class="doccomment">//!   function, and calling [`task`][`JoinHandle::task`] on the [`JoinHandle`].</span>
+<span class="doccomment">//! * By requesting the current task, using the [`task::current`] function.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Task-local storage</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! This module also provides an implementation of task-local storage for Rust</span>
+<span class="doccomment">//! programs. Task-local storage is a method of storing data into a global</span>
+<span class="doccomment">//! variable that each task in the program will have its own copy of.</span>
+<span class="doccomment">//! Tasks do not share this data, so accesses do not need to be synchronized.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! A task-local key owns the value it contains and will destroy the value when the</span>
+<span class="doccomment">//! task exits. It is created with the [`task_local!`] macro and can contain any</span>
+<span class="doccomment">//! value that is `&#39;static` (no borrowed pointers). It provides an accessor function,</span>
+<span class="doccomment">//! [`with`], that yields a shared reference to the value to the specified</span>
+<span class="doccomment">//! closure. Task-local keys allow only shared access to values, as there would be no</span>
+<span class="doccomment">//! way to guarantee uniqueness if mutable borrows were allowed.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Naming tasks</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Tasks are able to have associated names for identification purposes. By default, spawned</span>
+<span class="doccomment">//! tasks are unnamed. To specify a name for a task, build the task with [`Builder`] and pass</span>
+<span class="doccomment">//! the desired task name to [`Builder::name`]. To retrieve the task name from within the</span>
+<span class="doccomment">//! task, use [`Task::name`].</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! [`Arc`]: ../gsync/struct.Arc.html</span>
+<span class="doccomment">//! [`spawn`]: fn.spawn.html</span>
+<span class="doccomment">//! [`JoinHandle`]: struct.JoinHandle.html</span>
+<span class="doccomment">//! [`JoinHandle::task`]: struct.JoinHandle.html#method.task</span>
+<span class="doccomment">//! [`join`]: struct.JoinHandle.html#method.join</span>
+<span class="doccomment">//! [`panic!`]: https://doc.rust-lang.org/std/macro.panic.html</span>
+<span class="doccomment">//! [`Builder`]: struct.Builder.html</span>
+<span class="doccomment">//! [`Builder::name`]: struct.Builder.html#method.name</span>
+<span class="doccomment">//! [`task::current`]: fn.current.html</span>
+<span class="doccomment">//! [`Task`]: struct.Task.html</span>
+<span class="doccomment">//! [`Task::name`]: struct.Task.html#method.name</span>
+<span class="doccomment">//! [`task_local!`]: ../macro.task_local.html</span>
+<span class="doccomment">//! [`with`]: struct.LocalKey.html#method.with</span>
 
 <span class="macro">cfg_alloc</span><span class="macro">!</span> {
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>

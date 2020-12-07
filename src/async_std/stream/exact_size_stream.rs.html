@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/async-std-1.6.5/src/stream/exact_size_stream.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>exact_size_stream.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/async-std-1.7.0/src/stream/exact_size_stream.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>exact_size_stream.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
 <link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../async_std/index.html'><div class='logo-container'><img src='https://async.rs/images/logo--hero.svg' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
                 <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
@@ -124,114 +124,114 @@
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">stream</span>::<span class="ident">Stream</span>;
 
-<span class="doccomment">/// A stream that knows its exact length.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Many [`Stream`]s don&#39;t know how many times they will iterate, but some do.</span>
-<span class="doccomment">/// If a stream knows how many times it can iterate, providing access to</span>
-<span class="doccomment">/// that information can be useful. For example, if you want to iterate</span>
-<span class="doccomment">/// backwards, a good start is to know where the end is.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// When implementing an `ExactSizeStream`, you must also implement</span>
-<span class="doccomment">/// [`Stream`]. When doing so, the implementation of [`size_hint`] *must*</span>
-<span class="doccomment">/// return the exact size of the stream.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Stream`]: trait.Stream.html</span>
-<span class="doccomment">/// [`size_hint`]: trait.Stream.html#method.size_hint</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The [`len`] method has a default implementation, so you usually shouldn&#39;t</span>
-<span class="doccomment">/// implement it. However, you may be able to provide a more performant</span>
-<span class="doccomment">/// implementation than the default, so overriding it in this case makes sense.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`len`]: #method.len</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Basic usage:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// // a finite range knows exactly how many times it will iterate</span>
-<span class="doccomment">/// let five = 0..5;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(5, five.len());</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// In the [module level docs][moddocs], we implemented an [`Stream`],</span>
-<span class="doccomment">/// `Counter`. Let&#39;s implement `ExactSizeStream` for it as well:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [moddocs]: index.html</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use std::task::{Context, Poll};</span>
-<span class="doccomment">/// # use std::pin::Pin;</span>
-<span class="doccomment">/// # use async_std::prelude::*;</span>
-<span class="doccomment">/// # struct Counter {</span>
-<span class="doccomment">/// #     count: usize,</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// # impl Counter {</span>
-<span class="doccomment">/// #     fn new() -&gt; Counter {</span>
-<span class="doccomment">/// #         Counter { count: 0 }</span>
-<span class="doccomment">/// #     }</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// # impl Stream for Counter {</span>
-<span class="doccomment">/// #     type Item = usize;</span>
-<span class="doccomment">/// #     fn poll_next(mut self: Pin&lt;&amp;mut Self&gt;, _cx: &amp;mut Context&lt;&#39;_&gt;) -&gt; Poll&lt;Option&lt;Self::Item&gt;&gt; {</span>
-<span class="doccomment">/// #         self.count += 1;</span>
-<span class="doccomment">/// #         if self.count &lt; 6 {</span>
-<span class="doccomment">/// #             Poll::Ready(Some(self.count))</span>
-<span class="doccomment">/// #         } else {</span>
-<span class="doccomment">/// #             Poll::Ready(None)</span>
-<span class="doccomment">/// #         }</span>
-<span class="doccomment">/// #     }</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// # async_std::task::block_on(async {</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// impl ExactSizeStream for Counter {</span>
-<span class="doccomment">///     // We can easily calculate the remaining number of iterations.</span>
-<span class="doccomment">///     fn len(&amp;self) -&gt; usize {</span>
-<span class="doccomment">///         5 - self.count</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // And now we can use it!</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let counter = Counter::new();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(5, counter.len());</span>
-<span class="doccomment">/// # });</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">len_without_is_empty</span>)]</span> <span class="comment">// ExactSizeIterator::is_empty is unstable</span>
+<span class="doccomment">/// A stream that knows its exact length.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Many [`Stream`]s don&#39;t know how many times they will iterate, but some do.</span>
+<span class="doccomment">/// If a stream knows how many times it can iterate, providing access to</span>
+<span class="doccomment">/// that information can be useful. For example, if you want to iterate</span>
+<span class="doccomment">/// backwards, a good start is to know where the end is.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// When implementing an `ExactSizeStream`, you must also implement</span>
+<span class="doccomment">/// [`Stream`]. When doing so, the implementation of [`size_hint`] *must*</span>
+<span class="doccomment">/// return the exact size of the stream.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [`Stream`]: trait.Stream.html</span>
+<span class="doccomment">/// [`size_hint`]: trait.Stream.html#method.size_hint</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The [`len`] method has a default implementation, so you usually shouldn&#39;t</span>
+<span class="doccomment">/// implement it. However, you may be able to provide a more performant</span>
+<span class="doccomment">/// implementation than the default, so overriding it in this case makes sense.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [`len`]: #method.len</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Examples</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Basic usage:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// // a finite range knows exactly how many times it will iterate</span>
+<span class="doccomment">/// let five = 0..5;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// assert_eq!(5, five.len());</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// In the [module level docs][moddocs], we implemented an [`Stream`],</span>
+<span class="doccomment">/// `Counter`. Let&#39;s implement `ExactSizeStream` for it as well:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [moddocs]: index.html</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// # use std::task::{Context, Poll};</span>
+<span class="doccomment">/// # use std::pin::Pin;</span>
+<span class="doccomment">/// # use async_std::prelude::*;</span>
+<span class="doccomment">/// # struct Counter {</span>
+<span class="doccomment">/// #     count: usize,</span>
+<span class="doccomment">/// # }</span>
+<span class="doccomment">/// # impl Counter {</span>
+<span class="doccomment">/// #     fn new() -&gt; Counter {</span>
+<span class="doccomment">/// #         Counter { count: 0 }</span>
+<span class="doccomment">/// #     }</span>
+<span class="doccomment">/// # }</span>
+<span class="doccomment">/// # impl Stream for Counter {</span>
+<span class="doccomment">/// #     type Item = usize;</span>
+<span class="doccomment">/// #     fn poll_next(mut self: Pin&lt;&amp;mut Self&gt;, _cx: &amp;mut Context&lt;&#39;_&gt;) -&gt; Poll&lt;Option&lt;Self::Item&gt;&gt; {</span>
+<span class="doccomment">/// #         self.count += 1;</span>
+<span class="doccomment">/// #         if self.count &lt; 6 {</span>
+<span class="doccomment">/// #             Poll::Ready(Some(self.count))</span>
+<span class="doccomment">/// #         } else {</span>
+<span class="doccomment">/// #             Poll::Ready(None)</span>
+<span class="doccomment">/// #         }</span>
+<span class="doccomment">/// #     }</span>
+<span class="doccomment">/// # }</span>
+<span class="doccomment">/// # async_std::task::block_on(async {</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// impl ExactSizeStream for Counter {</span>
+<span class="doccomment">///     // We can easily calculate the remaining number of iterations.</span>
+<span class="doccomment">///     fn len(&amp;self) -&gt; usize {</span>
+<span class="doccomment">///         5 - self.count</span>
+<span class="doccomment">///     }</span>
+<span class="doccomment">/// }</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// // And now we can use it!</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let counter = Counter::new();</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// assert_eq!(5, counter.len());</span>
+<span class="doccomment">/// # });</span>
+<span class="doccomment">/// ```</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">len_without_is_empty</span>)]</span> <span class="comment">// ExactSizeIterator::is_empty is unstable</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">unstable</span>)))]</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ExactSizeStream</span>: <span class="ident">Stream</span> {
-    <span class="doccomment">/// Returns the exact number of times the stream will iterate.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method has a default implementation, so you usually should not</span>
-    <span class="doccomment">/// implement it directly. However, if you can provide a more efficient</span>
-    <span class="doccomment">/// implementation, you can do so. See the [trait-level] docs for an</span>
-    <span class="doccomment">/// example.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function has the same safety guarantees as the [`size_hint`]</span>
-    <span class="doccomment">/// function.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [trait-level]: trait.ExactSizeStream.html</span>
-    <span class="doccomment">/// [`size_hint`]: trait.Stream.html#method.size_hint</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Basic usage:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// // a finite range knows exactly how many times it will iterate</span>
-    <span class="doccomment">/// let five = 0..5;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(5, five.len());</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Returns the exact number of times the stream will iterate.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This method has a default implementation, so you usually should not</span>
+    <span class="doccomment">/// implement it directly. However, if you can provide a more efficient</span>
+    <span class="doccomment">/// implementation, you can do so. See the [trait-level] docs for an</span>
+    <span class="doccomment">/// example.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This function has the same safety guarantees as the [`size_hint`]</span>
+    <span class="doccomment">/// function.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [trait-level]: trait.ExactSizeStream.html</span>
+    <span class="doccomment">/// [`size_hint`]: trait.Stream.html#method.size_hint</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Basic usage:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// // a finite range knows exactly how many times it will iterate</span>
+    <span class="doccomment">/// let five = 0..5;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(5, five.len());</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
         <span class="kw">let</span> (<span class="ident">lower</span>, <span class="ident">upper</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">size_hint</span>();
-        <span class="comment">// Note: This assertion is overly defensive, but it checks the invariant</span>
-        <span class="comment">// guaranteed by the trait. If this trait were rust-internal,</span>
-        <span class="comment">// we could use debug_assert!; assert_eq! will check all Rust user</span>
-        <span class="comment">// implementations too.</span>
+        <span class="comment">// Note: This assertion is overly defensive, but it checks the invariant</span>
+        <span class="comment">// guaranteed by the trait. If this trait were rust-internal,</span>
+        <span class="comment">// we could use debug_assert!; assert_eq! will check all Rust user</span>
+        <span class="comment">// implementations too.</span>
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">upper</span>, <span class="prelude-val">Some</span>(<span class="ident">lower</span>));
         <span class="ident">lower</span>
     }

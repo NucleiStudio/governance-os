@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/async-std-1.6.5/src/net/tcp/listener.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>listener.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script src="../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/async-std-1.7.0/src/net/tcp/listener.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>listener.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script src="../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png">
 <link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../../async_std/index.html'><div class='logo-container'><img src='https://async.rs/images/logo--hero.svg' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
                 <a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
@@ -290,70 +290,70 @@
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">sync</span>::<span class="ident">Arc</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">task</span>::{<span class="ident">ready</span>, <span class="ident">Context</span>, <span class="ident">Poll</span>};
 
-<span class="doccomment">/// A TCP socket server, listening for connections.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// After creating a `TcpListener` by [`bind`]ing it to a socket address, it listens for incoming</span>
-<span class="doccomment">/// TCP connections. These can be accepted by awaiting elements from the async stream of</span>
-<span class="doccomment">/// [`incoming`] connections.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The socket will be closed when the value is dropped.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The Transmission Control Protocol is specified in [IETF RFC 793].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This type is an async version of [`std::net::TcpListener`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`bind`]: #method.bind</span>
-<span class="doccomment">/// [`incoming`]: #method.incoming</span>
-<span class="doccomment">/// [IETF RFC 793]: https://tools.ietf.org/html/rfc793</span>
-<span class="doccomment">/// [`std::net::TcpListener`]: https://doc.rust-lang.org/std/net/struct.TcpListener.html</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```no_run</span>
-<span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// use async_std::io;</span>
-<span class="doccomment">/// use async_std::net::TcpListener;</span>
-<span class="doccomment">/// use async_std::prelude::*;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let listener = TcpListener::bind(&quot;127.0.0.1:8080&quot;).await?;</span>
-<span class="doccomment">/// let mut incoming = listener.incoming();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// while let Some(stream) = incoming.next().await {</span>
-<span class="doccomment">///     let stream = stream?;</span>
-<span class="doccomment">///     let (reader, writer) = &amp;mut (&amp;stream, &amp;stream);</span>
-<span class="doccomment">///     io::copy(reader, writer).await?;</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # Ok(()) }) }</span>
-<span class="doccomment">/// ```</span>
+<span class="doccomment">/// A TCP socket server, listening for connections.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// After creating a `TcpListener` by [`bind`]ing it to a socket address, it listens for incoming</span>
+<span class="doccomment">/// TCP connections. These can be accepted by awaiting elements from the async stream of</span>
+<span class="doccomment">/// [`incoming`] connections.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The socket will be closed when the value is dropped.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The Transmission Control Protocol is specified in [IETF RFC 793].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This type is an async version of [`std::net::TcpListener`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [`bind`]: #method.bind</span>
+<span class="doccomment">/// [`incoming`]: #method.incoming</span>
+<span class="doccomment">/// [IETF RFC 793]: https://tools.ietf.org/html/rfc793</span>
+<span class="doccomment">/// [`std::net::TcpListener`]: https://doc.rust-lang.org/std/net/struct.TcpListener.html</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Examples</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```no_run</span>
+<span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// use async_std::io;</span>
+<span class="doccomment">/// use async_std::net::TcpListener;</span>
+<span class="doccomment">/// use async_std::prelude::*;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let listener = TcpListener::bind(&quot;127.0.0.1:8080&quot;).await?;</span>
+<span class="doccomment">/// let mut incoming = listener.incoming();</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// while let Some(stream) = incoming.next().await {</span>
+<span class="doccomment">///     let stream = stream?;</span>
+<span class="doccomment">///     let (reader, writer) = &amp;mut (&amp;stream, &amp;stream);</span>
+<span class="doccomment">///     io::copy(reader, writer).await?;</span>
+<span class="doccomment">/// }</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// # Ok(()) }) }</span>
+<span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TcpListener</span> {
     <span class="ident">watcher</span>: <span class="ident">Async</span><span class="op">&lt;</span><span class="ident">std</span>::<span class="ident">net</span>::<span class="ident">TcpListener</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">TcpListener</span> {
-    <span class="doccomment">/// Creates a new `TcpListener` which will be bound to the specified address.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The returned listener is ready for accepting connections.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Binding with a port number of 0 will request that the OS assigns a port to this listener.</span>
-    <span class="doccomment">/// The port allocated can be queried via the [`local_addr`] method.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">/// Create a TCP listener bound to 127.0.0.1:0:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::net::TcpListener;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let listener = TcpListener::bind(&quot;127.0.0.1:0&quot;).await?;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # Ok(()) }) }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`local_addr`]: #method.local_addr</span>
+    <span class="doccomment">/// Creates a new `TcpListener` which will be bound to the specified address.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The returned listener is ready for accepting connections.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Binding with a port number of 0 will request that the OS assigns a port to this listener.</span>
+    <span class="doccomment">/// The port allocated can be queried via the [`local_addr`] method.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">/// Create a TCP listener bound to 127.0.0.1:0:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```no_run</span>
+    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::net::TcpListener;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let listener = TcpListener::bind(&quot;127.0.0.1:0&quot;).await?;</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # Ok(()) }) }</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`local_addr`]: #method.local_addr</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">bind</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">ToSocketAddrs</span><span class="op">&gt;</span>(<span class="ident">addrs</span>: <span class="ident">A</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TcpListener</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">last_err</span> <span class="op">=</span> <span class="prelude-val">None</span>;
         <span class="kw">let</span> <span class="ident">addrs</span> <span class="op">=</span> <span class="ident">addrs</span>.<span class="ident">to_socket_addrs</span>().<span class="ident">await</span><span class="question-mark">?</span>;
@@ -375,22 +375,22 @@
         }))
     }
 
-    <span class="doccomment">/// Accepts a new incoming connection to this listener.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When a connection is established, the corresponding stream and address will be returned.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::net::TcpListener;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let listener = TcpListener::bind(&quot;127.0.0.1:0&quot;).await?;</span>
-    <span class="doccomment">/// let (stream, addr) = listener.accept().await?;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # Ok(()) }) }</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Accepts a new incoming connection to this listener.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// When a connection is established, the corresponding stream and address will be returned.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ## Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```no_run</span>
+    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::net::TcpListener;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let listener = TcpListener::bind(&quot;127.0.0.1:0&quot;).await?;</span>
+    <span class="doccomment">/// let (stream, addr) = listener.accept().await?;</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # Ok(()) }) }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">accept</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">TcpStream</span>, <span class="ident">SocketAddr</span>)<span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">stream</span>, <span class="ident">addr</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">watcher</span>.<span class="ident">accept</span>().<span class="ident">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">TcpStream</span> {
@@ -399,32 +399,32 @@
         <span class="prelude-val">Ok</span>((<span class="ident">stream</span>, <span class="ident">addr</span>))
     }
 
-    <span class="doccomment">/// Returns a stream of incoming connections.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Iterating over this stream is equivalent to calling [`accept`] in a loop. The stream of</span>
-    <span class="doccomment">/// connections is infinite, i.e awaiting the next connection will never result in [`None`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`accept`]: #method.accept</span>
-    <span class="doccomment">/// [`None`]: https://doc.rust-lang.org/std/option/enum.Option.html#variant.None</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::net::TcpListener;</span>
-    <span class="doccomment">/// use async_std::prelude::*;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let listener = TcpListener::bind(&quot;127.0.0.1:0&quot;).await?;</span>
-    <span class="doccomment">/// let mut incoming = listener.incoming();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// while let Some(stream) = incoming.next().await {</span>
-    <span class="doccomment">///     let mut stream = stream?;</span>
-    <span class="doccomment">///     stream.write_all(b&quot;hello world&quot;).await?;</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # Ok(()) }) }</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Returns a stream of incoming connections.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Iterating over this stream is equivalent to calling [`accept`] in a loop. The stream of</span>
+    <span class="doccomment">/// connections is infinite, i.e awaiting the next connection will never result in [`None`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`accept`]: #method.accept</span>
+    <span class="doccomment">/// [`None`]: https://doc.rust-lang.org/std/option/enum.Option.html#variant.None</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ## Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```no_run</span>
+    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::net::TcpListener;</span>
+    <span class="doccomment">/// use async_std::prelude::*;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let listener = TcpListener::bind(&quot;127.0.0.1:0&quot;).await?;</span>
+    <span class="doccomment">/// let mut incoming = listener.incoming();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// while let Some(stream) = incoming.next().await {</span>
+    <span class="doccomment">///     let mut stream = stream?;</span>
+    <span class="doccomment">///     stream.write_all(b&quot;hello world&quot;).await?;</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # Ok(()) }) }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">incoming</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Incoming</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="ident">Incoming</span> {
             <span class="ident">listener</span>: <span class="self">self</span>,
@@ -432,39 +432,39 @@
         }
     }
 
-    <span class="doccomment">/// Returns the local address that this listener is bound to.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This can be useful, for example, to identify when binding to port 0 which port was assigned</span>
-    <span class="doccomment">/// by the OS.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::net::TcpListener;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let listener = TcpListener::bind(&quot;127.0.0.1:8080&quot;).await?;</span>
-    <span class="doccomment">/// let addr = listener.local_addr()?;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # Ok(()) }) }</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Returns the local address that this listener is bound to.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This can be useful, for example, to identify when binding to port 0 which port was assigned</span>
+    <span class="doccomment">/// by the OS.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```no_run</span>
+    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::net::TcpListener;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let listener = TcpListener::bind(&quot;127.0.0.1:8080&quot;).await?;</span>
+    <span class="doccomment">/// let addr = listener.local_addr()?;</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # Ok(()) }) }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">local_addr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">watcher</span>.<span class="ident">get_ref</span>().<span class="ident">local_addr</span>()
     }
 }
 
-<span class="doccomment">/// A stream of incoming TCP connections.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This stream is infinite, i.e awaiting the next connection will never result in [`None`]. It is</span>
-<span class="doccomment">/// created by the [`incoming`] method on [`TcpListener`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This type is an async version of [`std::net::Incoming`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`None`]: https://doc.rust-lang.org/std/option/enum.Option.html#variant.None</span>
-<span class="doccomment">/// [`incoming`]: struct.TcpListener.html#method.incoming</span>
-<span class="doccomment">/// [`TcpListener`]: struct.TcpListener.html</span>
-<span class="doccomment">/// [`std::net::Incoming`]: https://doc.rust-lang.org/std/net/struct.Incoming.html</span>
+<span class="doccomment">/// A stream of incoming TCP connections.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This stream is infinite, i.e awaiting the next connection will never result in [`None`]. It is</span>
+<span class="doccomment">/// created by the [`incoming`] method on [`TcpListener`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This type is an async version of [`std::net::Incoming`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [`None`]: https://doc.rust-lang.org/std/option/enum.Option.html#variant.None</span>
+<span class="doccomment">/// [`incoming`]: struct.TcpListener.html#method.incoming</span>
+<span class="doccomment">/// [`TcpListener`]: struct.TcpListener.html</span>
+<span class="doccomment">/// [`std::net::Incoming`]: https://doc.rust-lang.org/std/net/struct.Incoming.html</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Incoming</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="ident">listener</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TcpListener</span>,
     <span class="ident">accept</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>
@@ -499,7 +499,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">std</span>::<span class="ident">net</span>::<span class="ident">TcpListener</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TcpListener</span> {
-    <span class="doccomment">/// Converts a `std::net::TcpListener` into its asynchronous equivalent.</span>
+    <span class="doccomment">/// Converts a `std::net::TcpListener` into its asynchronous equivalent.</span>
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">listener</span>: <span class="ident">std</span>::<span class="ident">net</span>::<span class="ident">TcpListener</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TcpListener</span> {
         <span class="ident">TcpListener</span> {
             <span class="ident">watcher</span>: <span class="ident">Async</span>::<span class="ident">new</span>(<span class="ident">listener</span>).<span class="ident">expect</span>(<span class="string">&quot;TcpListener is known to be good&quot;</span>),

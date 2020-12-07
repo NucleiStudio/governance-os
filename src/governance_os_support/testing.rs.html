@@ -206,8 +206,6 @@
 <span id="203">203</span>
 <span id="204">204</span>
 <span id="205">205</span>
-<span id="206">206</span>
-<span id="207">207</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">/*
  * Copyright 2020 Nuclei Studio OÜ
@@ -249,6 +247,7 @@
     <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">AccountId</span> <span class="op">=</span> <span class="ident">u128</span>;
     <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Balance</span> <span class="op">=</span> <span class="ident">u64</span>;
     <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">CurrencyId</span> <span class="op">=</span> <span class="ident">u8</span>;
+    <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">BlockNumber</span> <span class="op">=</span> <span class="ident">u64</span>;
 }
 
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
@@ -267,10 +266,9 @@
         <span class="kw">use</span> <span class="ident">codec</span>::{<span class="ident">Decode</span>, <span class="ident">Encode</span>};
         <span class="kw">use</span> <span class="ident">frame_support</span>::{<span class="ident">impl_outer_dispatch</span>, <span class="ident">impl_outer_origin</span>, <span class="ident">parameter_types</span>};
         <span class="kw">use</span> <span class="ident">governance_os_support</span>::{
-            <span class="ident">acl</span>::<span class="ident">Role</span>,
             <span class="ident">impl_enum_default</span>,
             <span class="ident">testing</span>::{
-                <span class="ident">primitives</span>::{<span class="ident">AccountId</span>, <span class="ident">CurrencyId</span>},
+                <span class="ident">primitives</span>::{<span class="ident">AccountId</span>, <span class="ident">BlockNumber</span>, <span class="ident">CurrencyId</span>},
                 <span class="ident">AvailableBlockRatio</span>, <span class="ident">BlockHashCount</span>, <span class="ident">MaximumBlockLength</span>, <span class="ident">MaximumBlockWeight</span>, <span class="ident">ROOT</span>,
             },
         };
@@ -300,7 +298,7 @@
             <span class="kw">type</span> <span class="ident">Origin</span> <span class="op">=</span> <span class="ident">Origin</span>;
             <span class="kw">type</span> <span class="ident">Call</span> <span class="op">=</span> <span class="ident">Call</span>;
             <span class="kw">type</span> <span class="ident">Index</span> <span class="op">=</span> <span class="ident">u64</span>;
-            <span class="kw">type</span> <span class="ident">BlockNumber</span> <span class="op">=</span> <span class="ident">u64</span>;
+            <span class="kw">type</span> <span class="ident">BlockNumber</span> <span class="op">=</span> <span class="ident">BlockNumber</span>;
             <span class="kw">type</span> <span class="ident">Hash</span> <span class="op">=</span> <span class="ident">H256</span>;
             <span class="kw">type</span> <span class="ident">Hashing</span> <span class="op">=</span> <span class="ident">BlakeTwo256</span>;
             <span class="kw">type</span> <span class="ident">AccountId</span> <span class="op">=</span> <span class="ident">AccountId</span>;
@@ -344,9 +342,7 @@
             <span class="ident">ManageCurrency</span>(<span class="ident">CurrencyId</span>),
             <span class="ident">CreateOrganizations</span>,
             <span class="ident">ApplyAsOrganization</span>(<span class="ident">AccountId</span>),
-            <span class="ident">ManageOrganization</span>(<span class="ident">AccountId</span>),
         }
-        <span class="kw">impl</span> <span class="ident">Role</span> <span class="kw">for</span> <span class="ident">MockRoles</span> {}
         <span class="macro">impl_enum_default</span><span class="macro">!</span>(<span class="ident">MockRoles</span>, <span class="ident">RemarkOnly</span>);
         <span class="kw">impl</span> <span class="ident">governance_os_pallet_bylaws</span>::<span class="ident">RoleBuilder</span> <span class="kw">for</span> <span class="ident">MockRoles</span> {
             <span class="kw">type</span> <span class="ident">Role</span> <span class="op">=</span> <span class="ident">MockRoles</span>;

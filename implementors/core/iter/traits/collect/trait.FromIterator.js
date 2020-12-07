@@ -25,7 +25,7 @@ implementors["serde_json"] = [{"text":"impl FromIterator&lt;(String, Value)&gt; 
 implementors["smallvec"] = [{"text":"impl&lt;A:&nbsp;Array&gt; FromIterator&lt;&lt;A as Array&gt;::Item&gt; for SmallVec&lt;A&gt;","synthetic":false,"types":[]}];
 implementors["sp_state_machine"] = [{"text":"impl FromIterator&lt;(Vec&lt;u8&gt;, Vec&lt;u8&gt;)&gt; for BasicExternalities","synthetic":false,"types":[]}];
 implementors["syn"] = [{"text":"impl&lt;T, P&gt; FromIterator&lt;T&gt; for Punctuated&lt;T, P&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;P: Default,&nbsp;</span>","synthetic":false,"types":[]},{"text":"impl&lt;T, P&gt; FromIterator&lt;Pair&lt;T, P&gt;&gt; for Punctuated&lt;T, P&gt;","synthetic":false,"types":[]}];
-implementors["tinyvec"] = [{"text":"impl&lt;A:&nbsp;Array + Default&gt; FromIterator&lt;&lt;A as Array&gt;::Item&gt; for ArrayVec&lt;A&gt;","synthetic":false,"types":[]},{"text":"impl&lt;A:&nbsp;Array + Default&gt; FromIterator&lt;&lt;A as Array&gt;::Item&gt; for TinyVec&lt;A&gt;","synthetic":false,"types":[]}];
+implementors["tinyvec"] = [{"text":"impl&lt;A:&nbsp;Array&gt; FromIterator&lt;&lt;A as Array&gt;::Item&gt; for ArrayVec&lt;A&gt;","synthetic":false,"types":[]},{"text":"impl&lt;A:&nbsp;Array&gt; FromIterator&lt;&lt;A as Array&gt;::Item&gt; for TinyVec&lt;A&gt;","synthetic":false,"types":[]}];
 implementors["toml"] = [{"text":"impl FromIterator&lt;(String, Value)&gt; for Map&lt;String, Value&gt;","synthetic":false,"types":[]}];
 implementors["vec_arena"] = [{"text":"impl&lt;T&gt; FromIterator&lt;T&gt; for Arena&lt;T&gt;","synthetic":false,"types":[]}];
 implementors["vec_map"] = [{"text":"impl&lt;V&gt; FromIterator&lt;(usize, V)&gt; for VecMap&lt;V&gt;","synthetic":false,"types":[]}];

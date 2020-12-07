@@ -23,5 +23,6 @@ implementors["sp_runtime"] = [{"text":"impl TryFrom&lt;MultiSignature&gt; for Si
 implementors["sp_wasm_interface"] = [{"text":"impl TryFrom&lt;u8&gt; for ValueType","synthetic":false,"types":[]}];
 implementors["tokio"] = [{"text":"impl TryFrom&lt;TcpListener&gt; for TcpListener","synthetic":false,"types":[]},{"text":"impl TryFrom&lt;TcpListener&gt; for TcpListener","synthetic":false,"types":[]},{"text":"impl TryFrom&lt;TcpStream&gt; for TcpStream","synthetic":false,"types":[]},{"text":"impl TryFrom&lt;TcpStream&gt; for TcpStream","synthetic":false,"types":[]}];
 implementors["trie_db"] = [{"text":"impl&lt;'a, HO&gt; TryFrom&lt;NodeHandle&lt;'a&gt;&gt; for ChildReference&lt;HO&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;HO: AsRef&lt;[u8]&gt; + AsMut&lt;[u8]&gt; + Default + Clone + Copy,&nbsp;</span>","synthetic":false,"types":[]}];
+implementors["url"] = [{"text":"impl&lt;'a&gt; TryFrom&lt;&amp;'a str&gt; for Url","synthetic":false,"types":[]}];
 implementors["wasmtime_runtime"] = [{"text":"impl TryFrom&lt;TableElement&gt; for *mut VMCallerCheckedAnyfunc","synthetic":false,"types":[]},{"text":"impl TryFrom&lt;TableElement&gt; for Option&lt;VMExternRef&gt;","synthetic":false,"types":[]}];
 if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

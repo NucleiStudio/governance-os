@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/async-std-1.6.5/src/fs/open_options.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>open_options.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/async-std-1.7.0/src/fs/open_options.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>open_options.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
 <link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../async_std/index.html'><div class='logo-container'><img src='https://async.rs/images/logo--hero.svg' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
                 <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
@@ -323,282 +323,282 @@
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">path</span>::<span class="ident">Path</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">task</span>::<span class="ident">spawn_blocking</span>;
 
-<span class="doccomment">/// A builder for opening files with configurable options.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Files can be opened in [`read`] and/or [`write`] mode.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The [`append`] option opens files in a special writing mode that moves the file cursor to the</span>
-<span class="doccomment">/// end of file before every write operation.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It is also possible to [`truncate`] the file right after opening, to [`create`] a file if it</span>
-<span class="doccomment">/// doesn&#39;t exist yet, or to always create a new file with [`create_new`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This type is an async version of [`std::fs::OpenOptions`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`read`]: #method.read</span>
-<span class="doccomment">/// [`write`]: #method.write</span>
-<span class="doccomment">/// [`append`]: #method.append</span>
-<span class="doccomment">/// [`truncate`]: #method.truncate</span>
-<span class="doccomment">/// [`create`]: #method.create</span>
-<span class="doccomment">/// [`create_new`]: #method.create_new</span>
-<span class="doccomment">/// [`std::fs::OpenOptions`]: https://doc.rust-lang.org/std/fs/struct.OpenOptions.html</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Open a file for reading:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```no_run</span>
-<span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// use async_std::fs::OpenOptions;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let file = OpenOptions::new()</span>
-<span class="doccomment">///     .read(true)</span>
-<span class="doccomment">///     .open(&quot;a.txt&quot;)</span>
-<span class="doccomment">///     .await?;</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # Ok(()) }) }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Open a file for both reading and writing, and create it if it doesn&#39;t exist yet:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```no_run</span>
-<span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// use async_std::fs::OpenOptions;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let file = OpenOptions::new()</span>
-<span class="doccomment">///     .read(true)</span>
-<span class="doccomment">///     .write(true)</span>
-<span class="doccomment">///     .create(true)</span>
-<span class="doccomment">///     .open(&quot;a.txt&quot;)</span>
-<span class="doccomment">///     .await?;</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # Ok(()) }) }</span>
-<span class="doccomment">/// ```</span>
+<span class="doccomment">/// A builder for opening files with configurable options.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Files can be opened in [`read`] and/or [`write`] mode.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The [`append`] option opens files in a special writing mode that moves the file cursor to the</span>
+<span class="doccomment">/// end of file before every write operation.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// It is also possible to [`truncate`] the file right after opening, to [`create`] a file if it</span>
+<span class="doccomment">/// doesn&#39;t exist yet, or to always create a new file with [`create_new`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This type is an async version of [`std::fs::OpenOptions`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [`read`]: #method.read</span>
+<span class="doccomment">/// [`write`]: #method.write</span>
+<span class="doccomment">/// [`append`]: #method.append</span>
+<span class="doccomment">/// [`truncate`]: #method.truncate</span>
+<span class="doccomment">/// [`create`]: #method.create</span>
+<span class="doccomment">/// [`create_new`]: #method.create_new</span>
+<span class="doccomment">/// [`std::fs::OpenOptions`]: https://doc.rust-lang.org/std/fs/struct.OpenOptions.html</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Examples</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Open a file for reading:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```no_run</span>
+<span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// use async_std::fs::OpenOptions;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let file = OpenOptions::new()</span>
+<span class="doccomment">///     .read(true)</span>
+<span class="doccomment">///     .open(&quot;a.txt&quot;)</span>
+<span class="doccomment">///     .await?;</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// # Ok(()) }) }</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Open a file for both reading and writing, and create it if it doesn&#39;t exist yet:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```no_run</span>
+<span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// use async_std::fs::OpenOptions;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let file = OpenOptions::new()</span>
+<span class="doccomment">///     .read(true)</span>
+<span class="doccomment">///     .write(true)</span>
+<span class="doccomment">///     .create(true)</span>
+<span class="doccomment">///     .open(&quot;a.txt&quot;)</span>
+<span class="doccomment">///     .await?;</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// # Ok(()) }) }</span>
+<span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OpenOptions</span>(<span class="ident">std</span>::<span class="ident">fs</span>::<span class="ident">OpenOptions</span>);
 
 <span class="kw">impl</span> <span class="ident">OpenOptions</span> {
-    <span class="doccomment">/// Creates a blank set of options.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// All options are initially set to `false`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::fs::OpenOptions;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let file = OpenOptions::new()</span>
-    <span class="doccomment">///     .read(true)</span>
-    <span class="doccomment">///     .open(&quot;a.txt&quot;)</span>
-    <span class="doccomment">///     .await?;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # Ok(()) }) }</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Creates a blank set of options.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// All options are initially set to `false`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```no_run</span>
+    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::fs::OpenOptions;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let file = OpenOptions::new()</span>
+    <span class="doccomment">///     .read(true)</span>
+    <span class="doccomment">///     .open(&quot;a.txt&quot;)</span>
+    <span class="doccomment">///     .await?;</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # Ok(()) }) }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OpenOptions</span> {
         <span class="ident">OpenOptions</span>(<span class="ident">std</span>::<span class="ident">fs</span>::<span class="ident">OpenOptions</span>::<span class="ident">new</span>())
     }
 
-    <span class="doccomment">/// Configures the option for read mode.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When set to `true`, this option means the file will be readable after opening.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::fs::OpenOptions;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let file = OpenOptions::new()</span>
-    <span class="doccomment">///     .read(true)</span>
-    <span class="doccomment">///     .open(&quot;a.txt&quot;)</span>
-    <span class="doccomment">///     .await?;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # Ok(()) }) }</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Configures the option for read mode.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// When set to `true`, this option means the file will be readable after opening.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```no_run</span>
+    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::fs::OpenOptions;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let file = OpenOptions::new()</span>
+    <span class="doccomment">///     .read(true)</span>
+    <span class="doccomment">///     .open(&quot;a.txt&quot;)</span>
+    <span class="doccomment">///     .await?;</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # Ok(()) }) }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">read</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">OpenOptions</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">read</span>(<span class="ident">read</span>);
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Configures the option for write mode.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When set to `true`, this option means the file will be writable after opening.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the file already exists, write calls on it will overwrite the previous contents without</span>
-    <span class="doccomment">/// truncating it.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::fs::OpenOptions;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let file = OpenOptions::new()</span>
-    <span class="doccomment">///     .write(true)</span>
-    <span class="doccomment">///     .open(&quot;a.txt&quot;)</span>
-    <span class="doccomment">///     .await?;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # Ok(()) }) }</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Configures the option for write mode.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// When set to `true`, this option means the file will be writable after opening.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If the file already exists, write calls on it will overwrite the previous contents without</span>
+    <span class="doccomment">/// truncating it.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```no_run</span>
+    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::fs::OpenOptions;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let file = OpenOptions::new()</span>
+    <span class="doccomment">///     .write(true)</span>
+    <span class="doccomment">///     .open(&quot;a.txt&quot;)</span>
+    <span class="doccomment">///     .await?;</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # Ok(()) }) }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">write</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">OpenOptions</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">write</span>(<span class="ident">write</span>);
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Configures the option for append mode.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When set to `true`, this option means the file will be writable after opening and the file</span>
-    <span class="doccomment">/// cursor will be moved to the end of file before every write operaiton.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::fs::OpenOptions;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let file = OpenOptions::new()</span>
-    <span class="doccomment">///     .append(true)</span>
-    <span class="doccomment">///     .open(&quot;a.txt&quot;)</span>
-    <span class="doccomment">///     .await?;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # Ok(()) }) }</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Configures the option for append mode.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// When set to `true`, this option means the file will be writable after opening and the file</span>
+    <span class="doccomment">/// cursor will be moved to the end of file before every write operaiton.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```no_run</span>
+    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::fs::OpenOptions;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let file = OpenOptions::new()</span>
+    <span class="doccomment">///     .append(true)</span>
+    <span class="doccomment">///     .open(&quot;a.txt&quot;)</span>
+    <span class="doccomment">///     .await?;</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # Ok(()) }) }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">append</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">append</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">OpenOptions</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">append</span>(<span class="ident">append</span>);
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Configures the option for truncating the previous file.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When set to `true`, the file will be truncated to the length of 0 bytes.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The file must be opened in [`write`] or [`append`] mode for truncation to work.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`write`]: #method.write</span>
-    <span class="doccomment">/// [`append`]: #method.append</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::fs::OpenOptions;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let file = OpenOptions::new()</span>
-    <span class="doccomment">///     .write(true)</span>
-    <span class="doccomment">///     .truncate(true)</span>
-    <span class="doccomment">///     .open(&quot;a.txt&quot;)</span>
-    <span class="doccomment">///     .await?;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # Ok(()) }) }</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Configures the option for truncating the previous file.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// When set to `true`, the file will be truncated to the length of 0 bytes.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The file must be opened in [`write`] or [`append`] mode for truncation to work.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`write`]: #method.write</span>
+    <span class="doccomment">/// [`append`]: #method.append</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```no_run</span>
+    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::fs::OpenOptions;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let file = OpenOptions::new()</span>
+    <span class="doccomment">///     .write(true)</span>
+    <span class="doccomment">///     .truncate(true)</span>
+    <span class="doccomment">///     .open(&quot;a.txt&quot;)</span>
+    <span class="doccomment">///     .await?;</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # Ok(()) }) }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">truncate</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">truncate</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">OpenOptions</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">truncate</span>(<span class="ident">truncate</span>);
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Configures the option for creating a new file if it doesn&#39;t exist.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When set to `true`, this option means a new file will be created if it doesn&#39;t exist.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The file must be opened in [`write`] or [`append`] mode for file creation to work.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`write`]: #method.write</span>
-    <span class="doccomment">/// [`append`]: #method.append</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::fs::OpenOptions;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let file = OpenOptions::new()</span>
-    <span class="doccomment">///     .write(true)</span>
-    <span class="doccomment">///     .create(true)</span>
-    <span class="doccomment">///     .open(&quot;a.txt&quot;)</span>
-    <span class="doccomment">///     .await?;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # Ok(()) }) }</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Configures the option for creating a new file if it doesn&#39;t exist.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// When set to `true`, this option means a new file will be created if it doesn&#39;t exist.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The file must be opened in [`write`] or [`append`] mode for file creation to work.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`write`]: #method.write</span>
+    <span class="doccomment">/// [`append`]: #method.append</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```no_run</span>
+    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::fs::OpenOptions;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let file = OpenOptions::new()</span>
+    <span class="doccomment">///     .write(true)</span>
+    <span class="doccomment">///     .create(true)</span>
+    <span class="doccomment">///     .open(&quot;a.txt&quot;)</span>
+    <span class="doccomment">///     .await?;</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # Ok(()) }) }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">create</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">OpenOptions</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">create</span>(<span class="ident">create</span>);
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Configures the option for creating a new file or failing if it already exists.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When set to `true`, this option means a new file will be created, or the open operation</span>
-    <span class="doccomment">/// will fail if the file already exists.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The file must be opened in [`write`] or [`append`] mode for file creation to work.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`write`]: #method.write</span>
-    <span class="doccomment">/// [`append`]: #method.append</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::fs::OpenOptions;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let file = OpenOptions::new()</span>
-    <span class="doccomment">///     .write(true)</span>
-    <span class="doccomment">///     .create_new(true)</span>
-    <span class="doccomment">///     .open(&quot;a.txt&quot;)</span>
-    <span class="doccomment">///     .await?;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # Ok(()) }) }</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Configures the option for creating a new file or failing if it already exists.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// When set to `true`, this option means a new file will be created, or the open operation</span>
+    <span class="doccomment">/// will fail if the file already exists.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The file must be opened in [`write`] or [`append`] mode for file creation to work.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`write`]: #method.write</span>
+    <span class="doccomment">/// [`append`]: #method.append</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```no_run</span>
+    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::fs::OpenOptions;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let file = OpenOptions::new()</span>
+    <span class="doccomment">///     .write(true)</span>
+    <span class="doccomment">///     .create_new(true)</span>
+    <span class="doccomment">///     .open(&quot;a.txt&quot;)</span>
+    <span class="doccomment">///     .await?;</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # Ok(()) }) }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">create_new</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">OpenOptions</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">create_new</span>(<span class="ident">create_new</span>);
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Opens a file with the configured options.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// An error will be returned in the following situations:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * The file does not exist and neither [`create`] nor [`create_new`] were set.</span>
-    <span class="doccomment">/// * The file&#39;s parent directory does not exist.</span>
-    <span class="doccomment">/// * The current process lacks permissions to open the file in the configured mode.</span>
-    <span class="doccomment">/// * The file already exists and [`create_new`] was set.</span>
-    <span class="doccomment">/// * Invalid combination of options was used, like [`truncate`] was set but [`write`] wasn&#39;t,</span>
-    <span class="doccomment">///   or none of [`read`], [`write`], and [`append`] modes was set.</span>
-    <span class="doccomment">/// * An OS-level occurred, like too many files are open or the file name is too long.</span>
-    <span class="doccomment">/// * Some other I/O error occurred.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`read`]: #method.read</span>
-    <span class="doccomment">/// [`write`]: #method.write</span>
-    <span class="doccomment">/// [`append`]: #method.append</span>
-    <span class="doccomment">/// [`truncate`]: #method.truncate</span>
-    <span class="doccomment">/// [`create`]: #method.create</span>
-    <span class="doccomment">/// [`create_new`]: #method.create_new</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::fs::OpenOptions;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let file = OpenOptions::new()</span>
-    <span class="doccomment">///     .read(true)</span>
-    <span class="doccomment">///     .open(&quot;a.txt&quot;)</span>
-    <span class="doccomment">///     .await?;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # Ok(()) }) }</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Opens a file with the configured options.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// An error will be returned in the following situations:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// * The file does not exist and neither [`create`] nor [`create_new`] were set.</span>
+    <span class="doccomment">/// * The file&#39;s parent directory does not exist.</span>
+    <span class="doccomment">/// * The current process lacks permissions to open the file in the configured mode.</span>
+    <span class="doccomment">/// * The file already exists and [`create_new`] was set.</span>
+    <span class="doccomment">/// * Invalid combination of options was used, like [`truncate`] was set but [`write`] wasn&#39;t,</span>
+    <span class="doccomment">///   or none of [`read`], [`write`], and [`append`] modes was set.</span>
+    <span class="doccomment">/// * An OS-level occurred, like too many files are open or the file name is too long.</span>
+    <span class="doccomment">/// * Some other I/O error occurred.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`read`]: #method.read</span>
+    <span class="doccomment">/// [`write`]: #method.write</span>
+    <span class="doccomment">/// [`append`]: #method.append</span>
+    <span class="doccomment">/// [`truncate`]: #method.truncate</span>
+    <span class="doccomment">/// [`create`]: #method.create</span>
+    <span class="doccomment">/// [`create_new`]: #method.create_new</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```no_run</span>
+    <span class="doccomment">/// # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::fs::OpenOptions;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let file = OpenOptions::new()</span>
+    <span class="doccomment">///     .read(true)</span>
+    <span class="doccomment">///     .open(&quot;a.txt&quot;)</span>
+    <span class="doccomment">///     .await?;</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # Ok(()) }) }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">path</span>: <span class="ident">P</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">File</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">as_ref</span>().<span class="ident">to_owned</span>();
         <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>();

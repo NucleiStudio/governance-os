@@ -1,1 +1,1 @@
-initSidebarItems({"derive":[["proc_macro_hack_const_random",""]]});
+initSidebarItems({"macro":[["proc_macro_hack_const_random",""]]});

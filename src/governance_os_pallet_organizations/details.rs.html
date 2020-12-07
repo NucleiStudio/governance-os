@@ -42,6 +42,16 @@
 <span id="39">39</span>
 <span id="40">40</span>
 <span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">/*
  * Copyright 2020 Nuclei Studio OÜ
@@ -68,21 +78,31 @@
 <span class="doccomment">/// This structure is used to encode metadata about an organization.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Default</span>, <span class="ident">RuntimeDebug</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OrganizationDetails</span><span class="op">&lt;</span><span class="ident">AccountId</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OrganizationDetails</span><span class="op">&lt;</span><span class="ident">AccountId</span>, <span class="ident">VotingSystem</span><span class="op">&gt;</span> {
     <span class="doccomment">/// A set of accounts that have access to the `apply_as` function</span>
     <span class="doccomment">/// of an organization.</span>
     <span class="kw">pub</span> <span class="ident">executors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AccountId</span><span class="op">&gt;</span>,
 
-    <span class="doccomment">/// A set of accounts that can change an organization&#39;s parameters.</span>
-    <span class="kw">pub</span> <span class="ident">managers</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AccountId</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Which voting system is in place. `executors` do not need to go</span>
+    <span class="doccomment">/// through it due to their higher privilege permission.</span>
+    <span class="kw">pub</span> <span class="ident">voting</span>: <span class="ident">VotingSystem</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">AccountId</span>: <span class="ident">Ord</span><span class="op">&gt;</span> <span class="ident">OrganizationDetails</span><span class="op">&lt;</span><span class="ident">AccountId</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">AccountId</span>: <span class="ident">Ord</span>, <span class="ident">VotingSystem</span><span class="op">&gt;</span> <span class="ident">OrganizationDetails</span><span class="op">&lt;</span><span class="ident">AccountId</span>, <span class="ident">VotingSystem</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Sort all the vectors inside the strutcture.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sort</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">executors</span>.<span class="ident">sort</span>();
-        <span class="self">self</span>.<span class="ident">managers</span>.<span class="ident">sort</span>();
     }
+}
+
+<span class="doccomment">/// Represent a proposal as stored by the pallet.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">RuntimeDebug</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Proposal</span><span class="op">&lt;</span><span class="ident">Call</span>, <span class="ident">Metadata</span>, <span class="ident">OrganizationId</span>, <span class="ident">VotingSystem</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="ident">org</span>: <span class="ident">OrganizationId</span>,
+    <span class="kw">pub</span> <span class="ident">call</span>: <span class="ident">Call</span>,
+    <span class="kw">pub</span> <span class="ident">metadata</span>: <span class="ident">Metadata</span>,
+    <span class="kw">pub</span> <span class="ident">voting</span>: <span class="ident">VotingSystem</span>,
 }
 </pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "governance_os_pallet_organizations";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>

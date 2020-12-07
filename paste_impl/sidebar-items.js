@@ -1,1 +1,1 @@
-initSidebarItems({"derive":[["proc_macro_hack_expr",""]],"macro":[["item",""],["item_with_macros",""]]});
+initSidebarItems({"macro":[["item",""],["item_with_macros",""],["proc_macro_hack_expr",""]]});

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/async-std-1.6.5/src/sync/channel.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>channel.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/async-std-1.7.0/src/sync/channel.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>channel.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
 <link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../async_std/index.html'><div class='logo-container'><img src='https://async.rs/images/logo--hero.svg' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
                 <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
@@ -1080,47 +1080,47 @@
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">stream</span>::<span class="ident">Stream</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">sync</span>::<span class="ident">WakerSet</span>;
 
-<span class="doccomment">/// Creates a bounded multi-producer multi-consumer channel.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This channel has a buffer that can hold at most `cap` messages at a time.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Senders and receivers can be cloned. When all senders associated with a channel get dropped, it</span>
-<span class="doccomment">/// becomes closed. Receive operations on a closed and empty channel return [RecvError] instead of</span>
-<span class="doccomment">/// trying to await a message when using [Receiver::recv] or `None` when used as a [Stream].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Panics</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If `cap` is zero, this function will panic.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # fn main() -&gt; Result&lt;(), async_std::sync::RecvError&gt; {</span>
-<span class="doccomment">/// # async_std::task::block_on(async {</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// use std::time::Duration;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// use async_std::sync::channel;</span>
-<span class="doccomment">/// use async_std::task;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let (s, r) = channel(1);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // This call returns immediately because there is enough space in the channel.</span>
-<span class="doccomment">/// s.send(1usize).await;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// task::spawn(async move {</span>
-<span class="doccomment">///     // This call will have to wait because the channel is full.</span>
-<span class="doccomment">///     // It will be able to complete only after the first message is received.</span>
-<span class="doccomment">///     s.send(2).await;</span>
-<span class="doccomment">/// });</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// task::sleep(Duration::from_secs(1)).await;</span>
-<span class="doccomment">/// assert_eq!(r.recv().await?, 1);</span>
-<span class="doccomment">/// assert_eq!(r.recv().await?, 2);</span>
-<span class="doccomment">/// # Ok(())</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # }) }</span>
-<span class="doccomment">/// ```</span>
+<span class="doccomment">/// Creates a bounded multi-producer multi-consumer channel.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This channel has a buffer that can hold at most `cap` messages at a time.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Senders and receivers can be cloned. When all senders associated with a channel get dropped, it</span>
+<span class="doccomment">/// becomes closed. Receive operations on a closed and empty channel return [RecvError] instead of</span>
+<span class="doccomment">/// trying to await a message when using [Receiver::recv] or `None` when used as a [Stream].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Panics</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// If `cap` is zero, this function will panic.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Examples</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// # fn main() -&gt; Result&lt;(), async_std::sync::RecvError&gt; {</span>
+<span class="doccomment">/// # async_std::task::block_on(async {</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// use std::time::Duration;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// use async_std::sync::channel;</span>
+<span class="doccomment">/// use async_std::task;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let (s, r) = channel(1);</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// // This call returns immediately because there is enough space in the channel.</span>
+<span class="doccomment">/// s.send(1usize).await;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// task::spawn(async move {</span>
+<span class="doccomment">///     // This call will have to wait because the channel is full.</span>
+<span class="doccomment">///     // It will be able to complete only after the first message is received.</span>
+<span class="doccomment">///     s.send(2).await;</span>
+<span class="doccomment">/// });</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// task::sleep(Duration::from_secs(1)).await;</span>
+<span class="doccomment">/// assert_eq!(r.recv().await?, 1);</span>
+<span class="doccomment">/// assert_eq!(r.recv().await?, 2);</span>
+<span class="doccomment">/// # Ok(())</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// # }) }</span>
+<span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">unstable</span>)))]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">cap</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) {
@@ -1135,69 +1135,69 @@
     (<span class="ident">s</span>, <span class="ident">r</span>)
 }
 
-<span class="doccomment">/// The sending side of a channel.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This struct is created by the [`channel`] function. See its</span>
-<span class="doccomment">/// documentation for more.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`channel`]: fn.channel.html</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # async_std::task::block_on(async {</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// use async_std::sync::channel;</span>
-<span class="doccomment">/// use async_std::task;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let (s1, r) = channel(100);</span>
-<span class="doccomment">/// let s2 = s1.clone();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// task::spawn(async move { s1.send(1).await });</span>
-<span class="doccomment">/// task::spawn(async move { s2.send(2).await });</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let msg1 = r.recv().await.unwrap();</span>
-<span class="doccomment">/// let msg2 = r.recv().await.unwrap();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(msg1 + msg2, 3);</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # })</span>
-<span class="doccomment">/// ```</span>
+<span class="doccomment">/// The sending side of a channel.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This struct is created by the [`channel`] function. See its</span>
+<span class="doccomment">/// documentation for more.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [`channel`]: fn.channel.html</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Examples</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// # async_std::task::block_on(async {</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// use async_std::sync::channel;</span>
+<span class="doccomment">/// use async_std::task;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let (s1, r) = channel(100);</span>
+<span class="doccomment">/// let s2 = s1.clone();</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// task::spawn(async move { s1.send(1).await });</span>
+<span class="doccomment">/// task::spawn(async move { s2.send(2).await });</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let msg1 = r.recv().await.unwrap();</span>
+<span class="doccomment">/// let msg2 = r.recv().await.unwrap();</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// assert_eq!(msg1 + msg2, 3);</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// # })</span>
+<span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">unstable</span>)))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The inner channel.</span>
+    <span class="doccomment">/// The inner channel.</span>
     <span class="ident">channel</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Channel</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Sends a message into the channel.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the channel is full, this method will wait until there is space in the channel.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), async_std::sync::RecvError&gt; {</span>
-    <span class="doccomment">/// # async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::sync::channel;</span>
-    <span class="doccomment">/// use async_std::task;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let (s, r) = channel(1);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// task::spawn(async move {</span>
-    <span class="doccomment">///     s.send(1).await;</span>
-    <span class="doccomment">///     s.send(2).await;</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(r.recv().await?, 1);</span>
-    <span class="doccomment">/// assert_eq!(r.recv().await?, 2);</span>
-    <span class="doccomment">/// assert!(r.recv().await.is_err());</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }) }</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Sends a message into the channel.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If the channel is full, this method will wait until there is space in the channel.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), async_std::sync::RecvError&gt; {</span>
+    <span class="doccomment">/// # async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::sync::channel;</span>
+    <span class="doccomment">/// use async_std::task;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let (s, r) = channel(1);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// task::spawn(async move {</span>
+    <span class="doccomment">///     s.send(1).await;</span>
+    <span class="doccomment">///     s.send(2).await;</span>
+    <span class="doccomment">/// });</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(r.recv().await?, 1);</span>
+    <span class="doccomment">/// assert_eq!(r.recv().await?, 2);</span>
+    <span class="doccomment">/// assert!(r.recv().await.is_err());</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # Ok(())</span>
+    <span class="doccomment">/// # }) }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">send</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">msg</span>: <span class="ident">T</span>) {
         <span class="kw">struct</span> <span class="ident">SendFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
             <span class="ident">channel</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Channel</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
@@ -1214,12 +1214,12 @@
                 <span class="kw">loop</span> {
                     <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">msg</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>();
 
-                    <span class="comment">// If the current task is in the set, remove it.</span>
+                    <span class="comment">// If the current task is in the set, remove it.</span>
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">key</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">opt_key</span>.<span class="ident">take</span>() {
                         <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">send_wakers</span>.<span class="ident">remove</span>(<span class="ident">key</span>);
                     }
 
-                    <span class="comment">// Try sending the message.</span>
+                    <span class="comment">// Try sending the message.</span>
                     <span class="kw">match</span> <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">try_send</span>(<span class="ident">msg</span>) {
                         <span class="prelude-val">Ok</span>(()) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll</span>::<span class="ident">Ready</span>(()),
                         <span class="prelude-val">Err</span>(<span class="ident">TrySendError</span>::<span class="ident">Disconnected</span>(<span class="ident">msg</span>)) <span class="op">=</span><span class="op">&gt;</span> {
@@ -1229,10 +1229,10 @@
                         <span class="prelude-val">Err</span>(<span class="ident">TrySendError</span>::<span class="ident">Full</span>(<span class="ident">msg</span>)) <span class="op">=</span><span class="op">&gt;</span> {
                             <span class="self">self</span>.<span class="ident">msg</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">msg</span>);
 
-                            <span class="comment">// Insert this send operation.</span>
+                            <span class="comment">// Insert this send operation.</span>
                             <span class="self">self</span>.<span class="ident">opt_key</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">send_wakers</span>.<span class="ident">insert</span>(<span class="ident">cx</span>));
 
-                            <span class="comment">// If the channel is still full and not disconnected, return.</span>
+                            <span class="comment">// If the channel is still full and not disconnected, return.</span>
                             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">is_full</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">is_disconnected</span>() {
                                 <span class="kw">return</span> <span class="ident">Poll</span>::<span class="ident">Pending</span>;
                             }
@@ -1244,8 +1244,8 @@
 
         <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">SendFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
             <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-                <span class="comment">// If the current task is still in the set, that means it is being cancelled now.</span>
-                <span class="comment">// Wake up another task instead.</span>
+                <span class="comment">// If the current task is still in the set, that means it is being cancelled now.</span>
+                <span class="comment">// Wake up another task instead.</span>
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">key</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">opt_key</span> {
                     <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">send_wakers</span>.<span class="ident">cancel</span>(<span class="ident">key</span>);
                 }
@@ -1260,101 +1260,101 @@
         .<span class="ident">await</span>
     }
 
-    <span class="doccomment">/// Attempts to send a message into the channel.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the channel is full, this method will return an error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::sync::channel;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let (s, r) = channel(1);</span>
-    <span class="doccomment">/// assert!(s.try_send(1).is_ok());</span>
-    <span class="doccomment">/// assert!(s.try_send(2).is_err());</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # })</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Attempts to send a message into the channel.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If the channel is full, this method will return an error.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::sync::channel;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let (s, r) = channel(1);</span>
+    <span class="doccomment">/// assert!(s.try_send(1).is_ok());</span>
+    <span class="doccomment">/// assert!(s.try_send(2).is_err());</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # })</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_send</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">msg</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TrySendError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">try_send</span>(<span class="ident">msg</span>)
     }
 
-    <span class="doccomment">/// Returns the channel capacity.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use async_std::sync::channel;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let (s, _) = channel::&lt;i32&gt;(5);</span>
-    <span class="doccomment">/// assert_eq!(s.capacity(), 5);</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Returns the channel capacity.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use async_std::sync::channel;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let (s, _) = channel::&lt;i32&gt;(5);</span>
+    <span class="doccomment">/// assert_eq!(s.capacity(), 5);</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">capacity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">cap</span>
     }
 
-    <span class="doccomment">/// Returns `true` if the channel is empty.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::sync::channel;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let (s, r) = channel(1);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert!(s.is_empty());</span>
-    <span class="doccomment">/// s.send(0).await;</span>
-    <span class="doccomment">/// assert!(!s.is_empty());</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # })</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Returns `true` if the channel is empty.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::sync::channel;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let (s, r) = channel(1);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert!(s.is_empty());</span>
+    <span class="doccomment">/// s.send(0).await;</span>
+    <span class="doccomment">/// assert!(!s.is_empty());</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # })</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">is_empty</span>()
     }
 
-    <span class="doccomment">/// Returns `true` if the channel is full.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::sync::channel;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let (s, r) = channel(1);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert!(!s.is_full());</span>
-    <span class="doccomment">/// s.send(0).await;</span>
-    <span class="doccomment">/// assert!(s.is_full());</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # })</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Returns `true` if the channel is full.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::sync::channel;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let (s, r) = channel(1);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert!(!s.is_full());</span>
+    <span class="doccomment">/// s.send(0).await;</span>
+    <span class="doccomment">/// assert!(s.is_full());</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # })</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_full</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">is_full</span>()
     }
 
-    <span class="doccomment">/// Returns the number of messages in the channel.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::sync::channel;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let (s, r) = channel(2);</span>
-    <span class="doccomment">/// assert_eq!(s.len(), 0);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// s.send(1).await;</span>
-    <span class="doccomment">/// s.send(2).await;</span>
-    <span class="doccomment">/// assert_eq!(s.len(), 2);</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # })</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Returns the number of messages in the channel.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::sync::channel;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let (s, r) = channel(2);</span>
+    <span class="doccomment">/// assert_eq!(s.len(), 0);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// s.send(1).await;</span>
+    <span class="doccomment">/// s.send(2).await;</span>
+    <span class="doccomment">/// assert_eq!(s.len(), 2);</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # })</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">len</span>()
     }
@@ -1362,7 +1362,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="comment">// Decrement the sender count and disconnect the channel if it drops down to zero.</span>
+        <span class="comment">// Decrement the sender count and disconnect the channel if it drops down to zero.</span>
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">sender_count</span>.<span class="ident">fetch_sub</span>(<span class="number">1</span>, <span class="ident">Ordering</span>::<span class="ident">AcqRel</span>) <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
             <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">disconnect</span>();
         }
@@ -1373,7 +1373,7 @@
     <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">sender_count</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering</span>::<span class="ident">Relaxed</span>);
 
-        <span class="comment">// Make sure the count never overflows, even if lots of sender clones are leaked.</span>
+        <span class="comment">// Make sure the count never overflows, even if lots of sender clones are leaked.</span>
         <span class="kw">if</span> <span class="ident">count</span> <span class="op">&gt;</span> <span class="ident">isize</span>::<span class="ident">MAX</span> <span class="kw">as</span> <span class="ident">usize</span> {
             <span class="ident">process</span>::<span class="ident">abort</span>();
         }
@@ -1390,81 +1390,81 @@
     }
 }
 
-<span class="doccomment">/// The receiving side of a channel.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This type receives messages by calling `recv`. But it also implements the [`Stream`] trait,</span>
-<span class="doccomment">/// which means it can act as an asynchronous iterator. This struct is created by the [`channel`]</span>
-<span class="doccomment">/// function. See its documentation for more.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`channel`]: fn.channel.html</span>
-<span class="doccomment">/// [`Stream`]: ../stream/trait.Stream.html</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # fn main() -&gt; Result&lt;(), async_std::sync::RecvError&gt; {</span>
-<span class="doccomment">/// # async_std::task::block_on(async {</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// use std::time::Duration;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// use async_std::sync::channel;</span>
-<span class="doccomment">/// use async_std::task;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let (s, r) = channel(100);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// task::spawn(async move {</span>
-<span class="doccomment">///     s.send(1usize).await;</span>
-<span class="doccomment">///     task::sleep(Duration::from_secs(1)).await;</span>
-<span class="doccomment">///     s.send(2).await;</span>
-<span class="doccomment">/// });</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(r.recv().await?, 1); // Received immediately.</span>
-<span class="doccomment">/// assert_eq!(r.recv().await?, 2); // Received after 1 second.</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # Ok(())</span>
-<span class="doccomment">/// # }) }</span>
-<span class="doccomment">/// ```</span>
+<span class="doccomment">/// The receiving side of a channel.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This type receives messages by calling `recv`. But it also implements the [`Stream`] trait,</span>
+<span class="doccomment">/// which means it can act as an asynchronous iterator. This struct is created by the [`channel`]</span>
+<span class="doccomment">/// function. See its documentation for more.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [`channel`]: fn.channel.html</span>
+<span class="doccomment">/// [`Stream`]: ../stream/trait.Stream.html</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Examples</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// # fn main() -&gt; Result&lt;(), async_std::sync::RecvError&gt; {</span>
+<span class="doccomment">/// # async_std::task::block_on(async {</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// use std::time::Duration;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// use async_std::sync::channel;</span>
+<span class="doccomment">/// use async_std::task;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let (s, r) = channel(100);</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// task::spawn(async move {</span>
+<span class="doccomment">///     s.send(1usize).await;</span>
+<span class="doccomment">///     task::sleep(Duration::from_secs(1)).await;</span>
+<span class="doccomment">///     s.send(2).await;</span>
+<span class="doccomment">/// });</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// assert_eq!(r.recv().await?, 1); // Received immediately.</span>
+<span class="doccomment">/// assert_eq!(r.recv().await?, 2); // Received after 1 second.</span>
+<span class="doccomment">/// #</span>
+<span class="doccomment">/// # Ok(())</span>
+<span class="doccomment">/// # }) }</span>
+<span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">unstable</span>)))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The inner channel.</span>
+    <span class="doccomment">/// The inner channel.</span>
     <span class="ident">channel</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Channel</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 
-    <span class="doccomment">/// The key for this receiver in the `channel.stream_wakers` set.</span>
+    <span class="doccomment">/// The key for this receiver in the `channel.stream_wakers` set.</span>
     <span class="ident">opt_key</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Receives a message from the channel.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the channel is empty and still has senders, this method</span>
-    <span class="doccomment">/// will wait until a message is sent into it. Once all senders</span>
-    <span class="doccomment">/// have been dropped it will return [RecvError].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), async_std::sync::RecvError&gt; {</span>
-    <span class="doccomment">/// # async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::sync::channel;</span>
-    <span class="doccomment">/// use async_std::task;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let (s, r) = channel(1);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// task::spawn(async move {</span>
-    <span class="doccomment">///     s.send(1usize).await;</span>
-    <span class="doccomment">///     s.send(2).await;</span>
-    <span class="doccomment">///     // Then we drop the sender</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(r.recv().await?, 1);</span>
-    <span class="doccomment">/// assert_eq!(r.recv().await?, 2);</span>
-    <span class="doccomment">/// assert!(r.recv().await.is_err());</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }) }</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Receives a message from the channel.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If the channel is empty and still has senders, this method</span>
+    <span class="doccomment">/// will wait until a message is sent into it. Once all senders</span>
+    <span class="doccomment">/// have been dropped it will return [RecvError].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), async_std::sync::RecvError&gt; {</span>
+    <span class="doccomment">/// # async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::sync::channel;</span>
+    <span class="doccomment">/// use async_std::task;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let (s, r) = channel(1);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// task::spawn(async move {</span>
+    <span class="doccomment">///     s.send(1usize).await;</span>
+    <span class="doccomment">///     s.send(2).await;</span>
+    <span class="doccomment">///     // Then we drop the sender</span>
+    <span class="doccomment">/// });</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(r.recv().await?, 1);</span>
+    <span class="doccomment">/// assert_eq!(r.recv().await?, 2);</span>
+    <span class="doccomment">/// assert!(r.recv().await.is_err());</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # Ok(())</span>
+    <span class="doccomment">/// # }) }</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">recv</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">RecvError</span><span class="op">&gt;</span> {
         <span class="kw">struct</span> <span class="ident">RecvFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
             <span class="ident">channel</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Channel</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
@@ -1486,7 +1486,7 @@
 
         <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">RecvFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
             <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-                <span class="comment">// If the current task is still in the set, that means it is being cancelled now.</span>
+                <span class="comment">// If the current task is still in the set, that means it is being cancelled now.</span>
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">key</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">opt_key</span> {
                     <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">recv_wakers</span>.<span class="ident">cancel</span>(<span class="ident">key</span>);
                 }
@@ -1500,104 +1500,104 @@
         .<span class="ident">await</span>
     }
 
-    <span class="doccomment">/// Attempts to receive a message from the channel.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the channel is empty, this method will return an error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::sync::channel;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let (s, r) = channel(1);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// s.send(1u8).await;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert!(r.try_recv().is_ok());</span>
-    <span class="doccomment">/// assert!(r.try_recv().is_err());</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # })</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Attempts to receive a message from the channel.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If the channel is empty, this method will return an error.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::sync::channel;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let (s, r) = channel(1);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// s.send(1u8).await;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert!(r.try_recv().is_ok());</span>
+    <span class="doccomment">/// assert!(r.try_recv().is_err());</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # })</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_recv</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">TryRecvError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">try_recv</span>()
     }
 
-    <span class="doccomment">/// Returns the channel capacity.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use async_std::sync::channel;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let (_, r) = channel::&lt;i32&gt;(5);</span>
-    <span class="doccomment">/// assert_eq!(r.capacity(), 5);</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Returns the channel capacity.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use async_std::sync::channel;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let (_, r) = channel::&lt;i32&gt;(5);</span>
+    <span class="doccomment">/// assert_eq!(r.capacity(), 5);</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">capacity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">cap</span>
     }
 
-    <span class="doccomment">/// Returns `true` if the channel is empty.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::sync::channel;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let (s, r) = channel(1);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert!(r.is_empty());</span>
-    <span class="doccomment">/// s.send(0).await;</span>
-    <span class="doccomment">/// assert!(!r.is_empty());</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # })</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Returns `true` if the channel is empty.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::sync::channel;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let (s, r) = channel(1);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert!(r.is_empty());</span>
+    <span class="doccomment">/// s.send(0).await;</span>
+    <span class="doccomment">/// assert!(!r.is_empty());</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # })</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">is_empty</span>()
     }
 
-    <span class="doccomment">/// Returns `true` if the channel is full.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::sync::channel;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let (s, r) = channel(1);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert!(!r.is_full());</span>
-    <span class="doccomment">/// s.send(0).await;</span>
-    <span class="doccomment">/// assert!(r.is_full());</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # })</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Returns `true` if the channel is full.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::sync::channel;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let (s, r) = channel(1);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert!(!r.is_full());</span>
+    <span class="doccomment">/// s.send(0).await;</span>
+    <span class="doccomment">/// assert!(r.is_full());</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # })</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_full</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">is_full</span>()
     }
 
-    <span class="doccomment">/// Returns the number of messages in the channel.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # async_std::task::block_on(async {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use async_std::sync::channel;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let (s, r) = channel(2);</span>
-    <span class="doccomment">/// assert_eq!(r.len(), 0);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// s.send(1).await;</span>
-    <span class="doccomment">/// s.send(2).await;</span>
-    <span class="doccomment">/// assert_eq!(r.len(), 2);</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # })</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// Returns the number of messages in the channel.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # async_std::task::block_on(async {</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// use async_std::sync::channel;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let (s, r) = channel(2);</span>
+    <span class="doccomment">/// assert_eq!(r.len(), 0);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// s.send(1).await;</span>
+    <span class="doccomment">/// s.send(2).await;</span>
+    <span class="doccomment">/// assert_eq!(r.len(), 2);</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # })</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">len</span>()
     }
@@ -1605,12 +1605,12 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="comment">// If the current task is still in the stream set, that means it is being cancelled now.</span>
+        <span class="comment">// If the current task is still in the stream set, that means it is being cancelled now.</span>
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">key</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">opt_key</span> {
             <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">stream_wakers</span>.<span class="ident">cancel</span>(<span class="ident">key</span>);
         }
 
-        <span class="comment">// Decrement the receiver count and disconnect the channel if it drops down to zero.</span>
+        <span class="comment">// Decrement the receiver count and disconnect the channel if it drops down to zero.</span>
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">receiver_count</span>.<span class="ident">fetch_sub</span>(<span class="number">1</span>, <span class="ident">Ordering</span>::<span class="ident">AcqRel</span>) <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
             <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">disconnect</span>();
         }
@@ -1621,7 +1621,7 @@
     <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">receiver_count</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering</span>::<span class="ident">Relaxed</span>);
 
-        <span class="comment">// Make sure the count never overflows, even if lots of receiver clones are leaked.</span>
+        <span class="comment">// Make sure the count never overflows, even if lots of receiver clones are leaked.</span>
         <span class="kw">if</span> <span class="ident">count</span> <span class="op">&gt;</span> <span class="ident">isize</span>::<span class="ident">MAX</span> <span class="kw">as</span> <span class="ident">usize</span> {
             <span class="ident">process</span>::<span class="ident">abort</span>();
         }
@@ -1654,10 +1654,10 @@
     }
 }
 
-<span class="doccomment">/// Polls a receive operation on a channel.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If the receive operation is blocked, the current task will be inserted into `wakers` and its</span>
-<span class="doccomment">/// associated key will then be stored in `opt_key`.</span>
+<span class="doccomment">/// Polls a receive operation on a channel.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// If the receive operation is blocked, the current task will be inserted into `wakers` and its</span>
+<span class="doccomment">/// associated key will then be stored in `opt_key`.</span>
 <span class="kw">fn</span> <span class="ident">poll_recv</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
     <span class="ident">channel</span>: <span class="kw-2">&amp;</span><span class="ident">Channel</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
     <span class="ident">wakers</span>: <span class="kw-2">&amp;</span><span class="ident">WakerSet</span>,
@@ -1665,20 +1665,20 @@
     <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">RecvError</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">loop</span> {
-        <span class="comment">// If the current task is in the set, remove it.</span>
+        <span class="comment">// If the current task is in the set, remove it.</span>
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">key</span>) <span class="op">=</span> <span class="ident">opt_key</span>.<span class="ident">take</span>() {
             <span class="ident">wakers</span>.<span class="ident">remove</span>(<span class="ident">key</span>);
         }
 
-        <span class="comment">// Try receiving a message.</span>
+        <span class="comment">// Try receiving a message.</span>
         <span class="kw">match</span> <span class="ident">channel</span>.<span class="ident">try_recv</span>() {
             <span class="prelude-val">Ok</span>(<span class="ident">msg</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">msg</span>)),
             <span class="prelude-val">Err</span>(<span class="ident">TryRecvError</span>::<span class="ident">Disconnected</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">RecvError</span> {})),
             <span class="prelude-val">Err</span>(<span class="ident">TryRecvError</span>::<span class="ident">Empty</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="comment">// Insert this receive operation.</span>
+                <span class="comment">// Insert this receive operation.</span>
                 <span class="kw-2">*</span><span class="ident">opt_key</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">wakers</span>.<span class="ident">insert</span>(<span class="ident">cx</span>));
 
-                <span class="comment">// If the channel is still empty and not disconnected, return.</span>
+                <span class="comment">// If the channel is still empty and not disconnected, return.</span>
                 <span class="kw">if</span> <span class="ident">channel</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">channel</span>.<span class="ident">is_disconnected</span>() {
                     <span class="kw">return</span> <span class="ident">Poll</span>::<span class="ident">Pending</span>;
                 }
@@ -1687,64 +1687,64 @@
     }
 }
 
-<span class="doccomment">/// A slot in a channel.</span>
+<span class="doccomment">/// A slot in a channel.</span>
 <span class="kw">struct</span> <span class="ident">Slot</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The current stamp.</span>
+    <span class="doccomment">/// The current stamp.</span>
     <span class="ident">stamp</span>: <span class="ident">AtomicUsize</span>,
 
-    <span class="doccomment">/// The message in this slot.</span>
+    <span class="doccomment">/// The message in this slot.</span>
     <span class="ident">msg</span>: <span class="ident">UnsafeCell</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
 }
 
-<span class="doccomment">/// Bounded channel based on a preallocated array.</span>
+<span class="doccomment">/// Bounded channel based on a preallocated array.</span>
 <span class="kw">struct</span> <span class="ident">Channel</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The head of the channel.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This value is a &quot;stamp&quot; consisting of an index into the buffer, a mark bit, and a lap, but</span>
-    <span class="doccomment">/// packed into a single `usize`. The lower bits represent the index, while the upper bits</span>
-    <span class="doccomment">/// represent the lap. The mark bit in the head is always zero.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Messages are popped from the head of the channel.</span>
+    <span class="doccomment">/// The head of the channel.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This value is a &quot;stamp&quot; consisting of an index into the buffer, a mark bit, and a lap, but</span>
+    <span class="doccomment">/// packed into a single `usize`. The lower bits represent the index, while the upper bits</span>
+    <span class="doccomment">/// represent the lap. The mark bit in the head is always zero.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Messages are popped from the head of the channel.</span>
     <span class="ident">head</span>: <span class="ident">AtomicUsize</span>,
 
-    <span class="doccomment">/// The tail of the channel.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This value is a &quot;stamp&quot; consisting of an index into the buffer, a mark bit, and a lap, but</span>
-    <span class="doccomment">/// packed into a single `usize`. The lower bits represent the index, while the upper bits</span>
-    <span class="doccomment">/// represent the lap. The mark bit indicates that the channel is disconnected.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Messages are pushed into the tail of the channel.</span>
+    <span class="doccomment">/// The tail of the channel.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This value is a &quot;stamp&quot; consisting of an index into the buffer, a mark bit, and a lap, but</span>
+    <span class="doccomment">/// packed into a single `usize`. The lower bits represent the index, while the upper bits</span>
+    <span class="doccomment">/// represent the lap. The mark bit indicates that the channel is disconnected.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Messages are pushed into the tail of the channel.</span>
     <span class="ident">tail</span>: <span class="ident">AtomicUsize</span>,
 
-    <span class="doccomment">/// The buffer holding slots.</span>
+    <span class="doccomment">/// The buffer holding slots.</span>
     <span class="ident">buffer</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Slot</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
 
-    <span class="doccomment">/// The channel capacity.</span>
+    <span class="doccomment">/// The channel capacity.</span>
     <span class="ident">cap</span>: <span class="ident">usize</span>,
 
-    <span class="doccomment">/// A stamp with the value of `{ lap: 1, mark: 0, index: 0 }`.</span>
+    <span class="doccomment">/// A stamp with the value of `{ lap: 1, mark: 0, index: 0 }`.</span>
     <span class="ident">one_lap</span>: <span class="ident">usize</span>,
 
-    <span class="doccomment">/// If this bit is set in the tail, that means either all senders were dropped or all receivers</span>
-    <span class="doccomment">/// were dropped.</span>
+    <span class="doccomment">/// If this bit is set in the tail, that means either all senders were dropped or all receivers</span>
+    <span class="doccomment">/// were dropped.</span>
     <span class="ident">mark_bit</span>: <span class="ident">usize</span>,
 
-    <span class="doccomment">/// Send operations waiting while the channel is full.</span>
+    <span class="doccomment">/// Send operations waiting while the channel is full.</span>
     <span class="ident">send_wakers</span>: <span class="ident">WakerSet</span>,
 
-    <span class="doccomment">/// Receive operations waiting while the channel is empty and not disconnected.</span>
+    <span class="doccomment">/// Receive operations waiting while the channel is empty and not disconnected.</span>
     <span class="ident">recv_wakers</span>: <span class="ident">WakerSet</span>,
 
-    <span class="doccomment">/// Streams waiting while the channel is empty and not disconnected.</span>
+    <span class="doccomment">/// Streams waiting while the channel is empty and not disconnected.</span>
     <span class="ident">stream_wakers</span>: <span class="ident">WakerSet</span>,
 
-    <span class="doccomment">/// The number of currently active `Sender`s.</span>
+    <span class="doccomment">/// The number of currently active `Sender`s.</span>
     <span class="ident">sender_count</span>: <span class="ident">AtomicUsize</span>,
 
-    <span class="doccomment">/// The number of currently active `Receivers`s.</span>
+    <span class="doccomment">/// The number of currently active `Receivers`s.</span>
     <span class="ident">receiver_count</span>: <span class="ident">AtomicUsize</span>,
 
-    <span class="doccomment">/// Indicates that dropping a `Channel&lt;T&gt;` may drop values of type `T`.</span>
+    <span class="doccomment">/// Indicates that dropping a `Channel&lt;T&gt;` may drop values of type `T`.</span>
     <span class="ident">_marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
 }
 
@@ -1753,20 +1753,20 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Unpin</span> <span class="kw">for</span> <span class="ident">Channel</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Channel</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Creates a bounded channel of capacity `cap`.</span>
+    <span class="doccomment">/// Creates a bounded channel of capacity `cap`.</span>
     <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">cap</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">cap</span> <span class="op">&gt;</span> <span class="number">0</span>, <span class="string">&quot;capacity must be positive&quot;</span>);
 
-        <span class="comment">// Compute constants `mark_bit` and `one_lap`.</span>
+        <span class="comment">// Compute constants `mark_bit` and `one_lap`.</span>
         <span class="kw">let</span> <span class="ident">mark_bit</span> <span class="op">=</span> (<span class="ident">cap</span> <span class="op">+</span> <span class="number">1</span>).<span class="ident">next_power_of_two</span>();
         <span class="kw">let</span> <span class="ident">one_lap</span> <span class="op">=</span> <span class="ident">mark_bit</span> <span class="op">*</span> <span class="number">2</span>;
 
-        <span class="comment">// Head is initialized to `{ lap: 0, mark: 0, index: 0 }`.</span>
+        <span class="comment">// Head is initialized to `{ lap: 0, mark: 0, index: 0 }`.</span>
         <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="comment">// Tail is initialized to `{ lap: 0, mark: 0, index: 0 }`.</span>
+        <span class="comment">// Tail is initialized to `{ lap: 0, mark: 0, index: 0 }`.</span>
         <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="number">0</span>;
 
-        <span class="comment">// Allocate a buffer of `cap` slots.</span>
+        <span class="comment">// Allocate a buffer of `cap` slots.</span>
         <span class="kw">let</span> <span class="ident">buffer</span> <span class="op">=</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">Slot</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>::<span class="ident">with_capacity</span>(<span class="ident">cap</span>);
             <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">v</span>.<span class="ident">as_mut_ptr</span>();
@@ -1774,10 +1774,10 @@
             <span class="ident">ptr</span>
         };
 
-        <span class="comment">// Initialize stamps in the slots.</span>
+        <span class="comment">// Initialize stamps in the slots.</span>
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">cap</span> {
             <span class="kw">unsafe</span> {
-                <span class="comment">// Set the stamp to `{ lap: 0, mark: 0, index: i }`.</span>
+                <span class="comment">// Set the stamp to `{ lap: 0, mark: 0, index: i }`.</span>
                 <span class="kw">let</span> <span class="ident">slot</span> <span class="op">=</span> <span class="ident">buffer</span>.<span class="ident">add</span>(<span class="ident">i</span>);
                 <span class="ident">ptr</span>::<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> (<span class="kw-2">*</span><span class="ident">slot</span>).<span class="ident">stamp</span>, <span class="ident">AtomicUsize</span>::<span class="ident">new</span>(<span class="ident">i</span>));
             }
@@ -1799,41 +1799,41 @@
         }
     }
 
-    <span class="doccomment">/// Attempts to send a message.</span>
+    <span class="doccomment">/// Attempts to send a message.</span>
     <span class="kw">fn</span> <span class="ident">try_send</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">msg</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TrySendError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">backoff</span> <span class="op">=</span> <span class="ident">Backoff</span>::<span class="ident">new</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering</span>::<span class="ident">Relaxed</span>);
 
         <span class="kw">loop</span> {
-            <span class="comment">// Extract mark bit from the tail and unset it.</span>
-            <span class="comment">//</span>
-            <span class="comment">// If the mark bit was set (which means all receivers have been dropped), we will still</span>
-            <span class="comment">// send the message into the channel if there is enough capacity. The message will get</span>
-            <span class="comment">// dropped when the channel is dropped (which means when all senders are also dropped).</span>
+            <span class="comment">// Extract mark bit from the tail and unset it.</span>
+            <span class="comment">//</span>
+            <span class="comment">// If the mark bit was set (which means all receivers have been dropped), we will still</span>
+            <span class="comment">// send the message into the channel if there is enough capacity. The message will get</span>
+            <span class="comment">// dropped when the channel is dropped (which means when all senders are also dropped).</span>
             <span class="kw">let</span> <span class="ident">mark_bit</span> <span class="op">=</span> <span class="ident">tail</span> <span class="op">&amp;</span> <span class="self">self</span>.<span class="ident">mark_bit</span>;
             <span class="ident">tail</span> <span class="op">^</span><span class="op">=</span> <span class="ident">mark_bit</span>;
 
-            <span class="comment">// Deconstruct the tail.</span>
+            <span class="comment">// Deconstruct the tail.</span>
             <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">tail</span> <span class="op">&amp;</span> (<span class="self">self</span>.<span class="ident">mark_bit</span> <span class="op">-</span> <span class="number">1</span>);
             <span class="kw">let</span> <span class="ident">lap</span> <span class="op">=</span> <span class="ident">tail</span> <span class="op">&amp;</span> <span class="op">!</span>(<span class="self">self</span>.<span class="ident">one_lap</span> <span class="op">-</span> <span class="number">1</span>);
 
-            <span class="comment">// Inspect the corresponding slot.</span>
+            <span class="comment">// Inspect the corresponding slot.</span>
             <span class="kw">let</span> <span class="ident">slot</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">add</span>(<span class="ident">index</span>) };
             <span class="kw">let</span> <span class="ident">stamp</span> <span class="op">=</span> <span class="ident">slot</span>.<span class="ident">stamp</span>.<span class="ident">load</span>(<span class="ident">Ordering</span>::<span class="ident">Acquire</span>);
 
-            <span class="comment">// If the tail and the stamp match, we may attempt to push.</span>
+            <span class="comment">// If the tail and the stamp match, we may attempt to push.</span>
             <span class="kw">if</span> <span class="ident">tail</span> <span class="op">=</span><span class="op">=</span> <span class="ident">stamp</span> {
                 <span class="kw">let</span> <span class="ident">new_tail</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">index</span> <span class="op">+</span> <span class="number">1</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">cap</span> {
-                    <span class="comment">// Same lap, incremented index.</span>
-                    <span class="comment">// Set to `{ lap: lap, mark: 0, index: index + 1 }`.</span>
+                    <span class="comment">// Same lap, incremented index.</span>
+                    <span class="comment">// Set to `{ lap: lap, mark: 0, index: index + 1 }`.</span>
                     <span class="ident">tail</span> <span class="op">+</span> <span class="number">1</span>
                 } <span class="kw">else</span> {
-                    <span class="comment">// One lap forward, index wraps around to zero.</span>
-                    <span class="comment">// Set to `{ lap: lap.wrapping_add(1), mark: 0, index: 0 }`.</span>
+                    <span class="comment">// One lap forward, index wraps around to zero.</span>
+                    <span class="comment">// Set to `{ lap: lap.wrapping_add(1), mark: 0, index: 0 }`.</span>
                     <span class="ident">lap</span>.<span class="ident">wrapping_add</span>(<span class="self">self</span>.<span class="ident">one_lap</span>)
                 };
 
-                <span class="comment">// Try moving the tail.</span>
+                <span class="comment">// Try moving the tail.</span>
                 <span class="kw">match</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">compare_exchange_weak</span>(
                     <span class="ident">tail</span> <span class="op">|</span> <span class="ident">mark_bit</span>,
                     <span class="ident">new_tail</span> <span class="op">|</span> <span class="ident">mark_bit</span>,
@@ -1841,15 +1841,15 @@
                     <span class="ident">Ordering</span>::<span class="ident">Relaxed</span>,
                 ) {
                     <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                        <span class="comment">// Write the message into the slot and update the stamp.</span>
+                        <span class="comment">// Write the message into the slot and update the stamp.</span>
                         <span class="kw">unsafe</span> { <span class="ident">slot</span>.<span class="ident">msg</span>.<span class="ident">get</span>().<span class="ident">write</span>(<span class="ident">msg</span>) };
                         <span class="kw">let</span> <span class="ident">stamp</span> <span class="op">=</span> <span class="ident">tail</span> <span class="op">+</span> <span class="number">1</span>;
                         <span class="ident">slot</span>.<span class="ident">stamp</span>.<span class="ident">store</span>(<span class="ident">stamp</span>, <span class="ident">Ordering</span>::<span class="ident">Release</span>);
 
-                        <span class="comment">// Wake a blocked receive operation.</span>
+                        <span class="comment">// Wake a blocked receive operation.</span>
                         <span class="self">self</span>.<span class="ident">recv_wakers</span>.<span class="ident">notify_one</span>();
 
-                        <span class="comment">// Wake all blocked streams.</span>
+                        <span class="comment">// Wake all blocked streams.</span>
                         <span class="self">self</span>.<span class="ident">stream_wakers</span>.<span class="ident">notify_all</span>();
 
                         <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
@@ -1863,11 +1863,11 @@
                 <span class="ident">atomic</span>::<span class="ident">fence</span>(<span class="ident">Ordering</span>::<span class="ident">SeqCst</span>);
                 <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">load</span>(<span class="ident">Ordering</span>::<span class="ident">Relaxed</span>);
 
-                <span class="comment">// If the head lags one lap behind the tail as well...</span>
+                <span class="comment">// If the head lags one lap behind the tail as well...</span>
                 <span class="kw">if</span> <span class="ident">head</span>.<span class="ident">wrapping_add</span>(<span class="self">self</span>.<span class="ident">one_lap</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">tail</span> {
-                    <span class="comment">// ...then the channel is full.</span>
+                    <span class="comment">// ...then the channel is full.</span>
 
-                    <span class="comment">// Check if the channel is disconnected.</span>
+                    <span class="comment">// Check if the channel is disconnected.</span>
                     <span class="kw">if</span> <span class="ident">mark_bit</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">TrySendError</span>::<span class="ident">Disconnected</span>(<span class="ident">msg</span>));
                     } <span class="kw">else</span> {
@@ -1878,40 +1878,40 @@
                 <span class="ident">backoff</span>.<span class="ident">spin</span>();
                 <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering</span>::<span class="ident">Relaxed</span>);
             } <span class="kw">else</span> {
-                <span class="comment">// Snooze because we need to wait for the stamp to get updated.</span>
+                <span class="comment">// Snooze because we need to wait for the stamp to get updated.</span>
                 <span class="ident">backoff</span>.<span class="ident">snooze</span>();
                 <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering</span>::<span class="ident">Relaxed</span>);
             }
         }
     }
 
-    <span class="doccomment">/// Attempts to receive a message.</span>
+    <span class="doccomment">/// Attempts to receive a message.</span>
     <span class="kw">fn</span> <span class="ident">try_recv</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">TryRecvError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">backoff</span> <span class="op">=</span> <span class="ident">Backoff</span>::<span class="ident">new</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">load</span>(<span class="ident">Ordering</span>::<span class="ident">Relaxed</span>);
 
         <span class="kw">loop</span> {
-            <span class="comment">// Deconstruct the head.</span>
+            <span class="comment">// Deconstruct the head.</span>
             <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">head</span> <span class="op">&amp;</span> (<span class="self">self</span>.<span class="ident">mark_bit</span> <span class="op">-</span> <span class="number">1</span>);
             <span class="kw">let</span> <span class="ident">lap</span> <span class="op">=</span> <span class="ident">head</span> <span class="op">&amp;</span> <span class="op">!</span>(<span class="self">self</span>.<span class="ident">one_lap</span> <span class="op">-</span> <span class="number">1</span>);
 
-            <span class="comment">// Inspect the corresponding slot.</span>
+            <span class="comment">// Inspect the corresponding slot.</span>
             <span class="kw">let</span> <span class="ident">slot</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">add</span>(<span class="ident">index</span>) };
             <span class="kw">let</span> <span class="ident">stamp</span> <span class="op">=</span> <span class="ident">slot</span>.<span class="ident">stamp</span>.<span class="ident">load</span>(<span class="ident">Ordering</span>::<span class="ident">Acquire</span>);
 
-            <span class="comment">// If the the stamp is ahead of the head by 1, we may attempt to pop.</span>
+            <span class="comment">// If the the stamp is ahead of the head by 1, we may attempt to pop.</span>
             <span class="kw">if</span> <span class="ident">head</span> <span class="op">+</span> <span class="number">1</span> <span class="op">=</span><span class="op">=</span> <span class="ident">stamp</span> {
                 <span class="kw">let</span> <span class="ident">new</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">index</span> <span class="op">+</span> <span class="number">1</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">cap</span> {
-                    <span class="comment">// Same lap, incremented index.</span>
-                    <span class="comment">// Set to `{ lap: lap, mark: 0, index: index + 1 }`.</span>
+                    <span class="comment">// Same lap, incremented index.</span>
+                    <span class="comment">// Set to `{ lap: lap, mark: 0, index: index + 1 }`.</span>
                     <span class="ident">head</span> <span class="op">+</span> <span class="number">1</span>
                 } <span class="kw">else</span> {
-                    <span class="comment">// One lap forward, index wraps around to zero.</span>
-                    <span class="comment">// Set to `{ lap: lap.wrapping_add(1), mark: 0, index: 0 }`.</span>
+                    <span class="comment">// One lap forward, index wraps around to zero.</span>
+                    <span class="comment">// Set to `{ lap: lap.wrapping_add(1), mark: 0, index: 0 }`.</span>
                     <span class="ident">lap</span>.<span class="ident">wrapping_add</span>(<span class="self">self</span>.<span class="ident">one_lap</span>)
                 };
 
-                <span class="comment">// Try moving the head.</span>
+                <span class="comment">// Try moving the head.</span>
                 <span class="kw">match</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">compare_exchange_weak</span>(
                     <span class="ident">head</span>,
                     <span class="ident">new</span>,
@@ -1919,12 +1919,12 @@
                     <span class="ident">Ordering</span>::<span class="ident">Relaxed</span>,
                 ) {
                     <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                        <span class="comment">// Read the message from the slot and update the stamp.</span>
+                        <span class="comment">// Read the message from the slot and update the stamp.</span>
                         <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">slot</span>.<span class="ident">msg</span>.<span class="ident">get</span>().<span class="ident">read</span>() };
                         <span class="kw">let</span> <span class="ident">stamp</span> <span class="op">=</span> <span class="ident">head</span>.<span class="ident">wrapping_add</span>(<span class="self">self</span>.<span class="ident">one_lap</span>);
                         <span class="ident">slot</span>.<span class="ident">stamp</span>.<span class="ident">store</span>(<span class="ident">stamp</span>, <span class="ident">Ordering</span>::<span class="ident">Release</span>);
 
-                        <span class="comment">// Wake a blocked send operation.</span>
+                        <span class="comment">// Wake a blocked send operation.</span>
                         <span class="self">self</span>.<span class="ident">send_wakers</span>.<span class="ident">notify_one</span>();
 
                         <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">msg</span>);
@@ -1938,13 +1938,13 @@
                 <span class="ident">atomic</span>::<span class="ident">fence</span>(<span class="ident">Ordering</span>::<span class="ident">SeqCst</span>);
                 <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering</span>::<span class="ident">Relaxed</span>);
 
-                <span class="comment">// If the tail equals the head, that means the channel is empty.</span>
+                <span class="comment">// If the tail equals the head, that means the channel is empty.</span>
                 <span class="kw">if</span> (<span class="ident">tail</span> <span class="op">&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">mark_bit</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">head</span> {
-                    <span class="comment">// If the channel is disconnected...</span>
+                    <span class="comment">// If the channel is disconnected...</span>
                     <span class="kw">if</span> <span class="ident">tail</span> <span class="op">&amp;</span> <span class="self">self</span>.<span class="ident">mark_bit</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">TryRecvError</span>::<span class="ident">Disconnected</span>);
                     } <span class="kw">else</span> {
-                        <span class="comment">// Otherwise, the receive operation is not ready.</span>
+                        <span class="comment">// Otherwise, the receive operation is not ready.</span>
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">TryRecvError</span>::<span class="ident">Empty</span>);
                     }
                 }
@@ -1952,21 +1952,21 @@
                 <span class="ident">backoff</span>.<span class="ident">spin</span>();
                 <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">load</span>(<span class="ident">Ordering</span>::<span class="ident">Relaxed</span>);
             } <span class="kw">else</span> {
-                <span class="comment">// Snooze because we need to wait for the stamp to get updated.</span>
+                <span class="comment">// Snooze because we need to wait for the stamp to get updated.</span>
                 <span class="ident">backoff</span>.<span class="ident">snooze</span>();
                 <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">load</span>(<span class="ident">Ordering</span>::<span class="ident">Relaxed</span>);
             }
         }
     }
 
-    <span class="doccomment">/// Returns the current number of messages inside the channel.</span>
+    <span class="doccomment">/// Returns the current number of messages inside the channel.</span>
     <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
         <span class="kw">loop</span> {
-            <span class="comment">// Load the tail, then load the head.</span>
+            <span class="comment">// Load the tail, then load the head.</span>
             <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering</span>::<span class="ident">SeqCst</span>);
             <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">load</span>(<span class="ident">Ordering</span>::<span class="ident">SeqCst</span>);
 
-            <span class="comment">// If the tail didn&#39;t change, we&#39;ve got consistent values to work with.</span>
+            <span class="comment">// If the tail didn&#39;t change, we&#39;ve got consistent values to work with.</span>
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering</span>::<span class="ident">SeqCst</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">tail</span> {
                 <span class="kw">let</span> <span class="ident">hix</span> <span class="op">=</span> <span class="ident">head</span> <span class="op">&amp;</span> (<span class="self">self</span>.<span class="ident">mark_bit</span> <span class="op">-</span> <span class="number">1</span>);
                 <span class="kw">let</span> <span class="ident">tix</span> <span class="op">=</span> <span class="ident">tail</span> <span class="op">&amp;</span> (<span class="self">self</span>.<span class="ident">mark_bit</span> <span class="op">-</span> <span class="number">1</span>);
@@ -1984,41 +1984,41 @@
         }
     }
 
-    <span class="doccomment">/// Returns `true` if the channel is disconnected.</span>
+    <span class="doccomment">/// Returns `true` if the channel is disconnected.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_disconnected</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering</span>::<span class="ident">SeqCst</span>) <span class="op">&amp;</span> <span class="self">self</span>.<span class="ident">mark_bit</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
     }
 
-    <span class="doccomment">/// Returns `true` if the channel is empty.</span>
+    <span class="doccomment">/// Returns `true` if the channel is empty.</span>
     <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">load</span>(<span class="ident">Ordering</span>::<span class="ident">SeqCst</span>);
         <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering</span>::<span class="ident">SeqCst</span>);
 
-        <span class="comment">// Is the tail equal to the head?</span>
-        <span class="comment">//</span>
-        <span class="comment">// Note: If the head changes just before we load the tail, that means there was a moment</span>
-        <span class="comment">// when the channel was not empty, so it is safe to just return `false`.</span>
+        <span class="comment">// Is the tail equal to the head?</span>
+        <span class="comment">//</span>
+        <span class="comment">// Note: If the head changes just before we load the tail, that means there was a moment</span>
+        <span class="comment">// when the channel was not empty, so it is safe to just return `false`.</span>
         (<span class="ident">tail</span> <span class="op">&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">mark_bit</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">head</span>
     }
 
-    <span class="doccomment">/// Returns `true` if the channel is full.</span>
+    <span class="doccomment">/// Returns `true` if the channel is full.</span>
     <span class="kw">fn</span> <span class="ident">is_full</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering</span>::<span class="ident">SeqCst</span>);
         <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">load</span>(<span class="ident">Ordering</span>::<span class="ident">SeqCst</span>);
 
-        <span class="comment">// Is the head lagging one lap behind tail?</span>
-        <span class="comment">//</span>
-        <span class="comment">// Note: If the tail changes just before we load the head, that means there was a moment</span>
-        <span class="comment">// when the channel was not full, so it is safe to just return `false`.</span>
+        <span class="comment">// Is the head lagging one lap behind tail?</span>
+        <span class="comment">//</span>
+        <span class="comment">// Note: If the tail changes just before we load the head, that means there was a moment</span>
+        <span class="comment">// when the channel was not full, so it is safe to just return `false`.</span>
         <span class="ident">head</span>.<span class="ident">wrapping_add</span>(<span class="self">self</span>.<span class="ident">one_lap</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">tail</span> <span class="op">&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">mark_bit</span>
     }
 
-    <span class="doccomment">/// Disconnects the channel and wakes up all blocked operations.</span>
+    <span class="doccomment">/// Disconnects the channel and wakes up all blocked operations.</span>
     <span class="kw">fn</span> <span class="ident">disconnect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">fetch_or</span>(<span class="self">self</span>.<span class="ident">mark_bit</span>, <span class="ident">Ordering</span>::<span class="ident">SeqCst</span>);
 
         <span class="kw">if</span> <span class="ident">tail</span> <span class="op">&amp;</span> <span class="self">self</span>.<span class="ident">mark_bit</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="comment">// Notify everyone blocked on this channel.</span>
+            <span class="comment">// Notify everyone blocked on this channel.</span>
             <span class="self">self</span>.<span class="ident">send_wakers</span>.<span class="ident">notify_all</span>();
             <span class="self">self</span>.<span class="ident">recv_wakers</span>.<span class="ident">notify_all</span>();
             <span class="self">self</span>.<span class="ident">stream_wakers</span>.<span class="ident">notify_all</span>();
@@ -2028,12 +2028,12 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Channel</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="comment">// Get the index of the head.</span>
+        <span class="comment">// Get the index of the head.</span>
         <span class="kw">let</span> <span class="ident">hix</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">load</span>(<span class="ident">Ordering</span>::<span class="ident">Relaxed</span>) <span class="op">&amp;</span> (<span class="self">self</span>.<span class="ident">mark_bit</span> <span class="op">-</span> <span class="number">1</span>);
 
-        <span class="comment">// Loop over all slots that hold a message and drop them.</span>
+        <span class="comment">// Loop over all slots that hold a message and drop them.</span>
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="self">self</span>.<span class="ident">len</span>() {
-            <span class="comment">// Compute the index of the next slot holding a message.</span>
+            <span class="comment">// Compute the index of the next slot holding a message.</span>
             <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">hix</span> <span class="op">+</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">cap</span> {
                 <span class="ident">hix</span> <span class="op">+</span> <span class="ident">i</span>
             } <span class="kw">else</span> {
@@ -2045,22 +2045,22 @@
             }
         }
 
-        <span class="comment">// Finally, deallocate the buffer, but don&#39;t run any destructors.</span>
+        <span class="comment">// Finally, deallocate the buffer, but don&#39;t run any destructors.</span>
         <span class="kw">unsafe</span> {
             <span class="ident">Vec</span>::<span class="ident">from_raw_parts</span>(<span class="self">self</span>.<span class="ident">buffer</span>, <span class="number">0</span>, <span class="self">self</span>.<span class="ident">cap</span>);
         }
     }
 }
 
-<span class="doccomment">/// An error returned from the `try_send` method.</span>
+<span class="doccomment">/// An error returned from the `try_send` method.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">unstable</span>)))]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TrySendError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The channel is full but not disconnected.</span>
+    <span class="doccomment">/// The channel is full but not disconnected.</span>
     <span class="ident">Full</span>(<span class="ident">T</span>),
 
-    <span class="doccomment">/// The channel is full and disconnected.</span>
+    <span class="doccomment">/// The channel is full and disconnected.</span>
     <span class="ident">Disconnected</span>(<span class="ident">T</span>),
 }
 
@@ -2084,15 +2084,15 @@
     }
 }
 
-<span class="doccomment">/// An error returned from the `try_recv` method.</span>
+<span class="doccomment">/// An error returned from the `try_recv` method.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">unstable</span>)))]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TryRecvError</span> {
-    <span class="doccomment">/// The channel is empty but not disconnected.</span>
+    <span class="doccomment">/// The channel is empty but not disconnected.</span>
     <span class="ident">Empty</span>,
 
-    <span class="doccomment">/// The channel is empty and disconnected.</span>
+    <span class="doccomment">/// The channel is empty and disconnected.</span>
     <span class="ident">Disconnected</span>,
 }
 
@@ -2107,7 +2107,7 @@
     }
 }
 
-<span class="doccomment">/// An error returned from the `recv` method.</span>
+<span class="doccomment">/// An error returned from the `recv` method.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">unstable</span>)))]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
