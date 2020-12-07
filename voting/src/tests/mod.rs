@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-pub mod coin_based;
-pub mod metadata;
-pub mod mock;
-pub mod none;
+mod coin_based;
+mod metadata;
+mod mock;
+mod none;

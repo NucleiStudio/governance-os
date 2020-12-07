@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-pub mod details;
-pub mod dispatchable;
-pub mod genesis;
-pub mod meta;
-pub mod mock;
+mod details;
+mod dispatchable;
+mod genesis;
+mod meta;
+mod mock;
