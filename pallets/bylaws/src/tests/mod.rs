@@ -16,4 +16,4 @@
 
 mod dispatchable;
 mod genesis;
-mod mock;
+pub mod mock;

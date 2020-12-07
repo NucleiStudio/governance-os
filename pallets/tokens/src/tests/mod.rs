@@ -19,4 +19,4 @@ mod currencies;
 mod dispatchable;
 mod genesis;
 mod misc;
-mod mock;
+pub mod mock;
