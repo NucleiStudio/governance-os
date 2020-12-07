@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-use crate::{GenesisConfig, Module, OrganizationDetailsOf, RoleBuilder, Trait};
+use crate::{
+    GenesisConfig, Module, OrganizationDetails, OrganizationDetailsOf, RoleBuilder, Trait,
+};
 use governance_os_pallet_tokens::CurrencyDetails;
 use governance_os_support::{
     mock_runtime_with_currencies,
@@ -80,7 +82,10 @@ impl ExtBuilder {
 
     pub fn with_default_orgs(mut self, nb: u32) -> Self {
         for _ in 0..nb {
-            self.orgs.push(OrganizationDetailsOf::<Test>::default());
+            self.orgs.push(OrganizationDetails {
+                executors: vec![],
+                voting: VotingSystems::None,
+            });
         }
         self
     }

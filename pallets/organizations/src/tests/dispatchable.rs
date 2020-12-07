@@ -29,6 +29,7 @@ use governance_os_support::{
 use governance_os_voting::{
     CoinBasedVotingParameters, ProposalMetadata, VotingErrors, VotingSystems,
 };
+use sp_std::collections::btree_map::BTreeMap;
 
 fn make_proposal() -> Box<Call> {
     Box::new(Call::System(frame_system::Call::remark(vec![])))
@@ -56,14 +57,14 @@ fn create_increments_counter_and_save_details_and_configure_roles() {
                 OrganizationDetails {
                     // We intentionally make it unsorted for the test
                     executors: vec![CHARLIE, BOB],
-                    ..Default::default()
+                    voting: VotingSystems::None,
                 }
             ));
             assert_eq!(Organizations::counter(), 1);
 
             let org_id = Organizations::org_id_for(0);
 
-            let params = Organizations::parameters(org_id);
+            let params = Organizations::parameters(org_id).unwrap();
             assert_eq!(params.executors.as_slice(), [BOB, CHARLIE]);
 
             assert!(Bylaws::has_role(
@@ -87,7 +88,7 @@ fn apply_as() {
                 RawOrigin::Signed(ALICE).into(),
                 OrganizationDetails {
                     executors: vec![ALICE],
-                    ..Default::default()
+                    voting: VotingSystems::None,
                 }
             ));
             assert_ok!(Organizations::apply_as(
@@ -108,7 +109,7 @@ fn mutate_save_details_and_update_roles() {
                 RawOrigin::Signed(ALICE).into(),
                 OrganizationDetails {
                     executors: vec![ALICE, BOB],
-                    ..Default::default()
+                    voting: VotingSystems::None,
                 }
             ));
             let org_id = Organizations::org_id_for(0);
@@ -116,11 +117,11 @@ fn mutate_save_details_and_update_roles() {
                 RawOrigin::Signed(org_id).into(),
                 OrganizationDetails {
                     executors: vec![ALICE, CHARLIE],
-                    ..Default::default()
+                    voting: VotingSystems::None,
                 },
             ));
 
-            let params = Organizations::parameters(org_id);
+            let params = Organizations::parameters(org_id).unwrap();
             assert_eq!(params.executors.as_slice(), [ALICE, CHARLIE]);
 
             // BOB lost permissions
@@ -149,7 +150,10 @@ fn create_fail_if_not_corect_role() {
         assert_noop!(
             Organizations::create(
                 RawOrigin::Signed(ALICE).into(),
-                OrganizationDetails::default()
+                OrganizationDetails {
+                    executors: vec![],
+                    voting: VotingSystems::None,
+                }
             ),
             AclError::MissingRole
         );
@@ -182,7 +186,10 @@ fn mutate_fail_if_not_the_org_itself() {
             assert_noop!(
                 Organizations::mutate(
                     RawOrigin::Signed(ALICE).into(),
-                    OrganizationDetails::default()
+                    OrganizationDetails {
+                        executors: vec![],
+                        voting: VotingSystems::None,
+                    }
                 ),
                 Error::<Test>::NotAnOrganization,
             );
@@ -213,8 +220,9 @@ fn create_proposal_with_hook() {
 
             assert_eq!(Tokens::reserved_balance(TEST_TOKEN_ID, &ALICE), 2);
             assert!(Proposals::<Test>::contains_key(proposal_id));
-            assert_eq!(Organizations::proposals(proposal_id).org, org_id);
-            assert_eq!(Organizations::proposals(proposal_id).voting, voting_system);
+            let proposal = Organizations::proposals(proposal_id).unwrap();
+            assert_eq!(proposal.org, org_id);
+            assert_eq!(proposal.voting, voting_system);
         })
 }
 
@@ -375,7 +383,7 @@ fn veto_proposal_fail_if_called_on_wrong_proposal() {
         // Need to create test organization to avoid the "NotAnOrganization" error
         .with_org(OrganizationDetails {
             executors: vec![],
-            ..Default::default()
+            voting: VotingSystems::None,
         })
         .build()
         .execute_with(|| {
@@ -398,13 +406,12 @@ fn veto_proposal_fail_if_called_on_wrong_proposal() {
                 Error::<Test>::ProposalNotForOrganization
             );
 
-            // Proposal does not exists
             assert_noop!(
                 Organizations::veto_proposal(
                     RawOrigin::Signed(org_id).into(),
                     Organizations::proposal_id(&Organizations::org_id_for(1), proposal)
                 ),
-                Error::<Test>::ProposalNotForOrganization
+                Error::<Test>::ProposalNotFound
             );
         })
 }
@@ -424,7 +431,15 @@ fn veto_proposal_fail_if_hook_fail() {
                 &proposal_id,
                 Proposal {
                     org: org_id,
-                    ..Default::default()
+                    call: vec![],
+                    voting: VotingSystems::None,
+                    metadata: ProposalMetadata {
+                        votes: BTreeMap::new(),
+                        favorable: 0,
+                        against: 0,
+                        creator: ALICE,
+                        expiry: 0,
+                    },
                 },
             );
 
@@ -485,7 +500,7 @@ fn decide_on_proposal_and_update_metadata() {
             assert_eq!(Tokens::reserved_balance(TEST_TOKEN_ID, &BOB), 10);
             assert_eq!(Tokens::reserved_balance(TEST_TOKEN_ID, &CHARLIE), 5);
 
-            let metadata = Proposals::<Test>::get(proposal_id).metadata;
+            let metadata = Proposals::<Test>::get(proposal_id).unwrap().metadata;
             assert_eq!(metadata.favorable, 12);
             assert_eq!(metadata.against, 5);
         })
@@ -524,7 +539,15 @@ fn decide_on_proposal_fails_if_hook_fails() {
                 &proposal_id,
                 Proposal {
                     org: org_id,
-                    ..Default::default()
+                    call: vec![],
+                    voting: VotingSystems::None,
+                    metadata: ProposalMetadata {
+                        votes: BTreeMap::new(),
+                        favorable: 0,
+                        against: 0,
+                        creator: ALICE,
+                        expiry: 0,
+                    },
                 },
             );
 
@@ -620,10 +643,12 @@ fn close_fails_if_hook_fails() {
             Proposal {
                 org: org_id,
                 metadata: ProposalMetadata {
+                    votes: BTreeMap::new(),
                     favorable: 1,
                     ..Default::default()
                 },
-                ..Default::default()
+                call: vec![],
+                voting: VotingSystems::None,
             },
         );
 

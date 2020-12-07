@@ -79,12 +79,10 @@ pub trait Trait: frame_system::Trait {
     type Currencies: ReservableCurrencies<Self::AccountId>;
 
     /// The different kinds of voting system present inside the runtime.
-    /// **NOTE**: The `Default` voting system will be the one used during benchmarks,
-    /// thus you should probably set the most expensive one as the default.
-    type VotingSystem: Parameter + Member + MaybeSerializeDeserialize + Default;
+    type VotingSystem: Parameter + Member + MaybeSerializeDeserialize;
 
     /// Some arbitrary data that can be added to proposals
-    type ProposalMetadata: Parameter + Default;
+    type ProposalMetadata: Parameter;
 
     /// Various hooks as implemented for each voting system.
     type VotingHooks: VotingHooks<
@@ -117,8 +115,8 @@ const ORGS_MODULE_ID: ModuleId = ModuleId(*b"gos/orgs");
 decl_storage! {
     trait Store for Module<T: Trait> as Organizations {
         pub Counter get(fn counter): OrganizationsCounter = 0;
-        pub Parameters get(fn parameters): map hasher(blake2_128_concat) T::AccountId => OrganizationDetailsOf<T>;
-        pub Proposals get(fn proposals): map hasher(blake2_128_concat) ProposalIdOf<T> => ProposalOf<T>;
+        pub Parameters get(fn parameters): map hasher(blake2_128_concat) T::AccountId => Option<OrganizationDetailsOf<T>>;
+        pub Proposals get(fn proposals): map hasher(blake2_128_concat) ProposalIdOf<T> => Option<ProposalOf<T>>;
     }
     add_extra_genesis {
         config(organizations): Vec<OrganizationDetailsOf<T>>;
@@ -204,12 +202,11 @@ decl_module! {
         /// Mutate an organization to use the new parameters. Only an organization can call this on itself.
         #[weight = 0]
         fn mutate(origin, new_details: OrganizationDetailsOf<T>) {
-            let org_id = Self::ensure_org(origin)?;
+            let (org_id, old_details) = Self::ensure_org(origin)?;
 
             // Make sure everything is sorted for optimization purposes
             let mut new_details = new_details;
             new_details.sort();
-            let old_details = Parameters::<T>::take(&org_id);
 
             Self::try_run_on_changes(old_details.executors.as_slice(), new_details.executors.as_slice(), |old_account| {
                 RoleManagerOf::<T>::revoke_role(Some(old_account), RoleBuilderOf::<T>::apply_as_organization(&org_id))
@@ -226,15 +223,13 @@ decl_module! {
         fn create_proposal(origin, org_id: <T::Lookup as StaticLookup>::Source, call: Box<<T as Trait>::Call>) {
             let who = ensure_signed(origin)?;
             let target_org_id = T::Lookup::lookup(org_id)?;
-            ensure!(Parameters::<T>::contains_key(&target_org_id), Error::<T>::NotAnOrganization);
-
+            let details = Self::try_get_parameters(&target_org_id)?;
             let proposal_id = Self::proposal_id(&target_org_id, call.clone());
             if Proposals::<T>::contains_key(proposal_id) {
                 return Err(Error::<T>::ProposalDuplicate.into());
             }
 
-            let details = Self::parameters(&target_org_id);
-            let (maybe_hook_sucessful, additional_data) = T::VotingHooks::on_create_proposal(details.voting, &who, frame_system::Module::<T>::block_number());
+            let (maybe_hook_sucessful, additional_data) = T::VotingHooks::on_create_proposal(details.clone().voting, &who, frame_system::Module::<T>::block_number());
             ensure_not_err!(maybe_hook_sucessful);
 
             Proposals::<T>::insert(&proposal_id, Proposal{
@@ -244,7 +239,7 @@ decl_module! {
                 // Not only does this save us future read weights but it also cover
                 // the case where an org change voting systems but still has pending
                 // proposals.
-                voting: Self::parameters(&target_org_id).voting,
+                voting: details.voting,
             });
 
             Self::deposit_event(RawEvent::ProposalSubmitted(target_org_id, proposal_id));
@@ -254,8 +249,8 @@ decl_module! {
         /// typically this could come from an 'apply_as' or a separate vote.
         #[weight = 0]
         fn veto_proposal(origin, proposal_id: ProposalIdOf<T>) {
-            let org_id = Self::ensure_org(origin)?;
-            let proposal = Self::proposals(proposal_id);
+            let (org_id, _details) = Self::ensure_org(origin)?;
+            let proposal = Self::try_get_proposal(proposal_id)?;
             ensure!(proposal.org == org_id, Error::<T>::ProposalNotForOrganization);
 
             T::VotingHooks::on_veto_proposal(proposal.voting, proposal.metadata)?;
@@ -269,9 +264,7 @@ decl_module! {
         #[weight = 0]
         fn decide_on_proposal(origin, proposal_id: ProposalIdOf<T>, power: BalanceOf<T>, in_support: bool) {
             let voter = ensure_signed(origin)?;
-            let mut proposal = Self::proposals(proposal_id);
-            ensure!(proposal != Default::default(), Error::<T>::ProposalNotFound);
-
+            let mut proposal = Self::try_get_proposal(proposal_id)?;
             let (maybe_hook_sucessful, maybe_new_metadata) = T::VotingHooks::on_decide_on_proposal(proposal.clone().voting, proposal.clone().metadata, &voter, power, in_support);
             ensure_not_err!(maybe_hook_sucessful);
             if maybe_new_metadata != proposal.metadata {
@@ -288,8 +281,7 @@ decl_module! {
         #[weight = 0]
         fn close_proposal(origin, proposal_id: ProposalIdOf<T>) {
             let _ = ensure_signed(origin)?;
-            let proposal = Self::proposals(proposal_id);
-            ensure!(proposal != Default::default(), Error::<T>::ProposalNotFound);
+            let proposal = Self::try_get_proposal(proposal_id)?;
             ensure!(T::VotingHooks::can_close(proposal.clone().voting, proposal.clone().metadata, frame_system::Module::<T>::block_number()), Error::<T>::ProposalCanNotBeClosed);
 
             let passing = T::VotingHooks::passing(proposal.clone().voting, proposal.clone().metadata);
@@ -341,11 +333,33 @@ impl<T: Trait> Module<T> {
     }
 
     /// Makes sure that the `origin` is a registered organization
-    fn ensure_org(origin: T::Origin) -> Result<T::AccountId, DispatchError> {
+    fn ensure_org(
+        origin: T::Origin,
+    ) -> Result<(T::AccountId, OrganizationDetailsOf<T>), DispatchError> {
         match ensure_signed(origin) {
             Err(e) => Err(e.into()),
-            Ok(maybe_org_id) if Parameters::<T>::contains_key(&maybe_org_id) => Ok(maybe_org_id),
-            _ => Err(Error::<T>::NotAnOrganization.into()),
+            Ok(maybe_org_id) => Ok((
+                maybe_org_id.clone(),
+                Self::try_get_parameters(&maybe_org_id)?,
+            )),
+        }
+    }
+
+    /// Fetch an org details or error
+    fn try_get_parameters(
+        org_id: &T::AccountId,
+    ) -> Result<OrganizationDetailsOf<T>, DispatchError> {
+        match Parameters::<T>::get(org_id) {
+            Some(details) => Ok(details),
+            None => Err(Error::<T>::NotAnOrganization.into()),
+        }
+    }
+
+    /// Fetch a proposal details or error
+    fn try_get_proposal(proposal_id: ProposalIdOf<T>) -> Result<ProposalOf<T>, DispatchError> {
+        match Proposals::<T>::get(proposal_id) {
+            Some(proposal) => Ok(proposal),
+            None => Err(Error::<T>::ProposalNotFound.into()),
         }
     }
 

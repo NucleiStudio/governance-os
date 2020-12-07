@@ -95,14 +95,6 @@ pub enum VotingSystems<Balance, CurrencyId, BlockNumber, Currencies, AccountId> 
     _Phantom(marker::PhantomData<(AccountId, Currencies)>),
 }
 
-impl<Balance, CurrencyId, BlockNumber, Currencies, AccountId> Default
-    for VotingSystems<Balance, CurrencyId, BlockNumber, Currencies, AccountId>
-{
-    fn default() -> Self {
-        Self::None
-    }
-}
-
 /// Parameters for the coin based voting system.
 #[derive(Eq, PartialEq, RuntimeDebug, Encode, Decode, Copy, Clone)]
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
