@@ -30,9 +30,8 @@ impl frame_system::WeightInfo for WeightInfo {
     fn set_heap_pages() -> Weight {
         (4_000_000 as Weight).saturating_add(DbWeight::get().writes(1 as Weight))
     }
-    fn set_changes_trie_config(d: u32) -> Weight {
+    fn set_changes_trie_config() -> Weight {
         (11_730_000 as Weight)
-            .saturating_add((3_000 as Weight).saturating_mul(d as Weight))
             .saturating_add(DbWeight::get().reads(1 as Weight))
             .saturating_add(DbWeight::get().writes(2 as Weight))
     }
