@@ -21,8 +21,7 @@
 
 use frame_support::weights::{constants::RocksDbWeight as DbWeight, Weight};
 
-pub struct WeightInfo;
-impl governance_os_pallet_tokens::WeightInfo for WeightInfo {
+impl crate::WeightInfo for () {
     fn create() -> Weight {
         (114_000_000 as Weight)
             .saturating_add(DbWeight::get().reads(7 as Weight))
