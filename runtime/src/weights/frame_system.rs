@@ -16,40 +16,43 @@
 
 //! THIS FILE WAS AUTO-GENERATED USING THE SUBSTRATE BENCHMARK CLI VERSION 2.0.0
 
+#![allow(unused_parens)]
+#![allow(unused_imports)]
+
 use frame_support::weights::{constants::RocksDbWeight as DbWeight, Weight};
 
 pub struct WeightInfo;
 impl frame_system::WeightInfo for WeightInfo {
     // WARNING! Some components were not used: ["b"]
     fn remark() -> Weight {
-        2_106_000 as Weight
+        (2_677_000 as Weight)
     }
     fn set_heap_pages() -> Weight {
-        (5_000_000 as Weight).saturating_add(DbWeight::get().writes(1 as Weight))
+        (4_000_000 as Weight).saturating_add(DbWeight::get().writes(1 as Weight))
     }
-    // WARNING! Some components were not used: ["d"]
-    fn set_changes_trie_config() -> Weight {
-        (14_307_000 as Weight)
+    fn set_changes_trie_config(d: u32) -> Weight {
+        (11_730_000 as Weight)
+            .saturating_add((3_000 as Weight).saturating_mul(d as Weight))
             .saturating_add(DbWeight::get().reads(1 as Weight))
             .saturating_add(DbWeight::get().writes(2 as Weight))
     }
     fn set_storage(i: u32) -> Weight {
-        (0 as Weight)
-            .saturating_add((1_599_000 as Weight).saturating_mul(i as Weight))
+        (4_336_000 as Weight)
+            .saturating_add((1_474_000 as Weight).saturating_mul(i as Weight))
             .saturating_add(DbWeight::get().writes((1 as Weight).saturating_mul(i as Weight)))
     }
     fn kill_storage(i: u32) -> Weight {
-        (4_553_000 as Weight)
-            .saturating_add((1_004_000 as Weight).saturating_mul(i as Weight))
+        (0 as Weight)
+            .saturating_add((1_055_000 as Weight).saturating_mul(i as Weight))
             .saturating_add(DbWeight::get().writes((1 as Weight).saturating_mul(i as Weight)))
     }
     fn kill_prefix(p: u32) -> Weight {
-        (10_358_000 as Weight)
-            .saturating_add((1_938_000 as Weight).saturating_mul(p as Weight))
+        (0 as Weight)
+            .saturating_add((1_851_000 as Weight).saturating_mul(p as Weight))
             .saturating_add(DbWeight::get().writes((1 as Weight).saturating_mul(p as Weight)))
     }
     fn suicide() -> Weight {
-        (71_000_000 as Weight)
+        (57_000_000 as Weight)
             .saturating_add(DbWeight::get().reads(4 as Weight))
             .saturating_add(DbWeight::get().writes(2 as Weight))
     }
