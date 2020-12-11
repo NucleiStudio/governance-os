@@ -18,4 +18,4 @@ mod details;
 mod dispatchable;
 mod genesis;
 mod meta;
-mod mock;
+pub mod mock;

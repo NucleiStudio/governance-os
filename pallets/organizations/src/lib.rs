@@ -24,9 +24,10 @@
 use codec::{Decode, Encode};
 use frame_support::{
     decl_error, decl_event, decl_module, decl_storage,
-    dispatch::{Dispatchable, Parameter},
+    dispatch::{DispatchResultWithPostInfo, Dispatchable, Parameter, PostDispatchInfo},
     ensure,
-    weights::GetDispatchInfo,
+    traits::Get,
+    weights::{GetDispatchInfo, Weight},
 };
 use frame_system::ensure_signed;
 use governance_os_support::{
@@ -39,6 +40,9 @@ use sp_runtime::{
 };
 use sp_std::{boxed::Box, prelude::Vec};
 
+#[cfg(feature = "runtime-benchmarks")]
+mod benchmarking;
+mod default_weights;
 mod details;
 #[cfg(test)]
 mod tests;
@@ -57,12 +61,25 @@ pub trait RoleBuilder {
     fn apply_as_organization(org_id: &Self::OrganizationId) -> Self::Role;
 }
 
+pub trait WeightInfo {
+    fn create(b: u32) -> Weight;
+    fn mutate(b: u32, c: u32) -> Weight;
+    fn create_proposal() -> Weight;
+    fn veto_proposal(b: u32, c: u32) -> Weight;
+    fn decide_on_proposal_favorable(b: u32, c: u32) -> Weight;
+    fn decide_on_proposal_against(b: u32, c: u32) -> Weight;
+    fn close_proposal(b: u32, c: u32) -> Weight;
+}
+
 pub trait Trait: frame_system::Trait {
     /// Because this pallet emits events, it depends on the runtime's definition of an event.
     type Event: From<Event<Self>> + Into<<Self as frame_system::Trait>::Event>;
 
     /// Calls triggered from an organization.
-    type Call: Parameter + GetDispatchInfo + Dispatchable<Origin = Self::Origin>;
+    type Call: Parameter
+        + GetDispatchInfo
+        + From<frame_system::Call<Self>>
+        + Dispatchable<Origin = Self::Origin, PostInfo = PostDispatchInfo>;
 
     /// Pallet that is in charge of managing the roles based ACL.
     type RoleManager: RoleManager<AccountId = Self::AccountId>;
@@ -78,8 +95,10 @@ pub trait Trait: frame_system::Trait {
     /// Pallet handling currencies. Used to represent voting weights.
     type Currencies: ReservableCurrencies<Self::AccountId>;
 
-    /// The different kinds of voting system present inside the runtime.
-    type VotingSystem: Parameter + Member + MaybeSerializeDeserialize;
+    /// The different kinds of voting system present inside the runtime. For benchmark purposes
+    /// please make sure that the default voting system is the most expensive to use in terms
+    /// of compute resources.
+    type VotingSystem: Parameter + Member + MaybeSerializeDeserialize + Default;
 
     /// Some arbitrary data that can be added to proposals
     type ProposalMetadata: Parameter;
@@ -93,6 +112,17 @@ pub trait Trait: frame_system::Trait {
         OrganizationId = Self::AccountId,
         VotingSystem = Self::VotingSystem,
     >;
+
+    /// Mostly used for weight computations and not actually enforced. The maximum number
+    /// of votes in favor or against we can expect a proposal to have.
+    type MaxVotes: Get<u32>;
+
+    /// Mostly used for weight computations and not actually enforced. Maximum numbers of
+    /// executors we expect to be configured for an organization.
+    type MaxExecutors: Get<u32>;
+
+    /// Weight values for this pallet
+    type WeightInfo: WeightInfo;
 }
 
 type BalanceOf<T> =
@@ -174,6 +204,8 @@ decl_error! {
         /// The proposal code couldn't be decoded for some reason. This isn't expected to ever
         /// happen and thus should be reported upstream.
         ProposalDecodingFailure,
+        /// The weight passed to the function is too small.
+        TooSmallWeightBound,
     }
 }
 
@@ -183,14 +215,21 @@ decl_module! {
 
         /// Create an organization with the given parameters. An event will be triggered with
         /// the organization's address.
-        #[weight = 0]
+        #[weight = T::WeightInfo::create(details.executors.len() as u32)]
         fn create(origin, details: OrganizationDetailsOf<T>) {
             RoleManagerOf::<T>::ensure_has_role(origin, RoleBuilderOf::<T>::create_organizations())?;
             Self::do_create(details)?;
         }
 
         /// Trigger a call as if it came from the organization itself.
-        #[weight = 0]
+        #[weight =
+            call.get_dispatch_info().weight
+                .saturating_add(10_000)
+                // AccountData for inner call origin accountdata.
+                .saturating_add(T::DbWeight::get().reads_writes(1, 1))
+                // Two read performed by ensure_has_role
+                .saturating_add(T::DbWeight::get().reads(2))
+        ]
         fn apply_as(origin, org_id: <T::Lookup as StaticLookup>::Source, call: Box<<T as Trait>::Call>) {
             let target_org_id = T::Lookup::lookup(org_id)?;
             RoleManagerOf::<T>::ensure_has_role(origin, RoleBuilderOf::<T>::apply_as_organization(&target_org_id))?;
@@ -200,26 +239,32 @@ decl_module! {
         }
 
         /// Mutate an organization to use the new parameters. Only an organization can call this on itself.
-        #[weight = 0]
-        fn mutate(origin, new_details: OrganizationDetailsOf<T>) {
+        #[weight = T::WeightInfo::mutate(new_details.executors.len() as u32, T::MaxExecutors::get())]
+        fn mutate(origin, new_details: OrganizationDetailsOf<T>) -> DispatchResultWithPostInfo {
             let (org_id, old_details) = Self::ensure_org(origin)?;
 
             // Make sure everything is sorted for optimization purposes
             let mut new_details = new_details;
             new_details.sort();
 
+            let mut roles_granted: u32 = 0;
+            let mut roles_revoked: u32 = 0;
             Self::try_run_on_changes(old_details.executors.as_slice(), new_details.executors.as_slice(), |old_account| {
+                roles_revoked = roles_revoked.saturating_add(1);
                 RoleManagerOf::<T>::revoke_role(Some(old_account), RoleBuilderOf::<T>::apply_as_organization(&org_id))
             }, |new_account| {
+                roles_granted = roles_granted.saturating_add(1);
                 RoleManagerOf::<T>::grant_role(Some(new_account), RoleBuilderOf::<T>::apply_as_organization(&org_id))
             })?;
             Parameters::<T>::insert(&org_id, new_details.clone());
 
             Self::deposit_event(RawEvent::OrganizationMutated(org_id, old_details, new_details));
+
+            Ok(Some(T::WeightInfo::mutate(roles_granted, roles_revoked)).into())
         }
 
         /// Create a proposal for a given organization
-        #[weight = 0]
+        #[weight = T::WeightInfo::create_proposal()]
         fn create_proposal(origin, org_id: <T::Lookup as StaticLookup>::Source, call: Box<<T as Trait>::Call>) {
             let who = ensure_signed(origin)?;
             let target_org_id = T::Lookup::lookup(org_id)?;
@@ -247,7 +292,7 @@ decl_module! {
 
         /// Remove a proposal from the batch of active ones. Has to be called by the organization itself,
         /// typically this could come from an 'apply_as' or a separate vote.
-        #[weight = 0]
+        #[weight = T::WeightInfo::veto_proposal(T::MaxVotes::get(), T::MaxVotes::get())]
         fn veto_proposal(origin, proposal_id: ProposalIdOf<T>) {
             let (org_id, _details) = Self::ensure_org(origin)?;
             let proposal = Self::try_get_proposal(proposal_id)?;
@@ -261,7 +306,12 @@ decl_module! {
 
         /// Vote for or against a given proposal. The caller can choose how much voting power is dedicated
         /// to it via the `power` parameter.
-        #[weight = 0]
+        #[weight = {
+            match in_support {
+                true => T::WeightInfo::decide_on_proposal_favorable(T::MaxVotes::get(), T::MaxVotes::get()),
+                false => T::WeightInfo::decide_on_proposal_against(T::MaxVotes::get(), T::MaxVotes::get()),
+            }
+        }]
         fn decide_on_proposal(origin, proposal_id: ProposalIdOf<T>, power: BalanceOf<T>, in_support: bool) {
             let voter = ensure_signed(origin)?;
             let mut proposal = Self::try_get_proposal(proposal_id)?;
@@ -278,22 +328,31 @@ decl_module! {
 
         /// If a proposal passed or failed but is not longer awaiting or waiting for votes it can be closed. Closing
         /// a proposal means executing it if it passed, freeing all funds locked and erasing it from the local storage.
-        #[weight = 0]
-        fn close_proposal(origin, proposal_id: ProposalIdOf<T>) {
+        /// `proposal_weight_bound` has to be at least equal to the weight of the call that will be executed would the
+        /// proposal pass.
+        #[weight = T::WeightInfo::close_proposal(T::MaxVotes::get(), T::MaxVotes::get()).saturating_add(*proposal_weight_bound)]
+        fn close_proposal(origin, proposal_id: ProposalIdOf<T>, proposal_weight_bound: Weight) -> DispatchResultWithPostInfo {
             let _ = ensure_signed(origin)?;
             let proposal = Self::try_get_proposal(proposal_id)?;
+            let decoded_call = <T as Trait>::Call::decode(&mut &proposal.clone().call[..]).map_err(|_| Error::<T>::ProposalDecodingFailure)?;
+            let decoded_call_weight = decoded_call.get_dispatch_info().weight;
+            ensure!(proposal_weight_bound >= decoded_call_weight, Error::<T>::TooSmallWeightBound);
             ensure!(T::VotingHooks::can_close(proposal.clone().voting, proposal.clone().metadata, frame_system::Module::<T>::block_number()), Error::<T>::ProposalCanNotBeClosed);
 
             let passing = T::VotingHooks::passing(proposal.clone().voting, proposal.clone().metadata);
             T::VotingHooks::on_close_proposal(proposal.clone().voting, proposal.clone().metadata, passing)?;
+
+            let mut external_weight: Weight = 0;
             if passing {
-                let decoded_call = <T as Trait>::Call::decode(&mut &proposal.clone().call[..]).map_err(|_| Error::<T>::ProposalDecodingFailure)?;
                 let res = decoded_call.dispatch(frame_system::RawOrigin::Signed(proposal.clone().org).into());
                 Self::deposit_event(RawEvent::ProposalExecuted(proposal_id, res.map(|_| ()).map_err(|e| e.error)));
+                external_weight = external_weight.saturating_add(Self::get_result_weight(res).unwrap_or(decoded_call_weight));
             }
             Proposals::<T>::remove(proposal_id);
 
             Self::deposit_event(RawEvent::ProposalClosed(proposal_id, passing));
+
+            Ok(Some(T::WeightInfo::close_proposal(T::MaxVotes::get(), T::MaxVotes::get()).saturating_add(external_weight)).into())
         }
     }
 }
@@ -305,8 +364,8 @@ impl<T: Trait> Module<T> {
     fn try_run_on_changes<Elem: Ord>(
         old_vec: &[Elem],
         new_vec: &[Elem],
-        on_old: impl Fn(&Elem) -> DispatchResult,
-        on_new: impl Fn(&Elem) -> DispatchResult,
+        on_old: impl FnMut(&Elem) -> DispatchResult,
+        on_new: impl FnMut(&Elem) -> DispatchResult,
     ) -> DispatchResult {
         Self::try_run_if_not_in_right(old_vec, new_vec, on_old)
             .and_then(|_| Self::try_run_if_not_in_right(new_vec, old_vec, on_new))
@@ -316,7 +375,7 @@ impl<T: Trait> Module<T> {
     fn try_run_if_not_in_right<Elem: Ord>(
         left: &[Elem],
         right: &[Elem],
-        to_run: impl Fn(&Elem) -> DispatchResult,
+        mut to_run: impl FnMut(&Elem) -> DispatchResult,
     ) -> DispatchResult {
         left.into_iter().try_for_each(|elem| {
             if right.binary_search(&elem).is_err() {
@@ -365,18 +424,41 @@ impl<T: Trait> Module<T> {
 
     /// Hash the block number, org id and proposal together to generate its id
     fn proposal_id(org_id: &T::AccountId, proposal: Box<<T as Trait>::Call>) -> ProposalIdOf<T> {
-        T::Hashing::hash_of(&[
-            frame_system::Module::<T>::block_number().encode(),
-            org_id.encode(),
-            proposal.encode(),
-        ])
+        // Proposals are organization specific and there can not be two identical proposals opened
+        // in the same organization.
+        T::Hashing::hash_of(&[org_id.encode(), proposal.encode()])
     }
 
+    /// Return the weight of a dispatch call result as an `Option`.
+    ///
+    /// Will return the weight regardless of what the state of the result is.
+    fn get_result_weight(result: DispatchResultWithPostInfo) -> Option<Weight> {
+        match result {
+            Ok(post_info) => post_info.actual_weight,
+            Err(err) => err.post_info.actual_weight,
+        }
+    }
+
+    /// Generate an organization id and use `do_create_with_id` to actually create the org.
     fn do_create(details: OrganizationDetailsOf<T>) -> DispatchResult {
         let counter = Self::counter();
         let new_counter = counter.checked_add(1).ok_or(Error::<T>::CounterOverflow)?;
         let org_id = Self::org_id_for(counter);
 
+        Self::do_create_with_id(details, org_id)?;
+        // We only increment the counter after the do_create_with_id as it may error early in
+        // which case we do not want to write to our storage.
+        Counter::put(new_counter);
+
+        Ok(())
+    }
+
+    /// Alternative to do_create where the caller set the org_id themselves. Mostly used
+    /// for benchmarks where we want the `org_id` to be whitelisted.
+    fn do_create_with_id(
+        details: OrganizationDetailsOf<T>,
+        org_id: T::AccountId,
+    ) -> DispatchResult {
         // Sorting details allows us to be more efficient when updating them later on.
         let mut details = details;
         details.sort();
@@ -389,7 +471,6 @@ impl<T: Trait> Module<T> {
                 RoleBuilderOf::<T>::apply_as_organization(&org_id),
             )
         })?;
-        Counter::put(new_counter);
         Parameters::<T>::insert(&org_id, details.clone());
 
         Self::deposit_event(RawEvent::OrganizationCreated(org_id, details));

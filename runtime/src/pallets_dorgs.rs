@@ -31,6 +31,11 @@ impl governance_os_pallet_bylaws::Trait for Runtime {
     type RoleBuilder = Role;
 }
 
+parameter_types! {
+    pub const MaxVotes: u32 = 10_000;
+    pub const MaxExecutors: u32 = 100;
+}
+
 impl governance_os_pallet_organizations::Trait for Runtime {
     type Event = Event;
     type Call = Call;
@@ -41,4 +46,7 @@ impl governance_os_pallet_organizations::Trait for Runtime {
         VotingSystems<Balance, CurrencyId, BlockNumber, Self::Currencies, AccountId>;
     type ProposalMetadata = ProposalMetadata<AccountId, Balance, BlockNumber>;
     type VotingHooks = VotingSystems<Balance, CurrencyId, BlockNumber, Self::Currencies, AccountId>;
+    type MaxVotes = MaxVotes;
+    type MaxExecutors = MaxExecutors;
+    type WeightInfo = ();
 }

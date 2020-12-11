@@ -17,6 +17,8 @@
 //! A collection of helpers and well know values used accross the Governance OS
 //! codebase when writing benchmarks.
 
+use frame_system::{Module as System, Trait as SystemTrait};
+
 pub const SEED: u32 = 0;
 
 #[macro_export]
@@ -32,4 +34,9 @@ macro_rules! create_benchmarking_test {
             })
         }
     };
+}
+
+/// Advance blocks by the `x`. Useful when benchmarks depends on block numbers changing.
+pub fn advance_blocks<T: SystemTrait>(x: T::BlockNumber) {
+    System::<T>::set_block_number(System::<T>::block_number() + x);
 }

@@ -70,6 +70,7 @@ fn testnet_genesis(
             Some(get_account_id_from_seed::<sr25519::Public>("Alice")),
         ),
         (Role::CreateCurrencies, None),
+        (Role::CreateOrganizations, None),
     ]);
 
     GenesisConfig {
