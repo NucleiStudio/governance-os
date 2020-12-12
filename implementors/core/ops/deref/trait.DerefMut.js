@@ -8,7 +8,7 @@ implementors["bstr"] = [{"text":"impl DerefMut for BString","synthetic":false,"t
 implementors["bytes"] = [{"text":"impl DerefMut for BytesMut","synthetic":false,"types":[]}];
 implementors["cache_padded"] = [{"text":"impl&lt;T&gt; DerefMut for CachePadded&lt;T&gt;","synthetic":false,"types":[]}];
 implementors["cranelift_codegen"] = [{"text":"impl DerefMut for VariableArgs","synthetic":false,"types":[]}];
-implementors["crossbeam_epoch"] = [{"text":"impl&lt;T:&nbsp;?Sized + Pointable&gt; DerefMut for Owned&lt;T&gt;","synthetic":false,"types":[]}];
+implementors["crossbeam_epoch"] = [{"text":"impl&lt;T&gt; DerefMut for Owned&lt;T&gt;","synthetic":false,"types":[]}];
 implementors["crossbeam_utils"] = [{"text":"impl&lt;T&gt; DerefMut for CachePadded&lt;T&gt;","synthetic":false,"types":[]},{"text":"impl&lt;'a, T:&nbsp;?Sized&gt; DerefMut for ShardedLockWriteGuard&lt;'a, T&gt;","synthetic":false,"types":[]}];
 implementors["either"] = [{"text":"impl&lt;L, R&gt; DerefMut for Either&lt;L, R&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;L: DerefMut,<br>&nbsp;&nbsp;&nbsp;&nbsp;R: DerefMut&lt;Target = L::Target&gt;,&nbsp;</span>","synthetic":false,"types":[]}];
 implementors["futures"] = [{"text":"impl&lt;'a, T&gt; DerefMut for BiLockGuard&lt;'a, T&gt;","synthetic":false,"types":[]},{"text":"impl&lt;T&gt; DerefMut for BiLockAcquired&lt;T&gt;","synthetic":false,"types":[]}];
