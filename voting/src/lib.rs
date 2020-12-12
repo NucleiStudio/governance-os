@@ -74,7 +74,13 @@ where
 /// This enum is in charge of representing and handling all existing voting systems.
 #[derive(Eq, PartialEq, RuntimeDebug, Encode, Decode, Copy, Clone)]
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
-pub enum VotingSystems<Balance, CurrencyId, BlockNumber, Currencies, AccountId> {
+pub enum VotingSystems<
+    Balance: Default,
+    CurrencyId: Default,
+    BlockNumber: Default,
+    Currencies,
+    AccountId,
+> {
     /// An empty voting system. Useful if someone wants to create an organization
     /// managed by other things than votes.
     None,
@@ -95,10 +101,22 @@ pub enum VotingSystems<Balance, CurrencyId, BlockNumber, Currencies, AccountId> 
     _Phantom(marker::PhantomData<(AccountId, Currencies)>),
 }
 
+impl<Balance, CurrencyId, BlockNumber, Currencies, AccountId> Default
+    for VotingSystems<Balance, CurrencyId, BlockNumber, Currencies, AccountId>
+where
+    Balance: Default,
+    CurrencyId: Default,
+    BlockNumber: Default,
+{
+    fn default() -> Self {
+        Self::CoinBased(CoinBasedVotingParameters::<Balance, CurrencyId, BlockNumber>::default())
+    }
+}
+
 /// Parameters for the coin based voting system.
-#[derive(Eq, PartialEq, RuntimeDebug, Encode, Decode, Copy, Clone)]
+#[derive(Eq, PartialEq, RuntimeDebug, Encode, Decode, Copy, Clone, Default)]
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
-pub struct CoinBasedVotingParameters<Balance, CurrencyId, BlockNumber> {
+pub struct CoinBasedVotingParameters<Balance: Default, CurrencyId: Default, BlockNumber: Default> {
     /// What currency is used to represent vote inside the organization.
     pub voting_currency: CurrencyId,
     /// How much one has to lock to create a proposal and fight spam.

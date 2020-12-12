@@ -35,11 +35,7 @@ pub enum CurrencyId {
     Native,
     Custom(u32),
 }
-impl Default for CurrencyId {
-    fn default() -> Self {
-        Self::Native
-    }
-}
+impl_enum_default!(CurrencyId, Native);
 
 /// An index to a block.
 pub type BlockNumber = u32;

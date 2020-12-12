@@ -95,7 +95,7 @@ decl_module! {
         #[weight = (
             call.get_dispatch_info().weight
                 .saturating_add(10_000)
-                 // AccountData for inner call origin accountdata.
+                // AccountData for inner call origin accountdata.
                 .saturating_add(T::DbWeight::get().reads_writes(1, 1))
                 // Two read performed by ensure_has_role
                 .saturating_add(T::DbWeight::get().reads(2)),

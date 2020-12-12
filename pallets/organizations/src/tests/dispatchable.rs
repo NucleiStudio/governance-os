@@ -16,7 +16,8 @@
 
 use super::mock::{Bylaws, Call, ExtBuilder, MockRoles, Organizations, Test, Tokens};
 use crate::{Error, OrganizationDetails, Proposal, Proposals, RoleBuilder};
-use frame_support::{assert_noop, assert_ok, StorageMap};
+use codec::Encode;
+use frame_support::{assert_noop, assert_ok, weights::GetDispatchInfo, StorageMap};
 use frame_system::RawOrigin;
 use governance_os_support::{
     errors::AclError,
@@ -223,42 +224,6 @@ fn create_proposal_with_hook() {
             let proposal = Organizations::proposals(proposal_id).unwrap();
             assert_eq!(proposal.org, org_id);
             assert_eq!(proposal.voting, voting_system);
-        })
-}
-
-#[test]
-fn create_same_proposal_later_works() {
-    ExtBuilder::default()
-        .hundred_for_alice()
-        .with_org(OrganizationDetails {
-            executors: vec![],
-            voting: make_voting_system_with_creation_fee(),
-        })
-        .build()
-        .execute_with(|| {
-            let org_id = Organizations::org_id_for(0);
-            let proposal = make_proposal();
-            let first_proposal_id = Organizations::proposal_id(&org_id, proposal.clone());
-
-            assert_ok!(Organizations::create_proposal(
-                RawOrigin::Signed(ALICE).into(),
-                org_id,
-                proposal.clone()
-            ));
-
-            // Change block numbers so that proposal IDs are different
-            frame_system::Module::<Test>::set_block_number(
-                frame_system::Module::<Test>::block_number() + 1,
-            );
-            let second_proposal_id = Organizations::proposal_id(&org_id, proposal.clone());
-            assert_ok!(Organizations::create_proposal(
-                RawOrigin::Signed(ALICE).into(),
-                org_id,
-                proposal.clone()
-            ));
-
-            assert!(first_proposal_id != second_proposal_id);
-            assert_eq!(Tokens::reserved_balance(TEST_TOKEN_ID, &ALICE), 4);
         })
 }
 
@@ -586,7 +551,7 @@ macro_rules! test_close_proposal {
                     assert_ok!(Organizations::create_proposal(
                         RawOrigin::Signed(ALICE).into(),
                         org_id,
-                        proposal
+                        proposal.clone()
                     ));
                     assert_ok!(Organizations::decide_on_proposal(
                         RawOrigin::Signed(ALICE).into(),
@@ -603,6 +568,7 @@ macro_rules! test_close_proposal {
                     assert_ok!(Organizations::close_proposal(
                         RawOrigin::Signed(ALICE).into(),
                         proposal_id,
+                        proposal.get_dispatch_info().weight
                     ));
 
                     // Freed the funds
@@ -618,13 +584,55 @@ test_close_proposal!(close_passing_proposal, true);
 test_close_proposal!(close_failing_proposal, false);
 
 #[test]
+fn close_fails_if_proposal_weight_bound_is_too_small() {
+    ExtBuilder::default()
+        .hundred_for_alice()
+        .with_org(OrganizationDetails {
+            executors: vec![],
+            voting: make_voting_system_with_creation_fee(),
+        })
+        .build()
+        .execute_with(|| {
+            let org_id = Organizations::org_id_for(0);
+            let proposal = make_proposal();
+            let proposal_id = Organizations::proposal_id(&org_id, proposal.clone());
+
+            assert_ok!(Organizations::create_proposal(
+                RawOrigin::Signed(ALICE).into(),
+                org_id,
+                proposal.clone()
+            ));
+            assert_ok!(Organizations::decide_on_proposal(
+                RawOrigin::Signed(ALICE).into(),
+                proposal_id,
+                10,
+                true
+            ));
+
+            // Make sure we can close by making the proposal expire
+            frame_system::Module::<Test>::set_block_number(
+                frame_system::Module::<Test>::block_number() + 10,
+            );
+
+            assert_noop!(
+                Organizations::close_proposal(
+                    RawOrigin::Signed(ALICE).into(),
+                    proposal_id,
+                    proposal.get_dispatch_info().weight - 1
+                ),
+                Error::<Test>::TooSmallWeightBound
+            );
+        })
+}
+
+#[test]
 fn close_fails_if_proposal_does_not_exists() {
     ExtBuilder::default().build().execute_with(|| {
         let proposal_id =
             Organizations::proposal_id(&Organizations::org_id_for(0), make_proposal());
 
         assert_noop!(
-            Organizations::close_proposal(RawOrigin::Signed(ALICE).into(), proposal_id,),
+            Organizations::close_proposal(RawOrigin::Signed(ALICE).into(), proposal_id, 0),
             Error::<Test>::ProposalNotFound
         );
     })
@@ -635,7 +643,7 @@ fn close_fails_if_hook_fails() {
     ExtBuilder::default().build().execute_with(|| {
         let org_id = Organizations::org_id_for(0);
         let proposal = make_proposal();
-        let proposal_id = Organizations::proposal_id(&org_id, proposal);
+        let proposal_id = Organizations::proposal_id(&org_id, proposal.clone());
 
         // We have to insert a fake proposal and bypass the hook for the `None` voting system
         Proposals::<Test>::insert(
@@ -647,13 +655,17 @@ fn close_fails_if_hook_fails() {
                     favorable: 1,
                     ..Default::default()
                 },
-                call: vec![],
+                call: make_proposal().encode(),
                 voting: VotingSystems::None,
             },
         );
 
         assert_noop!(
-            Organizations::close_proposal(RawOrigin::Signed(ALICE).into(), proposal_id,),
+            Organizations::close_proposal(
+                RawOrigin::Signed(ALICE).into(),
+                proposal_id,
+                proposal.get_dispatch_info().weight
+            ),
             VotingErrors::NotAVotingSystem
         );
     })
@@ -682,11 +694,15 @@ fn close_fails_if_proposal_still_needs_votes() {
             assert_ok!(Organizations::create_proposal(
                 RawOrigin::Signed(ALICE).into(),
                 org_id,
-                proposal
+                proposal.clone()
             ));
 
             assert_noop!(
-                Organizations::close_proposal(RawOrigin::Signed(ALICE).into(), proposal_id),
+                Organizations::close_proposal(
+                    RawOrigin::Signed(ALICE).into(),
+                    proposal_id,
+                    proposal.get_dispatch_info().weight
+                ),
                 Error::<Test>::ProposalCanNotBeClosed
             );
         })

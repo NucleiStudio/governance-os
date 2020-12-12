@@ -26,6 +26,11 @@ use governance_os_voting::{ProposalMetadata, VotingSystems};
 
 mock_runtime_with_currencies!(Test);
 
+parameter_types! {
+    pub const MaxVotes: u32 = 100;
+    pub const MaxExecutors: u32 = 100;
+}
+
 impl Trait for Test {
     type Event = ();
     type Call = Call;
@@ -36,6 +41,9 @@ impl Trait for Test {
         VotingSystems<Balance, CurrencyId, BlockNumber, Self::Currencies, AccountId>;
     type ProposalMetadata = ProposalMetadata<AccountId, Balance, BlockNumber>;
     type VotingHooks = VotingSystems<Balance, CurrencyId, BlockNumber, Self::Currencies, AccountId>;
+    type MaxVotes = MaxVotes;
+    type MaxExecutors = MaxExecutors;
+    type WeightInfo = ();
 }
 
 impl RoleBuilder for MockRoles {
@@ -112,13 +120,26 @@ impl ExtBuilder {
 
         governance_os_pallet_tokens::GenesisConfig::<Test> {
             endowed_accounts: self.endowed_accounts,
-            currency_details: vec![(
-                TEST_TOKEN_ID,
-                CurrencyDetails {
-                    owner: TEST_TOKEN_OWNER,
-                    transferable: true,
-                },
-            )],
+            currency_details: vec![
+                (
+                    TEST_TOKEN_ID,
+                    CurrencyDetails {
+                        owner: TEST_TOKEN_OWNER,
+                        transferable: true,
+                    },
+                ),
+                (
+                    // Benchmarks depends on a default voting system. A voting system may depend on a
+                    // default currency id that would need to be transferable. Normally, the default
+                    // value for our mocks would be 0 thus we make sure it was created as well. This makes
+                    // sure that a `cargo test --all --all-features` works.
+                    0,
+                    CurrencyDetails {
+                        owner: TEST_TOKEN_OWNER,
+                        transferable: true,
+                    },
+                ),
+            ],
         }
         .assimilate_storage(&mut t)
         .unwrap();
