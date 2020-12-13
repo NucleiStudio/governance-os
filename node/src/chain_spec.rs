@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
+use crate::helpers::core_org;
+use governance_os_pallet_organizations::OrganizationDetails;
 use governance_os_pallet_tokens::CurrencyDetails;
-use governance_os_primitives::{AccountId, CurrencyId, Role, Signature};
+use governance_os_primitives::{AccountId, Balance, BlockNumber, CurrencyId, Role, Signature};
 use governance_os_runtime::{
     AuraConfig, AuraId, BylawsConfig, GenesisConfig, GrandpaConfig, GrandpaId, NativeCurrencyId,
-    OrganizationsConfig, SystemConfig, TokensConfig, WASM_BINARY,
+    OrganizationsConfig, SystemConfig, Tokens, TokensConfig, WASM_BINARY,
 };
+use governance_os_voting::{CoinBasedVotingParameters, VotingSystems};
 use sc_service::ChainType;
 use sp_core::{sr25519, Pair, Public};
 use sp_runtime::traits::{IdentifyAccount, Verify};
@@ -56,22 +59,37 @@ fn testnet_genesis(
     endowed_accounts: Vec<AccountId>,
     currencies: Option<Vec<(CurrencyId, CurrencyDetails<AccountId>)>>,
     roles: Option<Vec<(Role, Option<AccountId>)>>,
+    organizations: Option<
+        Vec<
+            OrganizationDetails<
+                AccountId,
+                VotingSystems<Balance, CurrencyId, BlockNumber, Tokens, AccountId>,
+            >,
+        >,
+    >,
 ) -> GenesisConfig {
     let chain_currencies = currencies.unwrap_or(vec![(
         NativeCurrencyId::get(),
         CurrencyDetails {
-            owner: get_account_id_from_seed::<sr25519::Public>("Alice"),
+            owner: core_org(),
             transferable: true,
         },
     )]);
     let chain_roles = roles.unwrap_or(vec![
-        (
-            Role::Root,
-            Some(get_account_id_from_seed::<sr25519::Public>("Alice")),
-        ),
+        (Role::Root, Some(core_org())),
         (Role::CreateCurrencies, None),
         (Role::CreateOrganizations, None),
     ]);
+    let chain_orgs = organizations.unwrap_or(vec![OrganizationDetails {
+        executors: vec![get_account_id_from_seed::<sr25519::Public>("Alice")],
+        voting: VotingSystems::CoinBased(CoinBasedVotingParameters {
+            voting_currency: CurrencyId::Native,
+            creation_fee: 10,
+            min_quorum: 50,
+            min_participation: 33,
+            ttl: 50, // Short TTL for testing
+        }),
+    }]);
 
     GenesisConfig {
         frame_system: Some(SystemConfig {
@@ -98,12 +116,10 @@ fn testnet_genesis(
         }),
         governance_os_pallet_bylaws: Some(BylawsConfig { roles: chain_roles }),
         governance_os_pallet_organizations: Some(OrganizationsConfig {
-            organizations: vec![],
+            organizations: chain_orgs,
         }),
     }
 }
-
-// TODO: we'd like the native currency to be owned by a demo dOrg
 
 pub fn development_config() -> Result<ChainSpec, String> {
     let wasm_binary = WASM_BINARY.ok_or("Development wasm binary not available".to_string())?;
@@ -120,6 +136,7 @@ pub fn development_config() -> Result<ChainSpec, String> {
                     get_account_id_from_seed::<sr25519::Public>("Alice"),
                     get_account_id_from_seed::<sr25519::Public>("Bob"),
                 ],
+                None,
                 None,
                 None,
             )
@@ -156,6 +173,7 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
                 ],
                 None,
                 None,
+                None,
             )
         },
         vec![],
@@ -182,6 +200,7 @@ pub fn dummy_config() -> Result<ChainSpec, String> {
                 vec![],
                 Some(vec![]),
                 None,
+                Some(vec![]),
             )
         },
         vec![],

@@ -18,11 +18,14 @@ use crate::{
     chain_spec,
     cli::{Cli, Subcommand},
     executor::Executor,
+    helpers::{core_org, set_default_ss58_version},
     service::{new_full, new_light, new_partial},
 };
 use governance_os_runtime::Block;
+use log::info;
 use sc_cli::{ChainSpec, Role, RuntimeVersion, SubstrateCli};
 use sc_service::{ChainSpec as ServiceChainSpec, PartialComponents};
+use sp_core::crypto::Ss58Codec;
 
 impl SubstrateCli for Cli {
     fn impl_name() -> String {
@@ -68,6 +71,7 @@ impl SubstrateCli for Cli {
 /// Parse and run command line arguments
 pub fn run() -> sc_cli::Result<()> {
     let cli = Cli::from_args();
+    set_default_ss58_version();
 
     match &cli.subcommand {
         Some(Subcommand::BuildSpec(cmd)) => {
@@ -149,9 +153,16 @@ pub fn run() -> sc_cli::Result<()> {
         }
         None => {
             let runner = cli.create_runner(&cli.run)?;
-            runner.run_node_until_exit(|config| match config.role {
-                Role::Light => new_light(config),
-                _ => new_full(config),
+            runner.run_node_until_exit(|config| {
+                info!(
+                    "Core organization account id: {}",
+                    core_org().to_ss58check(),
+                );
+
+                match config.role {
+                    Role::Light => new_light(config),
+                    _ => new_full(config),
+                }
             })
         }
     }

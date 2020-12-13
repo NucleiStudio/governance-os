@@ -47,7 +47,7 @@ mod details;
 #[cfg(test)]
 mod tests;
 
-use details::{OrganizationDetails, Proposal};
+pub use details::{OrganizationDetails, Proposal};
 
 pub trait RoleBuilder {
     type OrganizationId;
@@ -387,7 +387,7 @@ impl<T: Trait> Module<T> {
     }
 
     /// Given any counter return the associated organization id
-    fn org_id_for(counter: u32) -> T::AccountId {
+    pub fn org_id_for(counter: u32) -> T::AccountId {
         ORGS_MODULE_ID.into_sub_account(counter)
     }
 

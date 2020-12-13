@@ -21,6 +21,7 @@ mod chain_spec;
 mod cli;
 mod command;
 mod executor;
+mod helpers;
 mod rpc;
 mod service;
 
