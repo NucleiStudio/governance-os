@@ -155,7 +155,30 @@ pub fn run() -> sc_cli::Result<()> {
             let runner = cli.create_runner(&cli.run)?;
             runner.run_node_until_exit(|config| {
                 info!(
-                    "Core organization account id: {}",
+                    r#"
+
+                     __/>^^^;:,
+        __  __      /-.       :,/|/|
+       /  \/  \  __/ ^         :,/ \__
+      |        |(~             ;/ /  /
+      \        / `-'--._       / / ,<  ___
+       \      /,__.   /=\     /  _/  >|_'.
+        \    /  `_ `--------'    __ / ',\ \
+         \  / ,_// ,---_____,   ,_  \_  ,| |
+          \/   `--' |=|           \._/ ,/  |
+                     \=\            `,,/   |
+                      \=\            ||    /
+                       \=\____       |\    \
+                      / \/    `     <__)    \
+                      | |                    |
+                    ,__\,\                   /
+                   ,--____>    /\.         ./
+                   '-__________>  \.______/
+                "#
+                );
+
+                info!(
+                    "✨ Core organization account id: {}",
                     core_org().to_ss58check(),
                 );
 
