@@ -32,7 +32,10 @@ impl governance_os_pallet_bylaws::Trait for Runtime {
 }
 
 parameter_types! {
-    pub const MaxVotes: u32 = 10_000;
+    // For now we keep this value small to avoid extrinsics with abusive weights.
+    // Future upgrades should bring this value up without increasing the maximum
+    // block weight.
+    pub const MaxVotes: u32 = 100;
     pub const MaxExecutors: u32 = 100;
 }
 
