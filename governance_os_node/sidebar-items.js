@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["main",""]],"mod":[["chain_spec",""],["cli",""],["command",""],["executor",""],["rpc","Implement node specific RPC handlers."],["service",""]]});
+initSidebarItems({"fn":[["main",""]],"mod":[["chain_spec",""],["cli",""],["command",""],["executor",""],["helpers",""],["rpc","Implement node specific RPC handlers."],["service",""]]});

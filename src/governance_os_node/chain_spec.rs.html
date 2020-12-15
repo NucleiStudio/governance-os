@@ -194,6 +194,25 @@
 <span id="191">191</span>
 <span id="192">192</span>
 <span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">/*
  * Copyright 2020 Nuclei Studio OÜ
@@ -211,12 +230,15 @@
  * limitations under the License.
  */</span>
 
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">helpers</span>::<span class="ident">core_org</span>;
+<span class="kw">use</span> <span class="ident">governance_os_pallet_organizations</span>::<span class="ident">OrganizationDetails</span>;
 <span class="kw">use</span> <span class="ident">governance_os_pallet_tokens</span>::<span class="ident">CurrencyDetails</span>;
-<span class="kw">use</span> <span class="ident">governance_os_primitives</span>::{<span class="ident">AccountId</span>, <span class="ident">CurrencyId</span>, <span class="ident">Role</span>, <span class="ident">Signature</span>};
+<span class="kw">use</span> <span class="ident">governance_os_primitives</span>::{<span class="ident">AccountId</span>, <span class="ident">Balance</span>, <span class="ident">BlockNumber</span>, <span class="ident">CurrencyId</span>, <span class="ident">Role</span>, <span class="ident">Signature</span>};
 <span class="kw">use</span> <span class="ident">governance_os_runtime</span>::{
     <span class="ident">AuraConfig</span>, <span class="ident">AuraId</span>, <span class="ident">BylawsConfig</span>, <span class="ident">GenesisConfig</span>, <span class="ident">GrandpaConfig</span>, <span class="ident">GrandpaId</span>, <span class="ident">NativeCurrencyId</span>,
-    <span class="ident">OrganizationsConfig</span>, <span class="ident">SystemConfig</span>, <span class="ident">TokensConfig</span>, <span class="ident">WASM_BINARY</span>,
+    <span class="ident">OrganizationsConfig</span>, <span class="ident">SystemConfig</span>, <span class="ident">Tokens</span>, <span class="ident">TokensConfig</span>, <span class="ident">WASM_BINARY</span>,
 };
+<span class="kw">use</span> <span class="ident">governance_os_voting</span>::{<span class="ident">CoinBasedVotingParameters</span>, <span class="ident">VotingSystems</span>};
 <span class="kw">use</span> <span class="ident">sc_service</span>::<span class="ident">ChainType</span>;
 <span class="kw">use</span> <span class="ident">sp_core</span>::{<span class="ident">sr25519</span>, <span class="ident">Pair</span>, <span class="ident">Public</span>};
 <span class="kw">use</span> <span class="ident">sp_runtime</span>::<span class="ident">traits</span>::{<span class="ident">IdentifyAccount</span>, <span class="ident">Verify</span>};
@@ -253,22 +275,37 @@
     <span class="ident">endowed_accounts</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AccountId</span><span class="op">&gt;</span>,
     <span class="ident">currencies</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">CurrencyId</span>, <span class="ident">CurrencyDetails</span><span class="op">&lt;</span><span class="ident">AccountId</span><span class="op">&gt;</span>)<span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">roles</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">Role</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AccountId</span><span class="op">&gt;</span>)<span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">organizations</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>
+        <span class="ident">Vec</span><span class="op">&lt;</span>
+            <span class="ident">OrganizationDetails</span><span class="op">&lt;</span>
+                <span class="ident">AccountId</span>,
+                <span class="ident">VotingSystems</span><span class="op">&lt;</span><span class="ident">Balance</span>, <span class="ident">CurrencyId</span>, <span class="ident">BlockNumber</span>, <span class="ident">Tokens</span>, <span class="ident">AccountId</span><span class="op">&gt;</span>,
+            <span class="op">&gt;</span>,
+        <span class="op">&gt;</span>,
+    <span class="op">&gt;</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GenesisConfig</span> {
     <span class="kw">let</span> <span class="ident">chain_currencies</span> <span class="op">=</span> <span class="ident">currencies</span>.<span class="ident">unwrap_or</span>(<span class="macro">vec</span><span class="macro">!</span>[(
         <span class="ident">NativeCurrencyId</span>::<span class="ident">get</span>(),
         <span class="ident">CurrencyDetails</span> {
-            <span class="ident">owner</span>: <span class="ident">get_account_id_from_seed</span>::<span class="op">&lt;</span><span class="ident">sr25519</span>::<span class="ident">Public</span><span class="op">&gt;</span>(<span class="string">&quot;Alice&quot;</span>),
+            <span class="ident">owner</span>: <span class="ident">core_org</span>(),
             <span class="ident">transferable</span>: <span class="bool-val">true</span>,
         },
     )]);
     <span class="kw">let</span> <span class="ident">chain_roles</span> <span class="op">=</span> <span class="ident">roles</span>.<span class="ident">unwrap_or</span>(<span class="macro">vec</span><span class="macro">!</span>[
-        (
-            <span class="ident">Role</span>::<span class="ident">Root</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">get_account_id_from_seed</span>::<span class="op">&lt;</span><span class="ident">sr25519</span>::<span class="ident">Public</span><span class="op">&gt;</span>(<span class="string">&quot;Alice&quot;</span>)),
-        ),
+        (<span class="ident">Role</span>::<span class="ident">Root</span>, <span class="prelude-val">Some</span>(<span class="ident">core_org</span>())),
         (<span class="ident">Role</span>::<span class="ident">CreateCurrencies</span>, <span class="prelude-val">None</span>),
         (<span class="ident">Role</span>::<span class="ident">CreateOrganizations</span>, <span class="prelude-val">None</span>),
     ]);
+    <span class="kw">let</span> <span class="ident">chain_orgs</span> <span class="op">=</span> <span class="ident">organizations</span>.<span class="ident">unwrap_or</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="ident">OrganizationDetails</span> {
+        <span class="ident">executors</span>: <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">get_account_id_from_seed</span>::<span class="op">&lt;</span><span class="ident">sr25519</span>::<span class="ident">Public</span><span class="op">&gt;</span>(<span class="string">&quot;Alice&quot;</span>)],
+        <span class="ident">voting</span>: <span class="ident">VotingSystems</span>::<span class="ident">CoinBased</span>(<span class="ident">CoinBasedVotingParameters</span> {
+            <span class="ident">voting_currency</span>: <span class="ident">CurrencyId</span>::<span class="ident">Native</span>,
+            <span class="ident">creation_fee</span>: <span class="number">10</span>,
+            <span class="ident">min_quorum</span>: <span class="number">50</span>,
+            <span class="ident">min_participation</span>: <span class="number">33</span>,
+            <span class="ident">ttl</span>: <span class="number">50</span>, <span class="comment">// Short TTL for testing</span>
+        }),
+    }]);
 
     <span class="ident">GenesisConfig</span> {
         <span class="ident">frame_system</span>: <span class="prelude-val">Some</span>(<span class="ident">SystemConfig</span> {
@@ -295,12 +332,10 @@
         }),
         <span class="ident">governance_os_pallet_bylaws</span>: <span class="prelude-val">Some</span>(<span class="ident">BylawsConfig</span> { <span class="ident">roles</span>: <span class="ident">chain_roles</span> }),
         <span class="ident">governance_os_pallet_organizations</span>: <span class="prelude-val">Some</span>(<span class="ident">OrganizationsConfig</span> {
-            <span class="ident">organizations</span>: <span class="macro">vec</span><span class="macro">!</span>[],
+            <span class="ident">organizations</span>: <span class="ident">chain_orgs</span>,
         }),
     }
 }
-
-<span class="comment">// TODO: we&#39;d like the native currency to be owned by a demo dOrg</span>
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">development_config</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ChainSpec</span>, <span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">wasm_binary</span> <span class="op">=</span> <span class="ident">WASM_BINARY</span>.<span class="ident">ok_or</span>(<span class="string">&quot;Development wasm binary not available&quot;</span>.<span class="ident">to_string</span>())<span class="question-mark">?</span>;
@@ -317,6 +352,7 @@
                     <span class="ident">get_account_id_from_seed</span>::<span class="op">&lt;</span><span class="ident">sr25519</span>::<span class="ident">Public</span><span class="op">&gt;</span>(<span class="string">&quot;Alice&quot;</span>),
                     <span class="ident">get_account_id_from_seed</span>::<span class="op">&lt;</span><span class="ident">sr25519</span>::<span class="ident">Public</span><span class="op">&gt;</span>(<span class="string">&quot;Bob&quot;</span>),
                 ],
+                <span class="prelude-val">None</span>,
                 <span class="prelude-val">None</span>,
                 <span class="prelude-val">None</span>,
             )
@@ -353,6 +389,7 @@
                 ],
                 <span class="prelude-val">None</span>,
                 <span class="prelude-val">None</span>,
+                <span class="prelude-val">None</span>,
             )
         },
         <span class="macro">vec</span><span class="macro">!</span>[],
@@ -379,6 +416,7 @@
                 <span class="macro">vec</span><span class="macro">!</span>[],
                 <span class="prelude-val">Some</span>(<span class="macro">vec</span><span class="macro">!</span>[]),
                 <span class="prelude-val">None</span>,
+                <span class="prelude-val">Some</span>(<span class="macro">vec</span><span class="macro">!</span>[]),
             )
         },
         <span class="macro">vec</span><span class="macro">!</span>[],
