@@ -50,10 +50,6 @@ pub mod primitives {
 /// better not write the same code twice.
 macro_rules! mock_runtime {
     ($runtime:tt) => {
-        mock_runtime!($runtime, ());
-    };
-
-    ($runtime:tt, $account_data:ty) => {
         use codec::{Decode, Encode};
         use frame_support::{impl_outer_dispatch, impl_outer_origin, parameter_types};
         use governance_os_support::{
@@ -106,7 +102,7 @@ macro_rules! mock_runtime {
             type AvailableBlockRatio = AvailableBlockRatio;
             type Version = ();
             type PalletInfo = ();
-            type AccountData = $account_data;
+            type AccountData = ();
             type OnNewAccount = ();
             type OnKilledAccount = ();
             type SystemWeightInfo = ();
@@ -171,7 +167,7 @@ macro_rules! mock_runtime_with_currencies {
     ($runtime:tt) => {
         use governance_os_support::{mock_runtime, testing::primitives::Balance};
 
-        mock_runtime!($runtime, governance_os_pallet_tokens::AccountData<CurrencyId, Balance>);
+        mock_runtime!($runtime);
 
         impl governance_os_pallet_tokens::RoleBuilder for MockRoles {
             type CurrencyId = CurrencyId;
@@ -195,11 +191,10 @@ macro_rules! mock_runtime_with_currencies {
             type CurrencyId = CurrencyId;
             type Balance = Balance;
             type WeightInfo = ();
-            type AccountStore = System;
             type RoleManager = Bylaws;
             type RoleBuilder = MockRoles;
         }
 
         pub type Tokens = governance_os_pallet_tokens::Module<Test>;
-    }
+    };
 }
