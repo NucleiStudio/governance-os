@@ -193,47 +193,6 @@
 <span id="190">190</span>
 <span id="191">191</span>
 <span id="192">192</span>
-<span id="193">193</span>
-<span id="194">194</span>
-<span id="195">195</span>
-<span id="196">196</span>
-<span id="197">197</span>
-<span id="198">198</span>
-<span id="199">199</span>
-<span id="200">200</span>
-<span id="201">201</span>
-<span id="202">202</span>
-<span id="203">203</span>
-<span id="204">204</span>
-<span id="205">205</span>
-<span id="206">206</span>
-<span id="207">207</span>
-<span id="208">208</span>
-<span id="209">209</span>
-<span id="210">210</span>
-<span id="211">211</span>
-<span id="212">212</span>
-<span id="213">213</span>
-<span id="214">214</span>
-<span id="215">215</span>
-<span id="216">216</span>
-<span id="217">217</span>
-<span id="218">218</span>
-<span id="219">219</span>
-<span id="220">220</span>
-<span id="221">221</span>
-<span id="222">222</span>
-<span id="223">223</span>
-<span id="224">224</span>
-<span id="225">225</span>
-<span id="226">226</span>
-<span id="227">227</span>
-<span id="228">228</span>
-<span id="229">229</span>
-<span id="230">230</span>
-<span id="231">231</span>
-<span id="232">232</span>
-<span id="233">233</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">/*
  * Copyright 2020 Nuclei Studio OÜ
@@ -251,14 +210,10 @@
  * limitations under the License.
  */</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">mutations</span>::<span class="ident">Mutation</span>, <span class="ident">Module</span>, <span class="ident">RawEvent</span>, <span class="ident">Trait</span>};
 <span class="kw">use</span> <span class="ident">frame_support</span>::<span class="ident">traits</span>::<span class="ident">BalanceStatus</span>;
 <span class="kw">use</span> <span class="ident">governance_os_support</span>::<span class="ident">traits</span>::{<span class="ident">Currencies</span>, <span class="ident">ReservableCurrencies</span>};
-<span class="kw">use</span> <span class="ident">sp_runtime</span>::{
-    <span class="ident">traits</span>::{<span class="ident">CheckedAdd</span>, <span class="ident">CheckedSub</span>, <span class="ident">Saturating</span>},
-    <span class="ident">DispatchError</span>, <span class="ident">DispatchResult</span>,
-};
-<span class="kw">use</span> <span class="ident">sp_std</span>::<span class="ident">result</span>;
+<span class="kw">use</span> <span class="ident">sp_runtime</span>::{<span class="ident">traits</span>::<span class="ident">Saturating</span>, <span class="ident">DispatchError</span>, <span class="ident">DispatchResult</span>};
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Trait</span><span class="op">&gt;</span> <span class="ident">Currencies</span><span class="op">&lt;</span><span class="ident">T</span>::<span class="ident">AccountId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Module</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">CurrencyId</span> <span class="op">=</span> <span class="ident">T</span>::<span class="ident">CurrencyId</span>;
@@ -273,18 +228,11 @@
         <span class="ident">who</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>::<span class="ident">AccountId</span>,
         <span class="ident">amount</span>: <span class="self">Self</span>::<span class="ident">Balance</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span> {
-        <span class="kw">let</span> <span class="ident">new_total</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">total_issuances</span>(<span class="ident">currency_id</span>)
-            .<span class="ident">checked_sub</span>(<span class="kw-2">&amp;</span><span class="ident">amount</span>)
-            .<span class="ident">ok_or</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">TotalIssuanceUnderflow</span>)<span class="question-mark">?</span>;
-        <span class="op">&lt;</span><span class="ident">TotalIssuances</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>::<span class="ident">insert</span>(<span class="ident">currency_id</span>, <span class="ident">new_total</span>);
-        <span class="self">Self</span>::<span class="ident">set_free_balance</span>(
-            <span class="ident">currency_id</span>,
-            <span class="ident">who</span>,
-            <span class="self">Self</span>::<span class="ident">free_balance</span>(<span class="ident">currency_id</span>, <span class="ident">who</span>)
-                .<span class="ident">checked_sub</span>(<span class="kw-2">&amp;</span><span class="ident">amount</span>)
-                .<span class="ident">ok_or</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">BalanceTooLow</span>)<span class="question-mark">?</span>,
-        );
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mutation</span> <span class="op">=</span> <span class="ident">Mutation</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">new_for_currency</span>(<span class="ident">currency_id</span>);
+        <span class="ident">mutation</span>.<span class="ident">sub_free_balance</span>(<span class="ident">who</span>, <span class="ident">amount</span>)<span class="question-mark">?</span>;
+        <span class="ident">mutation</span>.<span class="ident">apply</span>()<span class="question-mark">?</span>;
 
+        <span class="self">Self</span>::<span class="ident">deposit_event</span>(<span class="ident">RawEvent</span>::<span class="ident">CurrencyBurned</span>(<span class="ident">currency_id</span>, <span class="ident">who</span>.<span class="ident">clone</span>(), <span class="ident">amount</span>));
         <span class="prelude-val">Ok</span>(())
     }
 
@@ -293,18 +241,11 @@
         <span class="ident">who</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>::<span class="ident">AccountId</span>,
         <span class="ident">amount</span>: <span class="self">Self</span>::<span class="ident">Balance</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span> {
-        <span class="kw">let</span> <span class="ident">new_total</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">total_issuances</span>(<span class="ident">currency_id</span>)
-            .<span class="ident">checked_add</span>(<span class="kw-2">&amp;</span><span class="ident">amount</span>)
-            .<span class="ident">ok_or</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">TotalIssuanceOverflow</span>)<span class="question-mark">?</span>;
-        <span class="op">&lt;</span><span class="ident">TotalIssuances</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>::<span class="ident">insert</span>(<span class="ident">currency_id</span>, <span class="ident">new_total</span>);
-        <span class="self">Self</span>::<span class="ident">set_free_balance</span>(
-            <span class="ident">currency_id</span>,
-            <span class="ident">who</span>,
-            <span class="self">Self</span>::<span class="ident">free_balance</span>(<span class="ident">currency_id</span>, <span class="ident">who</span>)
-                .<span class="ident">checked_add</span>(<span class="kw-2">&amp;</span><span class="ident">amount</span>)
-                .<span class="ident">ok_or</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">BalanceOverflow</span>)<span class="question-mark">?</span>,
-        );
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mutation</span> <span class="op">=</span> <span class="ident">Mutation</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">new_for_currency</span>(<span class="ident">currency_id</span>);
+        <span class="ident">mutation</span>.<span class="ident">add_free_balance</span>(<span class="ident">who</span>, <span class="ident">amount</span>)<span class="question-mark">?</span>;
+        <span class="ident">mutation</span>.<span class="ident">apply</span>()<span class="question-mark">?</span>;
 
+        <span class="self">Self</span>::<span class="ident">deposit_event</span>(<span class="ident">RawEvent</span>::<span class="ident">CurrencyMinted</span>(<span class="ident">currency_id</span>, <span class="ident">who</span>.<span class="ident">clone</span>(), <span class="ident">amount</span>));
         <span class="prelude-val">Ok</span>(())
     }
 
@@ -313,8 +254,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">total_balance</span>(<span class="ident">currency_id</span>: <span class="self">Self</span>::<span class="ident">CurrencyId</span>, <span class="ident">who</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>::<span class="ident">AccountId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">Balance</span> {
-        <span class="kw">let</span> <span class="ident">account_data</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">get_currency_account</span>(<span class="ident">currency_id</span>, <span class="ident">who</span>);
-        <span class="ident">account_data</span>.<span class="ident">free</span>.<span class="ident">saturating_add</span>(<span class="ident">account_data</span>.<span class="ident">reserved</span>)
+        <span class="self">Self</span>::<span class="ident">get_currency_account</span>(<span class="ident">currency_id</span>, <span class="ident">who</span>).<span class="ident">total</span>()
     }
 
     <span class="kw">fn</span> <span class="ident">ensure_can_withdraw</span>(
@@ -322,15 +262,12 @@
         <span class="ident">who</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>::<span class="ident">AccountId</span>,
         <span class="ident">amount</span>: <span class="self">Self</span>::<span class="ident">Balance</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span> {
-        <span class="comment">// First verify permissions</span>
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">RoleManagerOf</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">has_role</span>(<span class="ident">who</span>, <span class="ident">RoleBuilderOf</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">transfer_currency</span>(<span class="ident">currency_id</span>)) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">UnTransferableCurrency</span>.<span class="ident">into</span>());
-        }
+        <span class="comment">// We simulate a withdrawal but never executes it and rather returns any error that</span>
+        <span class="comment">// happens along the way</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mutation</span> <span class="op">=</span> <span class="ident">Mutation</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">new_for_currency</span>(<span class="ident">currency_id</span>);
+        <span class="ident">mutation</span>.<span class="ident">ensure_must_be_transferable_for</span>(<span class="ident">who</span>)<span class="question-mark">?</span>;
+        <span class="ident">mutation</span>.<span class="ident">sub_free_balance</span>(<span class="ident">who</span>, <span class="ident">amount</span>)<span class="question-mark">?</span>;
 
-        <span class="comment">// Then balances</span>
-        <span class="kw">let</span> <span class="ident">_new_balance</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">free_balance</span>(<span class="ident">currency_id</span>, <span class="ident">who</span>)
-            .<span class="ident">checked_sub</span>(<span class="kw-2">&amp;</span><span class="ident">amount</span>)
-            .<span class="ident">ok_or</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">BalanceTooLow</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
@@ -340,22 +277,11 @@
         <span class="ident">dest</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>::<span class="ident">AccountId</span>,
         <span class="ident">amount</span>: <span class="self">Self</span>::<span class="ident">Balance</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span> {
-        <span class="self">Self</span>::<span class="ident">ensure_can_withdraw</span>(<span class="ident">currency_id</span>, <span class="ident">source</span>, <span class="ident">amount</span>)<span class="question-mark">?</span>;
-
-        <span class="self">Self</span>::<span class="ident">set_free_balance</span>(
-            <span class="ident">currency_id</span>,
-            <span class="ident">source</span>,
-            <span class="self">Self</span>::<span class="ident">free_balance</span>(<span class="ident">currency_id</span>, <span class="ident">source</span>)
-                .<span class="ident">checked_sub</span>(<span class="kw-2">&amp;</span><span class="ident">amount</span>)
-                .<span class="ident">ok_or</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">BalanceTooLow</span>)<span class="question-mark">?</span>,
-        );
-        <span class="self">Self</span>::<span class="ident">set_free_balance</span>(
-            <span class="ident">currency_id</span>,
-            <span class="ident">dest</span>,
-            <span class="self">Self</span>::<span class="ident">free_balance</span>(<span class="ident">currency_id</span>, <span class="ident">dest</span>)
-                .<span class="ident">checked_add</span>(<span class="kw-2">&amp;</span><span class="ident">amount</span>)
-                .<span class="ident">ok_or</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">BalanceOverflow</span>)<span class="question-mark">?</span>,
-        );
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mutation</span> <span class="op">=</span> <span class="ident">Mutation</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">new_for_currency</span>(<span class="ident">currency_id</span>);
+        <span class="ident">mutation</span>.<span class="ident">ensure_must_be_transferable_for</span>(<span class="ident">source</span>)<span class="question-mark">?</span>;
+        <span class="ident">mutation</span>.<span class="ident">sub_free_balance</span>(<span class="ident">source</span>, <span class="ident">amount</span>)<span class="question-mark">?</span>;
+        <span class="ident">mutation</span>.<span class="ident">add_free_balance</span>(<span class="ident">dest</span>, <span class="ident">amount</span>)<span class="question-mark">?</span>;
+        <span class="ident">mutation</span>.<span class="ident">apply</span>()<span class="question-mark">?</span>;
 
         <span class="self">Self</span>::<span class="ident">deposit_event</span>(<span class="ident">RawEvent</span>::<span class="ident">CurrencyTransferred</span>(
             <span class="ident">currency_id</span>,
@@ -381,13 +307,11 @@
         <span class="ident">who</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>::<span class="ident">AccountId</span>,
         <span class="ident">value</span>: <span class="self">Self</span>::<span class="ident">Balance</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">Balance</span> {
-        <span class="kw">let</span> <span class="ident">reserved_balance</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">reserved_balance</span>(<span class="ident">currency_id</span>, <span class="ident">who</span>);
-        <span class="kw">let</span> <span class="ident">actual</span> <span class="op">=</span> <span class="ident">reserved_balance</span>.<span class="ident">min</span>(<span class="ident">value</span>);
-
-        <span class="comment">// Amount will be at most equal to the total reserved balance thus neglecting the</span>
-        <span class="comment">// risk of any underflow</span>
-        <span class="self">Self</span>::<span class="ident">mutate_currency_account</span>(<span class="ident">currency_id</span>, <span class="ident">who</span>, <span class="op">|</span><span class="ident">data</span><span class="op">|</span> <span class="ident">data</span>.<span class="ident">reserved</span> <span class="op">-</span><span class="op">=</span> <span class="ident">actual</span>);
-        <span class="op">&lt;</span><span class="ident">TotalIssuances</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>::<span class="ident">mutate</span>(<span class="ident">currency_id</span>, <span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">v</span> <span class="op">-</span><span class="op">=</span> <span class="ident">actual</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mutation</span> <span class="op">=</span> <span class="ident">Mutation</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">new_for_currency</span>(<span class="ident">currency_id</span>);
+        <span class="kw">let</span> <span class="ident">actual</span> <span class="op">=</span> <span class="ident">mutation</span>.<span class="ident">sub_up_to_reserved_balance</span>(<span class="ident">who</span>, <span class="ident">value</span>);
+        <span class="ident">mutation</span>
+            .<span class="ident">apply</span>()
+            .<span class="ident">expect</span>(<span class="string">&quot;we assume the coins were created and added to the total issuance previously&quot;</span>);
 
         <span class="comment">// Return whatever we couldn&#39;t slash</span>
         <span class="ident">value</span> <span class="op">-</span> <span class="ident">actual</span>
@@ -402,14 +326,12 @@
         <span class="ident">who</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>::<span class="ident">AccountId</span>,
         <span class="ident">amount</span>: <span class="self">Self</span>::<span class="ident">Balance</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span> {
-        <span class="self">Self</span>::<span class="ident">ensure_can_withdraw</span>(<span class="ident">currency_id</span>, <span class="ident">who</span>, <span class="ident">amount</span>)<span class="question-mark">?</span>;
-
-        <span class="comment">// Because of the call to `ensure_can_withdraw` we now that amount is at most equal</span>
-        <span class="comment">// to the balance of the account, thus neflecting the use for the safe math checks.</span>
-        <span class="self">Self</span>::<span class="ident">mutate_currency_account</span>(<span class="ident">currency_id</span>, <span class="ident">who</span>, <span class="op">|</span><span class="ident">data</span><span class="op">|</span> {
-            <span class="ident">data</span>.<span class="ident">free</span> <span class="op">-</span><span class="op">=</span> <span class="ident">amount</span>;
-            <span class="ident">data</span>.<span class="ident">reserved</span> <span class="op">+</span><span class="op">=</span> <span class="ident">amount</span>;
-        });
+        <span class="comment">// We do not require the asset to be transferable, it is assume that it is acceptable</span>
+        <span class="comment">// to reserve non transferable currencies</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mutation</span> <span class="op">=</span> <span class="ident">Mutation</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">new_for_currency</span>(<span class="ident">currency_id</span>);
+        <span class="ident">mutation</span>.<span class="ident">sub_free_balance</span>(<span class="ident">who</span>, <span class="ident">amount</span>)<span class="question-mark">?</span>;
+        <span class="ident">mutation</span>.<span class="ident">add_reserved_balance</span>(<span class="ident">who</span>, <span class="ident">amount</span>)<span class="question-mark">?</span>;
+        <span class="ident">mutation</span>.<span class="ident">apply</span>()<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
@@ -419,17 +341,14 @@
         <span class="ident">who</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>::<span class="ident">AccountId</span>,
         <span class="ident">amount</span>: <span class="self">Self</span>::<span class="ident">Balance</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">Balance</span> {
-        <span class="comment">// Take the smallest between all the coins reserved or the amount</span>
-        <span class="kw">let</span> <span class="ident">unreserved</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">get_currency_account</span>(<span class="ident">currency_id</span>, <span class="ident">who</span>)
-            .<span class="ident">reserved</span>
-            .<span class="ident">min</span>(<span class="ident">amount</span>);
-
-        <span class="comment">// The amount will be at most equal to the reserved balance, thus we cannot have any</span>
-        <span class="comment">// overflow / underflow situation</span>
-        <span class="self">Self</span>::<span class="ident">mutate_currency_account</span>(<span class="ident">currency_id</span>, <span class="ident">who</span>, <span class="op">|</span><span class="ident">data</span><span class="op">|</span> {
-            <span class="ident">data</span>.<span class="ident">free</span> <span class="op">+</span><span class="op">=</span> <span class="ident">unreserved</span>;
-            <span class="ident">data</span>.<span class="ident">reserved</span> <span class="op">-</span><span class="op">=</span> <span class="ident">unreserved</span>;
-        });
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mutation</span> <span class="op">=</span> <span class="ident">Mutation</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">new_for_currency</span>(<span class="ident">currency_id</span>);
+        <span class="kw">let</span> <span class="ident">unreserved</span> <span class="op">=</span> <span class="ident">mutation</span>.<span class="ident">sub_up_to_reserved_balance</span>(<span class="ident">who</span>, <span class="ident">amount</span>);
+        <span class="ident">mutation</span>
+            .<span class="ident">add_free_balance</span>(<span class="ident">who</span>, <span class="ident">unreserved</span>)
+            .<span class="ident">expect</span>(<span class="string">&quot;we are merely reallocating balances&quot;</span>);
+        <span class="ident">mutation</span>
+            .<span class="ident">apply</span>()
+            .<span class="ident">expect</span>(<span class="string">&quot;we are not modifiying the total issuance and thus do not expect any errors&quot;</span>);
 
         <span class="comment">// Return the amount of coins we couldn&#39;t unreserve</span>
         <span class="ident">amount</span> <span class="op">-</span> <span class="ident">unreserved</span>
@@ -441,7 +360,7 @@
         <span class="ident">beneficiary</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>::<span class="ident">AccountId</span>,
         <span class="ident">value</span>: <span class="self">Self</span>::<span class="ident">Balance</span>,
         <span class="ident">status</span>: <span class="ident">BalanceStatus</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">result</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Balance</span>, <span class="ident">DispatchError</span><span class="op">&gt;</span> {
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Balance</span>, <span class="ident">DispatchError</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">slashed</span> <span class="op">=</span><span class="op">=</span> <span class="ident">beneficiary</span> {
             <span class="kw">return</span> <span class="kw">match</span> <span class="ident">status</span> {
                 <span class="ident">BalanceStatus</span>::<span class="ident">Free</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="self">Self</span>::<span class="ident">unreserve</span>(<span class="ident">currency_id</span>, <span class="ident">slashed</span>, <span class="ident">value</span>)),
@@ -452,18 +371,17 @@
             };
         }
 
-        <span class="kw">let</span> <span class="ident">from_account</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">get_currency_account</span>(<span class="ident">currency_id</span>, <span class="ident">slashed</span>);
-        <span class="kw">let</span> <span class="ident">to_account</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">get_currency_account</span>(<span class="ident">currency_id</span>, <span class="ident">beneficiary</span>);
-        <span class="kw">let</span> <span class="ident">actual</span> <span class="op">=</span> <span class="ident">from_account</span>.<span class="ident">reserved</span>.<span class="ident">min</span>(<span class="ident">value</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mutation</span> <span class="op">=</span> <span class="ident">Mutation</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">new_for_currency</span>(<span class="ident">currency_id</span>);
+        <span class="kw">let</span> <span class="ident">actual</span> <span class="op">=</span> <span class="ident">mutation</span>.<span class="ident">sub_up_to_reserved_balance</span>(<span class="ident">slashed</span>, <span class="ident">value</span>);
         <span class="kw">match</span> <span class="ident">status</span> {
             <span class="ident">BalanceStatus</span>::<span class="ident">Free</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="self">Self</span>::<span class="ident">set_free_balance</span>(<span class="ident">currency_id</span>, <span class="ident">beneficiary</span>, <span class="ident">to_account</span>.<span class="ident">free</span> <span class="op">+</span> <span class="ident">actual</span>);
+                <span class="ident">mutation</span>.<span class="ident">add_free_balance</span>(<span class="ident">beneficiary</span>, <span class="ident">actual</span>)<span class="question-mark">?</span>;
             }
             <span class="ident">BalanceStatus</span>::<span class="ident">Reserved</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="self">Self</span>::<span class="ident">mutate_currency_account</span>(<span class="ident">currency_id</span>, <span class="ident">beneficiary</span>, <span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">reserved</span> <span class="op">+</span><span class="op">=</span> <span class="ident">actual</span>);
+                <span class="ident">mutation</span>.<span class="ident">add_reserved_balance</span>(<span class="ident">beneficiary</span>, <span class="ident">actual</span>)<span class="question-mark">?</span>;
             }
-        }
-        <span class="self">Self</span>::<span class="ident">mutate_currency_account</span>(<span class="ident">currency_id</span>, <span class="ident">slashed</span>, <span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">reserved</span> <span class="op">-</span><span class="op">=</span> <span class="ident">actual</span>);
+        };
+        <span class="ident">mutation</span>.<span class="ident">apply</span>()<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">value</span> <span class="op">-</span> <span class="ident">actual</span>)
     }

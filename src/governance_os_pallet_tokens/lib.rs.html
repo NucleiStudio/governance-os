@@ -340,45 +340,6 @@
 <span id="337">337</span>
 <span id="338">338</span>
 <span id="339">339</span>
-<span id="340">340</span>
-<span id="341">341</span>
-<span id="342">342</span>
-<span id="343">343</span>
-<span id="344">344</span>
-<span id="345">345</span>
-<span id="346">346</span>
-<span id="347">347</span>
-<span id="348">348</span>
-<span id="349">349</span>
-<span id="350">350</span>
-<span id="351">351</span>
-<span id="352">352</span>
-<span id="353">353</span>
-<span id="354">354</span>
-<span id="355">355</span>
-<span id="356">356</span>
-<span id="357">357</span>
-<span id="358">358</span>
-<span id="359">359</span>
-<span id="360">360</span>
-<span id="361">361</span>
-<span id="362">362</span>
-<span id="363">363</span>
-<span id="364">364</span>
-<span id="365">365</span>
-<span id="366">366</span>
-<span id="367">367</span>
-<span id="368">368</span>
-<span id="369">369</span>
-<span id="370">370</span>
-<span id="371">371</span>
-<span id="372">372</span>
-<span id="373">373</span>
-<span id="374">374</span>
-<span id="375">375</span>
-<span id="376">376</span>
-<span id="377">377</span>
-<span id="378">378</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">/*
  * Copyright 2020 Nuclei Studio OÜ
@@ -407,8 +368,7 @@
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>), <span class="ident">no_std</span>)]</span>
 
 <span class="kw">use</span> <span class="ident">frame_support</span>::{
-    <span class="ident">decl_error</span>, <span class="ident">decl_event</span>, <span class="ident">decl_module</span>, <span class="ident">decl_storage</span>, <span class="ident">traits</span>::<span class="ident">StoredMap</span>, <span class="ident">weights</span>::<span class="ident">Weight</span>,
-    <span class="ident">Parameter</span>,
+    <span class="ident">decl_error</span>, <span class="ident">decl_event</span>, <span class="ident">decl_module</span>, <span class="ident">decl_storage</span>, <span class="ident">weights</span>::<span class="ident">Weight</span>, <span class="ident">Parameter</span>,
 };
 <span class="kw">use</span> <span class="ident">frame_system</span>::<span class="ident">ensure_signed</span>;
 <span class="kw">use</span> <span class="ident">governance_os_support</span>::<span class="ident">traits</span>::{<span class="ident">Currencies</span>, <span class="ident">RoleManager</span>};
@@ -434,10 +394,12 @@
 <span class="kw">mod</span> <span class="ident">default_weights</span>;
 <span class="kw">mod</span> <span class="ident">details</span>;
 <span class="kw">mod</span> <span class="ident">imbalances</span>;
+<span class="kw">mod</span> <span class="ident">mutations</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">account_data</span>::{<span class="ident">AccountCurrencyData</span>, <span class="ident">AccountData</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">account_data</span>::<span class="ident">AccountCurrencyData</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">adapter</span>::<span class="ident">NativeCurrencyAdapter</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">details</span>::<span class="ident">CurrencyDetails</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">imbalances</span>::{<span class="ident">NegativeImbalance</span>, <span class="ident">PositiveImbalance</span>};
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">WeightInfo</span> {
     <span class="kw">fn</span> <span class="ident">create</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span>;
@@ -478,9 +440,6 @@
         <span class="op">+</span> <span class="ident">Copy</span>
         <span class="op">+</span> <span class="ident">MaybeSerializeDeserialize</span>;
 
-    <span class="doccomment">/// The means of storing the balances of an account.</span>
-    <span class="kw">type</span> <span class="ident">AccountStore</span>: <span class="ident">StoredMap</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">AccountId</span>, <span class="ident">AccountData</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">CurrencyId</span>, <span class="self">Self</span>::<span class="ident">Balance</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-
     <span class="doccomment">/// Weight values for this pallet</span>
     <span class="kw">type</span> <span class="ident">WeightInfo</span>: <span class="ident">WeightInfo</span>;
 
@@ -501,6 +460,9 @@
 
 <span class="macro">decl_storage</span><span class="macro">!</span> {
     <span class="kw">trait</span> <span class="ident">Store</span> <span class="kw">for</span> <span class="ident">Module</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Trait</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">Tokens</span> {
+        <span class="doccomment">/// Store the balances holded by an account. By storing the balances under an account (VS storing</span>
+        <span class="doccomment">/// the accounts under the currency ids) we can enumerate the tokens holded by an account if needed.</span>
+        <span class="kw">pub</span> <span class="ident">Balances</span> <span class="ident">get</span>(<span class="kw">fn</span> <span class="ident">balances</span>): <span class="ident">double_map</span> <span class="ident">hasher</span>(<span class="ident">blake2_128_concat</span>) <span class="ident">T</span>::<span class="ident">AccountId</span>, <span class="ident">hasher</span>(<span class="ident">blake2_128_concat</span>) <span class="ident">T</span>::<span class="ident">CurrencyId</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AccountCurrencyData</span><span class="op">&lt;</span><span class="ident">T</span>::<span class="ident">Balance</span><span class="op">&gt;</span>;
         <span class="kw">pub</span> <span class="ident">TotalIssuances</span> <span class="ident">get</span>(<span class="kw">fn</span> <span class="ident">total_issuances</span>) <span class="ident">build</span>(<span class="op">|</span><span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">GenesisConfig</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">|</span> {
             <span class="ident">config</span>
                 .<span class="ident">endowed_accounts</span>
@@ -530,7 +492,7 @@
             });
 
             <span class="ident">config</span>.<span class="ident">endowed_accounts</span>.<span class="ident">iter</span>().<span class="ident">for_each</span>(<span class="op">|</span>(<span class="ident">currency_id</span>, <span class="ident">account_id</span>, <span class="ident">initial_balance</span>)<span class="op">|</span> {
-                <span class="ident">Module</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">set_free_balance</span>(<span class="kw-2">*</span><span class="ident">currency_id</span>, <span class="ident">account_id</span>, <span class="kw-2">*</span><span class="ident">initial_balance</span>);
+                <span class="ident">Balances</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">mutate</span>(<span class="ident">account_id</span>, <span class="kw-2">*</span><span class="ident">currency_id</span>, <span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">free</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">initial_balance</span>);
             });
         })
     }
@@ -611,8 +573,6 @@
             <span class="ident">RoleManagerOf</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">ensure_has_role</span>(<span class="ident">origin</span>, <span class="ident">RoleBuilderOf</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">manage_currency</span>(<span class="ident">currency_id</span>))<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">to</span> <span class="op">=</span> <span class="ident">T</span>::<span class="ident">Lookup</span>::<span class="ident">lookup</span>(<span class="ident">dest</span>)<span class="question-mark">?</span>;
             <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Currencies</span><span class="op">&lt;</span><span class="ident">T</span>::<span class="ident">AccountId</span><span class="op">&gt;</span><span class="op">&gt;</span>::<span class="ident">mint</span>(<span class="ident">currency_id</span>, <span class="kw-2">&amp;</span><span class="ident">to</span>, <span class="ident">amount</span>)<span class="question-mark">?</span>;
-
-            <span class="self">Self</span>::<span class="ident">deposit_event</span>(<span class="ident">RawEvent</span>::<span class="ident">CurrencyMinted</span>(<span class="ident">currency_id</span>, <span class="ident">to</span>, <span class="ident">amount</span>));
         }
 
         <span class="doccomment">/// Destroy some units of the currency identified by `currency_id` from `from`.</span>
@@ -622,8 +582,6 @@
             <span class="ident">RoleManagerOf</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">ensure_has_role</span>(<span class="ident">origin</span>, <span class="ident">RoleBuilderOf</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">manage_currency</span>(<span class="ident">currency_id</span>))<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">source</span> <span class="op">=</span> <span class="ident">T</span>::<span class="ident">Lookup</span>::<span class="ident">lookup</span>(<span class="ident">from</span>)<span class="question-mark">?</span>;
             <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Currencies</span><span class="op">&lt;</span><span class="ident">T</span>::<span class="ident">AccountId</span><span class="op">&gt;</span><span class="op">&gt;</span>::<span class="ident">burn</span>(<span class="ident">currency_id</span>, <span class="kw-2">&amp;</span><span class="ident">source</span>, <span class="ident">amount</span>)<span class="question-mark">?</span>;
-
-            <span class="self">Self</span>::<span class="ident">deposit_event</span>(<span class="ident">RawEvent</span>::<span class="ident">CurrencyBurned</span>(<span class="ident">currency_id</span>, <span class="ident">source</span>, <span class="ident">amount</span>));
         }
 
         <span class="doccomment">/// Update details about the currency identified by `currency_id`. For instance, this</span>
@@ -646,54 +604,18 @@
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">transfer</span>(<span class="ident">origin</span>, <span class="ident">currency_id</span>: <span class="ident">T</span>::<span class="ident">CurrencyId</span>, <span class="ident">dest</span>: <span class="op">&lt;</span><span class="ident">T</span>::<span class="ident">Lookup</span> <span class="kw">as</span> <span class="ident">StaticLookup</span><span class="op">&gt;</span>::<span class="ident">Source</span>, <span class="ident">amount</span>: <span class="ident">T</span>::<span class="ident">Balance</span>) {
             <span class="kw">let</span> <span class="ident">from</span> <span class="op">=</span> <span class="ident">ensure_signed</span>(<span class="ident">origin</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">to</span> <span class="op">=</span> <span class="ident">T</span>::<span class="ident">Lookup</span>::<span class="ident">lookup</span>(<span class="ident">dest</span>)<span class="question-mark">?</span>;
-
             <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Currencies</span><span class="op">&lt;</span><span class="ident">T</span>::<span class="ident">AccountId</span><span class="op">&gt;</span><span class="op">&gt;</span>::<span class="ident">transfer</span>(<span class="ident">currency_id</span>, <span class="kw-2">&amp;</span><span class="ident">from</span>, <span class="kw-2">&amp;</span><span class="ident">to</span>, <span class="ident">amount</span>)<span class="question-mark">?</span>;
         }
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Trait</span><span class="op">&gt;</span> <span class="ident">Module</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Set the free balance of `who` in `currency_id`. You are supposed to update the total</span>
-    <span class="doccomment">/// issuance yourself.</span>
-    <span class="kw">fn</span> <span class="ident">set_free_balance</span>(<span class="ident">currency_id</span>: <span class="ident">T</span>::<span class="ident">CurrencyId</span>, <span class="ident">who</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>::<span class="ident">AccountId</span>, <span class="ident">balance</span>: <span class="ident">T</span>::<span class="ident">Balance</span>) {
-        <span class="self">Self</span>::<span class="ident">mutate_currency_account</span>(<span class="ident">currency_id</span>, <span class="ident">who</span>, <span class="op">|</span><span class="ident">data</span><span class="op">|</span> <span class="ident">data</span>.<span class="ident">free</span> <span class="op">=</span> <span class="ident">balance</span>);
-    }
-
-    <span class="doccomment">/// Low Level call. Mutate a `who`&#39;s `AccountCurrencyData` for `currency_id`. If a balance is set to 0</span>
-    <span class="doccomment">/// or `who` no longers holds any currencies storage will be cleaned accordingly.</span>
-    <span class="kw">fn</span> <span class="ident">mutate_currency_account</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(
-        <span class="ident">currency_id</span>: <span class="ident">T</span>::<span class="ident">CurrencyId</span>,
-        <span class="ident">who</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>::<span class="ident">AccountId</span>,
-        <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AccountCurrencyData</span><span class="op">&lt;</span><span class="ident">T</span>::<span class="ident">Balance</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span> {
-        <span class="ident">T</span>::<span class="ident">AccountStore</span>::<span class="ident">mutate_exists</span>(<span class="ident">who</span>, <span class="op">|</span><span class="ident">maybe_account_data</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">account_data</span> <span class="op">=</span> <span class="ident">maybe_account_data</span>.<span class="ident">take</span>().<span class="ident">unwrap_or_default</span>();
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">currency_data</span> <span class="op">=</span> <span class="ident">account_data</span>.<span class="ident">entry</span>(<span class="ident">currency_id</span>).<span class="ident">or_default</span>();
-            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">currency_data</span>);
-
-            <span class="kw">if</span> <span class="ident">currency_data</span>.<span class="ident">total</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">Zero</span>::<span class="ident">zero</span>() {
-                <span class="ident">account_data</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">currency_id</span>);
-            }
-
-            <span class="kw">if</span> <span class="ident">account_data</span>.<span class="ident">is_empty</span>() {
-                <span class="kw-2">*</span><span class="ident">maybe_account_data</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-            } <span class="kw">else</span> {
-                <span class="kw-2">*</span><span class="ident">maybe_account_data</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">account_data</span>);
-            }
-
-            <span class="ident">result</span>
-        })
-    }
-
     <span class="doccomment">/// Return the `AccountCurrencyData` for the `who` and `currency_id`.</span>
     <span class="kw">fn</span> <span class="ident">get_currency_account</span>(
         <span class="ident">currency_id</span>: <span class="ident">T</span>::<span class="ident">CurrencyId</span>,
         <span class="ident">who</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>::<span class="ident">AccountId</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AccountCurrencyData</span><span class="op">&lt;</span><span class="ident">T</span>::<span class="ident">Balance</span><span class="op">&gt;</span> {
-        <span class="ident">T</span>::<span class="ident">AccountStore</span>::<span class="ident">get</span>(<span class="ident">who</span>)
-            .<span class="ident">entry</span>(<span class="ident">currency_id</span>)
-            .<span class="ident">or_default</span>()
-            .<span class="ident">clone</span>()
+        <span class="ident">Balances</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">get</span>(<span class="ident">who</span>, <span class="ident">currency_id</span>)
     }
 
     <span class="doccomment">/// Register the ACL roles accordingly for a given currency.</span>

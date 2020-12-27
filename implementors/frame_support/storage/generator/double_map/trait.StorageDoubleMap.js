@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["governance_os_pallet_tokens"] = [{"text":"impl&lt;T:&nbsp;Trait&gt; StorageDoubleMap&lt;&lt;T as Trait&gt;::AccountId, &lt;T as Trait&gt;::CurrencyId, AccountCurrencyData&lt;&lt;T as Trait&gt;::Balance&gt;&gt; for Balances&lt;T&gt;","synthetic":false,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
