@@ -35,7 +35,10 @@ use sp_runtime::{
     },
     DispatchResult,
 };
-use sp_std::cmp::{Eq, PartialEq};
+use sp_std::{
+    cmp::{Eq, PartialEq},
+    convert::Infallible,
+};
 
 #[cfg(feature = "std")]
 use sp_std::collections::btree_map::BTreeMap;
@@ -55,6 +58,7 @@ mod imbalances;
 pub use account_data::AccountCurrencyData;
 pub use adapter::NativeCurrencyAdapter;
 pub use details::CurrencyDetails;
+pub use imbalances::{NegativeImbalance, PositiveImbalance};
 
 pub trait WeightInfo {
     fn create() -> Weight;
@@ -228,8 +232,6 @@ decl_module! {
             RoleManagerOf::<T>::ensure_has_role(origin, RoleBuilderOf::<T>::manage_currency(currency_id))?;
             let to = T::Lookup::lookup(dest)?;
             <Self as Currencies<T::AccountId>>::mint(currency_id, &to, amount)?;
-
-            Self::deposit_event(RawEvent::CurrencyMinted(currency_id, to, amount));
         }
 
         /// Destroy some units of the currency identified by `currency_id` from `from`.
@@ -239,8 +241,6 @@ decl_module! {
             RoleManagerOf::<T>::ensure_has_role(origin, RoleBuilderOf::<T>::manage_currency(currency_id))?;
             let source = T::Lookup::lookup(from)?;
             <Self as Currencies<T::AccountId>>::burn(currency_id, &source, amount)?;
-
-            Self::deposit_event(RawEvent::CurrencyBurned(currency_id, source, amount));
         }
 
         /// Update details about the currency identified by `currency_id`. For instance, this
@@ -263,7 +263,6 @@ decl_module! {
         pub fn transfer(origin, currency_id: T::CurrencyId, dest: <T::Lookup as StaticLookup>::Source, amount: T::Balance) {
             let from = ensure_signed(origin)?;
             let to = T::Lookup::lookup(dest)?;
-
             <Self as Currencies<T::AccountId>>::transfer(currency_id, &from, &to, amount)?;
         }
     }
@@ -276,6 +275,20 @@ impl<T: Trait> Module<T> {
         Self::mutate_currency_account(currency_id, who, |data| data.free = balance);
     }
 
+    /// Overwrite the account data of `who` in `currency_id`. If the total balance in `data` in
+    /// 0 it will rather erase the entry. Does not perform any other check.
+    fn set_account_data(
+        currency_id: T::CurrencyId,
+        who: &T::AccountId,
+        data: AccountCurrencyData<T::Balance>,
+    ) {
+        if data.total() == Zero::zero() {
+            Balances::<T>::remove(who, currency_id);
+        } else {
+            Balances::<T>::insert(who, currency_id, data);
+        }
+    }
+
     /// Low Level call. Mutate a `who`'s `AccountCurrencyData` for `currency_id`. If a balance is set to 0
     /// storage will be cleaned accordingly.
     fn mutate_currency_account<R>(
@@ -283,7 +296,22 @@ impl<T: Trait> Module<T> {
         who: &T::AccountId,
         f: impl FnOnce(&mut AccountCurrencyData<T::Balance>) -> R,
     ) -> R {
-        Balances::<T>::mutate_exists(who, currency_id, |maybe_currency_data| {
+        Self::try_mutate_currency_account(
+            currency_id,
+            who,
+            |currency_data| -> Result<R, Infallible> { Ok(f(currency_data)) },
+        )
+        .expect("infallible")
+    }
+
+    /// Low Level call. Mutate a `who`'s `AccountCurrencyData` for `currency_id`. If a balance is set to 0
+    /// storage will be cleaned accordingly. If the closure returns an error no changes will be performed.
+    fn try_mutate_currency_account<R, E>(
+        currency_id: T::CurrencyId,
+        who: &T::AccountId,
+        f: impl FnOnce(&mut AccountCurrencyData<T::Balance>) -> Result<R, E>,
+    ) -> Result<R, E> {
+        Balances::<T>::try_mutate_exists(who, currency_id, |maybe_currency_data| {
             let mut currency_data = maybe_currency_data.take().unwrap_or_default();
             let result = f(&mut currency_data);
 
