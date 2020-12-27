@@ -152,7 +152,7 @@ decl_storage! {
             });
 
             config.endowed_accounts.iter().for_each(|(currency_id, account_id, initial_balance)| {
-                Module::<T>::set_free_balance(*currency_id, account_id, *initial_balance);
+                Balances::<T>::mutate(account_id, *currency_id, |d| d.free = *initial_balance);
             });
         })
     }
@@ -270,62 +270,6 @@ decl_module! {
 }
 
 impl<T: Trait> Module<T> {
-    /// Set the free balance of `who` in `currency_id`. You are supposed to update the total
-    /// issuance yourself.
-    fn set_free_balance(currency_id: T::CurrencyId, who: &T::AccountId, balance: T::Balance) {
-        Self::mutate_currency_account(currency_id, who, |data| data.free = balance);
-    }
-
-    /// Overwrite the account data of `who` in `currency_id`. If the total balance in `data` in
-    /// 0 it will rather erase the entry. Does not perform any other check.
-    fn set_account_data(
-        currency_id: T::CurrencyId,
-        who: &T::AccountId,
-        data: AccountCurrencyData<T::Balance>,
-    ) {
-        if data.total() == Zero::zero() {
-            Balances::<T>::remove(who, currency_id);
-        } else {
-            Balances::<T>::insert(who, currency_id, data);
-        }
-    }
-
-    /// Low Level call. Mutate a `who`'s `AccountCurrencyData` for `currency_id`. If a balance is set to 0
-    /// storage will be cleaned accordingly.
-    fn mutate_currency_account<R>(
-        currency_id: T::CurrencyId,
-        who: &T::AccountId,
-        f: impl FnOnce(&mut AccountCurrencyData<T::Balance>) -> R,
-    ) -> R {
-        Self::try_mutate_currency_account(
-            currency_id,
-            who,
-            |currency_data| -> Result<R, Infallible> { Ok(f(currency_data)) },
-        )
-        .expect("infallible")
-    }
-
-    /// Low Level call. Mutate a `who`'s `AccountCurrencyData` for `currency_id`. If a balance is set to 0
-    /// storage will be cleaned accordingly. If the closure returns an error no changes will be performed.
-    fn try_mutate_currency_account<R, E>(
-        currency_id: T::CurrencyId,
-        who: &T::AccountId,
-        f: impl FnOnce(&mut AccountCurrencyData<T::Balance>) -> Result<R, E>,
-    ) -> Result<R, E> {
-        Balances::<T>::try_mutate_exists(who, currency_id, |maybe_currency_data| {
-            let mut currency_data = maybe_currency_data.take().unwrap_or_default();
-            let result = f(&mut currency_data);
-
-            if currency_data.total() == Zero::zero() {
-                *maybe_currency_data = None;
-            } else {
-                *maybe_currency_data = Some(currency_data);
-            }
-
-            result
-        })
-    }
-
     /// Return the `AccountCurrencyData` for the `who` and `currency_id`.
     fn get_currency_account(
         currency_id: T::CurrencyId,
