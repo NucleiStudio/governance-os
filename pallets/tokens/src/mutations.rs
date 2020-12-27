@@ -42,8 +42,8 @@ impl<T: Trait> Mutation<T> {
         Self {
             currency_id: currency_id,
             balances: BTreeMap::new(),
-            coins_created: 0.into(),
-            coins_burned: 0.into(),
+            coins_created: Zero::zero(),
+            coins_burned: Zero::zero(),
             _phantom: marker::PhantomData,
         }
     }
@@ -141,6 +141,53 @@ impl<T: Trait> Mutation<T> {
         self.save_balance(who, balance);
 
         actual_subed
+    }
+
+    pub fn sub_up_to_free_balance(
+        &mut self,
+        who: &T::AccountId,
+        decrement: T::Balance,
+    ) -> T::Balance {
+        let mut balance = self.get_or_fetch_balance(who);
+        let actual_subed = balance.free.min(decrement);
+        // We just capped `actual_subed` to `balance.free` itself.
+        balance.free -= actual_subed;
+        self.coins_burned = self.coins_burned.saturating_add(actual_subed);
+        self.save_balance(who, balance);
+
+        actual_subed
+    }
+
+    /// Does what it says and return the old balance.
+    pub fn overwrite_free_balance(
+        &mut self,
+        who: &T::AccountId,
+        new_balance: T::Balance,
+    ) -> T::Balance {
+        let mut balance = self.get_or_fetch_balance(who);
+        if balance.free < new_balance {
+            self.coins_created = self
+                .coins_created
+                .saturating_add(new_balance.saturating_sub(balance.free));
+        } else {
+            self.coins_burned = self
+                .coins_burned
+                .saturating_add(balance.free.saturating_sub(new_balance));
+        }
+
+        let free_balance_bak = balance.free;
+        balance.free = new_balance;
+
+        self.save_balance(who, balance);
+
+        free_balance_bak
+    }
+
+    /// Reset the `coins_burned` and `coins_created` values to avoid modifiying `Totalissuances`
+    /// when calling `apply`.
+    pub fn forget_issuance_changes(&mut self) {
+        self.coins_created = Zero::zero();
+        self.coins_burned = Zero::zero();
     }
 
     /// Commit all the changes to the chain state or error.

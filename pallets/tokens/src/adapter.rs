@@ -14,13 +14,19 @@
  * limitations under the License.
  */
 
-use crate::*;
-use frame_support::traits::{
-    BalanceStatus, Currency, ExistenceRequirement, Get, Imbalance, ReservableCurrency,
-    SignedImbalance, WithdrawReasons,
+use crate::{
+    imbalances::{NegativeImbalance, PositiveImbalance},
+    mutations::Mutation,
+    Module, TotalIssuances, Trait,
+};
+use frame_support::{
+    traits::{
+        BalanceStatus, Currency, ExistenceRequirement, Get, Imbalance, ReservableCurrency,
+        SignedImbalance, WithdrawReasons,
+    },
+    StorageMap,
 };
 use governance_os_support::traits::{Currencies, ReservableCurrencies};
-use imbalances::{NegativeImbalance, PositiveImbalance};
 use sp_runtime::{
     traits::{Bounded, CheckedAdd, CheckedSub, Zero},
     DispatchError, DispatchResult,
@@ -120,22 +126,15 @@ where
     ) -> (Self::NegativeImbalance, Self::Balance) {
         // Return slashed, unslashed (ex: not enough balance)
 
-        let mut slashed = amount;
-        let mut left_to_be_slashed: Self::Balance = 0.into();
-        let old_balance = Self::free_balance(who);
-        Module::<Pallet>::set_free_balance(
-            GetCurrencyId::get(),
-            who,
-            old_balance.checked_sub(&amount).unwrap_or_else(|| {
-                // Balance is too low to slash everything, slash all the balance and log this
-                left_to_be_slashed = amount - old_balance; // What's left, can't overfloww cause we enter here only if amount > old_balance
-                slashed = old_balance;
+        let mut mutation = Mutation::<Pallet>::new_for_currency(GetCurrencyId::get());
+        let slashed = mutation.sub_up_to_free_balance(who, amount);
+        mutation.forget_issuance_changes();
+        mutation
+            .apply()
+            .expect("we just forgot issuance changes which were the only error source");
 
-                0.into()
-            }),
-        );
-
-        (Self::NegativeImbalance::new(slashed), left_to_be_slashed)
+        // `slashed` is at most equal to `amount`
+        (Self::NegativeImbalance::new(slashed), amount - slashed)
     }
 
     fn deposit_into_existing(
@@ -153,19 +152,16 @@ where
     fn withdraw(
         who: &Pallet::AccountId,
         value: Self::Balance,
-        reasons: WithdrawReasons,
+        _: WithdrawReasons,
         _: ExistenceRequirement,
     ) -> Result<Self::NegativeImbalance, DispatchError> {
         // Unlike `Currencies::burn`, this isn't supposed to reduce the total token supply
 
-        Self::ensure_can_withdraw(who, value, reasons, 0.into())?;
-        let currency_id = GetCurrencyId::get();
-        Module::<Pallet>::set_free_balance(
-            currency_id,
-            who,
-            // `ensure_can_withdraw` already does the math checks
-            Module::<Pallet>::free_balance(currency_id, who) - value,
-        );
+        let mut mutation = Mutation::<Pallet>::new_for_currency(GetCurrencyId::get());
+        mutation.ensure_must_be_transferable_for(who)?;
+        mutation.sub_free_balance(who, value)?;
+        mutation.forget_issuance_changes();
+        mutation.apply()?;
 
         Ok(Self::NegativeImbalance::new(value))
     }
@@ -177,8 +173,13 @@ where
         // This create an imbalance since some coins have to be either burned or
         // reallocated somewhere else.
 
-        let old_balance = Self::free_balance(who);
-        Module::<Pallet>::set_free_balance(GetCurrencyId::get(), who, value);
+        let mut mutation = Mutation::<Pallet>::new_for_currency(GetCurrencyId::get());
+        let old_balance = mutation.overwrite_free_balance(who, value);
+        mutation.forget_issuance_changes();
+        mutation
+            .apply()
+            .expect("we just forgot issuance changes which were the only error source");
+
         if old_balance <= value {
             SignedImbalance::Positive(PositiveImbalance::new(value - old_balance))
         } else {
@@ -201,12 +202,12 @@ where
         who: &Pallet::AccountId,
         amount: Self::Balance,
     ) -> (Self::NegativeImbalance, Self::Balance) {
-        let mut slashed = amount;
-        Module::<Pallet>::mutate_currency_account(GetCurrencyId::get(), who, |data| {
-            slashed = data.reserved.min(amount);
-            // Slashed will be at most equal to data.reserved, no underflow
-            data.reserved -= slashed;
-        });
+        let mut mutation = Mutation::<Pallet>::new_for_currency(GetCurrencyId::get());
+        let slashed = mutation.sub_up_to_reserved_balance(who, amount);
+        mutation.forget_issuance_changes();
+        mutation
+            .apply()
+            .expect("we just forgot issuance changes which were the only error source");
 
         (Self::NegativeImbalance::new(slashed), amount - slashed)
     }
