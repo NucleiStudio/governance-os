@@ -84,9 +84,10 @@ benchmarks! {
         let token_id: T::CurrencyId = T::CurrencyId::default();
         let coins_to_transfer: T::Balance = 10_000_000.into();
         let caller: T::AccountId = whitelisted_caller();
+        let caller_lookup: <T::Lookup as StaticLookup>::Source = T::Lookup::unlookup(caller.clone());
 
         let _ = Module::<T>::create(RawOrigin::Signed(caller.clone()).into(), token_id, true);
-        let _ = Module::<T>::set_free_balance(token_id, &caller, coins_to_transfer);
+        let _ = Module::<T>::mint(RawOrigin::Signed(caller.clone()).into(), token_id, caller_lookup, coins_to_transfer);
 
         let to: T::AccountId = account("to", 0, SEED);
         let to_lookup: <T::Lookup as StaticLookup>::Source = T::Lookup::unlookup(to.clone());

@@ -35,10 +35,7 @@ use sp_runtime::{
     },
     DispatchResult,
 };
-use sp_std::{
-    cmp::{Eq, PartialEq},
-    convert::Infallible,
-};
+use sp_std::cmp::{Eq, PartialEq};
 
 #[cfg(feature = "std")]
 use sp_std::collections::btree_map::BTreeMap;
