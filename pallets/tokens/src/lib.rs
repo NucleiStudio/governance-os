@@ -25,8 +25,7 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use frame_support::{
-    decl_error, decl_event, decl_module, decl_storage, traits::StoredMap, weights::Weight,
-    Parameter,
+    decl_error, decl_event, decl_module, decl_storage, weights::Weight, Parameter,
 };
 use frame_system::ensure_signed;
 use governance_os_support::traits::{Currencies, RoleManager};
@@ -52,10 +51,12 @@ mod currencies;
 mod default_weights;
 mod details;
 mod imbalances;
+mod mutations;
 
-pub use account_data::{AccountCurrencyData, AccountData};
+pub use account_data::AccountCurrencyData;
 pub use adapter::NativeCurrencyAdapter;
 pub use details::CurrencyDetails;
+pub use imbalances::{NegativeImbalance, PositiveImbalance};
 
 pub trait WeightInfo {
     fn create() -> Weight;
@@ -96,9 +97,6 @@ pub trait Trait: frame_system::Trait {
         + Copy
         + MaybeSerializeDeserialize;
 
-    /// The means of storing the balances of an account.
-    type AccountStore: StoredMap<Self::AccountId, AccountData<Self::CurrencyId, Self::Balance>>;
-
     /// Weight values for this pallet
     type WeightInfo: WeightInfo;
 
@@ -119,6 +117,9 @@ type RoleManagerOf<T> = <T as Trait>::RoleManager;
 
 decl_storage! {
     trait Store for Module<T: Trait> as Tokens {
+        /// Store the balances holded by an account. By storing the balances under an account (VS storing
+        /// the accounts under the currency ids) we can enumerate the tokens holded by an account if needed.
+        pub Balances get(fn balances): double_map hasher(blake2_128_concat) T::AccountId, hasher(blake2_128_concat) T::CurrencyId => AccountCurrencyData<T::Balance>;
         pub TotalIssuances get(fn total_issuances) build(|config: &GenesisConfig<T>| {
             config
                 .endowed_accounts
@@ -148,7 +149,7 @@ decl_storage! {
             });
 
             config.endowed_accounts.iter().for_each(|(currency_id, account_id, initial_balance)| {
-                Module::<T>::set_free_balance(*currency_id, account_id, *initial_balance);
+                Balances::<T>::mutate(account_id, *currency_id, |d| d.free = *initial_balance);
             });
         })
     }
@@ -229,8 +230,6 @@ decl_module! {
             RoleManagerOf::<T>::ensure_has_role(origin, RoleBuilderOf::<T>::manage_currency(currency_id))?;
             let to = T::Lookup::lookup(dest)?;
             <Self as Currencies<T::AccountId>>::mint(currency_id, &to, amount)?;
-
-            Self::deposit_event(RawEvent::CurrencyMinted(currency_id, to, amount));
         }
 
         /// Destroy some units of the currency identified by `currency_id` from `from`.
@@ -240,8 +239,6 @@ decl_module! {
             RoleManagerOf::<T>::ensure_has_role(origin, RoleBuilderOf::<T>::manage_currency(currency_id))?;
             let source = T::Lookup::lookup(from)?;
             <Self as Currencies<T::AccountId>>::burn(currency_id, &source, amount)?;
-
-            Self::deposit_event(RawEvent::CurrencyBurned(currency_id, source, amount));
         }
 
         /// Update details about the currency identified by `currency_id`. For instance, this
@@ -264,54 +261,18 @@ decl_module! {
         pub fn transfer(origin, currency_id: T::CurrencyId, dest: <T::Lookup as StaticLookup>::Source, amount: T::Balance) {
             let from = ensure_signed(origin)?;
             let to = T::Lookup::lookup(dest)?;
-
             <Self as Currencies<T::AccountId>>::transfer(currency_id, &from, &to, amount)?;
         }
     }
 }
 
 impl<T: Trait> Module<T> {
-    /// Set the free balance of `who` in `currency_id`. You are supposed to update the total
-    /// issuance yourself.
-    fn set_free_balance(currency_id: T::CurrencyId, who: &T::AccountId, balance: T::Balance) {
-        Self::mutate_currency_account(currency_id, who, |data| data.free = balance);
-    }
-
-    /// Low Level call. Mutate a `who`'s `AccountCurrencyData` for `currency_id`. If a balance is set to 0
-    /// or `who` no longers holds any currencies storage will be cleaned accordingly.
-    fn mutate_currency_account<R>(
-        currency_id: T::CurrencyId,
-        who: &T::AccountId,
-        f: impl FnOnce(&mut AccountCurrencyData<T::Balance>) -> R,
-    ) -> R {
-        T::AccountStore::mutate_exists(who, |maybe_account_data| {
-            let mut account_data = maybe_account_data.take().unwrap_or_default();
-            let mut currency_data = account_data.entry(currency_id).or_default();
-            let result = f(&mut currency_data);
-
-            if currency_data.total() == Zero::zero() {
-                account_data.remove(&currency_id);
-            }
-
-            if account_data.is_empty() {
-                *maybe_account_data = None;
-            } else {
-                *maybe_account_data = Some(account_data);
-            }
-
-            result
-        })
-    }
-
     /// Return the `AccountCurrencyData` for the `who` and `currency_id`.
     fn get_currency_account(
         currency_id: T::CurrencyId,
         who: &T::AccountId,
     ) -> AccountCurrencyData<T::Balance> {
-        T::AccountStore::get(who)
-            .entry(currency_id)
-            .or_default()
-            .clone()
+        Balances::<T>::get(who, currency_id)
     }
 
     /// Register the ACL roles accordingly for a given currency.

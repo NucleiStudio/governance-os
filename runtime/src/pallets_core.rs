@@ -22,7 +22,7 @@ use frame_support::{
         Weight,
     },
 };
-use governance_os_primitives::{AccountId, Balance, BlockNumber, CurrencyId, Hash, Index, Role};
+use governance_os_primitives::{AccountId, BlockNumber, Hash, Index, Role};
 use sp_runtime::{
     generic,
     traits::{BlakeTwo256, IdentityLookup, Saturating},
@@ -70,7 +70,7 @@ impl frame_system::Trait for Runtime {
     type AvailableBlockRatio = AvailableBlockRatio;
     type Version = Version;
     type PalletInfo = PalletInfo;
-    type AccountData = governance_os_pallet_tokens::AccountData<CurrencyId, Balance>;
+    type AccountData = ();
     type OnNewAccount = ();
     type OnKilledAccount = ();
     type SystemWeightInfo = weights::frame_system::WeightInfo;

@@ -16,7 +16,6 @@
 
 use codec::{Decode, Encode};
 use sp_runtime::{traits::Saturating, RuntimeDebug};
-use sp_std::collections::btree_map::BTreeMap;
 
 /// All balance information for an account and an associated currency.
 #[derive(Encode, Decode, Clone, PartialEq, Eq, Default, RuntimeDebug)]
@@ -41,6 +40,3 @@ impl<Balance: Saturating + Copy> AccountCurrencyData<Balance> {
         self.free.saturating_add(self.reserved)
     }
 }
-
-/// All balance and currency informations for an account.
-pub type AccountData<CurrencyId, Balance> = BTreeMap<CurrencyId, AccountCurrencyData<Balance>>;

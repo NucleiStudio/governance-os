@@ -14,14 +14,10 @@
  * limitations under the License.
  */
 
-use crate::*;
+use crate::{mutations::Mutation, Module, RawEvent, Trait};
 use frame_support::traits::BalanceStatus;
 use governance_os_support::traits::{Currencies, ReservableCurrencies};
-use sp_runtime::{
-    traits::{CheckedAdd, CheckedSub, Saturating},
-    DispatchError, DispatchResult,
-};
-use sp_std::result;
+use sp_runtime::{traits::Saturating, DispatchError, DispatchResult};
 
 impl<T: Trait> Currencies<T::AccountId> for Module<T> {
     type CurrencyId = T::CurrencyId;
@@ -36,18 +32,11 @@ impl<T: Trait> Currencies<T::AccountId> for Module<T> {
         who: &T::AccountId,
         amount: Self::Balance,
     ) -> DispatchResult {
-        let new_total = Self::total_issuances(currency_id)
-            .checked_sub(&amount)
-            .ok_or(Error::<T>::TotalIssuanceUnderflow)?;
-        <TotalIssuances<T>>::insert(currency_id, new_total);
-        Self::set_free_balance(
-            currency_id,
-            who,
-            Self::free_balance(currency_id, who)
-                .checked_sub(&amount)
-                .ok_or(Error::<T>::BalanceTooLow)?,
-        );
+        let mut mutation = Mutation::<T>::new_for_currency(currency_id);
+        mutation.sub_free_balance(who, amount)?;
+        mutation.apply()?;
 
+        Self::deposit_event(RawEvent::CurrencyBurned(currency_id, who.clone(), amount));
         Ok(())
     }
 
@@ -56,18 +45,11 @@ impl<T: Trait> Currencies<T::AccountId> for Module<T> {
         who: &T::AccountId,
         amount: Self::Balance,
     ) -> DispatchResult {
-        let new_total = Self::total_issuances(currency_id)
-            .checked_add(&amount)
-            .ok_or(Error::<T>::TotalIssuanceOverflow)?;
-        <TotalIssuances<T>>::insert(currency_id, new_total);
-        Self::set_free_balance(
-            currency_id,
-            who,
-            Self::free_balance(currency_id, who)
-                .checked_add(&amount)
-                .ok_or(Error::<T>::BalanceOverflow)?,
-        );
+        let mut mutation = Mutation::<T>::new_for_currency(currency_id);
+        mutation.add_free_balance(who, amount)?;
+        mutation.apply()?;
 
+        Self::deposit_event(RawEvent::CurrencyMinted(currency_id, who.clone(), amount));
         Ok(())
     }
 
@@ -76,8 +58,7 @@ impl<T: Trait> Currencies<T::AccountId> for Module<T> {
     }
 
     fn total_balance(currency_id: Self::CurrencyId, who: &T::AccountId) -> Self::Balance {
-        let account_data = Self::get_currency_account(currency_id, who);
-        account_data.free.saturating_add(account_data.reserved)
+        Self::get_currency_account(currency_id, who).total()
     }
 
     fn ensure_can_withdraw(
@@ -85,15 +66,12 @@ impl<T: Trait> Currencies<T::AccountId> for Module<T> {
         who: &T::AccountId,
         amount: Self::Balance,
     ) -> DispatchResult {
-        // First verify permissions
-        if !RoleManagerOf::<T>::has_role(who, RoleBuilderOf::<T>::transfer_currency(currency_id)) {
-            return Err(Error::<T>::UnTransferableCurrency.into());
-        }
+        // We simulate a withdrawal but never executes it and rather returns any error that
+        // happens along the way
+        let mut mutation = Mutation::<T>::new_for_currency(currency_id);
+        mutation.ensure_must_be_transferable_for(who)?;
+        mutation.sub_free_balance(who, amount)?;
 
-        // Then balances
-        let _new_balance = Self::free_balance(currency_id, who)
-            .checked_sub(&amount)
-            .ok_or(Error::<T>::BalanceTooLow)?;
         Ok(())
     }
 
@@ -103,22 +81,11 @@ impl<T: Trait> Currencies<T::AccountId> for Module<T> {
         dest: &T::AccountId,
         amount: Self::Balance,
     ) -> DispatchResult {
-        Self::ensure_can_withdraw(currency_id, source, amount)?;
-
-        Self::set_free_balance(
-            currency_id,
-            source,
-            Self::free_balance(currency_id, source)
-                .checked_sub(&amount)
-                .ok_or(Error::<T>::BalanceTooLow)?,
-        );
-        Self::set_free_balance(
-            currency_id,
-            dest,
-            Self::free_balance(currency_id, dest)
-                .checked_add(&amount)
-                .ok_or(Error::<T>::BalanceOverflow)?,
-        );
+        let mut mutation = Mutation::<T>::new_for_currency(currency_id);
+        mutation.ensure_must_be_transferable_for(source)?;
+        mutation.sub_free_balance(source, amount)?;
+        mutation.add_free_balance(dest, amount)?;
+        mutation.apply()?;
 
         Self::deposit_event(RawEvent::CurrencyTransferred(
             currency_id,
@@ -144,13 +111,11 @@ impl<T: Trait> ReservableCurrencies<T::AccountId> for Module<T> {
         who: &T::AccountId,
         value: Self::Balance,
     ) -> Self::Balance {
-        let reserved_balance = Self::reserved_balance(currency_id, who);
-        let actual = reserved_balance.min(value);
-
-        // Amount will be at most equal to the total reserved balance thus neglecting the
-        // risk of any underflow
-        Self::mutate_currency_account(currency_id, who, |data| data.reserved -= actual);
-        <TotalIssuances<T>>::mutate(currency_id, |v| *v -= actual);
+        let mut mutation = Mutation::<T>::new_for_currency(currency_id);
+        let actual = mutation.sub_up_to_reserved_balance(who, value);
+        mutation
+            .apply()
+            .expect("we assume the coins were created and added to the total issuance previously");
 
         // Return whatever we couldn't slash
         value - actual
@@ -165,14 +130,12 @@ impl<T: Trait> ReservableCurrencies<T::AccountId> for Module<T> {
         who: &T::AccountId,
         amount: Self::Balance,
     ) -> DispatchResult {
-        Self::ensure_can_withdraw(currency_id, who, amount)?;
-
-        // Because of the call to `ensure_can_withdraw` we now that amount is at most equal
-        // to the balance of the account, thus neflecting the use for the safe math checks.
-        Self::mutate_currency_account(currency_id, who, |data| {
-            data.free -= amount;
-            data.reserved += amount;
-        });
+        // We do not require the asset to be transferable, it is assume that it is acceptable
+        // to reserve non transferable currencies
+        let mut mutation = Mutation::<T>::new_for_currency(currency_id);
+        mutation.sub_free_balance(who, amount)?;
+        mutation.add_reserved_balance(who, amount)?;
+        mutation.apply()?;
 
         Ok(())
     }
@@ -182,17 +145,14 @@ impl<T: Trait> ReservableCurrencies<T::AccountId> for Module<T> {
         who: &T::AccountId,
         amount: Self::Balance,
     ) -> Self::Balance {
-        // Take the smallest between all the coins reserved or the amount
-        let unreserved = Self::get_currency_account(currency_id, who)
-            .reserved
-            .min(amount);
-
-        // The amount will be at most equal to the reserved balance, thus we cannot have any
-        // overflow / underflow situation
-        Self::mutate_currency_account(currency_id, who, |data| {
-            data.free += unreserved;
-            data.reserved -= unreserved;
-        });
+        let mut mutation = Mutation::<T>::new_for_currency(currency_id);
+        let unreserved = mutation.sub_up_to_reserved_balance(who, amount);
+        mutation
+            .add_free_balance(who, unreserved)
+            .expect("we are merely reallocating balances");
+        mutation
+            .apply()
+            .expect("we are not modifiying the total issuance and thus do not expect any errors");
 
         // Return the amount of coins we couldn't unreserve
         amount - unreserved
@@ -204,7 +164,7 @@ impl<T: Trait> ReservableCurrencies<T::AccountId> for Module<T> {
         beneficiary: &T::AccountId,
         value: Self::Balance,
         status: BalanceStatus,
-    ) -> result::Result<Self::Balance, DispatchError> {
+    ) -> Result<Self::Balance, DispatchError> {
         if slashed == beneficiary {
             return match status {
                 BalanceStatus::Free => Ok(Self::unreserve(currency_id, slashed, value)),
@@ -215,18 +175,17 @@ impl<T: Trait> ReservableCurrencies<T::AccountId> for Module<T> {
             };
         }
 
-        let from_account = Self::get_currency_account(currency_id, slashed);
-        let to_account = Self::get_currency_account(currency_id, beneficiary);
-        let actual = from_account.reserved.min(value);
+        let mut mutation = Mutation::<T>::new_for_currency(currency_id);
+        let actual = mutation.sub_up_to_reserved_balance(slashed, value);
         match status {
             BalanceStatus::Free => {
-                Self::set_free_balance(currency_id, beneficiary, to_account.free + actual);
+                mutation.add_free_balance(beneficiary, actual)?;
             }
             BalanceStatus::Reserved => {
-                Self::mutate_currency_account(currency_id, beneficiary, |d| d.reserved += actual);
+                mutation.add_reserved_balance(beneficiary, actual)?;
             }
-        }
-        Self::mutate_currency_account(currency_id, slashed, |d| d.reserved -= actual);
+        };
+        mutation.apply()?;
 
         Ok(value - actual)
     }
