@@ -25,7 +25,7 @@ use sp_runtime::{
     traits::{Bounded, CheckedAdd, CheckedSub, Zero},
     DispatchError, DispatchResult,
 };
-use sp_std::{marker, result};
+use sp_std::marker;
 
 /// This struct is useful to implement the `Currency` trait for any given
 /// currency inside the system. It basically takes an interface to the
@@ -141,7 +141,7 @@ where
     fn deposit_into_existing(
         who: &Pallet::AccountId,
         amount: Self::Balance,
-    ) -> result::Result<Self::PositiveImbalance, DispatchError> {
+    ) -> Result<Self::PositiveImbalance, DispatchError> {
         <Module<Pallet> as Currencies<Pallet::AccountId>>::mint(GetCurrencyId::get(), who, amount)?;
         Ok(Self::PositiveImbalance::new(amount))
     }
@@ -155,7 +155,7 @@ where
         value: Self::Balance,
         reasons: WithdrawReasons,
         _: ExistenceRequirement,
-    ) -> result::Result<Self::NegativeImbalance, DispatchError> {
+    ) -> Result<Self::NegativeImbalance, DispatchError> {
         // Unlike `Currencies::burn`, this isn't supposed to reduce the total token supply
 
         Self::ensure_can_withdraw(who, value, reasons, 0.into())?;
@@ -228,7 +228,7 @@ where
         beneficiary: &Pallet::AccountId,
         amount: Self::Balance,
         status: BalanceStatus,
-    ) -> result::Result<Self::Balance, DispatchError> {
+    ) -> Result<Self::Balance, DispatchError> {
         Module::<Pallet>::repatriate_reserved(
             GetCurrencyId::get(),
             slashed,

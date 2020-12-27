@@ -54,6 +54,7 @@ mod currencies;
 mod default_weights;
 mod details;
 mod imbalances;
+mod mutations;
 
 pub use account_data::AccountCurrencyData;
 pub use adapter::NativeCurrencyAdapter;
