@@ -20,7 +20,7 @@
 //! this one.
 
 use codec::FullCodec;
-use frame_support::traits::BalanceStatus;
+use frame_support::traits::{BalanceStatus, LockIdentifier};
 use sp_runtime::{
     traits::{AtLeast32BitUnsigned, MaybeSerializeDeserialize},
     DispatchError, DispatchResult,
@@ -161,4 +161,37 @@ pub trait ReservableCurrencies<AccountId>: Currencies<AccountId> {
         value: Self::Balance,
         status: BalanceStatus,
     ) -> result::Result<Self::Balance, DispatchError>;
+}
+
+/// An extension of the `Currencies` trait to allow the runtime to lock funds
+/// from the token holders. Locks should be combinable. Creating a lock shall
+/// increment any existing reference count, deleting one should decrement it.
+pub trait LockableCurrencies<AccountId>: Currencies<AccountId> {
+    /// Create a new lock on the balance of `who`. You can lock more coins
+    /// than the total balance of a user.
+    ///
+    /// NOTE: this should overwrite any existing lock with the same id.
+    fn set_lock(
+        currency_id: Self::CurrencyId,
+        lock_id: LockIdentifier,
+        who: &AccountId,
+        amount: Self::Balance,
+    ) -> DispatchResult;
+
+    /// Extend an existing lock for `who` and `currency_id`. If the lock
+    /// already exists it will take the maximum value between `amount` and
+    /// the existing one.
+    fn extend_lock(
+        currency_id: Self::CurrencyId,
+        lock_id: LockIdentifier,
+        who: &AccountId,
+        amount: Self::Balance,
+    ) -> DispatchResult;
+
+    /// Remove an existing lock.
+    fn remove_lock(
+        currency_id: Self::CurrencyId,
+        lock_id: LockIdentifier,
+        who: &AccountId,
+    ) -> DispatchResult;
 }
