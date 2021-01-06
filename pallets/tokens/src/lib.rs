@@ -188,6 +188,8 @@ decl_error! {
         BalanceOverflow,
         /// There are not enough coins inside the balance of the user to perform the action
         BalanceTooLow,
+        /// Some of the balance you are trying to withdraw is locked.
+        BalanceLockTriggered,
         /// The currency ID is already used by another currency
         CurrencyAlreadyExists,
         /// This owner(s) of this currency have disabled transfers

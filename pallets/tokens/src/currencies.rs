@@ -130,7 +130,7 @@ impl<T: Trait> ReservableCurrencies<T::AccountId> for Module<T> {
         who: &T::AccountId,
         amount: Self::Balance,
     ) -> DispatchResult {
-        // We do not require the asset to be transferable, it is assume that it is acceptable
+        // We do not require the asset to be transferable, it is assumed that it is acceptable
         // to reserve non transferable currencies
         let mut mutation = Mutation::<T>::new_for_currency(currency_id);
         mutation.sub_free_balance(who, amount)?;
