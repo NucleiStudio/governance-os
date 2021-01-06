@@ -32,7 +32,8 @@ use sp_std::{collections::btree_map::BTreeMap, marker};
 #[derive(Clone)]
 pub struct Mutation<T: Trait> {
     currency_id: T::CurrencyId,
-    balances: BTreeMap<T::AccountId, (AccountCurrencyData<T::Balance>, bool)>,
+    // bools are wether the balance was modified and wether the balance was zero when we first read it.
+    balances: BTreeMap<T::AccountId, (AccountCurrencyData<T::Balance>, bool, bool)>,
     coins_created: T::Balance,
     coins_burned: T::Balance,
     _phantom: marker::PhantomData<T>,
@@ -54,7 +55,10 @@ impl<T: Trait> Mutation<T> {
         match in_cache {
             None => {
                 let in_node = Balances::<T>::get(who, self.currency_id);
-                self.balances.insert(who.clone(), (in_node.clone(), false));
+                self.balances.insert(
+                    who.clone(),
+                    (in_node.clone(), false, in_node.total() == Zero::zero()),
+                );
 
                 in_node
             }
@@ -64,8 +68,16 @@ impl<T: Trait> Mutation<T> {
 
     /// Save an updated balance in our memory cache
     pub fn save_balance(&mut self, who: &T::AccountId, balance: AccountCurrencyData<T::Balance>) {
+        let in_memory_snapshot_first_started_at_0 = match self.balances.get(who) {
+            None => false,
+            Some(data) => data.2,
+        };
+
         // Note how the boolean is set to true since we modified the balance
-        self.balances.insert(who.clone(), (balance, true));
+        self.balances.insert(
+            who.clone(),
+            (balance, true, in_memory_snapshot_first_started_at_0),
+        );
     }
 
     /// Verify that the currency is transferable
@@ -194,12 +206,20 @@ impl<T: Trait> Mutation<T> {
     pub fn apply(self) -> DispatchResult {
         self.balances
             .iter()
-            .filter(|(_account, (_bal, changed))| *changed)
-            .map(|(account, (balance, _changed))| (account, balance))
-            .for_each(|(account, balance)| {
+            .filter(|(_account, (_bal, changed, _snapshot_was_0))| *changed)
+            .map(|(account, (balance, _changed, snapshot_was_0))| {
+                (account, balance, snapshot_was_0)
+            })
+            .for_each(|(account, balance, snapshot_0)| {
                 if balance.total() == Zero::zero() {
-                    Balances::<T>::remove(account, self.currency_id);
+                    if !*snapshot_0 {
+                        frame_system::Module::<T>::dec_ref(account);
+                        Balances::<T>::remove(account, self.currency_id);
+                    }
                 } else {
+                    if *snapshot_0 {
+                        frame_system::Module::<T>::inc_ref(account);
+                    }
                     Balances::<T>::insert(account, self.currency_id, balance);
                 }
             });

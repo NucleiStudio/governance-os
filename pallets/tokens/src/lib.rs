@@ -150,6 +150,7 @@ decl_storage! {
 
             config.endowed_accounts.iter().for_each(|(currency_id, account_id, initial_balance)| {
                 Balances::<T>::mutate(account_id, *currency_id, |d| d.free = *initial_balance);
+                frame_system::Module::<T>::inc_ref(&account_id);
             });
         })
     }

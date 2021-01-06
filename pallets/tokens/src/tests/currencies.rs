@@ -308,3 +308,55 @@ fn ensure_can_withdraw_refuse_if_non_transferable_currency() {
         );
     })
 }
+
+#[test]
+fn creating_a_new_account_inc_system_ref() {
+    ExtBuilder::default().build().execute_with(|| {
+        assert_ok!(<Tokens as Currencies<AccountId>>::mint(
+            TEST_TOKEN_ID,
+            &ALICE,
+            100
+        ));
+        assert_ok!(<Tokens as Currencies<AccountId>>::transfer(
+            TEST_TOKEN_ID,
+            &ALICE,
+            &BOB,
+            50
+        ));
+
+        assert_eq!(frame_system::Module::<Test>::refs(&ALICE), 1);
+        assert_eq!(frame_system::Module::<Test>::refs(&BOB), 1);
+    });
+}
+
+#[test]
+fn deleting_an_account_dec_system_ref() {
+    ExtBuilder::default().build().execute_with(|| {
+        assert_ok!(<Tokens as Currencies<AccountId>>::mint(
+            TEST_TOKEN_ID,
+            &ALICE,
+            100
+        ));
+        assert_ok!(<Tokens as Currencies<AccountId>>::transfer(
+            TEST_TOKEN_ID,
+            &ALICE,
+            &BOB,
+            50
+        ));
+
+        assert_ok!(<Tokens as Currencies<AccountId>>::transfer(
+            TEST_TOKEN_ID,
+            &BOB,
+            &ALICE,
+            50
+        ));
+        assert_ok!(<Tokens as Currencies<AccountId>>::burn(
+            TEST_TOKEN_ID,
+            &ALICE,
+            100
+        ));
+
+        assert_eq!(frame_system::Module::<Test>::refs(&ALICE), 0);
+        assert_eq!(frame_system::Module::<Test>::refs(&BOB), 0);
+    });
+}
