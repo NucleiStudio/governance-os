@@ -173,6 +173,11 @@ impl<T: Trait> Mutation<T> {
         actual_subed
     }
 
+    pub fn frozen(&mut self, who: &T::AccountId) -> T::Balance {
+        let balance = self.get_or_fetch_balance(who);
+        balance.frozen
+    }
+
     pub fn add_frozen(&mut self, who: &T::AccountId, increment: T::Balance) -> DispatchResult {
         let mut balance = self.get_or_fetch_balance(who);
         balance.frozen = balance

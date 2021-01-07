@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-use crate::{mutations::Mutation, Module, RawEvent, Trait};
-use frame_support::traits::BalanceStatus;
-use governance_os_support::traits::{Currencies, ReservableCurrencies};
+use crate::{mutations::Mutation, Locks, Module, RawEvent, Trait};
+use frame_support::{
+    traits::{BalanceStatus, LockIdentifier},
+    StorageDoubleMap,
+};
+use governance_os_support::traits::{Currencies, LockableCurrencies, ReservableCurrencies};
 use sp_runtime::{traits::Saturating, DispatchError, DispatchResult};
 
 impl<T: Trait> Currencies<T::AccountId> for Module<T> {
@@ -188,5 +191,71 @@ impl<T: Trait> ReservableCurrencies<T::AccountId> for Module<T> {
         mutation.apply()?;
 
         Ok(value - actual)
+    }
+}
+
+impl<T: Trait> LockableCurrencies<T::AccountId> for Module<T> {
+    fn set_lock(
+        currency_id: Self::CurrencyId,
+        lock_id: LockIdentifier,
+        who: &T::AccountId,
+        amount: Self::Balance,
+    ) -> DispatchResult {
+        Locks::<T>::try_mutate_exists(
+            (who, currency_id),
+            lock_id,
+            |maybe_existing_lock| -> DispatchResult {
+                let mut mutation = Mutation::<T>::new_for_currency(currency_id);
+
+                if maybe_existing_lock.is_none() {
+                    // We are creating a new lock. Add a few checks to handle cases when
+                    // more than one lock is present.
+                    if mutation.frozen(who) < amount {
+                        mutation.add_frozen(who, amount)?;
+                    }
+                } else {
+                    // We are overwriting an existing lock
+                    let existing_lock = maybe_existing_lock
+                        .take()
+                        .expect("we just did a is_none check");
+
+                    // We first check that it is needed to increase the locked amounts,
+                    // or not. It may not be necessary if we already have other locks in
+                    // place.
+                    if mutation.frozen(who).saturating_sub(existing_lock) < amount {
+                        // We use the fact that the mutation helper keeps things in memory,
+                        // so substracting and adding values to a balance does not require
+                        // multiple DB reads.
+                        mutation.sub_frozen(who, existing_lock)?;
+                        mutation.add_frozen(who, amount)?;
+                    }
+                }
+
+                // Update balance
+                mutation.apply()?;
+
+                // Write the lock
+                *maybe_existing_lock = Some(amount);
+
+                Ok(())
+            },
+        )
+    }
+
+    fn extend_lock(
+        currency_id: Self::CurrencyId,
+        lock_id: LockIdentifier,
+        who: &T::AccountId,
+        amount: Self::Balance,
+    ) -> DispatchResult {
+        unimplemented!()
+    }
+
+    fn remove_lock(
+        currency_id: Self::CurrencyId,
+        lock_id: LockIdentifier,
+        who: &T::AccountId,
+    ) -> DispatchResult {
+        unimplemented!()
     }
 }

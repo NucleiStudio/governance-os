@@ -22,7 +22,7 @@ use frame_support::{
 };
 use governance_os_support::{
     testing::{primitives::AccountId, ALICE, BOB, TEST_TOKEN_ID, TEST_TOKEN_OWNER},
-    traits::{Currencies, ReservableCurrencies},
+    traits::{Currencies, LockableCurrencies, ReservableCurrencies},
 };
 
 #[test]
@@ -359,4 +359,218 @@ fn deleting_an_account_dec_system_ref() {
         assert_eq!(frame_system::Module::<Test>::refs(&ALICE), 0);
         assert_eq!(frame_system::Module::<Test>::refs(&BOB), 0);
     });
+}
+
+#[test]
+fn set_lock_effectively_freeze_part_of_the_balance() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            assert_ok!(<Tokens as LockableCurrencies<AccountId>>::set_lock(
+                TEST_TOKEN_ID,
+                *b"testtest",
+                &ALICE,
+                30
+            ));
+            assert_eq!(
+                Tokens::get_currency_account(TEST_TOKEN_ID, &ALICE).frozen,
+                30
+            );
+            assert_noop!(
+                <Tokens as Currencies<AccountId>>::transfer(TEST_TOKEN_ID, &ALICE, &BOB, 100),
+                Error::<Test>::BalanceLockTriggered
+            );
+        })
+}
+
+#[test]
+fn set_lock_with_same_id_overwrite_existing_lock() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            // Initial setup
+            assert_ok!(<Tokens as LockableCurrencies<AccountId>>::set_lock(
+                TEST_TOKEN_ID,
+                *b"testtest",
+                &ALICE,
+                30
+            ));
+            assert_eq!(
+                Tokens::get_currency_account(TEST_TOKEN_ID, &ALICE).frozen,
+                30
+            );
+
+            // Reduce lock
+            assert_ok!(<Tokens as LockableCurrencies<AccountId>>::set_lock(
+                TEST_TOKEN_ID,
+                *b"testtest",
+                &ALICE,
+                20
+            ));
+            assert_eq!(
+                Tokens::get_currency_account(TEST_TOKEN_ID, &ALICE).frozen,
+                20
+            );
+
+            // Increase lock
+            assert_ok!(<Tokens as LockableCurrencies<AccountId>>::set_lock(
+                TEST_TOKEN_ID,
+                *b"testtest",
+                &ALICE,
+                40
+            ));
+            assert_eq!(
+                Tokens::get_currency_account(TEST_TOKEN_ID, &ALICE).frozen,
+                40
+            );
+        })
+}
+
+#[test]
+fn can_lock_more_than_free_balance() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            assert_ok!(<Tokens as LockableCurrencies<AccountId>>::set_lock(
+                TEST_TOKEN_ID,
+                *b"testtest",
+                &ALICE,
+                120
+            ));
+            assert_eq!(
+                Tokens::get_currency_account(TEST_TOKEN_ID, &ALICE).frozen,
+                120
+            );
+
+            // We locked more than free balance and thus can't transfer anything
+            assert_noop!(
+                <Tokens as Currencies<AccountId>>::transfer(TEST_TOKEN_ID, &ALICE, &BOB, 1),
+                Error::<Test>::BalanceLockTriggered
+            );
+        })
+}
+
+#[test]
+fn set_lock_with_different_id_extend_frozen_balance_if_needed() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            assert_ok!(<Tokens as LockableCurrencies<AccountId>>::set_lock(
+                TEST_TOKEN_ID,
+                *b"testtest",
+                &ALICE,
+                30
+            ));
+            assert_ok!(<Tokens as LockableCurrencies<AccountId>>::set_lock(
+                TEST_TOKEN_ID,
+                *b"deadbeef",
+                &ALICE,
+                30
+            ));
+            // No lock increase
+            assert_eq!(
+                Tokens::get_currency_account(TEST_TOKEN_ID, &ALICE).frozen,
+                30
+            );
+
+            assert_ok!(<Tokens as LockableCurrencies<AccountId>>::set_lock(
+                TEST_TOKEN_ID,
+                *b"deadbeef",
+                &ALICE,
+                50
+            ));
+            // Lock increase
+            assert_eq!(
+                Tokens::get_currency_account(TEST_TOKEN_ID, &ALICE).frozen,
+                50
+            );
+        })
+}
+
+#[test]
+fn can_not_withdraw_locked_balance() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            assert_ok!(<Tokens as LockableCurrencies<AccountId>>::set_lock(
+                TEST_TOKEN_ID,
+                *b"testtest",
+                &ALICE,
+                60
+            ));
+
+            assert_noop!(
+                <Tokens as Currencies<AccountId>>::ensure_can_withdraw(TEST_TOKEN_ID, &ALICE, 50),
+                Error::<Test>::BalanceLockTriggered
+            );
+        })
+}
+
+#[test]
+fn can_not_reserve_locked_balance() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            assert_ok!(<Tokens as LockableCurrencies<AccountId>>::set_lock(
+                TEST_TOKEN_ID,
+                *b"testtest",
+                &ALICE,
+                60
+            ));
+
+            assert_eq!(
+                <Tokens as ReservableCurrencies<AccountId>>::can_reserve(TEST_TOKEN_ID, &ALICE, 50),
+                false
+            );
+            assert_noop!(
+                <Tokens as ReservableCurrencies<AccountId>>::reserve(TEST_TOKEN_ID, &ALICE, 50),
+                Error::<Test>::BalanceLockTriggered
+            );
+        })
+}
+
+#[test]
+fn can_not_transfer_locked_balance() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            assert_ok!(<Tokens as LockableCurrencies<AccountId>>::set_lock(
+                TEST_TOKEN_ID,
+                *b"testtest",
+                &ALICE,
+                60
+            ));
+
+            assert_noop!(
+                <Tokens as Currencies<AccountId>>::transfer(TEST_TOKEN_ID, &ALICE, &BOB, 50),
+                Error::<Test>::BalanceLockTriggered
+            );
+        })
+}
+
+#[test]
+fn can_not_burn_locked_balance() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            assert_ok!(<Tokens as LockableCurrencies<AccountId>>::set_lock(
+                TEST_TOKEN_ID,
+                *b"testtest",
+                &ALICE,
+                60
+            ));
+
+            assert_noop!(
+                <Tokens as Currencies<AccountId>>::burn(TEST_TOKEN_ID, &ALICE, 50),
+                Error::<Test>::BalanceLockTriggered
+            );
+        })
 }

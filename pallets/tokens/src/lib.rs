@@ -25,7 +25,8 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use frame_support::{
-    decl_error, decl_event, decl_module, decl_storage, weights::Weight, Parameter,
+    decl_error, decl_event, decl_module, decl_storage, traits::LockIdentifier, weights::Weight,
+    Parameter,
 };
 use frame_system::ensure_signed;
 use governance_os_support::traits::{Currencies, RoleManager};
@@ -120,6 +121,7 @@ decl_storage! {
         /// Store the balances holded by an account. By storing the balances under an account (VS storing
         /// the accounts under the currency ids) we can enumerate the tokens holded by an account if needed.
         pub Balances get(fn balances): double_map hasher(blake2_128_concat) T::AccountId, hasher(blake2_128_concat) T::CurrencyId => AccountCurrencyData<T::Balance>;
+        pub Locks get(fn locks): double_map hasher(blake2_128_concat) (T::AccountId, T::CurrencyId), hasher(blake2_128_concat) LockIdentifier => T::Balance;
         pub TotalIssuances get(fn total_issuances) build(|config: &GenesisConfig<T>| {
             config
                 .endowed_accounts
