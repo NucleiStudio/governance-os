@@ -218,6 +218,9 @@ impl<T: Trait> Module<T> {
                     if mutation.frozen(who) < amount {
                         mutation.add_frozen(who, amount)?;
                     }
+
+                    // A new lock is being created, inc the system ref
+                    frame_system::Module::<T>::inc_ref(who);
                 } else {
                     // We are overwriting an existing lock
                     let existing_lock = maybe_existing_lock
@@ -279,6 +282,8 @@ impl<T: Trait> LockableCurrencies<T::AccountId> for Module<T> {
         who: &T::AccountId,
     ) -> DispatchResult {
         Locks::<T>::remove((who, currency_id), lock_id);
+        frame_system::Module::<T>::dec_ref(who);
+
         let highest_lock_value = Locks::<T>::iter_prefix((who, currency_id)).fold(
             Zero::zero(),
             |acc, (_lock_id, lock_val)| {

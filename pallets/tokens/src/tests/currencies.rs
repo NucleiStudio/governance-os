@@ -736,11 +736,103 @@ fn can_not_burn_locked_balance() {
         })
 }
 
-// #[test]
-// fn set_new_lock_inc_ref() {}
+#[test]
+fn set_new_lock_inc_ref() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            assert_ok!(<Tokens as LockableCurrencies<AccountId>>::set_lock(
+                TEST_TOKEN_ID,
+                *b"testtest",
+                &ALICE,
+                60
+            ));
 
-// #[test]
-// fn extend_new_lock_inc_ref() {}
+            assert_eq!(frame_system::Module::<Test>::refs(&ALICE), 2);
+        })
+}
+#[test]
+fn set_existing_lock_does_not_inc_ref() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            assert_ok!(<Tokens as LockableCurrencies<AccountId>>::set_lock(
+                TEST_TOKEN_ID,
+                *b"testtest",
+                &ALICE,
+                60
+            ));
+            assert_ok!(<Tokens as LockableCurrencies<AccountId>>::set_lock(
+                TEST_TOKEN_ID,
+                *b"testtest",
+                &ALICE,
+                50
+            ));
 
-// #[test]
-// fn remove_lock_dec_ref() {}
+            assert_eq!(frame_system::Module::<Test>::refs(&ALICE), 2);
+        })
+}
+
+#[test]
+fn extend_new_lock_inc_ref() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            assert_ok!(<Tokens as LockableCurrencies<AccountId>>::extend_lock(
+                TEST_TOKEN_ID,
+                *b"testtest",
+                &ALICE,
+                60
+            ));
+
+            assert_eq!(frame_system::Module::<Test>::refs(&ALICE), 2);
+        })
+}
+
+#[test]
+fn extend_existing_lock_does_not_inc_ref() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            assert_ok!(<Tokens as LockableCurrencies<AccountId>>::set_lock(
+                TEST_TOKEN_ID,
+                *b"testtest",
+                &ALICE,
+                50
+            ));
+            assert_ok!(<Tokens as LockableCurrencies<AccountId>>::extend_lock(
+                TEST_TOKEN_ID,
+                *b"testtest",
+                &ALICE,
+                60
+            ));
+
+            assert_eq!(frame_system::Module::<Test>::refs(&ALICE), 2);
+        })
+}
+
+#[test]
+fn remove_lock_dec_ref() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            assert_ok!(<Tokens as LockableCurrencies<AccountId>>::set_lock(
+                TEST_TOKEN_ID,
+                *b"testtest",
+                &ALICE,
+                60
+            ));
+            assert_ok!(<Tokens as LockableCurrencies<AccountId>>::remove_lock(
+                TEST_TOKEN_ID,
+                *b"testtest",
+                &ALICE,
+            ));
+
+            assert_eq!(frame_system::Module::<Test>::refs(&ALICE), 1);
+        })
+}
