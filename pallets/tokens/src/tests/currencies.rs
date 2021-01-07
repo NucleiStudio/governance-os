@@ -564,6 +564,95 @@ fn extend_lock_creates_new_lock_if_needed() {
 }
 
 #[test]
+fn remove_lock_may_not_decrease_frozen_amount_if_other_and_higher_locks_are_in_place() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            assert_ok!(<Tokens as LockableCurrencies<AccountId>>::set_lock(
+                TEST_TOKEN_ID,
+                *b"testtest",
+                &ALICE,
+                60
+            ));
+            assert_ok!(<Tokens as LockableCurrencies<AccountId>>::set_lock(
+                TEST_TOKEN_ID,
+                *b"deadbeef",
+                &ALICE,
+                100
+            ));
+            assert_ok!(<Tokens as LockableCurrencies<AccountId>>::remove_lock(
+                TEST_TOKEN_ID,
+                *b"testtest",
+                &ALICE
+            ));
+
+            // Still has the deadbeef lock in place
+            assert_eq!(
+                Tokens::get_currency_account(TEST_TOKEN_ID, &ALICE).frozen,
+                100
+            );
+        })
+}
+
+#[test]
+fn remove_lock_clears_frozen_balance_when_removing_last_lock() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            assert_ok!(<Tokens as LockableCurrencies<AccountId>>::set_lock(
+                TEST_TOKEN_ID,
+                *b"testtest",
+                &ALICE,
+                60
+            ));
+            assert_ok!(<Tokens as LockableCurrencies<AccountId>>::remove_lock(
+                TEST_TOKEN_ID,
+                *b"testtest",
+                &ALICE
+            ));
+
+            assert_eq!(
+                Tokens::get_currency_account(TEST_TOKEN_ID, &ALICE).frozen,
+                0
+            );
+        })
+}
+
+#[test]
+fn remove_lock_clears_frozen_balance_when_removing_higher_lock() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            assert_ok!(<Tokens as LockableCurrencies<AccountId>>::set_lock(
+                TEST_TOKEN_ID,
+                *b"testtest",
+                &ALICE,
+                60
+            ));
+            assert_ok!(<Tokens as LockableCurrencies<AccountId>>::set_lock(
+                TEST_TOKEN_ID,
+                *b"deadbeef",
+                &ALICE,
+                100
+            ));
+            assert_ok!(<Tokens as LockableCurrencies<AccountId>>::remove_lock(
+                TEST_TOKEN_ID,
+                *b"deadbeef",
+                &ALICE
+            ));
+
+            // Still has the testtest lock in place
+            assert_eq!(
+                Tokens::get_currency_account(TEST_TOKEN_ID, &ALICE).frozen,
+                60
+            );
+        })
+}
+
+#[test]
 fn can_not_withdraw_locked_balance() {
     ExtBuilder::default()
         .one_hundred_for_alice_n_bob()

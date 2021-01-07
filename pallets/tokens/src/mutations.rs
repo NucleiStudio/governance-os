@@ -203,6 +203,31 @@ impl<T: Trait> Mutation<T> {
     }
 
     /// Does what it says and return the old balance.
+    pub fn overwrite_frozen_balance(
+        &mut self,
+        who: &T::AccountId,
+        new_balance: T::Balance,
+    ) -> T::Balance {
+        let mut balance = self.get_or_fetch_balance(who);
+        if balance.frozen < new_balance {
+            self.coins_created = self
+                .coins_created
+                .saturating_add(new_balance.saturating_sub(balance.frozen));
+        } else {
+            self.coins_burned = self
+                .coins_burned
+                .saturating_add(balance.frozen.saturating_sub(new_balance));
+        }
+
+        let frozen_balance_bak = balance.frozen;
+        balance.frozen = new_balance;
+
+        self.save_balance(who, balance);
+
+        frozen_balance_bak
+    }
+
+    /// Does what it says and return the old balance.
     pub fn overwrite_free_balance(
         &mut self,
         who: &T::AccountId,

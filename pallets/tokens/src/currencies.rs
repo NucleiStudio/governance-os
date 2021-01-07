@@ -17,10 +17,13 @@
 use crate::{mutations::Mutation, Locks, Module, RawEvent, Trait};
 use frame_support::{
     traits::{BalanceStatus, LockIdentifier},
-    StorageDoubleMap,
+    IterableStorageDoubleMap, StorageDoubleMap,
 };
 use governance_os_support::traits::{Currencies, LockableCurrencies, ReservableCurrencies};
-use sp_runtime::{traits::Saturating, DispatchError, DispatchResult};
+use sp_runtime::{
+    traits::{Saturating, Zero},
+    DispatchError, DispatchResult,
+};
 
 impl<T: Trait> Currencies<T::AccountId> for Module<T> {
     type CurrencyId = T::CurrencyId;
@@ -275,6 +278,22 @@ impl<T: Trait> LockableCurrencies<T::AccountId> for Module<T> {
         lock_id: LockIdentifier,
         who: &T::AccountId,
     ) -> DispatchResult {
-        unimplemented!()
+        Locks::<T>::remove((who, currency_id), lock_id);
+        let highest_lock_value = Locks::<T>::iter_prefix((who, currency_id)).fold(
+            Zero::zero(),
+            |acc, (_lock_id, lock_val)| {
+                if acc < lock_val {
+                    lock_val
+                } else {
+                    acc
+                }
+            },
+        );
+
+        let mut mutation = Mutation::<T>::new_for_currency(currency_id);
+        mutation.overwrite_frozen_balance(who, highest_lock_value);
+        mutation.apply()?;
+
+        Ok(())
     }
 }
