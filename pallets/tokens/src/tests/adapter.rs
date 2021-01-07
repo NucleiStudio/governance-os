@@ -19,8 +19,8 @@ use crate::Error;
 use frame_support::{
     assert_noop, assert_ok,
     traits::{
-        BalanceStatus, Currency, ExistenceRequirement, Imbalance, ReservableCurrency,
-        SignedImbalance, WithdrawReason,
+        BalanceStatus, Currency, ExistenceRequirement, Imbalance, LockableCurrency,
+        ReservableCurrency, SignedImbalance, WithdrawReason, WithdrawReasons,
     },
 };
 use governance_os_support::{
@@ -425,5 +425,116 @@ fn slash_reserved() {
             let (imbalance, unslashed) = TokensCurrencyAdapter::slash_reserved(&ALICE, 50);
             assert_eq!(imbalance.peek(), 25);
             assert_eq!(unslashed, 25);
+        })
+}
+
+#[test]
+fn set_lock() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            TokensCurrencyAdapter::set_lock(*b"testtest", &ALICE, 25, WithdrawReasons::all());
+            assert_eq!(
+                Tokens::get_currency_account(TEST_TOKEN_ID, &ALICE).frozen,
+                25
+            );
+        })
+}
+
+#[test]
+fn extend_lock() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            TokensCurrencyAdapter::set_lock(*b"testtest", &ALICE, 25, WithdrawReasons::all());
+            TokensCurrencyAdapter::extend_lock(*b"testtest", &ALICE, 30, WithdrawReasons::all());
+            assert_eq!(
+                Tokens::get_currency_account(TEST_TOKEN_ID, &ALICE).frozen,
+                30
+            );
+        })
+}
+
+#[test]
+fn remove_lock() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            TokensCurrencyAdapter::set_lock(*b"testtest", &ALICE, 25, WithdrawReasons::all());
+            TokensCurrencyAdapter::remove_lock(*b"testtest", &ALICE);
+            assert_eq!(
+                Tokens::get_currency_account(TEST_TOKEN_ID, &ALICE).frozen,
+                0
+            );
+        })
+}
+
+#[test]
+fn can_not_withdraw_locked_balance() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            TokensCurrencyAdapter::set_lock(*b"testtest", &ALICE, 25, WithdrawReasons::all());
+            assert_noop!(
+                TokensCurrencyAdapter::ensure_can_withdraw(&ALICE, 100, WithdrawReasons::all(), 0),
+                Error::<Test>::BalanceLockTriggered
+            );
+
+            let withdraw_result = TokensCurrencyAdapter::withdraw(
+                &ALICE,
+                100,
+                WithdrawReasons::all(),
+                ExistenceRequirement::AllowDeath,
+            );
+            assert!(withdraw_result.is_err());
+            assert_eq!(
+                TokensCurrencyAdapter::withdraw(
+                    &ALICE,
+                    100,
+                    WithdrawReasons::all(),
+                    ExistenceRequirement::AllowDeath
+                )
+                .err()
+                .unwrap(),
+                Error::<Test>::BalanceLockTriggered.into()
+            );
+        })
+}
+
+#[test]
+fn can_not_transfer_locked_balance() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            TokensCurrencyAdapter::set_lock(*b"testtest", &ALICE, 25, WithdrawReasons::all());
+            assert_noop!(
+                TokensCurrencyAdapter::transfer(
+                    &ALICE,
+                    &BOB,
+                    100,
+                    ExistenceRequirement::AllowDeath
+                ),
+                Error::<Test>::BalanceLockTriggered
+            );
+        })
+}
+
+#[test]
+fn can_not_reserve_locked_balance() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            TokensCurrencyAdapter::set_lock(*b"testtest", &ALICE, 25, WithdrawReasons::all());
+            assert_eq!(TokensCurrencyAdapter::can_reserve(&ALICE, 100), false);
+            assert_noop!(
+                TokensCurrencyAdapter::reserve(&ALICE, 100,),
+                Error::<Test>::BalanceLockTriggered
+            );
         })
 }

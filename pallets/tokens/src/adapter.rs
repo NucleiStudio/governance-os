@@ -21,12 +21,12 @@ use crate::{
 };
 use frame_support::{
     traits::{
-        BalanceStatus, Currency, ExistenceRequirement, Get, Imbalance, ReservableCurrency,
-        SignedImbalance, WithdrawReasons,
+        BalanceStatus, Currency, ExistenceRequirement, Get, Imbalance, LockIdentifier,
+        LockableCurrency, ReservableCurrency, SignedImbalance, WithdrawReasons,
     },
     StorageMap,
 };
-use governance_os_support::traits::{Currencies, ReservableCurrencies};
+use governance_os_support::traits::{Currencies, LockableCurrencies, ReservableCurrencies};
 use sp_runtime::{
     traits::{Bounded, CheckedAdd, CheckedSub, Zero},
     DispatchError, DispatchResult,
@@ -237,5 +237,47 @@ where
             amount,
             status,
         )
+    }
+}
+
+impl<Pallet, GetCurrencyId> LockableCurrency<Pallet::AccountId>
+    for NativeCurrencyAdapter<Pallet, GetCurrencyId>
+where
+    Pallet: Trait,
+    GetCurrencyId: Get<Pallet::CurrencyId>,
+{
+    type Moment = Pallet::BlockNumber;
+    type MaxLocks = ();
+
+    fn set_lock(
+        id: LockIdentifier,
+        who: &Pallet::AccountId,
+        amount: Self::Balance,
+        _reasons: WithdrawReasons,
+    ) {
+        drop(Module::<Pallet>::set_lock(
+            GetCurrencyId::get(),
+            id,
+            who,
+            amount,
+        ))
+    }
+
+    fn extend_lock(
+        id: LockIdentifier,
+        who: &Pallet::AccountId,
+        amount: Self::Balance,
+        _reasons: WithdrawReasons,
+    ) {
+        drop(Module::<Pallet>::extend_lock(
+            GetCurrencyId::get(),
+            id,
+            who,
+            amount,
+        ))
+    }
+
+    fn remove_lock(id: LockIdentifier, who: &Pallet::AccountId) {
+        drop(Module::<Pallet>::remove_lock(GetCurrencyId::get(), id, who))
     }
 }
