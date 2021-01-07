@@ -340,6 +340,11 @@
 <span id="337">337</span>
 <span id="338">338</span>
 <span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">/*
  * Copyright 2020 Nuclei Studio OÜ
@@ -368,7 +373,8 @@
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>), <span class="ident">no_std</span>)]</span>
 
 <span class="kw">use</span> <span class="ident">frame_support</span>::{
-    <span class="ident">decl_error</span>, <span class="ident">decl_event</span>, <span class="ident">decl_module</span>, <span class="ident">decl_storage</span>, <span class="ident">weights</span>::<span class="ident">Weight</span>, <span class="ident">Parameter</span>,
+    <span class="ident">decl_error</span>, <span class="ident">decl_event</span>, <span class="ident">decl_module</span>, <span class="ident">decl_storage</span>, <span class="ident">traits</span>::<span class="ident">LockIdentifier</span>, <span class="ident">weights</span>::<span class="ident">Weight</span>,
+    <span class="ident">Parameter</span>,
 };
 <span class="kw">use</span> <span class="ident">frame_system</span>::<span class="ident">ensure_signed</span>;
 <span class="kw">use</span> <span class="ident">governance_os_support</span>::<span class="ident">traits</span>::{<span class="ident">Currencies</span>, <span class="ident">RoleManager</span>};
@@ -463,6 +469,7 @@
         <span class="doccomment">/// Store the balances holded by an account. By storing the balances under an account (VS storing</span>
         <span class="doccomment">/// the accounts under the currency ids) we can enumerate the tokens holded by an account if needed.</span>
         <span class="kw">pub</span> <span class="ident">Balances</span> <span class="ident">get</span>(<span class="kw">fn</span> <span class="ident">balances</span>): <span class="ident">double_map</span> <span class="ident">hasher</span>(<span class="ident">blake2_128_concat</span>) <span class="ident">T</span>::<span class="ident">AccountId</span>, <span class="ident">hasher</span>(<span class="ident">blake2_128_concat</span>) <span class="ident">T</span>::<span class="ident">CurrencyId</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AccountCurrencyData</span><span class="op">&lt;</span><span class="ident">T</span>::<span class="ident">Balance</span><span class="op">&gt;</span>;
+        <span class="kw">pub</span> <span class="ident">Locks</span> <span class="ident">get</span>(<span class="kw">fn</span> <span class="ident">locks</span>): <span class="ident">double_map</span> <span class="ident">hasher</span>(<span class="ident">blake2_128_concat</span>) (<span class="ident">T</span>::<span class="ident">AccountId</span>, <span class="ident">T</span>::<span class="ident">CurrencyId</span>), <span class="ident">hasher</span>(<span class="ident">blake2_128_concat</span>) <span class="ident">LockIdentifier</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">T</span>::<span class="ident">Balance</span>;
         <span class="kw">pub</span> <span class="ident">TotalIssuances</span> <span class="ident">get</span>(<span class="kw">fn</span> <span class="ident">total_issuances</span>) <span class="ident">build</span>(<span class="op">|</span><span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">GenesisConfig</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">|</span> {
             <span class="ident">config</span>
                 .<span class="ident">endowed_accounts</span>
@@ -493,6 +500,7 @@
 
             <span class="ident">config</span>.<span class="ident">endowed_accounts</span>.<span class="ident">iter</span>().<span class="ident">for_each</span>(<span class="op">|</span>(<span class="ident">currency_id</span>, <span class="ident">account_id</span>, <span class="ident">initial_balance</span>)<span class="op">|</span> {
                 <span class="ident">Balances</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">mutate</span>(<span class="ident">account_id</span>, <span class="kw-2">*</span><span class="ident">currency_id</span>, <span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">free</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">initial_balance</span>);
+                <span class="ident">frame_system</span>::<span class="ident">Module</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">inc_ref</span>(<span class="kw-2">&amp;</span><span class="ident">account_id</span>);
             });
         })
     }
@@ -530,6 +538,8 @@
         <span class="ident">BalanceOverflow</span>,
         <span class="doccomment">/// There are not enough coins inside the balance of the user to perform the action</span>
         <span class="ident">BalanceTooLow</span>,
+        <span class="doccomment">/// Some of the balance you are trying to withdraw is locked.</span>
+        <span class="ident">BalanceLockTriggered</span>,
         <span class="doccomment">/// The currency ID is already used by another currency</span>
         <span class="ident">CurrencyAlreadyExists</span>,
         <span class="doccomment">/// This owner(s) of this currency have disabled transfers</span>

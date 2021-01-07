@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bip39-0.6.0-beta.1/src/mnemonic.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mnemonic.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tiny-bip39-0.7.3/src/mnemonic.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mnemonic.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
 <link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../bip39/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
                 <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
@@ -359,14 +359,41 @@
 <span id="356">356</span>
 <span id="357">357</span>
 <span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="ident">util</span>::{<span class="ident">checksum</span>, <span class="ident">IterExt</span>, <span class="ident">BitWriter</span>};
-<span class="kw">use</span> <span class="ident">crypto</span>::{<span class="ident">gen_random_bytes</span>, <span class="ident">sha256_first_byte</span>};
-<span class="kw">use</span> <span class="ident">error</span>::<span class="ident">ErrorKind</span>;
-<span class="kw">use</span> <span class="ident">failure</span>::<span class="ident">Error</span>;
-<span class="kw">use</span> <span class="ident">mnemonic_type</span>::<span class="ident">MnemonicType</span>;
-<span class="kw">use</span> <span class="ident">language</span>::<span class="ident">Language</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
+<span class="kw">use</span> <span class="ident">failure</span>::<span class="ident">Error</span>;
+<span class="kw">use</span> <span class="ident">unicode_normalization</span>::<span class="ident">UnicodeNormalization</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">crypto</span>::{<span class="ident">gen_random_bytes</span>, <span class="ident">sha256_first_byte</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">error</span>::<span class="ident">ErrorKind</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">language</span>::<span class="ident">Language</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">mnemonic_type</span>::<span class="ident">MnemonicType</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">util</span>::{<span class="ident">checksum</span>, <span class="ident">BitWriter</span>, <span class="ident">IterExt</span>};
 
 <span class="doccomment">/// The primary type in this crate, most tasks require creating or using one.</span>
 <span class="doccomment">///</span>
@@ -448,7 +475,7 @@
 
     <span class="kw">fn</span> <span class="ident">from_entropy_unchecked</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">entropy</span>: <span class="ident">E</span>, <span class="ident">lang</span>: <span class="ident">Language</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Mnemonic</span>
     <span class="kw">where</span>
-        <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>
+        <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
         <span class="kw">let</span> <span class="ident">entropy</span> <span class="op">=</span> <span class="ident">entropy</span>.<span class="ident">into</span>();
         <span class="kw">let</span> <span class="ident">wordlist</span> <span class="op">=</span> <span class="ident">lang</span>.<span class="ident">wordlist</span>();
@@ -464,16 +491,17 @@
         <span class="comment">//</span>
         <span class="comment">// Given the entropy is of correct size, this ought to give us the correct word</span>
         <span class="comment">// count.</span>
-        <span class="kw">let</span> <span class="ident">phrase</span> <span class="op">=</span> <span class="ident">entropy</span>.<span class="ident">iter</span>()
-                            .<span class="ident">chain</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">checksum_byte</span>))
-                            .<span class="ident">bits</span>()
-                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">bits</span><span class="op">|</span> <span class="ident">wordlist</span>.<span class="ident">get_word</span>(<span class="ident">bits</span>))
-                            .<span class="ident">join</span>(<span class="string">&quot; &quot;</span>);
+        <span class="kw">let</span> <span class="ident">phrase</span> <span class="op">=</span> <span class="ident">entropy</span>
+            .<span class="ident">iter</span>()
+            .<span class="ident">chain</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">checksum_byte</span>))
+            .<span class="ident">bits</span>()
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">bits</span><span class="op">|</span> <span class="ident">wordlist</span>.<span class="ident">get_word</span>(<span class="ident">bits</span>))
+            .<span class="ident">join</span>(<span class="string">&quot; &quot;</span>);
 
         <span class="ident">Mnemonic</span> {
             <span class="ident">phrase</span>,
             <span class="ident">lang</span>,
-            <span class="ident">entropy</span>
+            <span class="ident">entropy</span>,
         }
     }
 
@@ -494,11 +522,11 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Mnemonic]: ../mnemonic/struct.Mnemonic.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_phrase</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">phrase</span>: <span class="ident">S</span>, <span class="ident">lang</span>: <span class="ident">Language</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Mnemonic</span>, <span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    {
-        <span class="kw">let</span> <span class="ident">phrase</span> <span class="op">=</span> <span class="ident">phrase</span>.<span class="ident">into</span>();
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_phrase</span>(<span class="ident">phrase</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">lang</span>: <span class="ident">Language</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Mnemonic</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">phrase</span> <span class="op">=</span> <span class="ident">phrase</span>
+            .<span class="ident">split_whitespace</span>()
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">w</span><span class="op">|</span> <span class="ident">w</span>.<span class="ident">nfkd</span>())
+            .<span class="ident">join</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>(<span class="string">&quot; &quot;</span>);
 
         <span class="comment">// this also validates the checksum and phrase length before returning the entropy so we</span>
         <span class="comment">// can store it. We don&#39;t use the validate function here to avoid having a public API that</span>
@@ -551,7 +579,10 @@
 
         <span class="kw">let</span> <span class="ident">mtype</span> <span class="op">=</span> <span class="ident">MnemonicType</span>::<span class="ident">for_word_count</span>(<span class="ident">bits</span>.<span class="ident">len</span>() <span class="op">/</span> <span class="number">11</span>)<span class="question-mark">?</span>;
 
-        <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">bits</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">mtype</span>.<span class="ident">total_bits</span>(), <span class="string">&quot;Insufficient amount of bits to validate&quot;</span>);
+        <span class="macro">debug_assert</span><span class="macro">!</span>(
+            <span class="ident">bits</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">mtype</span>.<span class="ident">total_bits</span>(),
+            <span class="string">&quot;Insufficient amount of bits to validate&quot;</span>
+        );
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">entropy</span> <span class="op">=</span> <span class="ident">bits</span>.<span class="ident">into_bytes</span>();
         <span class="kw">let</span> <span class="ident">entropy_bytes</span> <span class="op">=</span> <span class="ident">mtype</span>.<span class="ident">entropy_bits</span>() <span class="op">/</span> <span class="number">8</span>;
@@ -636,7 +667,7 @@
         }
 
         <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">entropy</span>() {
-            <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;{:x}&quot;</span>, <span class="ident">byte</span>)<span class="question-mark">?</span>;
+            <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;{:02x}&quot;</span>, <span class="ident">byte</span>)<span class="question-mark">?</span>;
         }
 
         <span class="prelude-val">Ok</span>(())
@@ -650,7 +681,7 @@
         }
 
         <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">entropy</span>() {
-            <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;{:X}&quot;</span>, <span class="ident">byte</span>)<span class="question-mark">?</span>;
+            <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;{:02X}&quot;</span>, <span class="ident">byte</span>)<span class="question-mark">?</span>;
         }
 
         <span class="prelude-val">Ok</span>(())
@@ -681,7 +712,10 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">mnemonic_from_entropy</span>() {
-        <span class="kw">let</span> <span class="ident">entropy</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="number">0x33</span>, <span class="number">0xE4</span>, <span class="number">0x6B</span>, <span class="number">0xB1</span>, <span class="number">0x3A</span>, <span class="number">0x74</span>, <span class="number">0x6E</span>, <span class="number">0xA4</span>, <span class="number">0x1C</span>, <span class="number">0xDD</span>, <span class="number">0xE4</span>, <span class="number">0x5C</span>, <span class="number">0x90</span>, <span class="number">0x84</span>, <span class="number">0x6A</span>, <span class="number">0x79</span>];
+        <span class="kw">let</span> <span class="ident">entropy</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[
+            <span class="number">0x33</span>, <span class="number">0xE4</span>, <span class="number">0x6B</span>, <span class="number">0xB1</span>, <span class="number">0x3A</span>, <span class="number">0x74</span>, <span class="number">0x6E</span>, <span class="number">0xA4</span>, <span class="number">0x1C</span>, <span class="number">0xDD</span>, <span class="number">0xE4</span>, <span class="number">0x5C</span>, <span class="number">0x90</span>, <span class="number">0x84</span>,
+            <span class="number">0x6A</span>, <span class="number">0x79</span>,
+        ];
         <span class="kw">let</span> <span class="ident">phrase</span> <span class="op">=</span> <span class="string">&quot;crop cash unable insane eight faith inflict route frame loud box vibrant&quot;</span>;
 
         <span class="kw">let</span> <span class="ident">mnemonic</span> <span class="op">=</span> <span class="ident">Mnemonic</span>::<span class="ident">from_entropy</span>(<span class="ident">entropy</span>, <span class="ident">Language</span>::<span class="ident">English</span>).<span class="ident">unwrap</span>();
@@ -691,7 +725,10 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">mnemonic_from_phrase</span>() {
-        <span class="kw">let</span> <span class="ident">entropy</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="number">0x33</span>, <span class="number">0xE4</span>, <span class="number">0x6B</span>, <span class="number">0xB1</span>, <span class="number">0x3A</span>, <span class="number">0x74</span>, <span class="number">0x6E</span>, <span class="number">0xA4</span>, <span class="number">0x1C</span>, <span class="number">0xDD</span>, <span class="number">0xE4</span>, <span class="number">0x5C</span>, <span class="number">0x90</span>, <span class="number">0x84</span>, <span class="number">0x6A</span>, <span class="number">0x79</span>];
+        <span class="kw">let</span> <span class="ident">entropy</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[
+            <span class="number">0x33</span>, <span class="number">0xE4</span>, <span class="number">0x6B</span>, <span class="number">0xB1</span>, <span class="number">0x3A</span>, <span class="number">0x74</span>, <span class="number">0x6E</span>, <span class="number">0xA4</span>, <span class="number">0x1C</span>, <span class="number">0xDD</span>, <span class="number">0xE4</span>, <span class="number">0x5C</span>, <span class="number">0x90</span>, <span class="number">0x84</span>,
+            <span class="number">0x6A</span>, <span class="number">0x79</span>,
+        ];
         <span class="kw">let</span> <span class="ident">phrase</span> <span class="op">=</span> <span class="string">&quot;crop cash unable insane eight faith inflict route frame loud box vibrant&quot;</span>;
 
         <span class="kw">let</span> <span class="ident">mnemonic</span> <span class="op">=</span> <span class="ident">Mnemonic</span>::<span class="ident">from_phrase</span>(<span class="ident">phrase</span>, <span class="ident">Language</span>::<span class="ident">English</span>).<span class="ident">unwrap</span>();
@@ -708,14 +745,29 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">mnemonic_hex_format</span>() {
-        <span class="kw">let</span> <span class="ident">entropy</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="number">0x33</span>, <span class="number">0xE4</span>, <span class="number">0x6B</span>, <span class="number">0xB1</span>, <span class="number">0x3A</span>, <span class="number">0x74</span>, <span class="number">0x6E</span>, <span class="number">0xA4</span>, <span class="number">0x1C</span>, <span class="number">0xDD</span>, <span class="number">0xE4</span>, <span class="number">0x5C</span>, <span class="number">0x90</span>, <span class="number">0x84</span>, <span class="number">0x6A</span>, <span class="number">0x79</span>];
+        <span class="kw">let</span> <span class="ident">entropy</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[
+            <span class="number">0x03</span>, <span class="number">0xE4</span>, <span class="number">0x6B</span>, <span class="number">0xB1</span>, <span class="number">0x3A</span>, <span class="number">0x74</span>, <span class="number">0x6E</span>, <span class="number">0xA4</span>, <span class="number">0x1C</span>, <span class="number">0xDD</span>, <span class="number">0xE4</span>, <span class="number">0x5C</span>, <span class="number">0x90</span>, <span class="number">0x84</span>,
+            <span class="number">0x6A</span>, <span class="number">0x79</span>,
+        ];
 
         <span class="kw">let</span> <span class="ident">mnemonic</span> <span class="op">=</span> <span class="ident">Mnemonic</span>::<span class="ident">from_entropy</span>(<span class="ident">entropy</span>, <span class="ident">Language</span>::<span class="ident">English</span>).<span class="ident">unwrap</span>();
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{:x}&quot;</span>, <span class="ident">mnemonic</span>), <span class="string">&quot;33e46bb13a746ea41cdde45c90846a79&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{:X}&quot;</span>, <span class="ident">mnemonic</span>), <span class="string">&quot;33E46BB13A746EA41CDDE45C90846A79&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{:#x}&quot;</span>, <span class="ident">mnemonic</span>), <span class="string">&quot;0x33e46bb13a746ea41cdde45c90846a79&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{:#X}&quot;</span>, <span class="ident">mnemonic</span>), <span class="string">&quot;0x33E46BB13A746EA41CDDE45C90846A79&quot;</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(
+            <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{:x}&quot;</span>, <span class="ident">mnemonic</span>),
+            <span class="string">&quot;03e46bb13a746ea41cdde45c90846a79&quot;</span>
+        );
+        <span class="macro">assert_eq</span><span class="macro">!</span>(
+            <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{:X}&quot;</span>, <span class="ident">mnemonic</span>),
+            <span class="string">&quot;03E46BB13A746EA41CDDE45C90846A79&quot;</span>
+        );
+        <span class="macro">assert_eq</span><span class="macro">!</span>(
+            <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{:#x}&quot;</span>, <span class="ident">mnemonic</span>),
+            <span class="string">&quot;0x03e46bb13a746ea41cdde45c90846a79&quot;</span>
+        );
+        <span class="macro">assert_eq</span><span class="macro">!</span>(
+            <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{:#X}&quot;</span>, <span class="ident">mnemonic</span>),
+            <span class="string">&quot;0x03E46BB13A746EA41CDDE45C90846A79&quot;</span>
+        );
     }
 }
 </pre></div>
