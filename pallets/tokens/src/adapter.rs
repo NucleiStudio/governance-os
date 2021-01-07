@@ -28,7 +28,7 @@ use frame_support::{
 };
 use governance_os_support::traits::{Currencies, LockableCurrencies, ReservableCurrencies};
 use sp_runtime::{
-    traits::{Bounded, CheckedAdd, CheckedSub, Zero},
+    traits::{Bounded, CheckedAdd, CheckedSub, Saturating, Zero},
     DispatchError, DispatchResult,
 };
 use sp_std::marker;
@@ -127,7 +127,20 @@ where
         // Return slashed, unslashed (ex: not enough balance)
 
         let mut mutation = Mutation::<Pallet>::new_for_currency(GetCurrencyId::get());
-        let slashed = mutation.sub_up_to_free_balance(who, amount);
+        let free_slashed = mutation.sub_up_to_free_balance(who, amount);
+
+        // Still has some to slash, we try to take the remaining coins from the
+        // reserved balance.
+        let slashed = {
+            if free_slashed != Zero::zero() {
+                let reserved_slashed =
+                    mutation.sub_up_to_reserved_balance(who, amount.saturating_sub(free_slashed));
+                free_slashed.saturating_add(reserved_slashed)
+            } else {
+                free_slashed
+            }
+        };
+
         mutation.forget_issuance_changes();
         mutation
             .apply()

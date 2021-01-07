@@ -236,6 +236,27 @@ fn slash() {
 }
 
 #[test]
+fn slash_may_take_from_reserved_balance_if_necessary() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            assert_ok!(TokensCurrencyAdapter::reserve(&ALICE, 75));
+            let alice_slash = TokensCurrencyAdapter::slash(&ALICE, 50);
+            assert_eq!(alice_slash.0.peek(), 50);
+            assert_eq!(alice_slash.1, 0);
+
+            // Took the 25 available from the free balance and then took 50
+            // out of the reserved balance.
+            assert_eq!(TokensCurrencyAdapter::free_balance(&ALICE), 0);
+            assert_eq!(TokensCurrencyAdapter::reserved_balance(&ALICE), 50);
+
+            // No issuance changes until the imbalances are consumed
+            assert_eq!(TokensCurrencyAdapter::total_issuance(), 200);
+        })
+}
+
+#[test]
 fn total_balance() {
     ExtBuilder::default()
         .one_hundred_for_alice_n_bob()
