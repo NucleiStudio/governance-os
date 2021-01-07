@@ -492,6 +492,78 @@ fn set_lock_with_different_id_extend_frozen_balance_if_needed() {
 }
 
 #[test]
+fn extend_lock_increases_lock() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            assert_ok!(<Tokens as LockableCurrencies<AccountId>>::set_lock(
+                TEST_TOKEN_ID,
+                *b"testtest",
+                &ALICE,
+                30
+            ));
+            assert_ok!(<Tokens as LockableCurrencies<AccountId>>::extend_lock(
+                TEST_TOKEN_ID,
+                *b"testtest",
+                &ALICE,
+                60
+            ));
+
+            assert_eq!(
+                Tokens::get_currency_account(TEST_TOKEN_ID, &ALICE).frozen,
+                60
+            );
+        })
+}
+
+#[test]
+fn extend_lock_does_not_decrease_lock() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            assert_ok!(<Tokens as LockableCurrencies<AccountId>>::set_lock(
+                TEST_TOKEN_ID,
+                *b"testtest",
+                &ALICE,
+                30
+            ));
+            assert_ok!(<Tokens as LockableCurrencies<AccountId>>::extend_lock(
+                TEST_TOKEN_ID,
+                *b"testtest",
+                &ALICE,
+                20
+            ));
+
+            assert_eq!(
+                Tokens::get_currency_account(TEST_TOKEN_ID, &ALICE).frozen,
+                30
+            );
+        })
+}
+
+#[test]
+fn extend_lock_creates_new_lock_if_needed() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            assert_ok!(<Tokens as LockableCurrencies<AccountId>>::extend_lock(
+                TEST_TOKEN_ID,
+                *b"testtest",
+                &ALICE,
+                60
+            ));
+
+            assert_eq!(
+                Tokens::get_currency_account(TEST_TOKEN_ID, &ALICE).frozen,
+                60
+            );
+        })
+}
+
+#[test]
 fn can_not_withdraw_locked_balance() {
     ExtBuilder::default()
         .one_hundred_for_alice_n_bob()
@@ -574,3 +646,12 @@ fn can_not_burn_locked_balance() {
             );
         })
 }
+
+// #[test]
+// fn set_new_lock_inc_ref() {}
+
+// #[test]
+// fn extend_new_lock_inc_ref() {}
+
+// #[test]
+// fn remove_lock_dec_ref() {}

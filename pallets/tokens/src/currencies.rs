@@ -194,12 +194,14 @@ impl<T: Trait> ReservableCurrencies<T::AccountId> for Module<T> {
     }
 }
 
-impl<T: Trait> LockableCurrencies<T::AccountId> for Module<T> {
-    fn set_lock(
-        currency_id: Self::CurrencyId,
+// Some helper to avoid code repetition when using locks
+impl<T: Trait> Module<T> {
+    fn conditionally_write_lock<Cond: FnOnce(T::Balance) -> bool>(
+        currency_id: T::CurrencyId,
         lock_id: LockIdentifier,
         who: &T::AccountId,
-        amount: Self::Balance,
+        amount: T::Balance,
+        condition: Cond,
     ) -> DispatchResult {
         Locks::<T>::try_mutate_exists(
             (who, currency_id),
@@ -219,9 +221,13 @@ impl<T: Trait> LockableCurrencies<T::AccountId> for Module<T> {
                         .take()
                         .expect("we just did a is_none check");
 
-                    // We first check that it is needed to increase the locked amounts,
-                    // or not. It may not be necessary if we already have other locks in
-                    // place.
+                    // If it isn't necessary to change anything we stop here
+                    if !condition(existing_lock) {
+                        return Ok(());
+                    }
+
+                    // We check that it is needed to increase the locked amounts,
+                    // or not.
                     if mutation.frozen(who).saturating_sub(existing_lock) < amount {
                         // We use the fact that the mutation helper keeps things in memory,
                         // so substracting and adding values to a balance does not require
@@ -241,6 +247,17 @@ impl<T: Trait> LockableCurrencies<T::AccountId> for Module<T> {
             },
         )
     }
+}
+
+impl<T: Trait> LockableCurrencies<T::AccountId> for Module<T> {
+    fn set_lock(
+        currency_id: Self::CurrencyId,
+        lock_id: LockIdentifier,
+        who: &T::AccountId,
+        amount: Self::Balance,
+    ) -> DispatchResult {
+        Self::conditionally_write_lock(currency_id, lock_id, who, amount, |_| true)
+    }
 
     fn extend_lock(
         currency_id: Self::CurrencyId,
@@ -248,7 +265,9 @@ impl<T: Trait> LockableCurrencies<T::AccountId> for Module<T> {
         who: &T::AccountId,
         amount: Self::Balance,
     ) -> DispatchResult {
-        unimplemented!()
+        Self::conditionally_write_lock(currency_id, lock_id, who, amount, |existing_lock| {
+            existing_lock < amount
+        })
     }
 
     fn remove_lock(
