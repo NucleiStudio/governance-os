@@ -21,14 +21,14 @@ use crate::{
 };
 use frame_support::{
     traits::{
-        BalanceStatus, Currency, ExistenceRequirement, Get, Imbalance, ReservableCurrency,
-        SignedImbalance, WithdrawReasons,
+        BalanceStatus, Currency, ExistenceRequirement, Get, Imbalance, LockIdentifier,
+        LockableCurrency, ReservableCurrency, SignedImbalance, WithdrawReasons,
     },
     StorageMap,
 };
-use governance_os_support::traits::{Currencies, ReservableCurrencies};
+use governance_os_support::traits::{Currencies, LockableCurrencies, ReservableCurrencies};
 use sp_runtime::{
-    traits::{Bounded, CheckedAdd, CheckedSub, Zero},
+    traits::{Bounded, CheckedAdd, CheckedSub, Saturating, Zero},
     DispatchError, DispatchResult,
 };
 use sp_std::marker;
@@ -127,7 +127,20 @@ where
         // Return slashed, unslashed (ex: not enough balance)
 
         let mut mutation = Mutation::<Pallet>::new_for_currency(GetCurrencyId::get());
-        let slashed = mutation.sub_up_to_free_balance(who, amount);
+        let free_slashed = mutation.sub_up_to_free_balance(who, amount);
+
+        // Still has some to slash, we try to take the remaining coins from the
+        // reserved balance.
+        let slashed = {
+            if free_slashed != Zero::zero() {
+                let reserved_slashed =
+                    mutation.sub_up_to_reserved_balance(who, amount.saturating_sub(free_slashed));
+                free_slashed.saturating_add(reserved_slashed)
+            } else {
+                free_slashed
+            }
+        };
+
         mutation.forget_issuance_changes();
         mutation
             .apply()
@@ -237,5 +250,47 @@ where
             amount,
             status,
         )
+    }
+}
+
+impl<Pallet, GetCurrencyId> LockableCurrency<Pallet::AccountId>
+    for NativeCurrencyAdapter<Pallet, GetCurrencyId>
+where
+    Pallet: Trait,
+    GetCurrencyId: Get<Pallet::CurrencyId>,
+{
+    type Moment = Pallet::BlockNumber;
+    type MaxLocks = ();
+
+    fn set_lock(
+        id: LockIdentifier,
+        who: &Pallet::AccountId,
+        amount: Self::Balance,
+        _reasons: WithdrawReasons,
+    ) {
+        drop(Module::<Pallet>::set_lock(
+            GetCurrencyId::get(),
+            id,
+            who,
+            amount,
+        ))
+    }
+
+    fn extend_lock(
+        id: LockIdentifier,
+        who: &Pallet::AccountId,
+        amount: Self::Balance,
+        _reasons: WithdrawReasons,
+    ) {
+        drop(Module::<Pallet>::extend_lock(
+            GetCurrencyId::get(),
+            id,
+            who,
+            amount,
+        ))
+    }
+
+    fn remove_lock(id: LockIdentifier, who: &Pallet::AccountId) {
+        drop(Module::<Pallet>::remove_lock(GetCurrencyId::get(), id, who))
     }
 }

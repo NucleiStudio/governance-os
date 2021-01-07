@@ -33,6 +33,8 @@ pub struct AccountCurrencyData<Balance> {
     /// This balance is a 'reserve' balance that other subsystems use in order to set aside tokens
     /// that are still 'owned' by the account holder, but which are suspendable.
     pub reserved: Balance,
+    /// Balance under which the free balance may never drop below.
+    pub frozen: Balance,
 }
 impl<Balance: Saturating + Copy> AccountCurrencyData<Balance> {
     /// Computes and return the total balance, including reserved funds.

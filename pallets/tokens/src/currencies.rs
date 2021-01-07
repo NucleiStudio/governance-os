@@ -14,10 +14,16 @@
  * limitations under the License.
  */
 
-use crate::{mutations::Mutation, Module, RawEvent, Trait};
-use frame_support::traits::BalanceStatus;
-use governance_os_support::traits::{Currencies, ReservableCurrencies};
-use sp_runtime::{traits::Saturating, DispatchError, DispatchResult};
+use crate::{mutations::Mutation, Locks, Module, RawEvent, Trait};
+use frame_support::{
+    traits::{BalanceStatus, LockIdentifier},
+    IterableStorageDoubleMap, StorageDoubleMap,
+};
+use governance_os_support::traits::{Currencies, LockableCurrencies, ReservableCurrencies};
+use sp_runtime::{
+    traits::{Saturating, Zero},
+    DispatchError, DispatchResult,
+};
 
 impl<T: Trait> Currencies<T::AccountId> for Module<T> {
     type CurrencyId = T::CurrencyId;
@@ -130,7 +136,7 @@ impl<T: Trait> ReservableCurrencies<T::AccountId> for Module<T> {
         who: &T::AccountId,
         amount: Self::Balance,
     ) -> DispatchResult {
-        // We do not require the asset to be transferable, it is assume that it is acceptable
+        // We do not require the asset to be transferable, it is assumed that it is acceptable
         // to reserve non transferable currencies
         let mut mutation = Mutation::<T>::new_for_currency(currency_id);
         mutation.sub_free_balance(who, amount)?;
@@ -188,5 +194,111 @@ impl<T: Trait> ReservableCurrencies<T::AccountId> for Module<T> {
         mutation.apply()?;
 
         Ok(value - actual)
+    }
+}
+
+// Some helper to avoid code repetition when using locks
+impl<T: Trait> Module<T> {
+    fn conditionally_write_lock<Cond: FnOnce(T::Balance) -> bool>(
+        currency_id: T::CurrencyId,
+        lock_id: LockIdentifier,
+        who: &T::AccountId,
+        amount: T::Balance,
+        condition: Cond,
+    ) -> DispatchResult {
+        Locks::<T>::try_mutate_exists(
+            (who, currency_id),
+            lock_id,
+            |maybe_existing_lock| -> DispatchResult {
+                let mut mutation = Mutation::<T>::new_for_currency(currency_id);
+
+                if maybe_existing_lock.is_none() {
+                    // We are creating a new lock. Add a few checks to handle cases when
+                    // more than one lock is present.
+                    if mutation.frozen(who) < amount {
+                        mutation.add_frozen(who, amount)?;
+                    }
+
+                    // A new lock is being created, inc the system ref
+                    frame_system::Module::<T>::inc_ref(who);
+                } else {
+                    // We are overwriting an existing lock
+                    let existing_lock = maybe_existing_lock
+                        .take()
+                        .expect("we just did a is_none check");
+
+                    // If it isn't necessary to change anything we stop here
+                    if !condition(existing_lock) {
+                        return Ok(());
+                    }
+
+                    // We check that it is needed to increase the locked amounts,
+                    // or not.
+                    if mutation.frozen(who).saturating_sub(existing_lock) < amount {
+                        // We use the fact that the mutation helper keeps things in memory,
+                        // so substracting and adding values to a balance does not require
+                        // multiple DB reads.
+                        mutation.sub_frozen(who, existing_lock)?;
+                        mutation.add_frozen(who, amount)?;
+                    }
+                }
+
+                // Update balance
+                mutation.apply()?;
+
+                // Write the lock
+                *maybe_existing_lock = Some(amount);
+
+                Ok(())
+            },
+        )
+    }
+}
+
+impl<T: Trait> LockableCurrencies<T::AccountId> for Module<T> {
+    fn set_lock(
+        currency_id: Self::CurrencyId,
+        lock_id: LockIdentifier,
+        who: &T::AccountId,
+        amount: Self::Balance,
+    ) -> DispatchResult {
+        Self::conditionally_write_lock(currency_id, lock_id, who, amount, |_| true)
+    }
+
+    fn extend_lock(
+        currency_id: Self::CurrencyId,
+        lock_id: LockIdentifier,
+        who: &T::AccountId,
+        amount: Self::Balance,
+    ) -> DispatchResult {
+        Self::conditionally_write_lock(currency_id, lock_id, who, amount, |existing_lock| {
+            existing_lock < amount
+        })
+    }
+
+    fn remove_lock(
+        currency_id: Self::CurrencyId,
+        lock_id: LockIdentifier,
+        who: &T::AccountId,
+    ) -> DispatchResult {
+        Locks::<T>::remove((who, currency_id), lock_id);
+        frame_system::Module::<T>::dec_ref(who);
+
+        let highest_lock_value = Locks::<T>::iter_prefix((who, currency_id)).fold(
+            Zero::zero(),
+            |acc, (_lock_id, lock_val)| {
+                if acc < lock_val {
+                    lock_val
+                } else {
+                    acc
+                }
+            },
+        );
+
+        let mut mutation = Mutation::<T>::new_for_currency(currency_id);
+        mutation.overwrite_frozen_balance(who, highest_lock_value);
+        mutation.apply()?;
+
+        Ok(())
     }
 }

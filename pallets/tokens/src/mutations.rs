@@ -32,7 +32,8 @@ use sp_std::{collections::btree_map::BTreeMap, marker};
 #[derive(Clone)]
 pub struct Mutation<T: Trait> {
     currency_id: T::CurrencyId,
-    balances: BTreeMap<T::AccountId, (AccountCurrencyData<T::Balance>, bool)>,
+    // bools are wether the balance was modified and wether the balance was zero when we first read it.
+    balances: BTreeMap<T::AccountId, (AccountCurrencyData<T::Balance>, bool, bool)>,
     coins_created: T::Balance,
     coins_burned: T::Balance,
     _phantom: marker::PhantomData<T>,
@@ -54,7 +55,10 @@ impl<T: Trait> Mutation<T> {
         match in_cache {
             None => {
                 let in_node = Balances::<T>::get(who, self.currency_id);
-                self.balances.insert(who.clone(), (in_node.clone(), false));
+                self.balances.insert(
+                    who.clone(),
+                    (in_node.clone(), false, in_node.total() == Zero::zero()),
+                );
 
                 in_node
             }
@@ -64,8 +68,16 @@ impl<T: Trait> Mutation<T> {
 
     /// Save an updated balance in our memory cache
     pub fn save_balance(&mut self, who: &T::AccountId, balance: AccountCurrencyData<T::Balance>) {
+        let in_memory_snapshot_first_started_at_0 = match self.balances.get(who) {
+            None => false,
+            Some(data) => data.2,
+        };
+
         // Note how the boolean is set to true since we modified the balance
-        self.balances.insert(who.clone(), (balance, true));
+        self.balances.insert(
+            who.clone(),
+            (balance, true, in_memory_snapshot_first_started_at_0),
+        );
     }
 
     /// Verify that the currency is transferable
@@ -106,6 +118,9 @@ impl<T: Trait> Mutation<T> {
             .free
             .checked_sub(&decrement)
             .ok_or(Error::<T>::BalanceTooLow)?;
+        if balance.free < balance.frozen {
+            return Err(Error::<T>::BalanceLockTriggered.into());
+        }
         self.coins_burned = self.coins_burned.saturating_add(decrement);
         self.save_balance(who, balance);
 
@@ -149,13 +164,67 @@ impl<T: Trait> Mutation<T> {
         decrement: T::Balance,
     ) -> T::Balance {
         let mut balance = self.get_or_fetch_balance(who);
-        let actual_subed = balance.free.min(decrement);
-        // We just capped `actual_subed` to `balance.free` itself.
+        let actual_subed = balance.free.saturating_sub(balance.frozen).min(decrement);
+        // We just capped `actual_subed` to `balance.free - balance.frozen` itself.
         balance.free -= actual_subed;
         self.coins_burned = self.coins_burned.saturating_add(actual_subed);
         self.save_balance(who, balance);
 
         actual_subed
+    }
+
+    pub fn frozen(&mut self, who: &T::AccountId) -> T::Balance {
+        let balance = self.get_or_fetch_balance(who);
+        balance.frozen
+    }
+
+    pub fn add_frozen(&mut self, who: &T::AccountId, increment: T::Balance) -> DispatchResult {
+        let mut balance = self.get_or_fetch_balance(who);
+        balance.frozen = balance
+            .frozen
+            .checked_add(&increment)
+            .ok_or(Error::<T>::BalanceOverflow)?;
+        self.coins_created = self.coins_created.saturating_add(increment);
+        self.save_balance(who, balance);
+
+        Ok(())
+    }
+
+    pub fn sub_frozen(&mut self, who: &T::AccountId, decrement: T::Balance) -> DispatchResult {
+        let mut balance = self.get_or_fetch_balance(who);
+        balance.frozen = balance
+            .frozen
+            .checked_sub(&decrement)
+            .ok_or(Error::<T>::BalanceTooLow)?;
+        self.coins_burned = self.coins_burned.saturating_sub(decrement);
+        self.save_balance(who, balance);
+
+        Ok(())
+    }
+
+    /// Does what it says and return the old balance.
+    pub fn overwrite_frozen_balance(
+        &mut self,
+        who: &T::AccountId,
+        new_balance: T::Balance,
+    ) -> T::Balance {
+        let mut balance = self.get_or_fetch_balance(who);
+        if balance.frozen < new_balance {
+            self.coins_created = self
+                .coins_created
+                .saturating_add(new_balance.saturating_sub(balance.frozen));
+        } else {
+            self.coins_burned = self
+                .coins_burned
+                .saturating_add(balance.frozen.saturating_sub(new_balance));
+        }
+
+        let frozen_balance_bak = balance.frozen;
+        balance.frozen = new_balance;
+
+        self.save_balance(who, balance);
+
+        frozen_balance_bak
     }
 
     /// Does what it says and return the old balance.
@@ -194,12 +263,20 @@ impl<T: Trait> Mutation<T> {
     pub fn apply(self) -> DispatchResult {
         self.balances
             .iter()
-            .filter(|(_account, (_bal, changed))| *changed)
-            .map(|(account, (balance, _changed))| (account, balance))
-            .for_each(|(account, balance)| {
+            .filter(|(_account, (_bal, changed, _snapshot_was_0))| *changed)
+            .map(|(account, (balance, _changed, snapshot_was_0))| {
+                (account, balance, snapshot_was_0)
+            })
+            .for_each(|(account, balance, snapshot_0)| {
                 if balance.total() == Zero::zero() {
-                    Balances::<T>::remove(account, self.currency_id);
+                    if !*snapshot_0 {
+                        frame_system::Module::<T>::dec_ref(account);
+                        Balances::<T>::remove(account, self.currency_id);
+                    }
                 } else {
+                    if *snapshot_0 {
+                        frame_system::Module::<T>::inc_ref(account);
+                    }
                     Balances::<T>::insert(account, self.currency_id, balance);
                 }
             });

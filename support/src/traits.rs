@@ -15,5 +15,5 @@
  */
 
 pub use crate::acl::RoleManager;
-pub use crate::currencies::{Currencies, ReservableCurrencies};
+pub use crate::currencies::{Currencies, LockableCurrencies, ReservableCurrencies};
 pub use crate::voting::VotingHooks;
