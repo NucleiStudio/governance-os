@@ -167,6 +167,9 @@ pub trait ReservableCurrencies<AccountId>: Currencies<AccountId> {
 /// from the token holders. Locks should be combinable. Creating a lock shall
 /// increment any existing reference count, deleting one should decrement it.
 pub trait LockableCurrencies<AccountId>: Currencies<AccountId> {
+    /// Return the total amount of coins locked for the given account.
+    fn locked_balance(currency_id: Self::CurrencyId, who: &AccountId) -> Self::Balance;
+
     /// Create a new lock on the balance of `who`. You can lock more coins
     /// than the total balance of a user.
     ///

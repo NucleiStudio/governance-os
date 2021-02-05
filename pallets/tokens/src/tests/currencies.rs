@@ -373,10 +373,7 @@ fn set_lock_effectively_freeze_part_of_the_balance() {
                 &ALICE,
                 30
             ));
-            assert_eq!(
-                Tokens::get_currency_account(TEST_TOKEN_ID, &ALICE).frozen,
-                30
-            );
+            assert_eq!(Tokens::locked_balance(TEST_TOKEN_ID, &ALICE), 30);
             assert_noop!(
                 <Tokens as Currencies<AccountId>>::transfer(TEST_TOKEN_ID, &ALICE, &BOB, 100),
                 Error::<Test>::BalanceLockTriggered
@@ -397,10 +394,7 @@ fn set_lock_with_same_id_overwrite_existing_lock() {
                 &ALICE,
                 30
             ));
-            assert_eq!(
-                Tokens::get_currency_account(TEST_TOKEN_ID, &ALICE).frozen,
-                30
-            );
+            assert_eq!(Tokens::locked_balance(TEST_TOKEN_ID, &ALICE), 30);
 
             // Reduce lock
             assert_ok!(<Tokens as LockableCurrencies<AccountId>>::set_lock(
@@ -409,10 +403,7 @@ fn set_lock_with_same_id_overwrite_existing_lock() {
                 &ALICE,
                 20
             ));
-            assert_eq!(
-                Tokens::get_currency_account(TEST_TOKEN_ID, &ALICE).frozen,
-                20
-            );
+            assert_eq!(Tokens::locked_balance(TEST_TOKEN_ID, &ALICE), 20);
 
             // Increase lock
             assert_ok!(<Tokens as LockableCurrencies<AccountId>>::set_lock(
@@ -421,10 +412,7 @@ fn set_lock_with_same_id_overwrite_existing_lock() {
                 &ALICE,
                 40
             ));
-            assert_eq!(
-                Tokens::get_currency_account(TEST_TOKEN_ID, &ALICE).frozen,
-                40
-            );
+            assert_eq!(Tokens::locked_balance(TEST_TOKEN_ID, &ALICE), 40);
         })
 }
 
@@ -440,10 +428,7 @@ fn can_lock_more_than_free_balance() {
                 &ALICE,
                 120
             ));
-            assert_eq!(
-                Tokens::get_currency_account(TEST_TOKEN_ID, &ALICE).frozen,
-                120
-            );
+            assert_eq!(Tokens::locked_balance(TEST_TOKEN_ID, &ALICE), 120);
 
             // We locked more than free balance and thus can't transfer anything
             assert_noop!(
@@ -472,10 +457,7 @@ fn set_lock_with_different_id_extend_frozen_balance_if_needed() {
                 30
             ));
             // No lock increase
-            assert_eq!(
-                Tokens::get_currency_account(TEST_TOKEN_ID, &ALICE).frozen,
-                30
-            );
+            assert_eq!(Tokens::locked_balance(TEST_TOKEN_ID, &ALICE), 30);
 
             assert_ok!(<Tokens as LockableCurrencies<AccountId>>::set_lock(
                 TEST_TOKEN_ID,
@@ -484,10 +466,7 @@ fn set_lock_with_different_id_extend_frozen_balance_if_needed() {
                 50
             ));
             // Lock increase
-            assert_eq!(
-                Tokens::get_currency_account(TEST_TOKEN_ID, &ALICE).frozen,
-                50
-            );
+            assert_eq!(Tokens::locked_balance(TEST_TOKEN_ID, &ALICE), 50);
         })
 }
 
@@ -510,10 +489,7 @@ fn extend_lock_increases_lock() {
                 60
             ));
 
-            assert_eq!(
-                Tokens::get_currency_account(TEST_TOKEN_ID, &ALICE).frozen,
-                60
-            );
+            assert_eq!(Tokens::locked_balance(TEST_TOKEN_ID, &ALICE), 60);
         })
 }
 
@@ -536,10 +512,7 @@ fn extend_lock_does_not_decrease_lock() {
                 20
             ));
 
-            assert_eq!(
-                Tokens::get_currency_account(TEST_TOKEN_ID, &ALICE).frozen,
-                30
-            );
+            assert_eq!(Tokens::locked_balance(TEST_TOKEN_ID, &ALICE), 30);
         })
 }
 
@@ -556,10 +529,7 @@ fn extend_lock_creates_new_lock_if_needed() {
                 60
             ));
 
-            assert_eq!(
-                Tokens::get_currency_account(TEST_TOKEN_ID, &ALICE).frozen,
-                60
-            );
+            assert_eq!(Tokens::locked_balance(TEST_TOKEN_ID, &ALICE), 60);
         })
 }
 
@@ -588,10 +558,7 @@ fn remove_lock_may_not_decrease_frozen_amount_if_other_and_higher_locks_are_in_p
             ));
 
             // Still has the deadbeef lock in place
-            assert_eq!(
-                Tokens::get_currency_account(TEST_TOKEN_ID, &ALICE).frozen,
-                100
-            );
+            assert_eq!(Tokens::locked_balance(TEST_TOKEN_ID, &ALICE), 100);
         })
 }
 
@@ -613,10 +580,7 @@ fn remove_lock_clears_frozen_balance_when_removing_last_lock() {
                 &ALICE
             ));
 
-            assert_eq!(
-                Tokens::get_currency_account(TEST_TOKEN_ID, &ALICE).frozen,
-                0
-            );
+            assert_eq!(Tokens::locked_balance(TEST_TOKEN_ID, &ALICE), 0);
         })
 }
 
@@ -645,10 +609,7 @@ fn remove_lock_clears_frozen_balance_when_removing_higher_lock() {
             ));
 
             // Still has the testtest lock in place
-            assert_eq!(
-                Tokens::get_currency_account(TEST_TOKEN_ID, &ALICE).frozen,
-                60
-            );
+            assert_eq!(Tokens::locked_balance(TEST_TOKEN_ID, &ALICE), 60);
         })
 }
 

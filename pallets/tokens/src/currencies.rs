@@ -256,6 +256,10 @@ impl<T: Trait> Module<T> {
 }
 
 impl<T: Trait> LockableCurrencies<T::AccountId> for Module<T> {
+    fn locked_balance(currency_id: Self::CurrencyId, who: &T::AccountId) -> Self::Balance {
+        Self::get_currency_account(currency_id, who).frozen
+    }
+
     fn set_lock(
         currency_id: Self::CurrencyId,
         lock_id: LockIdentifier,
