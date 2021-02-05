@@ -17,7 +17,50 @@
 //! A set of common traits to voting systems.
 
 use crate::traits::{Currencies, ReservableCurrencies};
-use sp_runtime::DispatchResult;
+use sp_runtime::{DispatchError, DispatchResult};
+use sp_std::result;
+
+/// End result of a proposal being closed.
+pub enum ProposalResult {
+    Passing,
+    Failing,
+}
+
+/// A common trait accross all voting implementations to make it easy to change
+/// between voting models or implementations.
+/// A pallet implementing this trait is not necessarily in charge of storing
+/// proposals but could stick to only to support the actual decison making
+/// code while proposal storage is delegated to another pallet.
+pub trait StandardizedVoting {
+    /// How we represent the a proposal as passed to the underlying functions.
+    /// This can be used to fetch any state associated to the proposal.
+    type ProposalID;
+
+    /// How the parameters of a voting system are represented and set at the
+    /// organization level.
+    type Parameters;
+
+    /// How voting data is passed to the underlying pallet.
+    type VoteData;
+
+    /// A proposal is being created. Handle any eventual registration and trigger
+    /// an error if any preconditions are not met. Shall be called before any other
+    /// state changes so that it is safe to fail here.
+    fn initiate(proposal: Self::ProposalID, parameters: Self::Parameters) -> DispatchResult;
+
+    /// Special function to handle the case when a proposal is being vetoed. This
+    /// should clean any storage or state associated to the given proposal.
+    fn veto(proposal: Self::ProposalID) -> DispatchResult;
+
+    /// Handle the reception of a new vote for the given proposal. This should mutate any
+    /// state linked to the proposal accordingly.
+    fn vote(proposal: Self::ProposalID, data: Self::VoteData) -> DispatchResult;
+
+    /// Handle the closure of a proposal or return an error if it cannot be closed because
+    /// some conditions are not met. Shall return an indicator on wether the proposal is
+    /// passing (should be executed) or not (should be discarded).
+    fn close(proposal: Self::ProposalID) -> result::Result<ProposalResult, DispatchError>;
+}
 
 /// Called by the host pallet to let the developer implement custom voting actions
 /// according to its own model.
