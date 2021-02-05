@@ -15,4 +15,4 @@
  */
 
 mod mock;
-mod spec;
+mod simple;

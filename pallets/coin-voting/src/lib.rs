@@ -20,9 +20,17 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use frame_support::{decl_error, decl_event, decl_module, decl_storage};
-use governance_os_support::traits::{Currencies, ProposalResult, StandardizedVoting};
-use sp_runtime::{traits::Zero, DispatchError, DispatchResult};
+use frame_support::{
+    decl_error, decl_event, decl_module, decl_storage, ensure, traits::LockIdentifier,
+};
+use governance_os_support::traits::{
+    Currencies, LockableCurrencies, ProposalResult, StandardizedVoting,
+};
+use sp_runtime::{
+    traits::{Saturating, Zero},
+    DispatchError, DispatchResult,
+};
+use sp_std::vec::Vec;
 
 #[cfg(test)]
 mod tests;
@@ -30,19 +38,24 @@ mod types;
 
 use crate::types::{ProposalState, VoteData, VotingParameters};
 
+pub const COIN_VOTING_LOCK_ID: LockIdentifier = *b"coinvote";
+
 pub trait Trait: frame_system::Trait {
     /// Because this pallet emits events, it depends on the runtime's definition of an event.
     type Event: From<Event> + Into<<Self as frame_system::Trait>::Event>;
     /// Pallet in charge of currencies. Used so that we can lock tokens etc...
-    type Currencies: Currencies<Self::AccountId>;
+    type Currencies: LockableCurrencies<Self::AccountId>;
 }
 
 type BalanceOf<T> =
     <<T as Trait>::Currencies as Currencies<<T as frame_system::Trait>::AccountId>>::Balance;
+type CurrencyIdOf<T> =
+    <<T as Trait>::Currencies as Currencies<<T as frame_system::Trait>::AccountId>>::CurrencyId;
 
 decl_storage! {
     trait Store for Module<T: Trait> as CoinVoting {
-        pub Proposals get(fn proposals): map hasher(blake2_128_concat) T::Hash => ProposalState<BalanceOf<T>, VotingParameters>;
+        pub Proposals get(fn proposals): map hasher(blake2_128_concat) T::Hash => ProposalState<BalanceOf<T>, VotingParameters<CurrencyIdOf<T>>>;
+        pub Votes get(fn votes): map hasher(blake2_128_concat) (CurrencyIdOf<T>, T::AccountId) => Vec<(T::Hash, bool, BalanceOf<T>)>;
     }
 }
 
@@ -51,6 +64,12 @@ decl_error! {
         /// This proposal ID is already pending a vote, thus it can not
         /// be created again for now.
         DuplicatedProposal,
+        /// There are not enough tokens in the user's balance to proceed
+        /// to this action.
+        NotEnoughBalance,
+        /// This proposal was not initialized with this pallet or simply
+        /// does not exists.
+        ProposalNotInitialized,
     }
 }
 
@@ -66,8 +85,9 @@ decl_module! {
 
 impl<T: Trait> StandardizedVoting for Module<T> {
     type ProposalID = T::Hash;
-    type Parameters = VotingParameters;
-    type VoteData = VoteData;
+    type Parameters = VotingParameters<CurrencyIdOf<T>>;
+    type VoteData = VoteData<BalanceOf<T>>;
+    type AccountId = T::AccountId;
 
     fn initiate(proposal: Self::ProposalID, parameters: Self::Parameters) -> DispatchResult {
         Proposals::<T>::try_mutate_exists(proposal, |maybe_existing_state| -> DispatchResult {
@@ -82,6 +102,7 @@ impl<T: Trait> StandardizedVoting for Module<T> {
                 parameters,
                 total_against: Zero::zero(),
                 total_favorable: Zero::zero(),
+                initialized: true,
             });
 
             Ok(())
@@ -94,11 +115,101 @@ impl<T: Trait> StandardizedVoting for Module<T> {
         todo!()
     }
 
-    fn vote(proposal: Self::ProposalID, data: Self::VoteData) -> DispatchResult {
-        todo!()
+    fn vote(
+        proposal: Self::ProposalID,
+        voter: &Self::AccountId,
+        data: Self::VoteData,
+    ) -> DispatchResult {
+        let mut state = Self::proposals(proposal);
+        ensure!(state.initialized, Error::<T>::ProposalNotInitialized);
+
+        // We want to prevent votes for user with less coins than they'd like to lock.
+        ensure!(
+            T::Currencies::free_balance(state.parameters.voting_currency, voter) >= data.power,
+            Error::<T>::NotEnoughBalance
+        );
+        Self::update_locks(
+            state.parameters.voting_currency,
+            voter,
+            proposal,
+            data.in_support,
+            data.power,
+            |_proposal, old_support, old_power| {
+                // We found a duplicated vote, thus we need to remove it from our precomputed
+                // state to avoid mistakes
+                if old_support {
+                    state.total_favorable = state.total_favorable.saturating_sub(old_power);
+                } else {
+                    state.total_against = state.total_against.saturating_sub(old_power);
+                }
+            },
+        )?;
+
+        if data.in_support {
+            state.total_favorable = state.total_favorable.saturating_add(data.power);
+        } else {
+            state.total_against = state.total_against.saturating_add(data.power);
+        }
+
+        Proposals::<T>::insert(proposal, state);
+
+        Ok(())
     }
 
     fn close(proposal: Self::ProposalID) -> Result<ProposalResult, DispatchError> {
         todo!()
+    }
+}
+
+impl<T: Trait> Module<T> {
+    fn update_locks<F>(
+        voting_currency: CurrencyIdOf<T>,
+        voter: &T::AccountId,
+        proposal: T::Hash,
+        support: bool,
+        power: BalanceOf<T>,
+        mut on_duplicate_vote_found: F,
+    ) -> DispatchResult
+    where
+        F: FnMut(T::Hash, bool, BalanceOf<T>),
+    {
+        Votes::<T>::try_mutate((voting_currency, voter), |votes| -> DispatchResult {
+            // because we use iterators we have to first create a vec for
+            // a use with chain() later on
+            let votes_addition = vec![(proposal, support, power)];
+
+            // Filter and remove any duplicate votes
+            *votes = votes
+                .iter()
+                .cloned()
+                .filter(|&(maybe_duplicate_proposal, support, power)| {
+                    if maybe_duplicate_proposal != proposal {
+                        true
+                    } else {
+                        // callback
+                        on_duplicate_vote_found(maybe_duplicate_proposal, support, power);
+                        //continue
+                        false
+                    }
+                })
+                .chain(votes_addition.iter().cloned())
+                .collect();
+
+            let max_to_lock: BalanceOf<T> = votes.iter().fold(
+                Zero::zero(),
+                |acc, &(_proposal, _support, power)| {
+                    if power > acc {
+                        power
+                    } else {
+                        acc
+                    }
+                },
+            );
+
+            T::Currencies::set_lock(voting_currency, COIN_VOTING_LOCK_ID, voter, max_to_lock)?;
+            Ok(())
+        })?;
+
+        Ok(())
     }
 }

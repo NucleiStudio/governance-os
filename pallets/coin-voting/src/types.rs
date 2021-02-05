@@ -20,13 +20,21 @@ use codec::{Decode, Encode};
 use sp_runtime::RuntimeDebug;
 
 #[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug, Default)]
-pub struct VotingParameters {}
+pub struct VotingParameters<CurrencyId> {
+    pub voting_currency: CurrencyId,
+}
 
-pub struct VoteData {}
+pub struct VoteData<Balance> {
+    pub in_support: bool,
+    pub power: Balance,
+}
 
 #[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug, Default)]
 pub struct ProposalState<Balance, Parameters> {
     pub parameters: Parameters,
     pub total_favorable: Balance,
     pub total_against: Balance,
+
+    /// Used to detect wether a proposal is ready to accept votes or not
+    pub initialized: bool,
 }

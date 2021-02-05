@@ -43,6 +43,9 @@ pub trait StandardizedVoting {
     /// How voting data is passed to the underlying pallet.
     type VoteData;
 
+    /// How accounts are represented, used to identify voters.
+    type AccountId;
+
     /// A proposal is being created. Handle any eventual registration and trigger
     /// an error if any preconditions are not met. Shall be called before any other
     /// state changes so that it is safe to fail here.
@@ -54,7 +57,11 @@ pub trait StandardizedVoting {
 
     /// Handle the reception of a new vote for the given proposal. This should mutate any
     /// state linked to the proposal accordingly.
-    fn vote(proposal: Self::ProposalID, data: Self::VoteData) -> DispatchResult;
+    fn vote(
+        proposal: Self::ProposalID,
+        voter: &Self::AccountId,
+        data: Self::VoteData,
+    ) -> DispatchResult;
 
     /// Handle the closure of a proposal or return an error if it cannot be closed because
     /// some conditions are not met. Shall return an indicator on wether the proposal is
