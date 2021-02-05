@@ -14,6 +14,19 @@
  * limitations under the License.
  */
 
-pub use crate::acl::RoleManager;
-pub use crate::currencies::{Currencies, LockableCurrencies, ReservableCurrencies};
-pub use crate::voting::{ProposalResult, StandardizedVoting, VotingHooks};
+//! Type definitions for the coin based voting pallet.
+
+use codec::{Decode, Encode};
+use sp_runtime::RuntimeDebug;
+
+#[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug, Default)]
+pub struct VotingParameters {}
+
+pub struct VoteData {}
+
+#[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug, Default)]
+pub struct ProposalState<Balance, Parameters> {
+    pub parameters: Parameters,
+    pub total_favorable: Balance,
+    pub total_against: Balance,
+}
