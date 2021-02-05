@@ -20,9 +20,9 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use frame_support::{decl_event, decl_module, decl_storage};
+use frame_support::{decl_error, decl_event, decl_module, decl_storage};
 use governance_os_support::traits::{Currencies, ProposalResult, StandardizedVoting};
-use sp_runtime::{DispatchError, DispatchResult};
+use sp_runtime::{traits::Zero, DispatchError, DispatchResult};
 
 #[cfg(test)]
 mod tests;
@@ -42,7 +42,15 @@ type BalanceOf<T> =
 
 decl_storage! {
     trait Store for Module<T: Trait> as CoinVoting {
-        pub ProposalsState get(fn proposals_state): map hasher(blake2_128_concat) T::Hash => ProposalState<BalanceOf<T>, VotingParameters>;
+        pub Proposals get(fn proposals): map hasher(blake2_128_concat) T::Hash => ProposalState<BalanceOf<T>, VotingParameters>;
+    }
+}
+
+decl_error! {
+    pub enum Error for Module<T: Trait> {
+        /// This proposal ID is already pending a vote, thus it can not
+        /// be created again for now.
+        DuplicatedProposal,
     }
 }
 
@@ -62,7 +70,24 @@ impl<T: Trait> StandardizedVoting for Module<T> {
     type VoteData = VoteData;
 
     fn initiate(proposal: Self::ProposalID, parameters: Self::Parameters) -> DispatchResult {
-        todo!()
+        Proposals::<T>::try_mutate_exists(proposal, |maybe_existing_state| -> DispatchResult {
+            if maybe_existing_state.is_some() {
+                // duplicate detected, we do not want to erase any pending vote's
+                // state and thus fail.
+                return Err(Error::<T>::DuplicatedProposal.into());
+            }
+
+            // no duplicates, we can create a new state
+            *maybe_existing_state = Some(ProposalState {
+                parameters,
+                total_against: Zero::zero(),
+                total_favorable: Zero::zero(),
+            });
+
+            Ok(())
+        })?;
+
+        Ok(())
     }
 
     fn veto(proposal: Self::ProposalID) -> DispatchResult {

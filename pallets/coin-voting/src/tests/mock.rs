@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+use crate::{Module, Trait};
 use governance_os_pallet_tokens::CurrencyDetails;
 use governance_os_support::{
     mock_runtime_with_currencies,
@@ -21,6 +22,13 @@ use governance_os_support::{
 };
 
 mock_runtime_with_currencies!(Test);
+
+impl Trait for Test {
+    type Event = ();
+    type Currencies = Tokens;
+}
+
+pub type CoinVoting = Module<Test>;
 
 pub struct ExtBuilder {
     endowed_accounts: Vec<(CurrencyId, AccountId, Balance)>,
