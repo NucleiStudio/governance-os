@@ -17,7 +17,7 @@
 use super::mock::*;
 use crate::{
     types::{VoteData, VotingParameters},
-    Error, Proposals,
+    Error, Locks, Proposals,
 };
 use frame_support::{assert_noop, assert_ok, StorageMap};
 use governance_os_support::{
@@ -122,7 +122,7 @@ fn vote_edit_previous_vote() {
             ));
 
             assert_eq!(
-                CoinVoting::votes((TEST_TOKEN_ID, &ALICE)),
+                CoinVoting::locks((TEST_TOKEN_ID, &ALICE)),
                 vec![(mock_hash, false, 15)]
             );
             assert_eq!(CoinVoting::proposals(mock_hash).total_against, 15);
@@ -169,11 +169,24 @@ fn votes_saved_correctly() {
             assert_eq!(CoinVoting::proposals(mock_hash).total_against, 15);
 
             assert_eq!(
-                CoinVoting::votes((TEST_TOKEN_ID, &ALICE)),
+                CoinVoting::proposals(mock_hash)
+                    .locks
+                    .contains(&(TEST_TOKEN_ID, ALICE)),
+                true
+            );
+            assert_eq!(
+                CoinVoting::proposals(mock_hash)
+                    .locks
+                    .contains(&(TEST_TOKEN_ID, BOB)),
+                true
+            );
+
+            assert_eq!(
+                CoinVoting::locks((TEST_TOKEN_ID, &ALICE)),
                 vec![(mock_hash, true, 10)]
             );
             assert_eq!(
-                CoinVoting::votes((TEST_TOKEN_ID, &BOB)),
+                CoinVoting::locks((TEST_TOKEN_ID, &BOB)),
                 vec![(mock_hash, false, 15)]
             );
         })
@@ -223,6 +236,10 @@ fn vote_other_proposals_extend_locks() {
                 }
             ));
 
+            assert_eq!(
+                CoinVoting::locks((TEST_TOKEN_ID, &ALICE)),
+                vec![(mock_hash_1, true, 10), (mock_hash_2, true, 11)]
+            );
             // Locked the max of both
             assert_eq!(
                 <Tokens as LockableCurrencies<AccountId>>::locked_balance(TEST_TOKEN_ID, &ALICE),
@@ -274,4 +291,146 @@ fn vote_fail_if_proposal_does_not_exists() {
             Error::<Test>::ProposalNotInitialized
         );
     })
+}
+
+#[test]
+fn veto_unlocks_all_coins() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            let mock_hash = H256::default();
+
+            assert_ok!(<CoinVoting as StandardizedVoting>::initiate(
+                mock_hash,
+                VotingParameters {
+                    voting_currency: TEST_TOKEN_ID,
+                }
+            ));
+
+            assert_ok!(<CoinVoting as StandardizedVoting>::vote(
+                mock_hash,
+                &ALICE,
+                VoteData {
+                    in_support: true,
+                    power: 10
+                }
+            ));
+            assert_ok!(<CoinVoting as StandardizedVoting>::vote(
+                mock_hash,
+                &BOB,
+                VoteData {
+                    in_support: false,
+                    power: 15
+                }
+            ));
+
+            assert_ok!(CoinVoting::veto(mock_hash));
+
+            assert_eq!(
+                <Tokens as LockableCurrencies<AccountId>>::locked_balance(TEST_TOKEN_ID, &ALICE),
+                0
+            );
+            assert_eq!(
+                <Tokens as LockableCurrencies<AccountId>>::locked_balance(TEST_TOKEN_ID, &BOB),
+                0
+            );
+        })
+}
+
+#[test]
+fn veto_free_storage_if_last_proposal() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            let mock_hash = H256::default();
+
+            assert_ok!(<CoinVoting as StandardizedVoting>::initiate(
+                mock_hash,
+                VotingParameters {
+                    voting_currency: TEST_TOKEN_ID,
+                }
+            ));
+
+            assert_ok!(<CoinVoting as StandardizedVoting>::vote(
+                mock_hash,
+                &ALICE,
+                VoteData {
+                    in_support: true,
+                    power: 10
+                }
+            ));
+
+            assert_ok!(CoinVoting::veto(mock_hash));
+
+            assert!(!Locks::<Test>::contains_key((TEST_TOKEN_ID, &ALICE)));
+            assert!(!Proposals::<Test>::contains_key(mock_hash));
+            assert_eq!(
+                <Tokens as LockableCurrencies<AccountId>>::locked_balance(TEST_TOKEN_ID, &ALICE),
+                0
+            );
+        })
+}
+
+#[test]
+fn veto_cleans_storage() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            let mut mock_hash_1 = H256::default();
+            let mut mock_hash_2 = H256::default();
+
+            mock_hash_1.randomize();
+            mock_hash_2.randomize();
+
+            assert!(mock_hash_1 != mock_hash_2);
+
+            assert_ok!(<CoinVoting as StandardizedVoting>::initiate(
+                mock_hash_1,
+                VotingParameters {
+                    voting_currency: TEST_TOKEN_ID,
+                }
+            ));
+            assert_ok!(<CoinVoting as StandardizedVoting>::initiate(
+                mock_hash_2,
+                VotingParameters {
+                    voting_currency: TEST_TOKEN_ID,
+                }
+            ));
+
+            assert_ok!(<CoinVoting as StandardizedVoting>::vote(
+                mock_hash_1,
+                &ALICE,
+                VoteData {
+                    in_support: true,
+                    power: 15
+                }
+            ));
+            assert_ok!(<CoinVoting as StandardizedVoting>::vote(
+                mock_hash_2,
+                &ALICE,
+                VoteData {
+                    in_support: true,
+                    power: 10
+                }
+            ));
+
+            assert_eq!(
+                <Tokens as LockableCurrencies<AccountId>>::locked_balance(TEST_TOKEN_ID, &ALICE),
+                15
+            );
+            assert_ok!(CoinVoting::veto(mock_hash_1));
+
+            assert_eq!(
+                CoinVoting::locks((TEST_TOKEN_ID, &ALICE)),
+                vec![(mock_hash_2, true, 10)]
+            );
+            assert!(!Proposals::<Test>::contains_key(mock_hash_1));
+            assert_eq!(
+                <Tokens as LockableCurrencies<AccountId>>::locked_balance(TEST_TOKEN_ID, &ALICE),
+                10
+            );
+        })
 }

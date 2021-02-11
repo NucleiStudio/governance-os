@@ -30,11 +30,14 @@ pub struct VoteData<Balance> {
 }
 
 #[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug, Default)]
-pub struct ProposalState<Balance, Parameters> {
+pub struct ProposalState<Balance, Parameters, LockIdentifier> {
     pub parameters: Parameters,
     pub total_favorable: Balance,
     pub total_against: Balance,
 
     /// Used to detect wether a proposal is ready to accept votes or not
     pub initialized: bool,
+
+    /// Used to list all opened locks on coins to later free those
+    pub locks: Vec<LockIdentifier>,
 }
