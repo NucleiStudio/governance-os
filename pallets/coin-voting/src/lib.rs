@@ -174,9 +174,8 @@ impl<T: Trait> StandardizedVoting for Module<T> {
     }
 
     fn veto(proposal: Self::ProposalID) -> DispatchResult {
-        // not the use of take instead of get which also deletes the storage
-        Self::unlock(Proposals::<T>::take(proposal).locks, proposal)?;
-        Ok(())
+        // note the use of take instead of get which also deletes the storage
+        Self::unlock(Proposals::<T>::take(proposal).locks, proposal)
     }
 
     fn close(proposal: Self::ProposalID) -> Result<ProposalResult, DispatchError> {
@@ -243,18 +242,7 @@ impl<T: Trait> Module<T> {
                 .chain(locks_addition.iter().cloned())
                 .collect();
 
-            let max_to_lock: BalanceOf<T> = locks.iter().fold(
-                Zero::zero(),
-                |acc, &(_proposal, _support, power)| {
-                    if power > acc {
-                        power
-                    } else {
-                        acc
-                    }
-                },
-            );
-
-            T::Currencies::set_lock(voting_currency, COIN_VOTING_LOCK_ID, voter, max_to_lock)?;
+            Self::rejig_locks(locks.to_vec(), voting_currency, voter)?;
             Ok(())
         })?;
 
@@ -279,34 +267,34 @@ impl<T: Trait> Module<T> {
                     Locks::<T>::remove(lock_identifier);
                 }
 
-                let max_to_lock: BalanceOf<T> = new_lock_data.iter().cloned().fold(
-                    Zero::zero(),
-                    |acc, (_proposal, _support, power)| {
-                        if power > acc {
-                            power
-                        } else {
-                            acc
-                        }
-                    },
-                );
-
-                if max_to_lock == Zero::zero() {
-                    T::Currencies::remove_lock(
-                        lock_identifier.0,
-                        COIN_VOTING_LOCK_ID,
-                        &lock_identifier.1,
-                    )?;
-                } else {
-                    T::Currencies::set_lock(
-                        lock_identifier.0,
-                        COIN_VOTING_LOCK_ID,
-                        &lock_identifier.1,
-                        max_to_lock,
-                    )?;
-                }
-
+                Self::rejig_locks(new_lock_data, lock_identifier.0, &lock_identifier.1)?;
                 Ok(())
             })?;
+
+        Ok(())
+    }
+
+    fn rejig_locks(
+        locks: Vec<LockDataOf<T>>,
+        voting_currency: CurrencyIdOf<T>,
+        who: &T::AccountId,
+    ) -> DispatchResult {
+        let max_to_lock: BalanceOf<T> = locks.iter().cloned().fold(
+            Zero::zero(),
+            |acc, (_proposal, _support, power)| {
+                if power > acc {
+                    power
+                } else {
+                    acc
+                }
+            },
+        );
+
+        if max_to_lock == Zero::zero() {
+            T::Currencies::remove_lock(voting_currency, COIN_VOTING_LOCK_ID, who)?;
+        } else {
+            T::Currencies::set_lock(voting_currency, COIN_VOTING_LOCK_ID, who, max_to_lock)?;
+        }
 
         Ok(())
     }
