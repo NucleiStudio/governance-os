@@ -17,11 +17,14 @@
 //! Type definitions for the coin based voting pallet.
 
 use codec::{Decode, Encode};
-use sp_runtime::RuntimeDebug;
+use sp_runtime::{Perbill, RuntimeDebug};
 
 #[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug, Default)]
-pub struct VotingParameters<CurrencyId> {
+pub struct VotingParameters<BlockNumber, CurrencyId> {
+    pub ttl: BlockNumber,
     pub voting_currency: CurrencyId,
+    pub min_quorum: Perbill,
+    pub min_participation: Perbill,
 }
 
 pub struct VoteData<Balance> {
@@ -30,8 +33,8 @@ pub struct VoteData<Balance> {
 }
 
 #[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug, Default)]
-pub struct ProposalState<Balance, Parameters, LockIdentifier> {
-    pub parameters: Parameters,
+pub struct ProposalState<Balance, BlockNumber, CurrencyId, LockIdentifier> {
+    pub parameters: VotingParameters<BlockNumber, CurrencyId>,
     pub total_favorable: Balance,
     pub total_against: Balance,
 
@@ -40,4 +43,6 @@ pub struct ProposalState<Balance, Parameters, LockIdentifier> {
 
     /// Used to list all opened locks on coins to later free those
     pub locks: Vec<LockIdentifier>,
+
+    pub created_on: BlockNumber,
 }

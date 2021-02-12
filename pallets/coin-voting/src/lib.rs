@@ -53,10 +53,16 @@ type CurrencyIdOf<T> =
     <<T as Trait>::Currencies as Currencies<<T as frame_system::Trait>::AccountId>>::CurrencyId;
 type LockDataOf<T> = (<T as frame_system::Trait>::Hash, bool, BalanceOf<T>);
 type LockIdentifierOf<T> = (CurrencyIdOf<T>, <T as frame_system::Trait>::AccountId);
+type ProposalStateOf<T> = ProposalState<
+    BalanceOf<T>,
+    <T as frame_system::Trait>::BlockNumber,
+    CurrencyIdOf<T>,
+    LockIdentifierOf<T>,
+>;
 
 decl_storage! {
     trait Store for Module<T: Trait> as CoinVoting {
-        pub Proposals get(fn proposals): map hasher(blake2_128_concat) T::Hash => ProposalState<BalanceOf<T>, VotingParameters<CurrencyIdOf<T>>, LockIdentifierOf<T>>;
+        pub Proposals get(fn proposals): map hasher(blake2_128_concat) T::Hash => ProposalStateOf<T>;
         pub Locks get(fn locks): map hasher(blake2_128_concat) LockIdentifierOf<T> => Vec<LockDataOf<T>>;
     }
 }
@@ -72,6 +78,8 @@ decl_error! {
         /// This proposal was not initialized with this pallet or simply
         /// does not exists.
         ProposalNotInitialized,
+        /// Proposal cannot be closed yet, it is likely too early.
+        CannotClose,
     }
 }
 
@@ -87,7 +95,7 @@ decl_module! {
 
 impl<T: Trait> StandardizedVoting for Module<T> {
     type ProposalID = T::Hash;
-    type Parameters = VotingParameters<CurrencyIdOf<T>>;
+    type Parameters = VotingParameters<T::BlockNumber, CurrencyIdOf<T>>;
     type VoteData = VoteData<BalanceOf<T>>;
     type AccountId = T::AccountId;
 
@@ -106,63 +114,11 @@ impl<T: Trait> StandardizedVoting for Module<T> {
                 total_favorable: Zero::zero(),
                 initialized: true,
                 locks: vec![],
+                created_on: Self::now(),
             });
 
             Ok(())
         })?;
-
-        Ok(())
-    }
-
-    fn veto(proposal: Self::ProposalID) -> DispatchResult {
-        // not the use of take instead of get which also deletes the storage
-        Proposals::<T>::take(proposal).locks.iter().try_for_each(
-            |lock_identifier| -> DispatchResult {
-                let lock_data = Locks::<T>::get(lock_identifier);
-
-                let new_lock_data: Vec<LockDataOf<T>> = lock_data
-                    .iter()
-                    .cloned()
-                    .filter(|(prop, _, _)| prop != &proposal)
-                    .collect();
-
-                if !new_lock_data.is_empty() {
-                    Locks::<T>::insert(lock_identifier, new_lock_data.clone());
-                } else {
-                    Locks::<T>::remove(lock_identifier);
-                }
-
-                let max_to_lock: BalanceOf<T> = new_lock_data.iter().cloned().fold(
-                    Zero::zero(),
-                    |acc, (_proposal, _support, power)| {
-                        if power > acc {
-                            power
-                        } else {
-                            acc
-                        }
-                    },
-                );
-
-                if max_to_lock == Zero::zero() {
-                    T::Currencies::remove_lock(
-                        lock_identifier.0,
-                        COIN_VOTING_LOCK_ID,
-                        &lock_identifier.1,
-                    )?;
-                } else {
-                    T::Currencies::set_lock(
-                        lock_identifier.0,
-                        COIN_VOTING_LOCK_ID,
-                        &lock_identifier.1,
-                        max_to_lock,
-                    )?;
-                }
-
-                Ok(())
-            },
-        )?;
-
-        Proposals::<T>::remove(proposal);
 
         Ok(())
     }
@@ -217,8 +173,39 @@ impl<T: Trait> StandardizedVoting for Module<T> {
         Ok(())
     }
 
+    fn veto(proposal: Self::ProposalID) -> DispatchResult {
+        // not the use of take instead of get which also deletes the storage
+        Self::unlock(Proposals::<T>::take(proposal).locks, proposal)?;
+        Ok(())
+    }
+
     fn close(proposal: Self::ProposalID) -> Result<ProposalResult, DispatchError> {
-        todo!()
+        let state = Proposals::<T>::get(proposal);
+
+        let total_supply = T::Currencies::total_issuance(state.parameters.voting_currency);
+        let total_participation = state.total_against + state.total_favorable;
+
+        let enough_participation =
+            state.parameters.min_participation * total_supply > total_participation;
+        let enough_quorum =
+            state.parameters.min_quorum * total_participation < state.total_favorable;
+
+        let result = if enough_participation && enough_quorum {
+            ProposalResult::Passing
+        } else {
+            ProposalResult::Failing
+        };
+
+        let can_close = state.created_on.saturating_add(state.parameters.ttl) < Self::now();
+        ensure!(
+            can_close || result == ProposalResult::Passing,
+            Error::<T>::CannotClose
+        );
+
+        Self::unlock(state.locks, proposal)?;
+
+        Proposals::<T>::remove(proposal);
+        Ok(result)
     }
 }
 
@@ -272,5 +259,59 @@ impl<T: Trait> Module<T> {
         })?;
 
         Ok(())
+    }
+
+    fn unlock(locks: Vec<LockIdentifierOf<T>>, proposal: T::Hash) -> DispatchResult {
+        locks
+            .iter()
+            .try_for_each(|lock_identifier| -> DispatchResult {
+                let lock_data = Locks::<T>::get(lock_identifier);
+
+                let new_lock_data: Vec<LockDataOf<T>> = lock_data
+                    .iter()
+                    .cloned()
+                    .filter(|(prop, _, _)| prop != &proposal)
+                    .collect();
+
+                if !new_lock_data.is_empty() {
+                    Locks::<T>::insert(lock_identifier, new_lock_data.clone());
+                } else {
+                    Locks::<T>::remove(lock_identifier);
+                }
+
+                let max_to_lock: BalanceOf<T> = new_lock_data.iter().cloned().fold(
+                    Zero::zero(),
+                    |acc, (_proposal, _support, power)| {
+                        if power > acc {
+                            power
+                        } else {
+                            acc
+                        }
+                    },
+                );
+
+                if max_to_lock == Zero::zero() {
+                    T::Currencies::remove_lock(
+                        lock_identifier.0,
+                        COIN_VOTING_LOCK_ID,
+                        &lock_identifier.1,
+                    )?;
+                } else {
+                    T::Currencies::set_lock(
+                        lock_identifier.0,
+                        COIN_VOTING_LOCK_ID,
+                        &lock_identifier.1,
+                        max_to_lock,
+                    )?;
+                }
+
+                Ok(())
+            })?;
+
+        Ok(())
+    }
+
+    fn now() -> T::BlockNumber {
+        frame_system::Module::<T>::block_number()
     }
 }

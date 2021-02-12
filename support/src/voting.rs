@@ -21,6 +21,7 @@ use sp_runtime::{DispatchError, DispatchResult};
 use sp_std::result;
 
 /// End result of a proposal being closed.
+#[derive(Debug, PartialEq, Eq)]
 pub enum ProposalResult {
     Passing,
     Failing,
