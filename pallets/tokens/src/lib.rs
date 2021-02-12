@@ -235,6 +235,7 @@ decl_module! {
             RoleManagerOf::<T>::ensure_has_role(origin, RoleBuilderOf::<T>::manage_currency(currency_id))?;
             let to = T::Lookup::lookup(dest)?;
             <Self as Currencies<T::AccountId>>::mint(currency_id, &to, amount)?;
+            Self::deposit_event(RawEvent::CurrencyMinted(currency_id, to, amount));
         }
 
         /// Destroy some units of the currency identified by `currency_id` from `from`.

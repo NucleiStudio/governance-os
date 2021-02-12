@@ -55,7 +55,6 @@ impl<T: Trait> Currencies<T::AccountId> for Module<T> {
         mutation.add_free_balance(who, amount)?;
         mutation.apply()?;
 
-        Self::deposit_event(RawEvent::CurrencyMinted(currency_id, who.clone(), amount));
         Ok(())
     }
 
