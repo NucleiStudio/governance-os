@@ -14,6 +14,3 @@
  * limitations under the License.
  */
 
-mod mock;
-mod simple;
-mod quadratic;

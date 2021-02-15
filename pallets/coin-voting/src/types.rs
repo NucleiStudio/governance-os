@@ -17,6 +17,7 @@
 //! Type definitions for the coin based voting pallet.
 
 use codec::{Decode, Encode};
+use governance_os_support::impl_enum_default;
 use sp_runtime::{Perbill, RuntimeDebug};
 
 #[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug, Default)]
@@ -25,7 +26,15 @@ pub struct VotingParameters<BlockNumber, CurrencyId> {
     pub voting_currency: CurrencyId,
     pub min_quorum: Perbill,
     pub min_participation: Perbill,
+
+    pub vote_counting_strategy: VoteCountingStrategy,
 }
+
+#[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug)]
+pub enum VoteCountingStrategy {
+    Simple,
+}
+impl_enum_default!(VoteCountingStrategy, Simple);
 
 pub struct VoteData<Balance> {
     pub in_support: bool,

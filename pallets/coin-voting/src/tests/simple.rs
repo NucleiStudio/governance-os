@@ -16,7 +16,7 @@
 
 use super::mock::*;
 use crate::{
-    types::{VoteData, VotingParameters},
+    types::{VoteCountingStrategy, VoteData, VotingParameters},
     Error, Locks, Proposals,
 };
 use frame_support::{assert_noop, assert_ok, StorageMap};
@@ -69,12 +69,7 @@ fn vote_lock_tokens() {
 
             assert_ok!(<CoinVoting as StandardizedVoting>::initiate(
                 mock_hash,
-                VotingParameters {
-                    voting_currency: TEST_TOKEN_ID,
-                    ttl: 10,
-                    min_quorum: Perbill::from_percent(0),
-                    min_participation: Perbill::from_percent(0),
-                }
+                mock_voting_parameters()
             ));
 
             assert_ok!(<CoinVoting as StandardizedVoting>::vote(
@@ -103,12 +98,7 @@ fn vote_edit_previous_vote() {
 
             assert_ok!(<CoinVoting as StandardizedVoting>::initiate(
                 mock_hash,
-                VotingParameters {
-                    voting_currency: TEST_TOKEN_ID,
-                    ttl: 10,
-                    min_quorum: Perbill::from_percent(0),
-                    min_participation: Perbill::from_percent(0),
-                }
+                mock_voting_parameters()
             ));
 
             assert_ok!(<CoinVoting as StandardizedVoting>::vote(
@@ -150,12 +140,7 @@ fn votes_saved_correctly() {
 
             assert_ok!(<CoinVoting as StandardizedVoting>::initiate(
                 mock_hash,
-                VotingParameters {
-                    voting_currency: TEST_TOKEN_ID,
-                    ttl: 10,
-                    min_quorum: Perbill::from_percent(0),
-                    min_participation: Perbill::from_percent(0),
-                }
+                mock_voting_parameters()
             ));
 
             assert_ok!(<CoinVoting as StandardizedVoting>::vote(
@@ -218,12 +203,7 @@ fn vote_other_proposals_extend_locks() {
 
             assert_ok!(<CoinVoting as StandardizedVoting>::initiate(
                 mock_hash_1,
-                VotingParameters {
-                    voting_currency: TEST_TOKEN_ID,
-                    ttl: 10,
-                    min_quorum: Perbill::from_percent(0),
-                    min_participation: Perbill::from_percent(0),
-                }
+                mock_voting_parameters()
             ));
             assert_ok!(<CoinVoting as StandardizedVoting>::vote(
                 mock_hash_1,
@@ -236,12 +216,7 @@ fn vote_other_proposals_extend_locks() {
 
             assert_ok!(<CoinVoting as StandardizedVoting>::initiate(
                 mock_hash_2,
-                VotingParameters {
-                    voting_currency: TEST_TOKEN_ID,
-                    ttl: 10,
-                    min_quorum: Perbill::from_percent(0),
-                    min_participation: Perbill::from_percent(0),
-                }
+                mock_voting_parameters()
             ));
             assert_ok!(<CoinVoting as StandardizedVoting>::vote(
                 mock_hash_2,
@@ -271,12 +246,7 @@ fn vote_fail_if_not_enough_tokens() {
 
         assert_ok!(<CoinVoting as StandardizedVoting>::initiate(
             mock_hash,
-            VotingParameters {
-                voting_currency: TEST_TOKEN_ID,
-                ttl: 10,
-                min_quorum: Perbill::from_percent(0),
-                min_participation: Perbill::from_percent(0),
-            }
+            mock_voting_parameters()
         ));
 
         assert_noop!(
@@ -324,12 +294,7 @@ macro_rules! test_close_or_veto {
 
                     assert_ok!(<CoinVoting as StandardizedVoting>::initiate(
                         mock_hash,
-                        VotingParameters {
-                            voting_currency: TEST_TOKEN_ID,
-                            ttl: 10,
-                            min_quorum: Perbill::from_percent(0),
-                            min_participation: Perbill::from_percent(0)
-                        }
+                        mock_voting_parameters()
                     ));
 
                     assert_ok!(<CoinVoting as StandardizedVoting>::vote(
@@ -379,12 +344,7 @@ macro_rules! test_close_or_veto {
 
                     assert_ok!(<CoinVoting as StandardizedVoting>::initiate(
                         mock_hash,
-                        VotingParameters {
-                            voting_currency: TEST_TOKEN_ID,
-                            ttl: 10,
-                            min_quorum: Perbill::from_percent(0),
-                            min_participation: Perbill::from_percent(0)
-                        }
+                        mock_voting_parameters()
                     ));
 
                     assert_ok!(<CoinVoting as StandardizedVoting>::vote(
@@ -427,21 +387,11 @@ macro_rules! test_close_or_veto {
 
                     assert_ok!(<CoinVoting as StandardizedVoting>::initiate(
                         mock_hash_1,
-                        VotingParameters {
-                            voting_currency: TEST_TOKEN_ID,
-                            ttl: 10,
-                            min_quorum: Perbill::from_percent(0),
-                            min_participation: Perbill::from_percent(0)
-                        }
+                        mock_voting_parameters()
                     ));
                     assert_ok!(<CoinVoting as StandardizedVoting>::initiate(
                         mock_hash_2,
-                        VotingParameters {
-                            voting_currency: TEST_TOKEN_ID,
-                            ttl: 10,
-                            min_quorum: Perbill::from_percent(0),
-                            min_participation: Perbill::from_percent(0)
-                        }
+                        mock_voting_parameters()
                     ));
 
                     assert_ok!(<CoinVoting as StandardizedVoting>::vote(
@@ -517,7 +467,8 @@ fn close_error_if_early() {
                     voting_currency: TEST_TOKEN_ID,
                     ttl: CoinVoting::now() + 10,
                     min_quorum: Perbill::from_percent(33),
-                    min_participation: Perbill::from_percent(50)
+                    min_participation: Perbill::from_percent(50),
+                    vote_counting_strategy: VoteCountingStrategy::Simple
                 }
             ));
 
@@ -545,7 +496,8 @@ fn close_failing() {
                     voting_currency: TEST_TOKEN_ID,
                     ttl: CoinVoting::now() + 10,
                     min_quorum: Perbill::from_percent(33),
-                    min_participation: Perbill::from_percent(50)
+                    min_participation: Perbill::from_percent(50),
+                    vote_counting_strategy: VoteCountingStrategy::Simple
                 }
             ));
 
@@ -572,7 +524,8 @@ fn close_passing_early() {
                     voting_currency: TEST_TOKEN_ID,
                     ttl: CoinVoting::now() + 10,
                     min_quorum: Perbill::from_percent(33),
-                    min_participation: Perbill::from_percent(50)
+                    min_participation: Perbill::from_percent(50),
+                    vote_counting_strategy: VoteCountingStrategy::Simple
                 }
             ));
 

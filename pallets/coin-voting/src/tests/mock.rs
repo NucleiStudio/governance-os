@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
-use crate::{Module, Trait};
+use crate::{
+    types::{VoteCountingStrategy, VotingParameters},
+    CurrencyIdOf, Module, Trait,
+};
 use governance_os_pallet_tokens::CurrencyDetails;
 use governance_os_support::{
     mock_runtime_with_currencies,
     testing::{ALICE, BOB, TEST_TOKEN_ID, TEST_TOKEN_OWNER},
 };
+use sp_runtime::Perbill;
 
 mock_runtime_with_currencies!(Test);
 
@@ -78,5 +82,15 @@ impl ExtBuilder {
         let mut ext = sp_io::TestExternalities::new(t);
         ext.execute_with(|| System::set_block_number(1));
         ext
+    }
+}
+
+pub fn mock_voting_parameters() -> VotingParameters<BlockNumber, CurrencyIdOf<Test>> {
+    VotingParameters {
+        voting_currency: TEST_TOKEN_ID,
+        ttl: 10,
+        min_quorum: Perbill::from_percent(0),
+        min_participation: Perbill::from_percent(0),
+        vote_counting_strategy: VoteCountingStrategy::Simple,
     }
 }
