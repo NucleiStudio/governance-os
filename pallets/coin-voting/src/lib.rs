@@ -31,6 +31,7 @@ use sp_runtime::{
     DispatchError, DispatchResult,
 };
 use sp_std::vec::Vec;
+use types::VoteCountingStrategy;
 
 #[cfg(test)]
 mod tests;
@@ -51,7 +52,12 @@ type BalanceOf<T> =
     <<T as Trait>::Currencies as Currencies<<T as frame_system::Trait>::AccountId>>::Balance;
 type CurrencyIdOf<T> =
     <<T as Trait>::Currencies as Currencies<<T as frame_system::Trait>::AccountId>>::CurrencyId;
-type LockDataOf<T> = (<T as frame_system::Trait>::Hash, bool, BalanceOf<T>);
+type LockDataOf<T> = (
+    <T as frame_system::Trait>::Hash,
+    bool,
+    BalanceOf<T>,
+    VoteCountingStrategy,
+);
 type LockIdentifierOf<T> = (CurrencyIdOf<T>, <T as frame_system::Trait>::AccountId);
 type ProposalStateOf<T> = ProposalState<
     BalanceOf<T>,
@@ -143,7 +149,8 @@ impl<T: Trait> StandardizedVoting for Module<T> {
             proposal,
             data.in_support,
             data.power,
-            |_proposal, old_support, old_power| {
+            state.parameters.vote_counting_strategy,
+            |_proposal, old_support, old_power, _strategy| {
                 // We found a duplicated vote, thus we need to remove it from our precomputed
                 // state to avoid mistakes
                 state.unrecord_vote(old_support, old_power);
@@ -206,26 +213,27 @@ impl<T: Trait> Module<T> {
         proposal: T::Hash,
         support: bool,
         power: BalanceOf<T>,
+        strategy: VoteCountingStrategy,
         mut on_duplicate_vote_found: F,
     ) -> DispatchResult
     where
-        F: FnMut(T::Hash, bool, BalanceOf<T>),
+        F: FnMut(T::Hash, bool, BalanceOf<T>, VoteCountingStrategy),
     {
         Locks::<T>::try_mutate((voting_currency, voter), |locks| -> DispatchResult {
             // because we use iterators we have to first create a vec for
             // a use with chain() later on
-            let locks_addition = vec![(proposal, support, power)];
+            let locks_addition = vec![(proposal, support, power, strategy)];
 
             // Filter and remove any duplicate votes
             *locks = locks
                 .iter()
                 .cloned()
-                .filter(|&(maybe_duplicate_proposal, support, power)| {
+                .filter(|&(maybe_duplicate_proposal, support, power, strategy)| {
                     if maybe_duplicate_proposal != proposal {
                         true
                     } else {
                         // callback
-                        on_duplicate_vote_found(maybe_duplicate_proposal, support, power);
+                        on_duplicate_vote_found(maybe_duplicate_proposal, support, power, strategy);
                         //continue
                         false
                     }
@@ -249,7 +257,7 @@ impl<T: Trait> Module<T> {
                 let new_lock_data: Vec<LockDataOf<T>> = lock_data
                     .iter()
                     .cloned()
-                    .filter(|(prop, _, _)| prop != &proposal)
+                    .filter(|(prop, _, _, _)| prop != &proposal)
                     .collect();
 
                 if !new_lock_data.is_empty() {
@@ -270,16 +278,36 @@ impl<T: Trait> Module<T> {
         voting_currency: CurrencyIdOf<T>,
         who: &T::AccountId,
     ) -> DispatchResult {
-        let max_to_lock: BalanceOf<T> = locks.iter().cloned().fold(
-            Zero::zero(),
-            |acc, (_proposal, _support, power)| {
-                if power > acc {
-                    power
-                } else {
-                    acc
-                }
-            },
-        );
+        let max_to_lock_with_simple_voting: BalanceOf<T> = locks
+            .iter()
+            .cloned()
+            .filter(|(_proposal, _support, _power, strategy)| {
+                strategy == &VoteCountingStrategy::Simple
+            })
+            .fold(
+                Zero::zero(),
+                |acc, (_proposal, _support, power, _strategy)| {
+                    if power > acc {
+                        power
+                    } else {
+                        acc
+                    }
+                },
+            );
+
+        let max_to_lock_with_quadratic_voting: BalanceOf<T> = locks
+            .iter()
+            .cloned()
+            .filter(|(_proposal, _support, _power, strategy)| {
+                strategy == &VoteCountingStrategy::Quadratic
+            })
+            .fold(
+                Zero::zero(),
+                |acc, (_proposal, _support, power, _strategy)| acc.saturating_add(power),
+            );
+
+        let max_to_lock =
+            max_to_lock_with_simple_voting.saturating_add(max_to_lock_with_quadratic_voting);
 
         if max_to_lock == Zero::zero() {
             T::Currencies::remove_lock(voting_currency, COIN_VOTING_LOCK_ID, who)?;

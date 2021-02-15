@@ -120,7 +120,7 @@ fn vote_edit_previous_vote() {
 
             assert_eq!(
                 CoinVoting::locks((TEST_TOKEN_ID, &ALICE)),
-                vec![(mock_hash, false, 15)]
+                vec![(mock_hash, false, 15, VoteCountingStrategy::Simple)]
             );
             assert_eq!(CoinVoting::proposals(mock_hash).total_against, 15);
             assert_eq!(
@@ -178,11 +178,11 @@ fn votes_saved_correctly() {
 
             assert_eq!(
                 CoinVoting::locks((TEST_TOKEN_ID, &ALICE)),
-                vec![(mock_hash, true, 10)]
+                vec![(mock_hash, true, 10, VoteCountingStrategy::Simple)]
             );
             assert_eq!(
                 CoinVoting::locks((TEST_TOKEN_ID, &BOB)),
-                vec![(mock_hash, false, 15)]
+                vec![(mock_hash, false, 15, VoteCountingStrategy::Simple)]
             );
         })
 }
@@ -229,7 +229,10 @@ fn vote_other_proposals_extend_locks() {
 
             assert_eq!(
                 CoinVoting::locks((TEST_TOKEN_ID, &ALICE)),
-                vec![(mock_hash_1, true, 10), (mock_hash_2, true, 11)]
+                vec![
+                    (mock_hash_1, true, 10, VoteCountingStrategy::Simple),
+                    (mock_hash_2, true, 11, VoteCountingStrategy::Simple)
+                ]
             );
             // Locked the max of both
             assert_eq!(
@@ -424,7 +427,7 @@ macro_rules! test_close_or_veto {
 
                     assert_eq!(
                         CoinVoting::locks((TEST_TOKEN_ID, &ALICE)),
-                        vec![(mock_hash_2, true, 10)]
+                        vec![(mock_hash_2, true, 10, VoteCountingStrategy::Simple)]
                     );
                     assert!(!Proposals::<Test>::contains_key(mock_hash_1));
                     assert_eq!(

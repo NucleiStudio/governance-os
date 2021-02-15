@@ -15,7 +15,7 @@
  */
 
 use super::mock::*;
-use crate::types::VoteData;
+use crate::types::{VoteCountingStrategy, VoteData};
 use frame_support::assert_ok;
 use governance_os_support::{
     testing::{primitives::AccountId, ALICE, TEST_TOKEN_ID},
@@ -48,7 +48,7 @@ fn registers_the_correct_amount_of_coins_locked() {
 
             assert_eq!(
                 CoinVoting::locks((TEST_TOKEN_ID, ALICE)),
-                vec![(mock_hash, true, 17)]
+                vec![(mock_hash, true, 17, VoteCountingStrategy::Quadratic)]
             );
             assert_eq!(
                 <Tokens as LockableCurrencies<AccountId>>::locked_balance(TEST_TOKEN_ID, &ALICE),
@@ -150,6 +150,59 @@ fn unlock_the_right_amount_of_coins() {
             assert_eq!(
                 <Tokens as LockableCurrencies<AccountId>>::locked_balance(TEST_TOKEN_ID, &ALICE),
                 0
+            );
+        })
+}
+
+#[test]
+fn locks_not_shared_between_proposals() {
+    // The whole point of quadratic voting is to force people to carefully
+    // allocate their votes between proposals. This is why we expect the
+    // pallet to not share quadratic locks between proposals.
+
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            let mut mock_hash_1 = H256::default();
+            let mut mock_hash_2 = H256::default();
+
+            mock_hash_1.randomize();
+            mock_hash_2.randomize();
+
+            assert_ok!(<CoinVoting as StandardizedVoting>::initiate(
+                mock_hash_1,
+                mock_quadratic_voting_parameters()
+            ));
+            assert_ok!(<CoinVoting as StandardizedVoting>::initiate(
+                mock_hash_2,
+                mock_quadratic_voting_parameters()
+            ));
+
+            assert_ok!(<CoinVoting as StandardizedVoting>::vote(
+                mock_hash_1,
+                &ALICE,
+                VoteData {
+                    in_support: true,
+                    // closest square root is 16
+                    power: 17
+                }
+            ));
+
+            assert_ok!(<CoinVoting as StandardizedVoting>::vote(
+                mock_hash_2,
+                &ALICE,
+                VoteData {
+                    in_support: true,
+                    power: 4
+                }
+            ));
+
+            // Since quadratic locks are not shared we expect to have a lock
+            // of 17 + 4 = 21
+            assert_eq!(
+                <Tokens as LockableCurrencies<AccountId>>::locked_balance(TEST_TOKEN_ID, &ALICE),
+                21
             );
         })
 }

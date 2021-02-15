@@ -33,7 +33,7 @@ pub struct VotingParameters<BlockNumber, CurrencyId> {
     pub vote_counting_strategy: VoteCountingStrategy,
 }
 
-#[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug)]
+#[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug, Copy)]
 pub enum VoteCountingStrategy {
     Simple,
     Quadratic,
