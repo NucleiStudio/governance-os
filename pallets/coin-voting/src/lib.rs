@@ -146,12 +146,7 @@ impl<T: Trait> StandardizedVoting for Module<T> {
             |_proposal, old_support, old_power| {
                 // We found a duplicated vote, thus we need to remove it from our precomputed
                 // state to avoid mistakes
-                if old_support {
-                    state.total_favorable = state.total_favorable.saturating_sub(old_power);
-                } else {
-                    state.total_against = state.total_against.saturating_sub(old_power);
-                }
-
+                state.unrecord_vote(old_support, old_power);
                 this_vote_is_a_duplicate = true;
             },
         )?;
@@ -162,11 +157,7 @@ impl<T: Trait> StandardizedVoting for Module<T> {
                 .push((state.parameters.voting_currency, voter.clone()));
         }
 
-        if data.in_support {
-            state.total_favorable = state.total_favorable.saturating_add(data.power);
-        } else {
-            state.total_against = state.total_against.saturating_add(data.power);
-        }
+        state.record_vote(data.in_support, data.power);
 
         Proposals::<T>::insert(proposal, state);
 

@@ -94,3 +94,13 @@ pub fn mock_voting_parameters() -> VotingParameters<BlockNumber, CurrencyIdOf<Te
         vote_counting_strategy: VoteCountingStrategy::Simple,
     }
 }
+
+pub fn mock_quadratic_voting_parameters() -> VotingParameters<BlockNumber, CurrencyIdOf<Test>> {
+    VotingParameters {
+        voting_currency: TEST_TOKEN_ID,
+        ttl: 10,
+        min_quorum: Perbill::from_percent(0),
+        min_participation: Perbill::from_percent(0),
+        vote_counting_strategy: VoteCountingStrategy::Quadratic,
+    }
+}
