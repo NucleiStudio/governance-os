@@ -31,13 +31,11 @@ use sp_runtime::{
     DispatchError, DispatchResult,
 };
 use sp_std::vec::Vec;
-use types::VoteCountingStrategy;
+use types::{ProposalState, VoteCountingStrategy, VoteData, VotingParameters};
 
 #[cfg(test)]
 mod tests;
 mod types;
-
-use crate::types::{ProposalState, VoteData, VotingParameters};
 
 pub const COIN_VOTING_LOCK_ID: LockIdentifier = *b"coinvote";
 
