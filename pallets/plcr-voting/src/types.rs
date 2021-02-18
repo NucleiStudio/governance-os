@@ -14,5 +14,17 @@
  * limitations under the License.
  */
 
-mod mock;
-mod spec;
+//! Type definitions for the coin based voting pallet.
+
+use codec::{Decode, Encode};
+use sp_runtime::{Perbill, RuntimeDebug};
+
+#[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug, Default)]
+pub struct VotingParameters<BlockNumber, CurrencyId> {
+    pub commit_duration: BlockNumber,
+    pub reveal_duration: BlockNumber,
+
+    pub voting_currency: CurrencyId,
+    pub min_quorum: Perbill,
+    pub min_participation: Perbill,
+}

@@ -20,7 +20,6 @@ use governance_os_support::{
     mock_runtime_with_currencies,
     testing::{ALICE, BOB, TEST_TOKEN_ID, TEST_TOKEN_OWNER},
 };
-use sp_runtime::Perbill;
 
 mock_runtime_with_currencies!(Test);
 
@@ -29,7 +28,7 @@ impl Trait for Test {
     type Currencies = Tokens;
 }
 
-pub type CoinVoting = Module<Test>;
+pub type PlcrVoting = Module<Test>;
 
 pub struct ExtBuilder {
     endowed_accounts: Vec<(CurrencyId, AccountId, Balance)>,

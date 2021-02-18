@@ -25,9 +25,12 @@ use frame_support::{decl_error, decl_event, decl_module, decl_storage, traits::L
 use governance_os_support::traits::{
     Currencies, LockableCurrencies, ProposalResult, StandardizedVoting,
 };
+use sp_runtime::{DispatchError, DispatchResult};
+use types::VotingParameters;
 
 #[cfg(test)]
 mod tests;
+mod types;
 
 pub const PLCR_VOTING_LOCK_ID: LockIdentifier = *b"plcrvote";
 
@@ -45,11 +48,15 @@ type CurrencyIdOf<T> =
 
 decl_storage! {
     trait Store for Module<T: Trait> as PlcrVoting {
+        pub Proposals get(fn proposals): map hasher(blake2_128_concat) T::Hash => ();
     }
 }
 
 decl_error! {
     pub enum Error for Module<T: Trait> {
+        /// This proposal ID is already pending a vote, thus it can not
+        /// be created again for now.
+        DuplicatedProposal,
     }
 }
 
@@ -60,5 +67,45 @@ decl_event!(
 decl_module! {
     pub struct Module<T: Trait> for enum Call where origin: T::Origin {
         fn deposit_event() = default;
+    }
+}
+
+impl<T: Trait> StandardizedVoting for Module<T> {
+    type ProposalID = T::Hash;
+    type Parameters = VotingParameters<T::BlockNumber, CurrencyIdOf<T>>;
+    type VoteData = ();
+    type AccountId = T::AccountId;
+
+    fn initiate(proposal: Self::ProposalID, parameters: Self::Parameters) -> DispatchResult {
+        Proposals::<T>::try_mutate_exists(proposal, |maybe_existing_state| -> DispatchResult {
+            if maybe_existing_state.is_some() {
+                // duplicate detected, we do not want to erase any pending vote's
+                // state and thus fail.
+                return Err(Error::<T>::DuplicatedProposal.into());
+            }
+
+            // no duplicates, we can create a new state
+            *maybe_existing_state = Some(());
+
+            Ok(())
+        })?;
+
+        Ok(())
+    }
+
+    fn veto(proposal: Self::ProposalID) -> DispatchResult {
+        todo!()
+    }
+
+    fn vote(
+        proposal: Self::ProposalID,
+        voter: &Self::AccountId,
+        data: Self::VoteData,
+    ) -> DispatchResult {
+        todo!()
+    }
+
+    fn close(proposal: Self::ProposalID) -> Result<ProposalResult, DispatchError> {
+        todo!()
     }
 }
