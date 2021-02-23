@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
-use crate::{Module, Trait};
+use crate::{
+    types::{VoteData, VotingParameters},
+    BalanceOf, CurrencyIdOf, Module, Trait,
+};
 use governance_os_pallet_tokens::CurrencyDetails;
 use governance_os_support::{
     mock_runtime_with_currencies,
     testing::{ALICE, BOB, TEST_TOKEN_ID, TEST_TOKEN_OWNER},
 };
+use sp_runtime::{traits::Hash, Perbill};
 
 mock_runtime_with_currencies!(Test);
 
@@ -79,4 +83,30 @@ impl ExtBuilder {
         ext.execute_with(|| System::set_block_number(1));
         ext
     }
+}
+
+pub fn mock_parameters() -> VotingParameters<BlockNumber, CurrencyIdOf<Test>> {
+    VotingParameters {
+        commit_duration: 10,
+        reveal_duration: 10,
+        voting_currency: TEST_TOKEN_ID,
+        min_quorum: Perbill::from_percent(0),
+        min_participation: Perbill::from_percent(0),
+    }
+}
+
+pub fn mock_vote(
+    decoy_power: BalanceOf<Test>,
+    actual_power: BalanceOf<Test>,
+    support: bool,
+    salt: u64,
+) -> (
+    VoteData<BalanceOf<Test>, H256>,
+    VoteData<BalanceOf<Test>, H256>,
+) {
+    let hashed = BlakeTwo256::hash_of(&(actual_power, support, salt));
+    (
+        VoteData::Commit(hashed, decoy_power),
+        VoteData::Reveal(actual_power, support, salt),
+    )
 }

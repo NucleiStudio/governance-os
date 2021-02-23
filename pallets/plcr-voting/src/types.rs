@@ -17,7 +17,7 @@
 //! Type definitions for the coin based voting pallet.
 
 use codec::{Decode, Encode};
-use sp_runtime::{Perbill, RuntimeDebug};
+use sp_runtime::{traits::Saturating, Perbill, RuntimeDebug};
 
 #[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug, Default)]
 pub struct VotingParameters<BlockNumber, CurrencyId> {
@@ -27,4 +27,35 @@ pub struct VotingParameters<BlockNumber, CurrencyId> {
     pub voting_currency: CurrencyId,
     pub min_quorum: Perbill,
     pub min_participation: Perbill,
+}
+
+#[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug, Default)]
+pub struct ProposalState<Balance, BlockNumber, CurrencyId> {
+    pub parameters: VotingParameters<BlockNumber, CurrencyId>,
+    pub revealed_against: Balance,
+    pub revealed_favorable: Balance,
+
+    pub created_on: BlockNumber,
+}
+impl<Balance: Saturating + Copy, BlockNumber, CurrencyId>
+    ProposalState<Balance, BlockNumber, CurrencyId>
+{
+    pub fn add_support(&mut self, support: bool, stake: Balance) {
+        if support {
+            self.revealed_favorable = self.revealed_favorable.saturating_add(stake);
+        } else {
+            self.revealed_against = self.revealed_against.saturating_add(stake);
+        }
+    }
+}
+
+#[derive(Encode, Decode, Clone, Copy, PartialEq, Eq, RuntimeDebug)]
+pub enum VoteData<Balance, Hash> {
+    Commit(Hash, Balance), // second balance is at least the amount of coins to lock
+    Reveal(Balance, bool, u64), // Coins locked, support, salt
+}
+impl<Balance: Default, Hash: Default> Default for VoteData<Balance, Hash> {
+    fn default() -> Self {
+        Self::Commit(Hash::default(), Balance::default())
+    }
 }
