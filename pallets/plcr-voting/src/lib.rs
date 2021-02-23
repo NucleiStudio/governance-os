@@ -28,7 +28,7 @@ use governance_os_support::traits::{
     Currencies, LockableCurrencies, ProposalResult, StandardizedVoting,
 };
 use sp_runtime::{
-    traits::{Hash, Zero},
+    traits::{Hash, Saturating, Zero},
     DispatchError, DispatchResult,
 };
 use sp_std::prelude::*;
@@ -71,6 +71,12 @@ decl_error! {
         RevealCommitMismatch,
         /// We were not able to find a commit for the given reveal vote.
         NoCommitFound,
+        /// The vote we are trying to commit for was already revealed.
+        Revealed,
+        /// The vote is being pushed for the wrong phase, either you are
+        /// trying to commit too late, either you are trying to reveal too
+        /// too early or late.
+        Phase,
     }
 }
 
@@ -123,13 +129,29 @@ impl<T: Trait> StandardizedVoting for Module<T> {
         data: Self::VoteData,
     ) -> DispatchResult {
         let mut state = Self::proposals(proposal);
+        let commit_phase_ends_on = state
+            .created_on
+            .saturating_add(state.parameters.commit_duration);
+        let reveal_phase_ends_on =
+            commit_phase_ends_on.saturating_add(state.parameters.reveal_duration);
 
         match data {
-            VoteData::Commit(hash, decoy) => {
+            VoteData::Commit(_hash, decoy) => {
+                if let VoteData::Reveal(_, _, _) = Self::votes(voter, proposal) {
+                    return Err(Error::<T>::Revealed.into());
+                }
+
+                ensure!(Self::now() < commit_phase_ends_on, Error::<T>::Phase);
+
                 Self::lock(proposal, state.parameters.voting_currency, voter, decoy)?;
             }
             VoteData::Reveal(balance, support, salt) => {
                 if let VoteData::Commit(hash, decoy) = Self::votes(voter, proposal) {
+                    ensure!(
+                        Self::now() > commit_phase_ends_on && Self::now() < reveal_phase_ends_on,
+                        Error::<T>::Phase
+                    );
+
                     let hashed_reveal = T::Hashing::hash_of(&(balance, support, salt));
                     ensure!(hashed_reveal == hash, Error::<T>::RevealCommitMismatch);
 

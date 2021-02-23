@@ -110,3 +110,8 @@ pub fn mock_vote(
         VoteData::Reveal(actual_power, support, salt),
     )
 }
+
+pub fn advance_blocks(blocks: BlockNumber) {
+    let now = System::block_number();
+    System::set_block_number(now.saturating_add(blocks));
+}
