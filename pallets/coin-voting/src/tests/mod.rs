@@ -15,5 +15,5 @@
  */
 
 mod mock;
-mod simple;
 mod quadratic;
+mod simple;
