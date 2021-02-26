@@ -58,7 +58,7 @@ decl_storage! {
     trait Store for Module<T: Trait> as PlcrVoting {
         pub Proposals get(fn proposals): map hasher(blake2_128_concat) T::Hash => ProposalStateOf<T>;
         pub Locks get(fn locks): map hasher(blake2_128_concat) (CurrencyIdOf<T>, T::AccountId) => Vec<(T::Hash, BalanceOf<T>)>;
-        pub Votes get(fn votes): double_map hasher(blake2_128_concat) T::AccountId, hasher(blake2_128_concat) T::Hash => VoteData<BalanceOf<T>, T::Hash>;
+        pub Votes get(fn votes): double_map hasher(blake2_128_concat) T::Hash, hasher(blake2_128_concat) T::AccountId => VoteData<BalanceOf<T>, T::Hash>;
     }
 }
 
@@ -77,6 +77,8 @@ decl_error! {
         /// trying to commit too late, either you are trying to reveal too
         /// too early or late.
         Phase,
+        /// We cannot close the vote now and have to wait
+        TooEarly,
     }
 }
 
@@ -120,7 +122,7 @@ impl<T: Trait> StandardizedVoting for Module<T> {
     }
 
     fn veto(proposal: Self::ProposalID) -> DispatchResult {
-        todo!()
+        Self::finalize_proposal(proposal, Self::proposals(proposal))
     }
 
     fn vote(
@@ -137,7 +139,7 @@ impl<T: Trait> StandardizedVoting for Module<T> {
 
         match data {
             VoteData::Commit(_hash, decoy) => {
-                if let VoteData::Reveal(_, _, _) = Self::votes(voter, proposal) {
+                if let VoteData::Reveal(_, _, _) = Self::votes(proposal, voter) {
                     return Err(Error::<T>::Revealed.into());
                 }
 
@@ -146,7 +148,7 @@ impl<T: Trait> StandardizedVoting for Module<T> {
                 Self::lock(proposal, state.parameters.voting_currency, voter, decoy)?;
             }
             VoteData::Reveal(balance, support, salt) => {
-                if let VoteData::Commit(hash, decoy) = Self::votes(voter, proposal) {
+                if let VoteData::Commit(hash, _decoy) = Self::votes(proposal, voter) {
                     ensure!(
                         Self::now() > commit_phase_ends_on && Self::now() < reveal_phase_ends_on,
                         Error::<T>::Phase
@@ -155,7 +157,6 @@ impl<T: Trait> StandardizedVoting for Module<T> {
                     let hashed_reveal = T::Hashing::hash_of(&(balance, support, salt));
                     ensure!(hashed_reveal == hash, Error::<T>::RevealCommitMismatch);
 
-                    Self::unlock(proposal, state.parameters.voting_currency, voter, decoy)?;
                     Self::lock(proposal, state.parameters.voting_currency, voter, balance)?;
 
                     state.add_support(support, balance);
@@ -166,12 +167,36 @@ impl<T: Trait> StandardizedVoting for Module<T> {
             }
         };
 
-        Votes::<T>::insert(voter, proposal, data);
+        Votes::<T>::insert(proposal, voter, data);
         Ok(())
     }
 
     fn close(proposal: Self::ProposalID) -> Result<ProposalResult, DispatchError> {
-        todo!()
+        let state = Self::proposals(proposal);
+        let proposal_expired = Self::now()
+            > state
+                .created_on
+                .saturating_add(state.parameters.commit_duration)
+                .saturating_add(state.parameters.reveal_duration);
+
+        let total_supply = T::Currencies::total_issuance(state.parameters.voting_currency);
+        let total_participation = state
+            .revealed_against
+            .saturating_add(state.revealed_favorable);
+        let participation_met =
+            total_participation > state.parameters.min_participation * total_supply;
+        let quorum_met =
+            state.revealed_favorable > state.parameters.min_quorum * total_participation;
+        let proposal_passing = quorum_met && participation_met;
+
+        ensure!(proposal_expired || proposal_passing, Error::<T>::TooEarly);
+
+        Self::finalize_proposal(proposal, state)?;
+        Ok(if proposal_passing {
+            ProposalResult::Passing
+        } else {
+            ProposalResult::Failing
+        })
     }
 }
 
@@ -255,6 +280,23 @@ impl<T: Trait> Module<T> {
             T::Currencies::set_lock(currency, PLCR_VOTING_LOCK_ID, who, max_to_lock)?;
         }
 
+        Ok(())
+    }
+
+    fn finalize_proposal(proposal: T::Hash, state: ProposalStateOf<T>) -> DispatchResult {
+        Votes::<T>::iter_prefix(proposal).try_for_each(|(account, vote)| -> DispatchResult {
+            let locked = match vote {
+                VoteData::Commit(_, balance) => balance,
+                VoteData::Reveal(balance, _, _) => balance,
+            };
+
+            Self::unlock(proposal, state.parameters.voting_currency, &account, locked)?;
+
+            Ok(())
+        })?;
+
+        Proposals::<T>::remove(proposal);
+        Votes::<T>::remove_prefix(proposal);
         Ok(())
     }
 }

@@ -242,6 +242,9 @@ impl<T: Trait> Module<T> {
                     }
                 }
 
+                // Locks do not impact total issuance
+                mutation.forget_issuance_changes();
+
                 // Update balance
                 mutation.apply()?;
 

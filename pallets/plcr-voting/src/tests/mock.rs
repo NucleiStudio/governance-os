@@ -90,8 +90,8 @@ pub fn mock_parameters() -> VotingParameters<BlockNumber, CurrencyIdOf<Test>> {
         commit_duration: 10,
         reveal_duration: 10,
         voting_currency: TEST_TOKEN_ID,
-        min_quorum: Perbill::from_percent(0),
-        min_participation: Perbill::from_percent(0),
+        min_quorum: Perbill::from_percent(50),
+        min_participation: Perbill::from_percent(33),
     }
 }
 

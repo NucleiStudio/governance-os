@@ -17,11 +17,11 @@
 use super::mock::{
     advance_blocks, mock_parameters, mock_vote, ExtBuilder, PlcrVoting, Test, Tokens,
 };
-use crate::{Error, Proposals};
-use frame_support::{assert_noop, assert_ok, StorageMap};
+use crate::{Error, Locks, Proposals, Votes};
+use frame_support::{assert_noop, assert_ok, IterableStorageDoubleMap, StorageMap};
 use governance_os_support::{
-    testing::{primitives::AccountId, ALICE, TEST_TOKEN_ID},
-    traits::{LockableCurrencies, StandardizedVoting},
+    testing::{primitives::AccountId, ALICE, BOB, TEST_TOKEN_ID},
+    traits::{LockableCurrencies, ProposalResult, StandardizedVoting},
 };
 use sp_core::H256;
 
@@ -85,12 +85,12 @@ fn vote_normal_flow() {
                 PlcrVoting::locks((TEST_TOKEN_ID, ALICE)),
                 vec![(mock_hash, 50)]
             );
-            assert_eq!(PlcrVoting::votes(ALICE, mock_hash), commit);
+            assert_eq!(PlcrVoting::votes(mock_hash, ALICE), commit);
 
             assert_ok!(<PlcrVoting as StandardizedVoting>::vote(
                 mock_hash, &ALICE, reveal
             ));
-            assert_eq!(PlcrVoting::votes(ALICE, mock_hash), reveal);
+            assert_eq!(PlcrVoting::votes(mock_hash, ALICE), reveal);
 
             assert_eq!(PlcrVoting::proposals(mock_hash).revealed_against, 0);
             assert_eq!(PlcrVoting::proposals(mock_hash).revealed_favorable, 10);
@@ -293,7 +293,7 @@ fn vote_update_commit_change_locks() {
                 PlcrVoting::locks((TEST_TOKEN_ID, ALICE)),
                 vec![(mock_hash, 50)]
             );
-            assert_eq!(PlcrVoting::votes(ALICE, mock_hash), initial_commit);
+            assert_eq!(PlcrVoting::votes(mock_hash, ALICE), initial_commit);
 
             assert_ok!(<PlcrVoting as StandardizedVoting>::vote(
                 mock_hash, &ALICE, commit,
@@ -306,7 +306,7 @@ fn vote_update_commit_change_locks() {
                 PlcrVoting::locks((TEST_TOKEN_ID, ALICE)),
                 vec![(mock_hash, 40)]
             );
-            assert_eq!(PlcrVoting::votes(ALICE, mock_hash), commit);
+            assert_eq!(PlcrVoting::votes(mock_hash, ALICE), commit);
         })
 }
 
@@ -336,5 +336,329 @@ fn vote_multiple_locks_pick_highest_lock() {
                 <Tokens as LockableCurrencies<AccountId>>::locked_balance(TEST_TOKEN_ID, &ALICE),
                 100
             );
+        })
+}
+
+macro_rules! test_close_or_veto {
+    ($function:tt, $t1:ident, $t2:ident, $t3:ident) => {
+        #[test]
+        fn $t1() {
+            ExtBuilder::default()
+                .one_hundred_for_alice_n_bob()
+                .build()
+                .execute_with(|| {
+                    let mock_hash = H256::default();
+
+                    assert_ok!(<PlcrVoting as StandardizedVoting>::initiate(
+                        mock_hash,
+                        mock_parameters()
+                    ));
+
+                    let (alice_commit, alice_reveal) = mock_vote(50, 10, true, 42);
+                    let (bob_commit, bob_reveal) = mock_vote(50, 15, false, 42);
+
+                    assert_ok!(<PlcrVoting as StandardizedVoting>::vote(
+                        mock_hash,
+                        &ALICE,
+                        alice_commit,
+                    ));
+                    assert_ok!(<PlcrVoting as StandardizedVoting>::vote(
+                        mock_hash, &BOB, bob_commit,
+                    ));
+
+                    advance_blocks(mock_parameters().commit_duration + 1);
+
+                    assert_ok!(<PlcrVoting as StandardizedVoting>::vote(
+                        mock_hash,
+                        &ALICE,
+                        alice_reveal
+                    ));
+                    assert_ok!(<PlcrVoting as StandardizedVoting>::vote(
+                        mock_hash, &BOB, bob_reveal
+                    ));
+
+                    advance_blocks(mock_parameters().reveal_duration + 1);
+
+                    assert_ok!(PlcrVoting::$function(mock_hash));
+
+                    assert_eq!(
+                        <Tokens as LockableCurrencies<AccountId>>::locked_balance(
+                            TEST_TOKEN_ID,
+                            &ALICE
+                        ),
+                        0
+                    );
+                    assert_eq!(
+                        <Tokens as LockableCurrencies<AccountId>>::locked_balance(
+                            TEST_TOKEN_ID,
+                            &BOB
+                        ),
+                        0
+                    );
+                })
+        }
+
+        #[test]
+        fn $t2() {
+            ExtBuilder::default()
+                .one_hundred_for_alice_n_bob()
+                .build()
+                .execute_with(|| {
+                    let mock_hash = H256::default();
+
+                    assert_ok!(<PlcrVoting as StandardizedVoting>::initiate(
+                        mock_hash,
+                        mock_parameters()
+                    ));
+
+                    let (alice_commit, alice_reveal) = mock_vote(50, 10, true, 42);
+
+                    assert_ok!(<PlcrVoting as StandardizedVoting>::vote(
+                        mock_hash,
+                        &ALICE,
+                        alice_commit,
+                    ));
+
+                    advance_blocks(mock_parameters().commit_duration + 1);
+
+                    assert_ok!(<PlcrVoting as StandardizedVoting>::vote(
+                        mock_hash,
+                        &ALICE,
+                        alice_reveal
+                    ));
+
+                    advance_blocks(mock_parameters().reveal_duration + 1);
+
+                    assert_ok!(PlcrVoting::$function(mock_hash));
+
+                    // Empty!
+                    assert_eq!(Votes::<Test>::iter_prefix(mock_hash).next(), None);
+                    assert!(!Locks::<Test>::contains_key((TEST_TOKEN_ID, &ALICE)));
+                    assert!(!Proposals::<Test>::contains_key(mock_hash));
+                    assert_eq!(
+                        <Tokens as LockableCurrencies<AccountId>>::locked_balance(
+                            TEST_TOKEN_ID,
+                            &ALICE
+                        ),
+                        0
+                    );
+                })
+        }
+
+        #[test]
+        fn $t3() {
+            ExtBuilder::default()
+                .one_hundred_for_alice_n_bob()
+                .build()
+                .execute_with(|| {
+                    let mut mock_hash_1 = H256::default();
+                    let mut mock_hash_2 = H256::default();
+
+                    mock_hash_1.randomize();
+                    mock_hash_2.randomize();
+
+                    assert!(mock_hash_1 != mock_hash_2);
+
+                    assert_ok!(<PlcrVoting as StandardizedVoting>::initiate(
+                        mock_hash_1,
+                        mock_parameters()
+                    ));
+                    assert_ok!(<PlcrVoting as StandardizedVoting>::initiate(
+                        mock_hash_2,
+                        mock_parameters()
+                    ));
+
+                    let (commit_1, reveal_1) = mock_vote(50, 15, true, 42);
+                    let (commit_2, reveal_2) = mock_vote(50, 10, true, 42);
+
+                    assert_ok!(<PlcrVoting as StandardizedVoting>::vote(
+                        mock_hash_1,
+                        &ALICE,
+                        commit_1,
+                    ));
+                    assert_ok!(<PlcrVoting as StandardizedVoting>::vote(
+                        mock_hash_2,
+                        &ALICE,
+                        commit_2,
+                    ));
+
+                    advance_blocks(mock_parameters().commit_duration + 1);
+
+                    assert_ok!(<PlcrVoting as StandardizedVoting>::vote(
+                        mock_hash_1,
+                        &ALICE,
+                        reveal_1
+                    ));
+                    assert_ok!(<PlcrVoting as StandardizedVoting>::vote(
+                        mock_hash_2,
+                        &ALICE,
+                        reveal_2
+                    ));
+
+                    assert_eq!(
+                        <Tokens as LockableCurrencies<AccountId>>::locked_balance(
+                            TEST_TOKEN_ID,
+                            &ALICE
+                        ),
+                        15
+                    );
+
+                    advance_blocks(mock_parameters().reveal_duration + 1);
+                    assert_ok!(PlcrVoting::$function(mock_hash_1));
+
+                    // Empty!
+                    assert_eq!(Votes::<Test>::iter_prefix(mock_hash_1).next(), None);
+                    assert_eq!(
+                        PlcrVoting::locks((TEST_TOKEN_ID, &ALICE)),
+                        vec![(mock_hash_2, 10)]
+                    );
+                    assert!(!Proposals::<Test>::contains_key(mock_hash_1));
+                    assert_eq!(
+                        <Tokens as LockableCurrencies<AccountId>>::locked_balance(
+                            TEST_TOKEN_ID,
+                            &ALICE
+                        ),
+                        10
+                    );
+                })
+        }
+    };
+}
+
+test_close_or_veto!(
+    veto,
+    veto_unlocks_coins,
+    veto_free_storage_if_last_proposal,
+    veto_cleans_storage
+);
+
+test_close_or_veto!(
+    close,
+    close_unlocks_coins,
+    close_free_storage_if_last_proposal,
+    close_cleans_storage
+);
+
+#[test]
+fn close_error_if_early() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            let mock_hash = H256::default();
+
+            assert_ok!(<PlcrVoting as StandardizedVoting>::initiate(
+                mock_hash,
+                mock_parameters()
+            ));
+
+            let (alice_commit, alice_reveal) = mock_vote(50, 10, false, 42);
+
+            assert_ok!(<PlcrVoting as StandardizedVoting>::vote(
+                mock_hash,
+                &ALICE,
+                alice_commit,
+            ));
+
+            advance_blocks(mock_parameters().commit_duration + 1);
+
+            assert_ok!(<PlcrVoting as StandardizedVoting>::vote(
+                mock_hash,
+                &ALICE,
+                alice_reveal
+            ));
+
+            assert_noop!(PlcrVoting::close(mock_hash), Error::<Test>::TooEarly);
+        })
+}
+
+#[test]
+fn close_passing() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            let mock_hash = H256::default();
+
+            assert_ok!(<PlcrVoting as StandardizedVoting>::initiate(
+                mock_hash,
+                mock_parameters()
+            ));
+
+            let (commit, reveal) = mock_vote(90, 90, true, 42);
+
+            assert_ok!(<PlcrVoting as StandardizedVoting>::vote(
+                mock_hash, &ALICE, commit,
+            ));
+
+            advance_blocks(mock_parameters().commit_duration + 1);
+
+            assert_ok!(<PlcrVoting as StandardizedVoting>::vote(
+                mock_hash, &ALICE, reveal
+            ));
+
+            advance_blocks(mock_parameters().reveal_duration + 1);
+
+            assert_eq!(PlcrVoting::close(mock_hash), Ok(ProposalResult::Passing));
+        })
+}
+
+#[test]
+fn close_failing() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            let mock_hash = H256::default();
+
+            assert_ok!(<PlcrVoting as StandardizedVoting>::initiate(
+                mock_hash,
+                mock_parameters()
+            ));
+
+            let (commit, reveal) = mock_vote(90, 90, false, 42);
+
+            assert_ok!(<PlcrVoting as StandardizedVoting>::vote(
+                mock_hash, &ALICE, commit,
+            ));
+
+            advance_blocks(mock_parameters().commit_duration + 1);
+
+            assert_ok!(<PlcrVoting as StandardizedVoting>::vote(
+                mock_hash, &ALICE, reveal
+            ));
+
+            advance_blocks(mock_parameters().reveal_duration + 1);
+
+            assert_eq!(PlcrVoting::close(mock_hash), Ok(ProposalResult::Failing));
+        })
+}
+
+#[test]
+fn close_passing_early() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            let mock_hash = H256::default();
+
+            assert_ok!(<PlcrVoting as StandardizedVoting>::initiate(
+                mock_hash,
+                mock_parameters()
+            ));
+
+            let (commit, reveal) = mock_vote(90, 90, true, 42);
+
+            assert_ok!(<PlcrVoting as StandardizedVoting>::vote(
+                mock_hash, &ALICE, commit,
+            ));
+
+            advance_blocks(mock_parameters().commit_duration + 1);
+
+            assert_ok!(<PlcrVoting as StandardizedVoting>::vote(
+                mock_hash, &ALICE, reveal
+            ));
+
+            assert_eq!(PlcrVoting::close(mock_hash), Ok(ProposalResult::Passing));
         })
 }
