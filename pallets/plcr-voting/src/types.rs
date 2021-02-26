@@ -51,11 +51,11 @@ impl<Balance: Saturating + Copy, BlockNumber, CurrencyId>
 
 #[derive(Encode, Decode, Clone, Copy, PartialEq, Eq, RuntimeDebug)]
 pub enum VoteData<Balance, Hash> {
-    Commit(Hash, Balance), // second balance is at least the amount of coins to lock
+    Commit(Hash),
     Reveal(Balance, bool, u64), // Coins locked, support, salt
 }
 impl<Balance: Default, Hash: Default> Default for VoteData<Balance, Hash> {
     fn default() -> Self {
-        Self::Commit(Hash::default(), Balance::default())
+        Self::Commit(Hash::default())
     }
 }

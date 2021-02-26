@@ -70,21 +70,12 @@ fn vote_normal_flow() {
                 mock_parameters()
             ));
 
-            let (commit, reveal) = mock_vote(50, 10, true, 42);
+            let (commit, reveal) = mock_vote(10, true, 42);
             assert_ok!(<PlcrVoting as StandardizedVoting>::vote(
                 mock_hash, &ALICE, commit,
             ));
             advance_blocks(mock_parameters().commit_duration + 1);
 
-            // Locked the decoy
-            assert_eq!(
-                <Tokens as LockableCurrencies<AccountId>>::locked_balance(TEST_TOKEN_ID, &ALICE),
-                50
-            );
-            assert_eq!(
-                PlcrVoting::locks((TEST_TOKEN_ID, ALICE)),
-                vec![(mock_hash, 50)]
-            );
             assert_eq!(PlcrVoting::votes(mock_hash, ALICE), commit);
 
             assert_ok!(<PlcrVoting as StandardizedVoting>::vote(
@@ -120,7 +111,7 @@ fn vote_cannot_reveal_early() {
                 mock_parameters()
             ));
 
-            let (_commit, reveal) = mock_vote(50, 10, true, 42);
+            let (_commit, reveal) = mock_vote(10, true, 42);
 
             assert_noop!(
                 <PlcrVoting as StandardizedVoting>::vote(mock_hash, &ALICE, reveal),
@@ -142,7 +133,7 @@ fn vote_cannot_commit_late() {
                 mock_parameters()
             ));
 
-            let (commit, _reveal) = mock_vote(50, 10, true, 42);
+            let (commit, _reveal) = mock_vote(10, true, 42);
 
             advance_blocks(mock_parameters().commit_duration + 1);
             assert_noop!(
@@ -165,7 +156,7 @@ fn vote_cannot_reveal_uncommitted() {
                 mock_parameters()
             ));
 
-            let (_commit, reveal) = mock_vote(50, 10, true, 42);
+            let (_commit, reveal) = mock_vote(10, true, 42);
 
             advance_blocks(mock_parameters().commit_duration + 1);
             assert_noop!(
@@ -188,7 +179,7 @@ fn cannot_reveal_twice() {
                 mock_parameters()
             ));
 
-            let (commit, reveal) = mock_vote(50, 10, true, 42);
+            let (commit, reveal) = mock_vote(10, true, 42);
             assert_ok!(<PlcrVoting as StandardizedVoting>::vote(
                 mock_hash, &ALICE, commit,
             ));
@@ -218,7 +209,7 @@ fn vote_cannot_commit_after_reveal() {
                 mock_parameters()
             ));
 
-            let (commit, reveal) = mock_vote(50, 10, true, 42);
+            let (commit, reveal) = mock_vote(10, true, 42);
             assert_ok!(<PlcrVoting as StandardizedVoting>::vote(
                 mock_hash, &ALICE, commit,
             ));
@@ -249,8 +240,8 @@ fn vote_cannot_reveal_wrong_hash() {
             ));
 
             // Salts are different
-            let (commit, _reveal) = mock_vote(50, 10, true, 42);
-            let (_commit, reveal) = mock_vote(50, 10, true, 43);
+            let (commit, _reveal) = mock_vote(10, true, 42);
+            let (_commit, reveal) = mock_vote(10, true, 43);
 
             assert_ok!(<PlcrVoting as StandardizedVoting>::vote(
                 mock_hash, &ALICE, commit,
@@ -277,35 +268,19 @@ fn vote_update_commit_change_locks() {
                 mock_parameters()
             ));
 
-            let (initial_commit, _reveal) = mock_vote(50, 10, true, 42);
-            let (commit, _reveal) = mock_vote(40, 15, false, 42);
+            let (initial_commit, _reveal) = mock_vote(10, true, 42);
+            let (commit, _reveal) = mock_vote(15, false, 42);
 
             assert_ok!(<PlcrVoting as StandardizedVoting>::vote(
                 mock_hash,
                 &ALICE,
                 initial_commit,
             ));
-            assert_eq!(
-                <Tokens as LockableCurrencies<AccountId>>::locked_balance(TEST_TOKEN_ID, &ALICE),
-                50
-            );
-            assert_eq!(
-                PlcrVoting::locks((TEST_TOKEN_ID, ALICE)),
-                vec![(mock_hash, 50)]
-            );
             assert_eq!(PlcrVoting::votes(mock_hash, ALICE), initial_commit);
 
             assert_ok!(<PlcrVoting as StandardizedVoting>::vote(
                 mock_hash, &ALICE, commit,
             ));
-            assert_eq!(
-                <Tokens as LockableCurrencies<AccountId>>::locked_balance(TEST_TOKEN_ID, &ALICE),
-                40
-            );
-            assert_eq!(
-                PlcrVoting::locks((TEST_TOKEN_ID, ALICE)),
-                vec![(mock_hash, 40)]
-            );
             assert_eq!(PlcrVoting::votes(mock_hash, ALICE), commit);
         })
 }
@@ -330,7 +305,7 @@ fn vote_multiple_locks_pick_highest_lock() {
                 120
             );
 
-            assert_ok!(PlcrVoting::unlock(mock_hash_2, TEST_TOKEN_ID, &ALICE, 120));
+            assert_ok!(PlcrVoting::unlock(mock_hash_2, TEST_TOKEN_ID, &ALICE));
 
             assert_eq!(
                 <Tokens as LockableCurrencies<AccountId>>::locked_balance(TEST_TOKEN_ID, &ALICE),
@@ -354,8 +329,8 @@ macro_rules! test_close_or_veto {
                         mock_parameters()
                     ));
 
-                    let (alice_commit, alice_reveal) = mock_vote(50, 10, true, 42);
-                    let (bob_commit, bob_reveal) = mock_vote(50, 15, false, 42);
+                    let (alice_commit, alice_reveal) = mock_vote(10, true, 42);
+                    let (bob_commit, bob_reveal) = mock_vote(15, false, 42);
 
                     assert_ok!(<PlcrVoting as StandardizedVoting>::vote(
                         mock_hash,
@@ -411,7 +386,7 @@ macro_rules! test_close_or_veto {
                         mock_parameters()
                     ));
 
-                    let (alice_commit, alice_reveal) = mock_vote(50, 10, true, 42);
+                    let (alice_commit, alice_reveal) = mock_vote(10, true, 42);
 
                     assert_ok!(<PlcrVoting as StandardizedVoting>::vote(
                         mock_hash,
@@ -468,8 +443,8 @@ macro_rules! test_close_or_veto {
                         mock_parameters()
                     ));
 
-                    let (commit_1, reveal_1) = mock_vote(50, 15, true, 42);
-                    let (commit_2, reveal_2) = mock_vote(50, 10, true, 42);
+                    let (commit_1, reveal_1) = mock_vote(15, true, 42);
+                    let (commit_2, reveal_2) = mock_vote(10, true, 42);
 
                     assert_ok!(<PlcrVoting as StandardizedVoting>::vote(
                         mock_hash_1,
@@ -552,7 +527,7 @@ fn close_error_if_early() {
                 mock_parameters()
             ));
 
-            let (alice_commit, alice_reveal) = mock_vote(50, 10, false, 42);
+            let (alice_commit, alice_reveal) = mock_vote(10, false, 42);
 
             assert_ok!(<PlcrVoting as StandardizedVoting>::vote(
                 mock_hash,
@@ -585,7 +560,7 @@ fn close_passing() {
                 mock_parameters()
             ));
 
-            let (commit, reveal) = mock_vote(90, 90, true, 42);
+            let (commit, reveal) = mock_vote(90, true, 42);
 
             assert_ok!(<PlcrVoting as StandardizedVoting>::vote(
                 mock_hash, &ALICE, commit,
@@ -616,7 +591,7 @@ fn close_failing() {
                 mock_parameters()
             ));
 
-            let (commit, reveal) = mock_vote(90, 90, false, 42);
+            let (commit, reveal) = mock_vote(90, false, 42);
 
             assert_ok!(<PlcrVoting as StandardizedVoting>::vote(
                 mock_hash, &ALICE, commit,
@@ -647,7 +622,7 @@ fn close_passing_early() {
                 mock_parameters()
             ));
 
-            let (commit, reveal) = mock_vote(90, 90, true, 42);
+            let (commit, reveal) = mock_vote(90, true, 42);
 
             assert_ok!(<PlcrVoting as StandardizedVoting>::vote(
                 mock_hash, &ALICE, commit,

@@ -96,18 +96,17 @@ pub fn mock_parameters() -> VotingParameters<BlockNumber, CurrencyIdOf<Test>> {
 }
 
 pub fn mock_vote(
-    decoy_power: BalanceOf<Test>,
-    actual_power: BalanceOf<Test>,
+    power: BalanceOf<Test>,
     support: bool,
     salt: u64,
 ) -> (
     VoteData<BalanceOf<Test>, H256>,
     VoteData<BalanceOf<Test>, H256>,
 ) {
-    let hashed = BlakeTwo256::hash_of(&(actual_power, support, salt));
+    let hashed = BlakeTwo256::hash_of(&(power, support, salt));
     (
-        VoteData::Commit(hashed, decoy_power),
-        VoteData::Reveal(actual_power, support, salt),
+        VoteData::Commit(hashed),
+        VoteData::Reveal(power, support, salt),
     )
 }
 

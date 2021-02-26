@@ -138,17 +138,15 @@ impl<T: Trait> StandardizedVoting for Module<T> {
             commit_phase_ends_on.saturating_add(state.parameters.reveal_duration);
 
         match data {
-            VoteData::Commit(_hash, decoy) => {
+            VoteData::Commit(_hash) => {
                 if let VoteData::Reveal(_, _, _) = Self::votes(proposal, voter) {
                     return Err(Error::<T>::Revealed.into());
                 }
 
                 ensure!(Self::now() < commit_phase_ends_on, Error::<T>::Phase);
-
-                Self::lock(proposal, state.parameters.voting_currency, voter, decoy)?;
             }
             VoteData::Reveal(balance, support, salt) => {
-                if let VoteData::Commit(hash, _decoy) = Self::votes(proposal, voter) {
+                if let VoteData::Commit(hash) = Self::votes(proposal, voter) {
                     ensure!(
                         Self::now() > commit_phase_ends_on && Self::now() < reveal_phase_ends_on,
                         Error::<T>::Phase
@@ -233,18 +231,13 @@ impl<T: Trait> Module<T> {
         Ok(())
     }
 
-    fn unlock(
-        proposal: T::Hash,
-        currency: CurrencyIdOf<T>,
-        who: &T::AccountId,
-        amount: BalanceOf<T>,
-    ) -> DispatchResult {
+    fn unlock(proposal: T::Hash, currency: CurrencyIdOf<T>, who: &T::AccountId) -> DispatchResult {
         let mut lock_data = Locks::<T>::get((currency, who));
         lock_data = lock_data
             .iter()
             .cloned()
-            .filter(|&(maybe_duplicate_proposal, locked_amount)| {
-                maybe_duplicate_proposal != proposal && locked_amount != amount
+            .filter(|&(maybe_duplicate_proposal, _locked_amount)| {
+                maybe_duplicate_proposal != proposal
             })
             .collect();
 
@@ -284,13 +277,8 @@ impl<T: Trait> Module<T> {
     }
 
     fn finalize_proposal(proposal: T::Hash, state: ProposalStateOf<T>) -> DispatchResult {
-        Votes::<T>::iter_prefix(proposal).try_for_each(|(account, vote)| -> DispatchResult {
-            let locked = match vote {
-                VoteData::Commit(_, balance) => balance,
-                VoteData::Reveal(balance, _, _) => balance,
-            };
-
-            Self::unlock(proposal, state.parameters.voting_currency, &account, locked)?;
+        Votes::<T>::iter_prefix(proposal).try_for_each(|(account, _vote)| -> DispatchResult {
+            Self::unlock(proposal, state.parameters.voting_currency, &account)?;
 
             Ok(())
         })?;
