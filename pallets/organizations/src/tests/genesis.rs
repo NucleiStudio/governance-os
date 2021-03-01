@@ -21,7 +21,9 @@ use frame_support::StorageMap;
 #[test]
 fn create_organizations_and_increment_counter() {
     ExtBuilder::default()
-        .with_default_orgs(3)
+        .with_default_org()
+        .with_default_org()
+        .with_default_org()
         .build()
         .execute_with(|| {
             assert_eq!(Organizations::counter(), 3);

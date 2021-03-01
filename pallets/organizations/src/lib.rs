@@ -30,12 +30,9 @@ use frame_support::{
     weights::{GetDispatchInfo, Weight},
 };
 use frame_system::ensure_signed;
-use governance_os_support::{
-    ensure_not_err,
-    traits::{Currencies, ReservableCurrencies, RoleManager, VotingHooks},
-};
+use governance_os_support::traits::{ProposalResult, RoleManager, VotingRouter};
 use sp_runtime::{
-    traits::{AccountIdConversion, Hash, MaybeSerializeDeserialize, Member, StaticLookup},
+    traits::{AccountIdConversion, Hash, StaticLookup},
     DispatchError, DispatchResult, ModuleId,
 };
 use sp_std::{boxed::Box, prelude::Vec};
@@ -66,8 +63,7 @@ pub trait WeightInfo {
     fn mutate(b: u32, c: u32) -> Weight;
     fn create_proposal() -> Weight;
     fn veto_proposal(b: u32, c: u32) -> Weight;
-    fn decide_on_proposal_favorable(b: u32, c: u32) -> Weight;
-    fn decide_on_proposal_against(b: u32, c: u32) -> Weight;
+    fn decide_on_proposal(b: u32) -> Weight;
     fn close_proposal(b: u32, c: u32) -> Weight;
 }
 
@@ -92,26 +88,9 @@ pub trait Trait: frame_system::Trait {
         Role = <RoleManagerOf<Self> as RoleManager>::Role,
     >;
 
-    /// Pallet handling currencies. Used to represent voting weights.
-    type Currencies: ReservableCurrencies<Self::AccountId>;
-
-    /// The different kinds of voting system present inside the runtime. For benchmark purposes
-    /// please make sure that the default voting system is the most expensive to use in terms
-    /// of compute resources.
-    type VotingSystem: Parameter + Member + MaybeSerializeDeserialize + Default;
-
-    /// Some arbitrary data that can be added to proposals
-    type ProposalMetadata: Parameter;
-
-    /// Various hooks as implemented for each voting system.
-    type VotingHooks: VotingHooks<
-        AccountId = Self::AccountId,
-        BlockNumber = Self::BlockNumber,
-        Currencies = Self::Currencies,
-        Data = Self::ProposalMetadata,
-        OrganizationId = Self::AccountId,
-        VotingSystem = Self::VotingSystem,
-    >;
+    /// VotingRouter implementation to choose between voting systems and route those
+    /// to the right pallets.
+    type VotingRouter: VotingRouter<AccountId = Self::AccountId, ProposalId = ProposalIdOf<Self>>;
 
     /// Mostly used for weight computations and not actually enforced. The maximum number
     /// of votes in favor or against we can expect a proposal to have.
@@ -125,20 +104,18 @@ pub trait Trait: frame_system::Trait {
     type WeightInfo: WeightInfo;
 }
 
-type BalanceOf<T> =
-    <<T as Trait>::Currencies as Currencies<<T as frame_system::Trait>::AccountId>>::Balance;
-type OrganizationDetailsOf<T> =
-    OrganizationDetails<<T as frame_system::Trait>::AccountId, <T as Trait>::VotingSystem>;
+type OrganizationDetailsOf<T> = OrganizationDetails<
+    <T as frame_system::Trait>::AccountId,
+    (VotingSystemIdOf<T>, VotingParametersOf<T>),
+>;
 pub type OrganizationsCounter = u32;
 type ProposalIdOf<T> = <T as frame_system::Trait>::Hash;
-type ProposalOf<T> = Proposal<
-    Vec<u8>,
-    <T as Trait>::ProposalMetadata,
-    <T as frame_system::Trait>::AccountId,
-    <T as Trait>::VotingSystem,
->;
+type ProposalOf<T> = Proposal<Vec<u8>, <T as frame_system::Trait>::AccountId, VotingSystemIdOf<T>>;
 type RoleBuilderOf<T> = <T as Trait>::RoleBuilder;
 type RoleManagerOf<T> = <T as Trait>::RoleManager;
+type VoteDataOf<T> = <<T as Trait>::VotingRouter as VotingRouter>::VoteData;
+type VotingParametersOf<T> = <<T as Trait>::VotingRouter as VotingRouter>::Parameters;
+type VotingSystemIdOf<T> = <<T as Trait>::VotingRouter as VotingRouter>::VotingSystemId;
 
 const ORGS_MODULE_ID: ModuleId = ModuleId(*b"gos/orgs");
 
@@ -165,7 +142,7 @@ decl_event!(
         AccountId = <T as frame_system::Trait>::AccountId,
         OrganizationDetails = OrganizationDetailsOf<T>,
         ProposalId = ProposalIdOf<T>,
-        Balance = BalanceOf<T>,
+        VoteData = VoteDataOf<T>,
     {
         /// An organization was created with the following parameters. \[org. address, details\]
         OrganizationCreated(AccountId, OrganizationDetails),
@@ -177,12 +154,12 @@ decl_event!(
         ProposalSubmitted(AccountId, ProposalId),
         /// A proposal has been vetoed and removed from the queue of open proposals. \[proposal id\]
         ProposalVetoed(ProposalId),
-        /// Somebody just voted on a proposal. \[proposal id, voter, power, support\]
-        ProposalVoteCasted(ProposalId, AccountId, Balance, bool),
+        /// Somebody just voted on a proposal. \[proposal id, voter, vote data\]
+        ProposalVoteCasted(ProposalId, AccountId, VoteData),
         /// A proposal has been executed with the following result. \[proposal id, result\]
         ProposalExecuted(ProposalId, DispatchResult),
         /// A proposal was closed. \[proposal id, wether it passed or not\]
-        ProposalClosed(ProposalId, bool),
+        ProposalClosed(ProposalId, ProposalResult),
     }
 );
 
@@ -266,7 +243,7 @@ decl_module! {
         /// Create a proposal for a given organization
         #[weight = T::WeightInfo::create_proposal()]
         fn create_proposal(origin, org_id: <T::Lookup as StaticLookup>::Source, call: Box<<T as Trait>::Call>) {
-            let who = ensure_signed(origin)?;
+            let _who = ensure_signed(origin)?;
             let target_org_id = T::Lookup::lookup(org_id)?;
             let details = Self::try_get_parameters(&target_org_id)?;
             let proposal_id = Self::proposal_id(&target_org_id, call.clone());
@@ -274,17 +251,15 @@ decl_module! {
                 return Err(Error::<T>::ProposalDuplicate.into());
             }
 
-            let (maybe_hook_sucessful, additional_data) = T::VotingHooks::on_create_proposal(details.clone().voting, &who, frame_system::Module::<T>::block_number());
-            ensure_not_err!(maybe_hook_sucessful);
+            T::VotingRouter::initiate(details.voting.0.clone(), proposal_id, details.voting.1)?;
 
             Proposals::<T>::insert(&proposal_id, Proposal{
                 org: target_org_id.clone(),
                 call: call.encode(),
-                metadata: additional_data,
                 // Not only does this save us future read weights but it also cover
                 // the case where an org change voting systems but still has pending
                 // proposals.
-                voting: details.voting,
+                voting: details.voting.0,
             });
 
             Self::deposit_event(RawEvent::ProposalSubmitted(target_org_id, proposal_id));
@@ -298,7 +273,7 @@ decl_module! {
             let proposal = Self::try_get_proposal(proposal_id)?;
             ensure!(proposal.org == org_id, Error::<T>::ProposalNotForOrganization);
 
-            T::VotingHooks::on_veto_proposal(proposal.voting, proposal.metadata)?;
+            T::VotingRouter::veto(proposal.voting, proposal_id)?;
             Proposals::<T>::remove(proposal_id);
 
             Self::deposit_event(RawEvent::ProposalVetoed(proposal_id));
@@ -306,24 +281,13 @@ decl_module! {
 
         /// Vote for or against a given proposal. The caller can choose how much voting power is dedicated
         /// to it via the `power` parameter.
-        #[weight = {
-            match in_support {
-                true => T::WeightInfo::decide_on_proposal_favorable(T::MaxVotes::get(), T::MaxVotes::get()),
-                false => T::WeightInfo::decide_on_proposal_against(T::MaxVotes::get(), T::MaxVotes::get()),
-            }
-        }]
-        fn decide_on_proposal(origin, proposal_id: ProposalIdOf<T>, power: BalanceOf<T>, in_support: bool) {
+        #[weight = T::WeightInfo::decide_on_proposal(T::MaxVotes::get())]
+        fn decide_on_proposal(origin, proposal_id: ProposalIdOf<T>, vote_data: VoteDataOf<T>) {
             let voter = ensure_signed(origin)?;
-            let mut proposal = Self::try_get_proposal(proposal_id)?;
-            let (maybe_hook_sucessful, maybe_new_metadata) = T::VotingHooks::on_decide_on_proposal(proposal.clone().voting, proposal.clone().metadata, &voter, power, in_support);
-            ensure_not_err!(maybe_hook_sucessful);
-            if maybe_new_metadata != proposal.metadata {
-                // Save the new metadata, overwriting the previous one
-                proposal.metadata = maybe_new_metadata;
-                Proposals::<T>::insert(proposal_id, proposal);
-            }
+            let proposal = Self::try_get_proposal(proposal_id)?;
 
-            Self::deposit_event(RawEvent::ProposalVoteCasted(proposal_id, voter, power, in_support));
+            T::VotingRouter::vote(proposal.voting, proposal_id, &voter, vote_data.clone())?;
+            Self::deposit_event(RawEvent::ProposalVoteCasted(proposal_id, voter, vote_data));
         }
 
         /// If a proposal passed or failed but is not longer awaiting or waiting for votes it can be closed. Closing
@@ -337,20 +301,18 @@ decl_module! {
             let decoded_call = <T as Trait>::Call::decode(&mut &proposal.clone().call[..]).map_err(|_| Error::<T>::ProposalDecodingFailure)?;
             let decoded_call_weight = decoded_call.get_dispatch_info().weight;
             ensure!(proposal_weight_bound >= decoded_call_weight, Error::<T>::TooSmallWeightBound);
-            ensure!(T::VotingHooks::can_close(proposal.clone().voting, proposal.clone().metadata, frame_system::Module::<T>::block_number()), Error::<T>::ProposalCanNotBeClosed);
 
-            let passing = T::VotingHooks::passing(proposal.clone().voting, proposal.clone().metadata);
-            T::VotingHooks::on_close_proposal(proposal.clone().voting, proposal.clone().metadata, passing)?;
+            let proposal_result = T::VotingRouter::close(proposal.voting.clone(), proposal_id)?;
 
             let mut external_weight: Weight = 0;
-            if passing {
+            if proposal_result == ProposalResult::Passing {
                 let res = decoded_call.dispatch(frame_system::RawOrigin::Signed(proposal.clone().org).into());
                 Self::deposit_event(RawEvent::ProposalExecuted(proposal_id, res.map(|_| ()).map_err(|e| e.error)));
                 external_weight = external_weight.saturating_add(Self::get_result_weight(res).unwrap_or(decoded_call_weight));
             }
             Proposals::<T>::remove(proposal_id);
 
-            Self::deposit_event(RawEvent::ProposalClosed(proposal_id, passing));
+            Self::deposit_event(RawEvent::ProposalClosed(proposal_id, proposal_result));
 
             Ok(Some(T::WeightInfo::close_proposal(T::MaxVotes::get(), T::MaxVotes::get()).saturating_add(external_weight)).into())
         }

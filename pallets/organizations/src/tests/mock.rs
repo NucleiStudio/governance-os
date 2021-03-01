@@ -17,18 +17,77 @@
 use crate::{
     GenesisConfig, Module, OrganizationDetails, OrganizationDetailsOf, RoleBuilder, Trait,
 };
-use governance_os_pallet_tokens::CurrencyDetails;
 use governance_os_support::{
-    mock_runtime_with_currencies,
-    testing::{ALICE, TEST_TOKEN_ID, TEST_TOKEN_OWNER},
+    mock_runtime,
+    testing::ALICE,
+    traits::{ProposalResult, VotingRouter},
 };
-use governance_os_voting::{ProposalMetadata, VotingSystems};
+use sp_runtime::{DispatchError, DispatchResult};
 
-mock_runtime_with_currencies!(Test);
+mock_runtime!(Test);
 
 parameter_types! {
     pub const MaxVotes: u32 = 100;
     pub const MaxExecutors: u32 = 100;
+}
+
+#[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug, Serialize, Deserialize)]
+pub enum MockVotingSystemId {
+    WithResult(ProposalResult),
+    FailInitiate,
+    FailVeto,
+    FailVote,
+    FailClose,
+}
+
+pub struct MockVotingRouter;
+impl VotingRouter for MockVotingRouter {
+    type AccountId = AccountId;
+    type VotingSystemId = MockVotingSystemId;
+    type Parameters = ();
+    type ProposalId = H256;
+    type VoteData = ();
+
+    fn initiate(
+        voting_system: Self::VotingSystemId,
+        _proposal: Self::ProposalId,
+        _parameters: Self::Parameters,
+    ) -> DispatchResult {
+        match voting_system {
+            MockVotingSystemId::FailInitiate => Err("fail".into()),
+            _ => Ok(()),
+        }
+    }
+
+    fn veto(voting_system: Self::VotingSystemId, _proposal: Self::ProposalId) -> DispatchResult {
+        match voting_system {
+            MockVotingSystemId::FailVeto => Err("fail".into()),
+            _ => Ok(()),
+        }
+    }
+
+    fn vote(
+        voting_system: Self::VotingSystemId,
+        _proposal: Self::ProposalId,
+        _voter: &Self::AccountId,
+        _data: Self::VoteData,
+    ) -> DispatchResult {
+        match voting_system {
+            MockVotingSystemId::FailVote => Err("fail".into()),
+            _ => Ok(()),
+        }
+    }
+
+    fn close(
+        voting_system: Self::VotingSystemId,
+        _proposal: Self::ProposalId,
+    ) -> Result<ProposalResult, DispatchError> {
+        match voting_system {
+            MockVotingSystemId::WithResult(res) => Ok(res),
+            MockVotingSystemId::FailClose => Err("fail".into()),
+            _ => Ok(ProposalResult::Passing),
+        }
+    }
 }
 
 impl Trait for Test {
@@ -36,11 +95,7 @@ impl Trait for Test {
     type Call = Call;
     type RoleManager = Bylaws;
     type RoleBuilder = MockRoles;
-    type Currencies = Tokens;
-    type VotingSystem =
-        VotingSystems<Balance, CurrencyId, BlockNumber, Self::Currencies, AccountId>;
-    type ProposalMetadata = ProposalMetadata<AccountId, Balance, BlockNumber>;
-    type VotingHooks = VotingSystems<Balance, CurrencyId, BlockNumber, Self::Currencies, AccountId>;
+    type VotingRouter = MockVotingRouter;
     type MaxVotes = MaxVotes;
     type MaxExecutors = MaxExecutors;
     type WeightInfo = ();
@@ -64,7 +119,6 @@ pub type Organizations = Module<Test>;
 pub struct ExtBuilder {
     can_create: Vec<AccountId>,
     orgs: Vec<OrganizationDetailsOf<Test>>,
-    endowed_accounts: Vec<(CurrencyId, AccountId, Balance)>,
 }
 
 impl Default for ExtBuilder {
@@ -72,7 +126,6 @@ impl Default for ExtBuilder {
         Self {
             can_create: vec![],
             orgs: vec![],
-            endowed_accounts: vec![],
         }
     }
 }
@@ -88,18 +141,11 @@ impl ExtBuilder {
         self
     }
 
-    pub fn with_default_orgs(mut self, nb: u32) -> Self {
-        for _ in 0..nb {
-            self.orgs.push(OrganizationDetails {
-                executors: vec![],
-                voting: VotingSystems::None,
-            });
-        }
-        self
-    }
-
-    pub fn hundred_for_alice(mut self) -> Self {
-        self.endowed_accounts.push((TEST_TOKEN_ID, ALICE, 100));
+    pub fn with_default_org(mut self) -> Self {
+        self.orgs.push(OrganizationDetails {
+            executors: vec![],
+            voting: (MockVotingSystemId::WithResult(ProposalResult::Passing), ()),
+        });
         self
     }
 
@@ -118,32 +164,6 @@ impl ExtBuilder {
         .assimilate_storage(&mut t)
         .unwrap();
 
-        governance_os_pallet_tokens::GenesisConfig::<Test> {
-            endowed_accounts: self.endowed_accounts,
-            currency_details: vec![
-                (
-                    TEST_TOKEN_ID,
-                    CurrencyDetails {
-                        owner: TEST_TOKEN_OWNER,
-                        transferable: true,
-                    },
-                ),
-                (
-                    // Benchmarks depends on a default voting system. A voting system may depend on a
-                    // default currency id that would need to be transferable. Normally, the default
-                    // value for our mocks would be 0 thus we make sure it was created as well. This makes
-                    // sure that a `cargo test --all --all-features` works.
-                    0,
-                    CurrencyDetails {
-                        owner: TEST_TOKEN_OWNER,
-                        transferable: true,
-                    },
-                ),
-            ],
-        }
-        .assimilate_storage(&mut t)
-        .unwrap();
-
         GenesisConfig::<Test> {
             organizations: self.orgs,
         }
@@ -154,4 +174,8 @@ impl ExtBuilder {
         ext.execute_with(|| System::set_block_number(1));
         ext
     }
+}
+
+pub fn make_proposal() -> Box<Call> {
+    Box::new(Call::System(frame_system::Call::remark(vec![])))
 }

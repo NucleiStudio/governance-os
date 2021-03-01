@@ -40,16 +40,3 @@ macro_rules! impl_enum_default {
         }
     };
 }
-
-#[macro_export]
-/// This macro makes it easy to check a result from a function and returning it
-/// if it is an error.
-/// Useful when `?` is not usable, for instance if a function returns a tuple of
-/// a result and something else.
-macro_rules! ensure_not_err {
-    ($res:tt) => {
-        if $res.is_err() {
-            return $res;
-        }
-    };
-}

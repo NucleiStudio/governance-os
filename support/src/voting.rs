@@ -16,12 +16,16 @@
 
 //! A set of common traits to voting systems.
 
-use crate::traits::{Currencies, ReservableCurrencies};
-use sp_runtime::{DispatchError, DispatchResult};
+use codec::{Decode, Encode};
+use frame_support::Parameter;
+#[cfg(feature = "std")]
+use serde::{Deserialize, Serialize};
+use sp_runtime::{DispatchError, DispatchResult, RuntimeDebug};
 use sp_std::result;
 
 /// End result of a proposal being closed.
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug)]
+#[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 pub enum ProposalResult {
     Passing,
     Failing,
@@ -35,7 +39,7 @@ pub enum ProposalResult {
 pub trait StandardizedVoting {
     /// How we represent the a proposal as passed to the underlying functions.
     /// This can be used to fetch any state associated to the proposal.
-    type ProposalID;
+    type ProposalId;
 
     /// How the parameters of a voting system are represented and set at the
     /// organization level.
@@ -50,16 +54,16 @@ pub trait StandardizedVoting {
     /// A proposal is being created. Handle any eventual registration and trigger
     /// an error if any preconditions are not met. Shall be called before any other
     /// state changes so that it is safe to fail here.
-    fn initiate(proposal: Self::ProposalID, parameters: Self::Parameters) -> DispatchResult;
+    fn initiate(proposal: Self::ProposalId, parameters: Self::Parameters) -> DispatchResult;
 
     /// Special function to handle the case when a proposal is being vetoed. This
     /// should clean any storage or state associated to the given proposal.
-    fn veto(proposal: Self::ProposalID) -> DispatchResult;
+    fn veto(proposal: Self::ProposalId) -> DispatchResult;
 
     /// Handle the reception of a new vote for the given proposal. This should mutate any
     /// state linked to the proposal accordingly.
     fn vote(
-        proposal: Self::ProposalID,
+        proposal: Self::ProposalId,
         voter: &Self::AccountId,
         data: Self::VoteData,
     ) -> DispatchResult;
@@ -67,58 +71,34 @@ pub trait StandardizedVoting {
     /// Handle the closure of a proposal or return an error if it cannot be closed because
     /// some conditions are not met. Shall return an indicator on wether the proposal is
     /// passing (should be executed) or not (should be discarded).
-    fn close(proposal: Self::ProposalID) -> result::Result<ProposalResult, DispatchError>;
+    fn close(proposal: Self::ProposalId) -> result::Result<ProposalResult, DispatchError>;
 }
 
-/// Called by the host pallet to let the developer implement custom voting actions
-/// according to its own model.
-pub trait VotingHooks {
+/// Used to route votes and related actions between different voting system implementations.
+pub trait VotingRouter {
     type AccountId;
-    type BlockNumber;
-    type Currencies: ReservableCurrencies<Self::AccountId>;
-    type Data;
-    type OrganizationId;
-    type VotingSystem;
+    type VotingSystemId: Parameter;
+    type Parameters: Parameter;
+    type ProposalId: Parameter;
+    type VoteData: Parameter;
 
-    /// Somebody is creating a proposal. Called before any state changes. This
-    /// is where you have the ability to try and reserve a certain amount of coins
-    /// for instance.
-    fn on_create_proposal(
-        voting_system: Self::VotingSystem,
-        creator: &Self::AccountId,
-        current_block: Self::BlockNumber,
-    ) -> (DispatchResult, Self::Data);
-
-    /// A proposal is going to be vetoed. Called before any state changes. This is
-    /// where you have the possibility to free any funds reserved.
-    fn on_veto_proposal(voting_system: Self::VotingSystem, data: Self::Data) -> DispatchResult;
-
-    /// Handle an incoming vote. Returns a result and some updated metadata.
-    fn on_decide_on_proposal(
-        voting_system: Self::VotingSystem,
-        data: Self::Data,
-        voter: &Self::AccountId,
-        power: <Self::Currencies as Currencies<Self::AccountId>>::Balance,
-        in_support: bool,
-    ) -> (DispatchResult, Self::Data);
-
-    /// Return wether we should enable calls to closing the proposal. Closing a proposal
-    /// means executing it if it passed and then cleaning the storage.
-    fn can_close(
-        voting_system: Self::VotingSystem,
-        data: Self::Data,
-        current_block: Self::BlockNumber,
-    ) -> bool;
-
-    /// Return if a proposal is passing. If it is, it will likely be executed in the same
-    /// transaction and then closed.
-    fn passing(voting_system: Self::VotingSystem, data: Self::Data) -> bool;
-
-    /// Called before cleaning the storage related to a proposal and before its eventual
-    /// execution. Last chance to prevent it from running!
-    fn on_close_proposal(
-        voting_system: Self::VotingSystem,
-        data: Self::Data,
-        executed: bool,
+    fn initiate(
+        voting_system: Self::VotingSystemId,
+        proposal: Self::ProposalId,
+        parameters: Self::Parameters,
     ) -> DispatchResult;
+
+    fn veto(voting_system: Self::VotingSystemId, proposal: Self::ProposalId) -> DispatchResult;
+
+    fn vote(
+        voting_system: Self::VotingSystemId,
+        proposal: Self::ProposalId,
+        voter: &Self::AccountId,
+        data: Self::VoteData,
+    ) -> DispatchResult;
+
+    fn close(
+        voting_system: Self::VotingSystemId,
+        proposal: Self::ProposalId,
+    ) -> result::Result<ProposalResult, DispatchError>;
 }

@@ -57,17 +57,10 @@ impl crate::WeightInfo for () {
             .saturating_add(DbWeight::get().writes((1 as Weight).saturating_mul(b as Weight)))
             .saturating_add(DbWeight::get().writes((1 as Weight).saturating_mul(c as Weight)))
     }
-    fn decide_on_proposal_favorable(b: u32, c: u32) -> Weight {
+    fn decide_on_proposal(b: u32) -> Weight {
         (126_842_000 as Weight)
             .saturating_add((1_272_000 as Weight).saturating_mul(b as Weight))
-            .saturating_add((1_280_000 as Weight).saturating_mul(c as Weight))
-            .saturating_add(DbWeight::get().reads(7 as Weight))
-            .saturating_add(DbWeight::get().writes(3 as Weight))
-    }
-    fn decide_on_proposal_against(b: u32, c: u32) -> Weight {
-        (115_653_000 as Weight)
-            .saturating_add((1_259_000 as Weight).saturating_mul(b as Weight))
-            .saturating_add((1_436_000 as Weight).saturating_mul(c as Weight))
+            .saturating_add((1_280_000 as Weight).saturating_mul(b as Weight))
             .saturating_add(DbWeight::get().reads(7 as Weight))
             .saturating_add(DbWeight::get().writes(3 as Weight))
     }
