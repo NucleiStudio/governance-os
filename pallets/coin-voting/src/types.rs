@@ -18,12 +18,16 @@
 
 use codec::{Decode, Encode};
 use governance_os_support::impl_enum_default;
+#[cfg(feature = "std")]
+use serde::{Deserialize, Serialize};
 use sp_runtime::{
     traits::{IntegerSquareRoot, Saturating},
     Perbill, RuntimeDebug,
 };
+use sp_std::vec::Vec;
 
 #[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug, Default)]
+#[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 pub struct VotingParameters<BlockNumber, CurrencyId> {
     pub ttl: BlockNumber,
     pub voting_currency: CurrencyId,
@@ -34,18 +38,22 @@ pub struct VotingParameters<BlockNumber, CurrencyId> {
 }
 
 #[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug, Copy)]
+#[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 pub enum VoteCountingStrategy {
     Simple,
     Quadratic,
 }
 impl_enum_default!(VoteCountingStrategy, Simple);
 
+#[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug)]
+#[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 pub struct VoteData<Balance> {
     pub in_support: bool,
     pub power: Balance,
 }
 
 #[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug, Default)]
+#[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 pub struct ProposalState<Balance, BlockNumber, CurrencyId, LockIdentifier> {
     pub parameters: VotingParameters<BlockNumber, CurrencyId>,
     pub total_favorable: Balance,

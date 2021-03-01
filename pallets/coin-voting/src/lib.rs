@@ -30,7 +30,7 @@ use sp_runtime::{
     traits::{Saturating, Zero},
     DispatchError, DispatchResult,
 };
-use sp_std::vec::Vec;
+use sp_std::{vec::Vec, prelude::*};
 use types::{ProposalState, VoteCountingStrategy};
 
 #[cfg(test)]

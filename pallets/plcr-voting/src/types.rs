@@ -17,9 +17,12 @@
 //! Type definitions for the coin based voting pallet.
 
 use codec::{Decode, Encode};
+#[cfg(feature = "std")]
+use serde::{Deserialize, Serialize};
 use sp_runtime::{traits::Saturating, Perbill, RuntimeDebug};
 
 #[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug, Default)]
+#[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 pub struct VotingParameters<BlockNumber, CurrencyId> {
     pub commit_duration: BlockNumber,
     pub reveal_duration: BlockNumber,
@@ -30,6 +33,7 @@ pub struct VotingParameters<BlockNumber, CurrencyId> {
 }
 
 #[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug, Default)]
+#[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 pub struct ProposalState<Balance, BlockNumber, CurrencyId> {
     pub parameters: VotingParameters<BlockNumber, CurrencyId>,
     pub revealed_against: Balance,
@@ -50,6 +54,7 @@ impl<Balance: Saturating + Copy, BlockNumber, CurrencyId>
 }
 
 #[derive(Encode, Decode, Clone, Copy, PartialEq, Eq, RuntimeDebug)]
+#[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 pub enum VoteData<Balance, Hash> {
     Commit(Hash),
     Reveal(Balance, bool, u64), // Coins locked, support, salt

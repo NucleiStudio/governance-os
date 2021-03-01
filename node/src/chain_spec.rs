@@ -22,7 +22,6 @@ use governance_os_runtime::{
     AuraConfig, AuraId, BylawsConfig, GenesisConfig, GrandpaConfig, GrandpaId, NativeCurrencyId,
     OrganizationsConfig, SystemConfig, Tokens, TokensConfig, WASM_BINARY,
 };
-use governance_os_voting::{CoinBasedVotingParameters, VotingSystems};
 use sc_service::ChainType;
 use sp_core::{sr25519, Pair, Public};
 use sp_runtime::traits::{IdentifyAccount, Verify};
