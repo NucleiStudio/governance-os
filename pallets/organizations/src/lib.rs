@@ -37,8 +37,6 @@ use sp_runtime::{
 };
 use sp_std::{boxed::Box, prelude::Vec};
 
-#[cfg(feature = "runtime-benchmarks")]
-mod benchmarking;
 mod default_weights;
 mod details;
 #[cfg(test)]
