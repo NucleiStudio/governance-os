@@ -32,11 +32,13 @@ use sp_runtime::{
     DispatchError, DispatchResult,
 };
 use sp_std::prelude::*;
-use types::{ProposalState, VoteData, VotingParameters};
+use types::ProposalState;
 
 #[cfg(test)]
 mod tests;
 mod types;
+
+pub use types::{VoteData, VotingParameters};
 
 pub const PLCR_VOTING_LOCK_ID: LockIdentifier = *b"plcrvote";
 
@@ -93,12 +95,12 @@ decl_module! {
 }
 
 impl<T: Trait> StandardizedVoting for Module<T> {
-    type ProposalID = T::Hash;
+    type ProposalId = T::Hash;
     type Parameters = VotingParameters<T::BlockNumber, CurrencyIdOf<T>>;
     type VoteData = VoteData<BalanceOf<T>, T::Hash>;
     type AccountId = T::AccountId;
 
-    fn initiate(proposal: Self::ProposalID, parameters: Self::Parameters) -> DispatchResult {
+    fn initiate(proposal: Self::ProposalId, parameters: Self::Parameters) -> DispatchResult {
         Proposals::<T>::try_mutate_exists(proposal, |maybe_existing_state| -> DispatchResult {
             if maybe_existing_state.is_some() {
                 // duplicate detected, we do not want to erase any pending vote's
@@ -121,12 +123,12 @@ impl<T: Trait> StandardizedVoting for Module<T> {
         Ok(())
     }
 
-    fn veto(proposal: Self::ProposalID) -> DispatchResult {
+    fn veto(proposal: Self::ProposalId) -> DispatchResult {
         Self::finalize_proposal(proposal, Self::proposals(proposal))
     }
 
     fn vote(
-        proposal: Self::ProposalID,
+        proposal: Self::ProposalId,
         voter: &Self::AccountId,
         data: Self::VoteData,
     ) -> DispatchResult {
@@ -169,7 +171,7 @@ impl<T: Trait> StandardizedVoting for Module<T> {
         Ok(())
     }
 
-    fn close(proposal: Self::ProposalID) -> Result<ProposalResult, DispatchError> {
+    fn close(proposal: Self::ProposalId) -> Result<ProposalResult, DispatchError> {
         let state = Self::proposals(proposal);
         let proposal_expired = Self::now()
             > state

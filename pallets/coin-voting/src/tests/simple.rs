@@ -541,15 +541,6 @@ fn close_passing_early() {
                 }
             ));
 
-            assert_ok!(<CoinVoting as StandardizedVoting>::vote(
-                mock_hash,
-                &BOB,
-                VoteData {
-                    in_support: false,
-                    power: 50
-                }
-            ));
-
             assert_eq!(
                 CoinVoting::close(mock_hash).expect("proposal shall pass"),
                 ProposalResult::Passing

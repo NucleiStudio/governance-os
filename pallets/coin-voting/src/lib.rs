@@ -31,11 +31,13 @@ use sp_runtime::{
     DispatchError, DispatchResult,
 };
 use sp_std::vec::Vec;
-use types::{ProposalState, VoteCountingStrategy, VoteData, VotingParameters};
+use types::{ProposalState, VoteCountingStrategy};
 
 #[cfg(test)]
 mod tests;
 mod types;
+
+pub use types::{VoteData, VotingParameters};
 
 pub const COIN_VOTING_LOCK_ID: LockIdentifier = *b"coinvote";
 
@@ -98,12 +100,12 @@ decl_module! {
 }
 
 impl<T: Trait> StandardizedVoting for Module<T> {
-    type ProposalID = T::Hash;
+    type ProposalId = T::Hash;
     type Parameters = VotingParameters<T::BlockNumber, CurrencyIdOf<T>>;
     type VoteData = VoteData<BalanceOf<T>>;
     type AccountId = T::AccountId;
 
-    fn initiate(proposal: Self::ProposalID, parameters: Self::Parameters) -> DispatchResult {
+    fn initiate(proposal: Self::ProposalId, parameters: Self::Parameters) -> DispatchResult {
         Proposals::<T>::try_mutate_exists(proposal, |maybe_existing_state| -> DispatchResult {
             if maybe_existing_state.is_some() {
                 // duplicate detected, we do not want to erase any pending vote's
@@ -128,7 +130,7 @@ impl<T: Trait> StandardizedVoting for Module<T> {
     }
 
     fn vote(
-        proposal: Self::ProposalID,
+        proposal: Self::ProposalId,
         voter: &Self::AccountId,
         data: Self::VoteData,
     ) -> DispatchResult {
@@ -169,12 +171,12 @@ impl<T: Trait> StandardizedVoting for Module<T> {
         Ok(())
     }
 
-    fn veto(proposal: Self::ProposalID) -> DispatchResult {
+    fn veto(proposal: Self::ProposalId) -> DispatchResult {
         // note the use of take instead of get which also deletes the storage
         Self::unlock(Proposals::<T>::take(proposal).locks, proposal)
     }
 
-    fn close(proposal: Self::ProposalID) -> Result<ProposalResult, DispatchError> {
+    fn close(proposal: Self::ProposalId) -> Result<ProposalResult, DispatchError> {
         let state = Proposals::<T>::get(proposal);
 
         let total_supply = T::Currencies::total_issuance(state.parameters.voting_currency);
