@@ -16,10 +16,10 @@
 
 use crate::{CoinVoting, PlcrVoting};
 use codec::{Decode, Encode};
-use governance_os_pallet_coin_voting::{
+pub use governance_os_pallet_coin_voting::{
     VoteData as CoinVoteData, VotingParameters as CoinVotingParameters,
 };
-use governance_os_pallet_plcr_voting::{
+pub use governance_os_pallet_plcr_voting::{
     VoteData as PlcrVoteData, VotingParameters as PlcrVotingParameters,
 };
 use governance_os_primitives::{AccountId, Balance, BlockNumber, CurrencyId, Hash};

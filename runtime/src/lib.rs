@@ -56,6 +56,9 @@ pub use pallets_economics::{NativeCurrency, NativeCurrencyId};
 #[cfg(feature = "std")]
 pub use version::native_version;
 pub use version::VERSION;
+pub use voting_router::{
+    CoinVotingParameters, PlcrVotingParameters, RuntimeVotingParameters, RuntimeVotingSystemId,
+};
 
 construct_runtime!(
     pub enum Runtime

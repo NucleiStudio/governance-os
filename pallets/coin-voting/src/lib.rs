@@ -30,14 +30,14 @@ use sp_runtime::{
     traits::{Saturating, Zero},
     DispatchError, DispatchResult,
 };
-use sp_std::{vec::Vec, prelude::*};
-use types::{ProposalState, VoteCountingStrategy};
+use sp_std::{prelude::*, vec::Vec};
+use types::ProposalState;
 
 #[cfg(test)]
 mod tests;
 mod types;
 
-pub use types::{VoteData, VotingParameters};
+pub use types::{VoteCountingStrategy, VoteData, VotingParameters};
 
 pub const COIN_VOTING_LOCK_ID: LockIdentifier = *b"coinvote";
 

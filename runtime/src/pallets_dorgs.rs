@@ -16,7 +16,7 @@
 
 use crate::{voting_router::RuntimeVotingRouter, Bylaws, Call, Event, Runtime, Tokens};
 use frame_support::parameter_types;
-use governance_os_primitives::{AccountId, Balance, BlockNumber, CurrencyId, Role};
+use governance_os_primitives::Role;
 
 parameter_types! {
     pub const MaxRoles: u32 = 50;
