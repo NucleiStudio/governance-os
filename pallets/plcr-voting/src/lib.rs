@@ -55,12 +55,13 @@ type CurrencyIdOf<T> =
     <<T as Trait>::Currencies as Currencies<<T as frame_system::Trait>::AccountId>>::CurrencyId;
 type PlcrProposalStateOf<T> =
     ProposalState<BalanceOf<T>, <T as frame_system::Trait>::BlockNumber, CurrencyIdOf<T>>;
+type PlcrVoteData<Balance, Hash> = VoteData<Balance, Hash>;
 
 decl_storage! {
     trait Store for Module<T: Trait> as PlcrVoting {
         pub Proposals get(fn proposals): map hasher(blake2_128_concat) T::Hash => PlcrProposalStateOf<T>;
         pub Locks get(fn locks): map hasher(blake2_128_concat) (CurrencyIdOf<T>, T::AccountId) => Vec<(T::Hash, BalanceOf<T>)>;
-        pub Votes get(fn votes): double_map hasher(blake2_128_concat) T::Hash, hasher(blake2_128_concat) T::AccountId => VoteData<BalanceOf<T>, T::Hash>;
+        pub Votes get(fn votes): double_map hasher(blake2_128_concat) T::Hash, hasher(blake2_128_concat) T::AccountId => PlcrVoteData<BalanceOf<T>, T::Hash>;
     }
 }
 
