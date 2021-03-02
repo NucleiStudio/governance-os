@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+use governance_os_primitives::Balance;
 use sc_cli::RunCmd;
 use structopt::StructOpt;
 
@@ -24,6 +25,24 @@ pub struct Cli {
 
     #[structopt(flatten)]
     pub run: RunCmd,
+}
+
+/// The `generate-plcr-votes` command used to generate PLCR vote commit and reveal
+/// messages.
+#[derive(Debug, StructOpt)]
+pub struct GeneratePlcrVotesCmd {
+    /// How much "power" is staked in favor or against the proposal.
+    #[structopt(long = "power")]
+    pub power: Balance,
+
+    /// Wether we are staking in support or against the proposal.
+    #[structopt(long = "in-support")]
+    pub support: bool,
+
+    /// An arbitrary number to use as a salt to avoid identifying
+    /// votes.
+    #[structopt(long = "salt")]
+    pub salt: u64,
 }
 
 #[derive(Debug, StructOpt)]
@@ -52,4 +71,7 @@ pub enum Subcommand {
     /// The custom benchmark subcommmand benchmarking runtime pallets.
     #[structopt(name = "benchmark", about = "Benchmark runtime pallets.")]
     Benchmark(frame_benchmarking_cli::BenchmarkCmd),
+
+    /// Generate a set of votes for PLCR voting.
+    GeneratePlcrVotes(GeneratePlcrVotesCmd),
 }

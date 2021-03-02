@@ -14,13 +14,6 @@
  * limitations under the License.
  */
 
-use crate::ProposalMetadata;
-use governance_os_support::testing::primitives::{AccountId, Balance, BlockNumber};
-
-#[test]
-fn default_sets_everything_to_zero() {
-    let data: ProposalMetadata<AccountId, Balance, BlockNumber> = Default::default();
-    assert_eq!(data.against, 0);
-    assert_eq!(data.favorable, 0);
-    assert_eq!(data.votes.len(), 0);
-}
+mod mock;
+mod quadratic;
+mod simple;

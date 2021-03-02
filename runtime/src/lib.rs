@@ -48,6 +48,7 @@ mod pallets_core;
 mod pallets_dorgs;
 mod pallets_economics;
 mod version;
+mod voting_router;
 mod weights;
 
 pub use pallets_consensus::{AuraId, GrandpaId, SessionKeys};
@@ -55,6 +56,9 @@ pub use pallets_economics::{NativeCurrency, NativeCurrencyId};
 #[cfg(feature = "std")]
 pub use version::native_version;
 pub use version::VERSION;
+pub use voting_router::{
+    CoinVotingParameters, PlcrVotingParameters, RuntimeVotingParameters, RuntimeVotingSystemId,
+};
 
 construct_runtime!(
     pub enum Runtime
@@ -79,6 +83,8 @@ construct_runtime!(
 
         // dOrgs
         Bylaws: governance_os_pallet_bylaws::{Module, Call, Storage, Config<T>, Event<T>},
+        CoinVoting: governance_os_pallet_coin_voting::{Module, Call, Storage},
+        PlcrVoting: governance_os_pallet_plcr_voting::{Module, Call, Storage, Event<T>},
         Organizations: governance_os_pallet_organizations::{Module, Call, Storage, Config<T>, Event<T>},
     }
 );
@@ -252,7 +258,7 @@ impl_runtime_apis! {
 
             add_benchmark!(params, batches, frame_system, SystemBench::<Runtime>);
             add_benchmark!(params, batches, governance_os_pallet_bylaws, Bylaws);
-            add_benchmark!(params, batches, governance_os_pallet_organizations, Organizations);
+            //add_benchmark!(params, batches, governance_os_pallet_organizations, Organizations);
             add_benchmark!(params, batches, governance_os_pallet_tokens, Tokens);
             add_benchmark!(params, batches, pallet_grandpa, Grandpa);
             add_benchmark!(params, batches, pallet_timestamp, Timestamp);

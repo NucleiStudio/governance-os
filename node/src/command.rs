@@ -25,7 +25,9 @@ use governance_os_runtime::Block;
 use log::info;
 use sc_cli::{ChainSpec, Role, RuntimeVersion, SubstrateCli};
 use sc_service::{ChainSpec as ServiceChainSpec, PartialComponents};
+use sp_api::HashT;
 use sp_core::crypto::Ss58Codec;
+use sp_runtime::traits::BlakeTwo256;
 
 impl SubstrateCli for Cli {
     fn impl_name() -> String {
@@ -150,6 +152,13 @@ pub fn run() -> sc_cli::Result<()> {
 				You can enable it with `--features runtime-benchmarks`."
                     .into())
             }
+        }
+        Some(Subcommand::GeneratePlcrVotes(args)) => {
+            let hashed = BlakeTwo256::hash_of(&(args.power, args.support, args.salt));
+            println!("Commit: {:#x}", hashed);
+            println!("Reveal: {}, {}, {}", args.power, args.support, args.salt);
+
+            Ok(())
         }
         None => {
             let runner = cli.create_runner(&cli.run)?;

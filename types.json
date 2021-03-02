@@ -10,12 +10,25 @@
     "data": "Null"
   },
   "Address": "AccountId",
-  "CoinBasedVotingParameters": {
+  "CoinProposalState": {
+    "parameters": "CoinVotingParameters",
+    "total_favorable": "Balance",
+    "total_against": "Balance",
+    "initialized": "bool",
+    "locks": "Vec<LockIdentifier>",
+    "created_on": "BlockNumber"
+  },
+  "CoinProposalStateOf": "CoinProposalState",
+  "CoinVoteData": {
+    "in_support": "bool",
+    "power": "Balance"
+  },
+  "CoinVotingParameters": {
+    "ttl": "BlockNumber",
     "voting_currency": "CurrencyId",
-    "creation_fee": "Balance",
     "min_quorum": "u32",
     "min_participation": "u32",
-    "ttl": "BlockNumber"
+    "vote_counting_strategy": "VoteCountingStrategy"
   },
   "CurrencyDetails": {
     "owner": "AccountId",
@@ -27,29 +40,52 @@
       "Custom": "u32"
     }
   },
+  "CurrencyIdOf": "CurrencyId",
+  "LockData": "(Hash, bool, Balance, VoteCountingStrategy)",
+  "LockDataOf": "LockData",
+  "LockIdentifier": "(CurrencyId, AccountId)",
+  "LockIdentifierOf": "LockIdentifier",
   "LookupSource": "AccountId",
   "OrganizationsCounter": "u32",
   "OrganizationDetails": {
     "executors": "Vec<AccountId>",
-    "voting": "VotingSystem"
+    "voting": "(RuntimeVotingSystemId, RuntimeVotingParameters)"
   },
   "OrganizationDetailsOf": "OrganizationDetails",
+  "PlcrProposalState": {
+    "parameters": "PlcrVotingParameters",
+    "revealed_against": "Balance",
+    "revealed_favorable": "Balance",
+    "created_on": "BlockNumber"
+  },
+  "PlcrProposalStateOf": "PlcrProposalState",
+  "PlcrVoteData": {
+    "_enum": {
+      "Commit": "(Hash)",
+      "Reveal": "(Balance, bool, u64)"
+    }
+  },
+  "PlcrVotingParameters": {
+    "commit_duration": "BlockNumber",
+    "reveal_duration": "BlockNumber",
+    "voting_currency": "CurrencyId",
+    "min_quorum": "u32",
+    "min_participation": "u32"
+  },
   "Proposal": {
     "org": "AccountId",
     "call": "Vec<u8>",
-    "metadata": "ProposalMetadata",
-    "voting": "VotingSystem"
+    "voting": "RuntimeVotingSystemId"
   },
   "ProposalId": "Hash",
   "ProposalIdOf": "ProposalId",
-  "ProposalMetadata": {
-    "votes": "BTreeMap<AccountId, (Balance, bool)>",
-    "favorable": "Balance",
-    "against": "Balance",
-    "creator": "AccountId",
-    "expiry": "BlockNumber"
-  },
   "ProposalOf": "Proposal",
+  "ProposalResult": {
+    "_enum": {
+      "Passing": "Null",
+      "Failing": "Null"
+    }
+  },
   "Role": {
     "_enum": {
       "ApplyAsOrganization": "AccountId",
@@ -61,10 +97,30 @@
       "TransferCurrency": "CurrencyId"
     }
   },
-  "VotingSystem": {
+  "RuntimeVoteData": {
     "_enum": {
-      "None": "Null",
-      "CoinBased": "CoinBasedVotingParameters"
+      "CoinVoting": "CoinVoteData",
+      "PlcrVoting": "PlcrVoteData"
     }
-  }
+  },
+  "RuntimeVotingParameters": {
+    "_enum": {
+      "CoinVoting": "CoinVotingParameters",
+      "PlcrVoting": "PlcrVotingParameters"
+    }
+  },
+  "RuntimeVotingSystemId": {
+    "_enum": {
+      "CoinVoting": "Null",
+      "PlcrVoting": "Null"
+    }
+  },
+  "VoteCountingStrategy": {
+    "_enum": {
+      "Simple": "Null",
+      "Quadratic": "Null"
+    }
+  },
+  "VoteData": "RuntimeVoteData",
+  "VoteDataOf": "VoteData"
 }

@@ -15,14 +15,15 @@
  */
 
 use crate::helpers::core_org;
+use governance_os_pallet_coin_voting::VoteCountingStrategy;
 use governance_os_pallet_organizations::OrganizationDetails;
 use governance_os_pallet_tokens::CurrencyDetails;
-use governance_os_primitives::{AccountId, Balance, BlockNumber, CurrencyId, Role, Signature};
+use governance_os_primitives::{AccountId, CurrencyId, Role, Signature};
 use governance_os_runtime::{
-    AuraConfig, AuraId, BylawsConfig, GenesisConfig, GrandpaConfig, GrandpaId, NativeCurrencyId,
-    OrganizationsConfig, SystemConfig, Tokens, TokensConfig, WASM_BINARY,
+    AuraConfig, AuraId, BylawsConfig, CoinVotingParameters, GenesisConfig, GrandpaConfig,
+    GrandpaId, NativeCurrencyId, OrganizationsConfig, RuntimeVotingParameters,
+    RuntimeVotingSystemId, SystemConfig, TokensConfig, WASM_BINARY,
 };
-use governance_os_voting::{CoinBasedVotingParameters, VotingSystems};
 use sc_service::ChainType;
 use sp_core::{sr25519, Pair, Public};
 use sp_runtime::traits::{IdentifyAccount, Verify};
@@ -60,12 +61,7 @@ fn testnet_genesis(
     currencies: Option<Vec<(CurrencyId, CurrencyDetails<AccountId>)>>,
     roles: Option<Vec<(Role, Option<AccountId>)>>,
     organizations: Option<
-        Vec<
-            OrganizationDetails<
-                AccountId,
-                VotingSystems<Balance, CurrencyId, BlockNumber, Tokens, AccountId>,
-            >,
-        >,
+        Vec<OrganizationDetails<AccountId, (RuntimeVotingSystemId, RuntimeVotingParameters)>>,
     >,
 ) -> GenesisConfig {
     let chain_currencies = currencies.unwrap_or(vec![(
@@ -82,13 +78,16 @@ fn testnet_genesis(
     ]);
     let chain_orgs = organizations.unwrap_or(vec![OrganizationDetails {
         executors: vec![get_account_id_from_seed::<sr25519::Public>("Alice")],
-        voting: VotingSystems::CoinBased(CoinBasedVotingParameters {
-            voting_currency: CurrencyId::Native,
-            creation_fee: 10,
-            min_quorum: 50,
-            min_participation: 33,
-            ttl: 50, // Short TTL for testing
-        }),
+        voting: (
+            RuntimeVotingSystemId::CoinVoting,
+            RuntimeVotingParameters::CoinVoting(CoinVotingParameters {
+                ttl: 10,
+                voting_currency: NativeCurrencyId::get(),
+                min_quorum: 50,
+                min_participation: 33,
+                vote_counting_strategy: VoteCountingStrategy::Simple,
+            }),
+        ),
     }]);
 
     GenesisConfig {

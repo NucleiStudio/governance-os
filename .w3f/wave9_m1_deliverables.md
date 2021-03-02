@@ -1,0 +1,13 @@
+| Number | Deliverable | Link | Notes |
+|-|-|-|-|
+| 0a. | License | [../LICENSE](../LICENSE) | We chose the Apache 2.0 license as initially agreed. |
+| 0b. | Documentation | https://nucleistudio.github.io/governance-os/governance_os_node/index.html | The code contains inline rust documentation. Additionally, we use a github action to auto publish it. |
+| 0c. | Testing Guide | [wave9_m1_testing.md](wave9_m1_testing.md) | The guide should cover any manual testing needs for you to confirm the functionalities of the pallets. When it comes to running our unit tests a simple `cargo test --all` should be enough. |
+| 1. | `coin-voting` pallet | [../pallets/coin-voting](../pallets/coin-voting) | This pallet is in charge of handling direct coin voting operations. When instantiating an organization with this voting system one can choose between two vote counting strategies: `Simple` and `Quadratic`. The second one counts votes in a quadratic way to create a quadratic voting system. The firts one could thought of as a standard liquid democracy type system. |
+| 2. | `plcr-voting` pallet | [../pallets/plcr-voting](../pallets/plcr-voting) | This pallet is in charge of managing a Partial Lock Commit Reveal type of voting sysem where people first have to "commit" their votes before revealing them later on. This is especially efficient when trying to prevent collusion between the participants. |
+| 3. | Patches | N/A | We have streamlined the code in the `organizations` pallet and the node runtime to support the new voting pallets. We have added the concept of a `VotingRouter` to route proposals and votes to the right pallets. |
+| 4. | Demonstration Chain | [../runtime](../runtime) and [../node](../node) | We tried to keep the runtime as minimal as possible; it doesn't rely on the `balances` pallet which is **fully replaced** by our `tokens` pallet. We have also defined some default bylaws roles such as `Root` or `CreateCurrencies`. You may need to use the types available in [../types.json](../types.json) when testing. |
+| 5. | Dockerfile | [../Dockerfile](../Dockerfile) | You can build the container as usual. We also have a public image being built thanks to a little overnight [automation system](https://github.com/ETeissonniere/substrate-nodeops/), you can grab the public image under the name [`eteissonniere/governance-os`](https://hub.docker.com/r/eteissonniere/governance-os). |
+
+
+> **Notes**: we have discovered that the two voting pallets don't necessarily share similar code but have similar procedures and structures. Later on it may make sense to create a rust macro to make it simpler to write those.

@@ -55,7 +55,6 @@ impl<T: Trait> Currencies<T::AccountId> for Module<T> {
         mutation.add_free_balance(who, amount)?;
         mutation.apply()?;
 
-        Self::deposit_event(RawEvent::CurrencyMinted(currency_id, who.clone(), amount));
         Ok(())
     }
 
@@ -243,6 +242,9 @@ impl<T: Trait> Module<T> {
                     }
                 }
 
+                // Locks do not impact total issuance
+                mutation.forget_issuance_changes();
+
                 // Update balance
                 mutation.apply()?;
 
@@ -256,6 +258,10 @@ impl<T: Trait> Module<T> {
 }
 
 impl<T: Trait> LockableCurrencies<T::AccountId> for Module<T> {
+    fn locked_balance(currency_id: Self::CurrencyId, who: &T::AccountId) -> Self::Balance {
+        Self::get_currency_account(currency_id, who).frozen
+    }
+
     fn set_lock(
         currency_id: Self::CurrencyId,
         lock_id: LockIdentifier,

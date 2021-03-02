@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-use crate::{Bylaws, Call, Event, Runtime, Tokens};
+use crate::{voting_router::RuntimeVotingRouter, Bylaws, Call, Event, Runtime, Tokens};
 use frame_support::parameter_types;
-use governance_os_primitives::{AccountId, Balance, BlockNumber, CurrencyId, Role};
-use governance_os_voting::{ProposalMetadata, VotingSystems};
+use governance_os_primitives::Role;
 
 parameter_types! {
     pub const MaxRoles: u32 = 50;
@@ -29,6 +28,15 @@ impl governance_os_pallet_bylaws::Trait for Runtime {
     type WeightInfo = ();
     type MaxRoles = MaxRoles;
     type RoleBuilder = Role;
+}
+
+impl governance_os_pallet_coin_voting::Trait for Runtime {
+    type Currencies = Tokens;
+}
+
+impl governance_os_pallet_plcr_voting::Trait for Runtime {
+    type Event = Event;
+    type Currencies = Tokens;
 }
 
 parameter_types! {
@@ -44,11 +52,7 @@ impl governance_os_pallet_organizations::Trait for Runtime {
     type Call = Call;
     type RoleManager = Bylaws;
     type RoleBuilder = Role;
-    type Currencies = Tokens;
-    type VotingSystem =
-        VotingSystems<Balance, CurrencyId, BlockNumber, Self::Currencies, AccountId>;
-    type ProposalMetadata = ProposalMetadata<AccountId, Balance, BlockNumber>;
-    type VotingHooks = VotingSystems<Balance, CurrencyId, BlockNumber, Self::Currencies, AccountId>;
+    type VotingRouter = RuntimeVotingRouter;
     type MaxVotes = MaxVotes;
     type MaxExecutors = MaxExecutors;
     type WeightInfo = ();

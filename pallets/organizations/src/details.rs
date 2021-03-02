@@ -43,9 +43,8 @@ impl<AccountId: Ord, VotingSystem> OrganizationDetails<AccountId, VotingSystem> 
 /// Represent a proposal as stored by the pallet.
 #[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug)]
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
-pub struct Proposal<Call, Metadata, OrganizationId, VotingSystem> {
+pub struct Proposal<Call, OrganizationId, VotingSystem> {
     pub org: OrganizationId,
     pub call: Call,
-    pub metadata: Metadata,
     pub voting: VotingSystem,
 }
