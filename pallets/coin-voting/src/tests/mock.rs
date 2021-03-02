@@ -23,7 +23,6 @@ use governance_os_support::{
     mock_runtime_with_currencies,
     testing::{ALICE, BOB, TEST_TOKEN_ID, TEST_TOKEN_OWNER},
 };
-use sp_runtime::Perbill;
 
 mock_runtime_with_currencies!(Test);
 
@@ -88,8 +87,8 @@ pub fn mock_voting_parameters() -> VotingParameters<BlockNumber, CurrencyIdOf<Te
     VotingParameters {
         voting_currency: TEST_TOKEN_ID,
         ttl: 10,
-        min_quorum: Perbill::from_percent(0),
-        min_participation: Perbill::from_percent(0),
+        min_quorum: 0,
+        min_participation: 0,
         vote_counting_strategy: VoteCountingStrategy::Simple,
     }
 }
@@ -98,8 +97,8 @@ pub fn mock_quadratic_voting_parameters() -> VotingParameters<BlockNumber, Curre
     VotingParameters {
         voting_currency: TEST_TOKEN_ID,
         ttl: 10,
-        min_quorum: Perbill::from_percent(0),
-        min_participation: Perbill::from_percent(0),
+        min_quorum: 0,
+        min_participation: 0,
         vote_counting_strategy: VoteCountingStrategy::Quadratic,
     }
 }

@@ -25,7 +25,6 @@ use governance_os_support::{
     traits::{LockableCurrencies, ProposalResult, StandardizedVoting},
 };
 use sp_core::H256;
-use sp_runtime::Perbill;
 
 #[test]
 fn initialize_registers_proposal_hash() {
@@ -469,8 +468,8 @@ fn close_error_if_early() {
                 VotingParameters {
                     voting_currency: TEST_TOKEN_ID,
                     ttl: CoinVoting::now() + 10,
-                    min_quorum: Perbill::from_percent(33),
-                    min_participation: Perbill::from_percent(50),
+                    min_quorum: 33,
+                    min_participation: 50,
                     vote_counting_strategy: VoteCountingStrategy::Simple
                 }
             ));
@@ -498,8 +497,8 @@ fn close_failing() {
                 VotingParameters {
                     voting_currency: TEST_TOKEN_ID,
                     ttl: CoinVoting::now() + 10,
-                    min_quorum: Perbill::from_percent(33),
-                    min_participation: Perbill::from_percent(50),
+                    min_quorum: 33,
+                    min_participation: 50,
                     vote_counting_strategy: VoteCountingStrategy::Simple
                 }
             ));
@@ -526,8 +525,8 @@ fn close_passing_early() {
                 VotingParameters {
                     voting_currency: TEST_TOKEN_ID,
                     ttl: CoinVoting::now() + 10,
-                    min_quorum: Perbill::from_percent(33),
-                    min_participation: Perbill::from_percent(50),
+                    min_quorum: 33,
+                    min_participation: 50,
                     vote_counting_strategy: VoteCountingStrategy::Simple
                 }
             ));

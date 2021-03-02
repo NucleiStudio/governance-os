@@ -23,7 +23,7 @@ use governance_os_support::{
     mock_runtime_with_currencies,
     testing::{ALICE, BOB, TEST_TOKEN_ID, TEST_TOKEN_OWNER},
 };
-use sp_runtime::{traits::Hash, Perbill};
+use sp_runtime::traits::Hash;
 
 mock_runtime_with_currencies!(Test);
 
@@ -90,8 +90,8 @@ pub fn mock_parameters() -> VotingParameters<BlockNumber, CurrencyIdOf<Test>> {
         commit_duration: 10,
         reveal_duration: 10,
         voting_currency: TEST_TOKEN_ID,
-        min_quorum: Perbill::from_percent(50),
-        min_participation: Perbill::from_percent(33),
+        min_quorum: 50,
+        min_participation: 33,
     }
 }
 

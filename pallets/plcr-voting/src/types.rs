@@ -19,7 +19,7 @@
 use codec::{Decode, Encode};
 #[cfg(feature = "std")]
 use serde::{Deserialize, Serialize};
-use sp_runtime::{traits::Saturating, Perbill, RuntimeDebug};
+use sp_runtime::{traits::Saturating, RuntimeDebug};
 
 #[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug, Default)]
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
@@ -28,8 +28,8 @@ pub struct VotingParameters<BlockNumber, CurrencyId> {
     pub reveal_duration: BlockNumber,
 
     pub voting_currency: CurrencyId,
-    pub min_quorum: Perbill,
-    pub min_participation: Perbill,
+    pub min_quorum: u32,
+    pub min_participation: u32,
 }
 
 #[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug, Default)]

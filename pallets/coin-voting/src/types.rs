@@ -22,7 +22,7 @@ use governance_os_support::impl_enum_default;
 use serde::{Deserialize, Serialize};
 use sp_runtime::{
     traits::{IntegerSquareRoot, Saturating},
-    Perbill, RuntimeDebug,
+    RuntimeDebug,
 };
 use sp_std::vec::Vec;
 
@@ -31,8 +31,8 @@ use sp_std::vec::Vec;
 pub struct VotingParameters<BlockNumber, CurrencyId> {
     pub ttl: BlockNumber,
     pub voting_currency: CurrencyId,
-    pub min_quorum: Perbill,
-    pub min_participation: Perbill,
+    pub min_quorum: u32,
+    pub min_participation: u32,
 
     pub vote_counting_strategy: VoteCountingStrategy,
 }

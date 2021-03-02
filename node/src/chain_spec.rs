@@ -26,10 +26,7 @@ use governance_os_runtime::{
 };
 use sc_service::ChainType;
 use sp_core::{sr25519, Pair, Public};
-use sp_runtime::{
-    traits::{IdentifyAccount, Verify},
-    Perbill,
-};
+use sp_runtime::traits::{IdentifyAccount, Verify};
 
 /// Specialized `ChainSpec`. This is a specialization of the general Substrate ChainSpec type.
 pub type ChainSpec = sc_service::GenericChainSpec<GenesisConfig>;
@@ -86,8 +83,8 @@ fn testnet_genesis(
             RuntimeVotingParameters::CoinVoting(CoinVotingParameters {
                 ttl: 10,
                 voting_currency: NativeCurrencyId::get(),
-                min_quorum: Perbill::from_percent(50),
-                min_participation: Perbill::from_percent(33),
+                min_quorum: 50,
+                min_participation: 33,
                 vote_counting_strategy: VoteCountingStrategy::Simple,
             }),
         ),

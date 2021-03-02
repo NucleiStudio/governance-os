@@ -29,7 +29,7 @@ use governance_os_support::traits::{
 };
 use sp_runtime::{
     traits::{Hash, Saturating, Zero},
-    DispatchError, DispatchResult,
+    DispatchError, DispatchResult, Perbill,
 };
 use sp_std::prelude::*;
 use types::ProposalState;
@@ -196,10 +196,10 @@ impl<T: Trait> StandardizedVoting for Module<T> {
         let total_participation = state
             .revealed_against
             .saturating_add(state.revealed_favorable);
-        let participation_met =
-            total_participation > state.parameters.min_participation * total_supply;
-        let quorum_met =
-            state.revealed_favorable > state.parameters.min_quorum * total_participation;
+        let participation_met = total_participation
+            > Perbill::from_percent(state.parameters.min_participation) * total_supply;
+        let quorum_met = state.revealed_favorable
+            > Perbill::from_percent(state.parameters.min_quorum) * total_participation;
         let proposal_passing = quorum_met && participation_met;
 
         ensure!(proposal_expired || proposal_passing, Error::<T>::TooEarly);

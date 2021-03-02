@@ -26,7 +26,7 @@ use governance_os_support::traits::{
 };
 use sp_runtime::{
     traits::{Saturating, Zero},
-    DispatchError, DispatchResult,
+    DispatchError, DispatchResult, Perbill,
 };
 use sp_std::{prelude::*, vec::Vec};
 use types::ProposalState;
@@ -173,10 +173,12 @@ impl<T: Trait> StandardizedVoting for Module<T> {
         let total_supply = T::Currencies::total_issuance(state.parameters.voting_currency);
         let total_participation = state.total_against + state.total_favorable;
 
-        let enough_participation =
-            state.parameters.min_participation * total_supply > total_participation;
-        let enough_quorum =
-            state.parameters.min_quorum * total_participation < state.total_favorable;
+        let enough_participation = Perbill::from_percent(state.parameters.min_participation)
+            * total_supply
+            > total_participation;
+        let enough_quorum = Perbill::from_percent(state.parameters.min_quorum)
+            * total_participation
+            < state.total_favorable;
 
         let result = if enough_participation && enough_quorum {
             ProposalResult::Passing
