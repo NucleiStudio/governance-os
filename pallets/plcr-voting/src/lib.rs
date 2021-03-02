@@ -53,12 +53,12 @@ type BalanceOf<T> =
     <<T as Trait>::Currencies as Currencies<<T as frame_system::Trait>::AccountId>>::Balance;
 type CurrencyIdOf<T> =
     <<T as Trait>::Currencies as Currencies<<T as frame_system::Trait>::AccountId>>::CurrencyId;
-type ProposalStateOf<T> =
+type PlcrProposalStateOf<T> =
     ProposalState<BalanceOf<T>, <T as frame_system::Trait>::BlockNumber, CurrencyIdOf<T>>;
 
 decl_storage! {
     trait Store for Module<T: Trait> as PlcrVoting {
-        pub Proposals get(fn proposals): map hasher(blake2_128_concat) T::Hash => ProposalStateOf<T>;
+        pub Proposals get(fn proposals): map hasher(blake2_128_concat) T::Hash => PlcrProposalStateOf<T>;
         pub Locks get(fn locks): map hasher(blake2_128_concat) (CurrencyIdOf<T>, T::AccountId) => Vec<(T::Hash, BalanceOf<T>)>;
         pub Votes get(fn votes): double_map hasher(blake2_128_concat) T::Hash, hasher(blake2_128_concat) T::AccountId => VoteData<BalanceOf<T>, T::Hash>;
     }
@@ -291,7 +291,7 @@ impl<T: Trait> Module<T> {
         Ok(())
     }
 
-    fn finalize_proposal(proposal: T::Hash, state: ProposalStateOf<T>) -> DispatchResult {
+    fn finalize_proposal(proposal: T::Hash, state: PlcrProposalStateOf<T>) -> DispatchResult {
         Votes::<T>::iter_prefix(proposal).try_for_each(|(account, _vote)| -> DispatchResult {
             Self::unlock(proposal, state.parameters.voting_currency, &account)?;
 
