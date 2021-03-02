@@ -525,8 +525,8 @@ fn close_passing_early() {
                 VotingParameters {
                     voting_currency: TEST_TOKEN_ID,
                     ttl: CoinVoting::now() + 10,
-                    min_quorum: 33,
-                    min_participation: 50,
+                    min_quorum: 50,
+                    min_participation: 33,
                     vote_counting_strategy: VoteCountingStrategy::Simple
                 }
             ));

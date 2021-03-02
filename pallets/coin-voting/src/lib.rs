@@ -173,12 +173,10 @@ impl<T: Trait> StandardizedVoting for Module<T> {
         let total_supply = T::Currencies::total_issuance(state.parameters.voting_currency);
         let total_participation = state.total_against + state.total_favorable;
 
-        let enough_participation = Perbill::from_percent(state.parameters.min_participation)
-            * total_supply
-            < total_participation;
-        let enough_quorum = Perbill::from_percent(state.parameters.min_quorum)
-            * total_participation
-            < state.total_favorable;
+        let enough_participation = total_participation
+            > Perbill::from_percent(state.parameters.min_participation) * total_supply;
+        let enough_quorum = state.total_favorable
+            > Perbill::from_percent(state.parameters.min_quorum) * total_participation;
 
         let result = if enough_participation && enough_quorum {
             ProposalResult::Passing
