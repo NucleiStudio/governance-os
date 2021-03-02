@@ -31,7 +31,6 @@ impl governance_os_pallet_bylaws::Trait for Runtime {
 }
 
 impl governance_os_pallet_coin_voting::Trait for Runtime {
-    type Event = Event;
     type Currencies = Tokens;
 }
 

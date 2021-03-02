@@ -44,7 +44,7 @@ pub const PLCR_VOTING_LOCK_ID: LockIdentifier = *b"plcrvote";
 
 pub trait Trait: frame_system::Trait {
     /// Because this pallet emits events, it depends on the runtime's definition of an event.
-    type Event: From<Event> + Into<<Self as frame_system::Trait>::Event>;
+    type Event: From<Event<Self>> + Into<<Self as frame_system::Trait>::Event>;
     /// Pallet in charge of currencies. Used so that we can lock tokens etc...
     type Currencies: LockableCurrencies<Self::AccountId>;
 }
@@ -85,7 +85,16 @@ decl_error! {
 }
 
 decl_event!(
-    pub enum Event {}
+    pub enum Event<T>
+    where
+        Hash = <T as frame_system::Trait>::Hash,
+        AccountId = <T as frame_system::Trait>::AccountId,
+    {
+        /// A commit vote was registered. \[voter, proposal, commit\]
+        VoteCommited(AccountId, Hash, Hash),
+        /// A commited vote was revealed. \[voter, proposal, commit\]
+        VoteRevealed(AccountId, Hash, Hash),
+    }
 );
 
 decl_module! {
@@ -140,12 +149,14 @@ impl<T: Trait> StandardizedVoting for Module<T> {
             commit_phase_ends_on.saturating_add(state.parameters.reveal_duration);
 
         match data {
-            VoteData::Commit(_hash) => {
+            VoteData::Commit(hash) => {
                 if let VoteData::Reveal(_, _, _) = Self::votes(proposal, voter) {
                     return Err(Error::<T>::Revealed.into());
                 }
 
                 ensure!(Self::now() < commit_phase_ends_on, Error::<T>::Phase);
+
+                Self::deposit_event(RawEvent::VoteCommited(voter.clone(), proposal, hash));
             }
             VoteData::Reveal(balance, support, salt) => {
                 if let VoteData::Commit(hash) = Self::votes(proposal, voter) {
@@ -161,6 +172,8 @@ impl<T: Trait> StandardizedVoting for Module<T> {
 
                     state.add_support(support, balance);
                     Proposals::<T>::insert(proposal, state);
+
+                    Self::deposit_event(RawEvent::VoteRevealed(voter.clone(), proposal, hash));
                 } else {
                     return Err(Error::<T>::NoCommitFound.into());
                 }

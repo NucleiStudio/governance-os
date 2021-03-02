@@ -28,7 +28,6 @@ use sp_runtime::Perbill;
 mock_runtime_with_currencies!(Test);
 
 impl Trait for Test {
-    type Event = ();
     type Currencies = Tokens;
 }
 

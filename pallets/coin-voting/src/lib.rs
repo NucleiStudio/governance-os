@@ -20,9 +20,7 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use frame_support::{
-    decl_error, decl_event, decl_module, decl_storage, ensure, traits::LockIdentifier,
-};
+use frame_support::{decl_error, decl_module, decl_storage, ensure, traits::LockIdentifier};
 use governance_os_support::traits::{
     Currencies, LockableCurrencies, ProposalResult, StandardizedVoting,
 };
@@ -42,8 +40,6 @@ pub use types::{VoteCountingStrategy, VoteData, VotingParameters};
 pub const COIN_VOTING_LOCK_ID: LockIdentifier = *b"coinvote";
 
 pub trait Trait: frame_system::Trait {
-    /// Because this pallet emits events, it depends on the runtime's definition of an event.
-    type Event: From<Event> + Into<<Self as frame_system::Trait>::Event>;
     /// Pallet in charge of currencies. Used so that we can lock tokens etc...
     type Currencies: LockableCurrencies<Self::AccountId>;
 }
@@ -89,13 +85,8 @@ decl_error! {
     }
 }
 
-decl_event!(
-    pub enum Event {}
-);
-
 decl_module! {
     pub struct Module<T: Trait> for enum Call where origin: T::Origin {
-        fn deposit_event() = default;
     }
 }
 
