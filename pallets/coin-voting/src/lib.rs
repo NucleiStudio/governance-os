@@ -175,7 +175,7 @@ impl<T: Trait> StandardizedVoting for Module<T> {
 
         let enough_participation = Perbill::from_percent(state.parameters.min_participation)
             * total_supply
-            > total_participation;
+            < total_participation;
         let enough_quorum = Perbill::from_percent(state.parameters.min_quorum)
             * total_participation
             < state.total_favorable;
