@@ -197,6 +197,32 @@ fn cannot_reveal_twice() {
 }
 
 #[test]
+fn cannot_vote_with_tokens_they_do_not_have() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            let mock_hash = H256::default();
+
+            assert_ok!(<PlcrVoting as StandardizedVoting>::initiate(
+                mock_hash,
+                mock_parameters()
+            ));
+
+            let (commit, reveal) = mock_vote(200, true, 42);
+            assert_ok!(<PlcrVoting as StandardizedVoting>::vote(
+                mock_hash, &ALICE, commit,
+            ));
+            advance_blocks(mock_parameters().commit_duration + 1);
+
+            assert_noop!(
+                <PlcrVoting as StandardizedVoting>::vote(mock_hash, &ALICE, reveal),
+                Error::<Test>::NotEnoughBalance
+            );
+        })
+}
+
+#[test]
 fn vote_cannot_commit_after_reveal() {
     ExtBuilder::default()
         .one_hundred_for_alice_n_bob()

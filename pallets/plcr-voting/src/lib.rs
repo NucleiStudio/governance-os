@@ -76,6 +76,9 @@ decl_error! {
         NoCommitFound,
         /// The vote we are trying to commit for was already revealed.
         Revealed,
+        /// The caller's balance is too small to lock the coins they want
+        /// to lock.
+        NotEnoughBalance,
         /// The vote is being pushed for the wrong phase, either you are
         /// trying to commit too late, either you are trying to reveal too
         /// too early or late.
@@ -164,6 +167,12 @@ impl<T: Trait> StandardizedVoting for Module<T> {
                     ensure!(
                         Self::now() > commit_phase_ends_on && Self::now() < reveal_phase_ends_on,
                         Error::<T>::Phase
+                    );
+                    // We want to prevent votes for user with less coins than they'd like to lock.
+                    ensure!(
+                        T::Currencies::free_balance(state.parameters.voting_currency, voter)
+                            >= balance,
+                        Error::<T>::NotEnoughBalance
                     );
 
                     let hashed_reveal = T::Hashing::hash_of(&(balance, support, salt));
