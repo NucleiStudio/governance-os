@@ -212,7 +212,6 @@
 <span id="209">209</span>
 <span id="210">210</span>
 <span id="211">211</span>
-<span id="212">212</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">/*
  * Copyright 2020 Nuclei Studio OÜ
@@ -231,14 +230,15 @@
  */</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">helpers</span>::<span class="ident">core_org</span>;
+<span class="kw">use</span> <span class="ident">governance_os_pallet_coin_voting</span>::<span class="ident">VoteCountingStrategy</span>;
 <span class="kw">use</span> <span class="ident">governance_os_pallet_organizations</span>::<span class="ident">OrganizationDetails</span>;
 <span class="kw">use</span> <span class="ident">governance_os_pallet_tokens</span>::<span class="ident">CurrencyDetails</span>;
-<span class="kw">use</span> <span class="ident">governance_os_primitives</span>::{<span class="ident">AccountId</span>, <span class="ident">Balance</span>, <span class="ident">BlockNumber</span>, <span class="ident">CurrencyId</span>, <span class="ident">Role</span>, <span class="ident">Signature</span>};
+<span class="kw">use</span> <span class="ident">governance_os_primitives</span>::{<span class="ident">AccountId</span>, <span class="ident">CurrencyId</span>, <span class="ident">Role</span>, <span class="ident">Signature</span>};
 <span class="kw">use</span> <span class="ident">governance_os_runtime</span>::{
-    <span class="ident">AuraConfig</span>, <span class="ident">AuraId</span>, <span class="ident">BylawsConfig</span>, <span class="ident">GenesisConfig</span>, <span class="ident">GrandpaConfig</span>, <span class="ident">GrandpaId</span>, <span class="ident">NativeCurrencyId</span>,
-    <span class="ident">OrganizationsConfig</span>, <span class="ident">SystemConfig</span>, <span class="ident">Tokens</span>, <span class="ident">TokensConfig</span>, <span class="ident">WASM_BINARY</span>,
+    <span class="ident">AuraConfig</span>, <span class="ident">AuraId</span>, <span class="ident">BylawsConfig</span>, <span class="ident">CoinVotingParameters</span>, <span class="ident">GenesisConfig</span>, <span class="ident">GrandpaConfig</span>,
+    <span class="ident">GrandpaId</span>, <span class="ident">NativeCurrencyId</span>, <span class="ident">OrganizationsConfig</span>, <span class="ident">RuntimeVotingParameters</span>,
+    <span class="ident">RuntimeVotingSystemId</span>, <span class="ident">SystemConfig</span>, <span class="ident">TokensConfig</span>, <span class="ident">WASM_BINARY</span>,
 };
-<span class="kw">use</span> <span class="ident">governance_os_voting</span>::{<span class="ident">CoinBasedVotingParameters</span>, <span class="ident">VotingSystems</span>};
 <span class="kw">use</span> <span class="ident">sc_service</span>::<span class="ident">ChainType</span>;
 <span class="kw">use</span> <span class="ident">sp_core</span>::{<span class="ident">sr25519</span>, <span class="ident">Pair</span>, <span class="ident">Public</span>};
 <span class="kw">use</span> <span class="ident">sp_runtime</span>::<span class="ident">traits</span>::{<span class="ident">IdentifyAccount</span>, <span class="ident">Verify</span>};
@@ -276,12 +276,7 @@
     <span class="ident">currencies</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">CurrencyId</span>, <span class="ident">CurrencyDetails</span><span class="op">&lt;</span><span class="ident">AccountId</span><span class="op">&gt;</span>)<span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">roles</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">Role</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AccountId</span><span class="op">&gt;</span>)<span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">organizations</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>
-        <span class="ident">Vec</span><span class="op">&lt;</span>
-            <span class="ident">OrganizationDetails</span><span class="op">&lt;</span>
-                <span class="ident">AccountId</span>,
-                <span class="ident">VotingSystems</span><span class="op">&lt;</span><span class="ident">Balance</span>, <span class="ident">CurrencyId</span>, <span class="ident">BlockNumber</span>, <span class="ident">Tokens</span>, <span class="ident">AccountId</span><span class="op">&gt;</span>,
-            <span class="op">&gt;</span>,
-        <span class="op">&gt;</span>,
+        <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OrganizationDetails</span><span class="op">&lt;</span><span class="ident">AccountId</span>, (<span class="ident">RuntimeVotingSystemId</span>, <span class="ident">RuntimeVotingParameters</span>)<span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="op">&gt;</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GenesisConfig</span> {
     <span class="kw">let</span> <span class="ident">chain_currencies</span> <span class="op">=</span> <span class="ident">currencies</span>.<span class="ident">unwrap_or</span>(<span class="macro">vec</span><span class="macro">!</span>[(
@@ -298,13 +293,16 @@
     ]);
     <span class="kw">let</span> <span class="ident">chain_orgs</span> <span class="op">=</span> <span class="ident">organizations</span>.<span class="ident">unwrap_or</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="ident">OrganizationDetails</span> {
         <span class="ident">executors</span>: <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">get_account_id_from_seed</span>::<span class="op">&lt;</span><span class="ident">sr25519</span>::<span class="ident">Public</span><span class="op">&gt;</span>(<span class="string">&quot;Alice&quot;</span>)],
-        <span class="ident">voting</span>: <span class="ident">VotingSystems</span>::<span class="ident">CoinBased</span>(<span class="ident">CoinBasedVotingParameters</span> {
-            <span class="ident">voting_currency</span>: <span class="ident">CurrencyId</span>::<span class="ident">Native</span>,
-            <span class="ident">creation_fee</span>: <span class="number">10</span>,
-            <span class="ident">min_quorum</span>: <span class="number">50</span>,
-            <span class="ident">min_participation</span>: <span class="number">33</span>,
-            <span class="ident">ttl</span>: <span class="number">50</span>, <span class="comment">// Short TTL for testing</span>
-        }),
+        <span class="ident">voting</span>: (
+            <span class="ident">RuntimeVotingSystemId</span>::<span class="ident">CoinVoting</span>,
+            <span class="ident">RuntimeVotingParameters</span>::<span class="ident">CoinVoting</span>(<span class="ident">CoinVotingParameters</span> {
+                <span class="ident">ttl</span>: <span class="number">10</span>,
+                <span class="ident">voting_currency</span>: <span class="ident">NativeCurrencyId</span>::<span class="ident">get</span>(),
+                <span class="ident">min_quorum</span>: <span class="number">50</span>,
+                <span class="ident">min_participation</span>: <span class="number">33</span>,
+                <span class="ident">vote_counting_strategy</span>: <span class="ident">VoteCountingStrategy</span>::<span class="ident">Simple</span>,
+            }),
+        ),
     }]);
 
     <span class="ident">GenesisConfig</span> {

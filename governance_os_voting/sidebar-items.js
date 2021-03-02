@@ -1,1 +1,0 @@
-initSidebarItems({"enum":[["VotingErrors",""],["VotingSystems","This enum is in charge of representing and handling all existing voting systems."]],"struct":[["CoinBasedVotingParameters","Parameters for the coin based voting system."],["ProposalMetadata","Metadata used and managed by all our voting systems. Need to be passed to their functions and persisted in storage."]]});

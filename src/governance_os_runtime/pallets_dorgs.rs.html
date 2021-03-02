@@ -56,6 +56,10 @@
 <span id="53">53</span>
 <span id="54">54</span>
 <span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">/*
  * Copyright 2020 Nuclei Studio OÜ
@@ -73,10 +77,9 @@
  * limitations under the License.
  */</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Bylaws</span>, <span class="ident">Call</span>, <span class="ident">Event</span>, <span class="ident">Runtime</span>, <span class="ident">Tokens</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">voting_router</span>::<span class="ident">RuntimeVotingRouter</span>, <span class="ident">Bylaws</span>, <span class="ident">Call</span>, <span class="ident">Event</span>, <span class="ident">Runtime</span>, <span class="ident">Tokens</span>};
 <span class="kw">use</span> <span class="ident">frame_support</span>::<span class="ident">parameter_types</span>;
-<span class="kw">use</span> <span class="ident">governance_os_primitives</span>::{<span class="ident">AccountId</span>, <span class="ident">Balance</span>, <span class="ident">BlockNumber</span>, <span class="ident">CurrencyId</span>, <span class="ident">Role</span>};
-<span class="kw">use</span> <span class="ident">governance_os_voting</span>::{<span class="ident">ProposalMetadata</span>, <span class="ident">VotingSystems</span>};
+<span class="kw">use</span> <span class="ident">governance_os_primitives</span>::<span class="ident">Role</span>;
 
 <span class="macro">parameter_types</span><span class="macro">!</span> {
     <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MaxRoles</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">50</span>;
@@ -88,6 +91,15 @@
     <span class="kw">type</span> <span class="ident">WeightInfo</span> <span class="op">=</span> ();
     <span class="kw">type</span> <span class="ident">MaxRoles</span> <span class="op">=</span> <span class="ident">MaxRoles</span>;
     <span class="kw">type</span> <span class="ident">RoleBuilder</span> <span class="op">=</span> <span class="ident">Role</span>;
+}
+
+<span class="kw">impl</span> <span class="ident">governance_os_pallet_coin_voting</span>::<span class="ident">Trait</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
+    <span class="kw">type</span> <span class="ident">Currencies</span> <span class="op">=</span> <span class="ident">Tokens</span>;
+}
+
+<span class="kw">impl</span> <span class="ident">governance_os_pallet_plcr_voting</span>::<span class="ident">Trait</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
+    <span class="kw">type</span> <span class="ident">Event</span> <span class="op">=</span> <span class="ident">Event</span>;
+    <span class="kw">type</span> <span class="ident">Currencies</span> <span class="op">=</span> <span class="ident">Tokens</span>;
 }
 
 <span class="macro">parameter_types</span><span class="macro">!</span> {
@@ -103,11 +115,7 @@
     <span class="kw">type</span> <span class="ident">Call</span> <span class="op">=</span> <span class="ident">Call</span>;
     <span class="kw">type</span> <span class="ident">RoleManager</span> <span class="op">=</span> <span class="ident">Bylaws</span>;
     <span class="kw">type</span> <span class="ident">RoleBuilder</span> <span class="op">=</span> <span class="ident">Role</span>;
-    <span class="kw">type</span> <span class="ident">Currencies</span> <span class="op">=</span> <span class="ident">Tokens</span>;
-    <span class="kw">type</span> <span class="ident">VotingSystem</span> <span class="op">=</span>
-        <span class="ident">VotingSystems</span><span class="op">&lt;</span><span class="ident">Balance</span>, <span class="ident">CurrencyId</span>, <span class="ident">BlockNumber</span>, <span class="self">Self</span>::<span class="ident">Currencies</span>, <span class="ident">AccountId</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">ProposalMetadata</span> <span class="op">=</span> <span class="ident">ProposalMetadata</span><span class="op">&lt;</span><span class="ident">AccountId</span>, <span class="ident">Balance</span>, <span class="ident">BlockNumber</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">VotingHooks</span> <span class="op">=</span> <span class="ident">VotingSystems</span><span class="op">&lt;</span><span class="ident">Balance</span>, <span class="ident">CurrencyId</span>, <span class="ident">BlockNumber</span>, <span class="self">Self</span>::<span class="ident">Currencies</span>, <span class="ident">AccountId</span><span class="op">&gt;</span>;
+    <span class="kw">type</span> <span class="ident">VotingRouter</span> <span class="op">=</span> <span class="ident">RuntimeVotingRouter</span>;
     <span class="kw">type</span> <span class="ident">MaxVotes</span> <span class="op">=</span> <span class="ident">MaxVotes</span>;
     <span class="kw">type</span> <span class="ident">MaxExecutors</span> <span class="op">=</span> <span class="ident">MaxExecutors</span>;
     <span class="kw">type</span> <span class="ident">WeightInfo</span> <span class="op">=</span> ();

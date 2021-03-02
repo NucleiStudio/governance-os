@@ -2,8 +2,10 @@
 implementors["frame_metadata"] = [];
 implementors["frame_system"] = [{"text":"impl&lt;T:&nbsp;Trait&gt; ModuleErrorMetadata for Error&lt;T&gt;","synthetic":false,"types":[]},{"text":"impl&lt;T:&nbsp;Trait&gt; ModuleErrorMetadata for Module&lt;T&gt;","synthetic":false,"types":[]}];
 implementors["governance_os_pallet_bylaws"] = [{"text":"impl&lt;T:&nbsp;Trait&gt; ModuleErrorMetadata for Error&lt;T&gt;","synthetic":false,"types":[]},{"text":"impl&lt;T:&nbsp;Trait&gt; ModuleErrorMetadata for Module&lt;T&gt;","synthetic":false,"types":[]}];
+implementors["governance_os_pallet_coin_voting"] = [{"text":"impl&lt;T:&nbsp;Trait&gt; ModuleErrorMetadata for Error&lt;T&gt;","synthetic":false,"types":[]},{"text":"impl&lt;T:&nbsp;Trait&gt; ModuleErrorMetadata for Module&lt;T&gt;","synthetic":false,"types":[]}];
 implementors["governance_os_pallet_compat"] = [{"text":"impl&lt;T:&nbsp;Trait&gt; ModuleErrorMetadata for Module&lt;T&gt;","synthetic":false,"types":[]}];
 implementors["governance_os_pallet_organizations"] = [{"text":"impl&lt;T:&nbsp;Trait&gt; ModuleErrorMetadata for Error&lt;T&gt;","synthetic":false,"types":[]},{"text":"impl&lt;T:&nbsp;Trait&gt; ModuleErrorMetadata for Module&lt;T&gt;","synthetic":false,"types":[]}];
+implementors["governance_os_pallet_plcr_voting"] = [{"text":"impl&lt;T:&nbsp;Trait&gt; ModuleErrorMetadata for Error&lt;T&gt;","synthetic":false,"types":[]},{"text":"impl&lt;T:&nbsp;Trait&gt; ModuleErrorMetadata for Module&lt;T&gt;","synthetic":false,"types":[]}];
 implementors["governance_os_pallet_tokens"] = [{"text":"impl&lt;T:&nbsp;Trait&gt; ModuleErrorMetadata for Error&lt;T&gt;","synthetic":false,"types":[]},{"text":"impl&lt;T:&nbsp;Trait&gt; ModuleErrorMetadata for Module&lt;T&gt;","synthetic":false,"types":[]}];
 implementors["pallet_aura"] = [{"text":"impl&lt;T:&nbsp;Trait&gt; ModuleErrorMetadata for Module&lt;T&gt;","synthetic":false,"types":[]}];
 implementors["pallet_authorship"] = [{"text":"impl&lt;T:&nbsp;Trait&gt; ModuleErrorMetadata for Error&lt;T&gt;","synthetic":false,"types":[]},{"text":"impl&lt;T:&nbsp;Trait&gt; ModuleErrorMetadata for Module&lt;T&gt;","synthetic":false,"types":[]}];

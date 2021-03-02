@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["COIN_VOTING_LOCK_ID",""]],"enum":[["Call","Dispatchable calls."],["Error",""],["VoteCountingStrategy",""]],"struct":[["Locks",""],["Module",""],["Proposals",""],["VoteData",""],["VotingParameters",""]],"trait":[["Trait",""]]});

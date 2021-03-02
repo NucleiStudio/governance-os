@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["PLCR_VOTING_LOCK_ID",""]],"enum":[["Call","Dispatchable calls."],["Error",""],["RawEvent","Events for this module."],["VoteData",""]],"struct":[["Locks",""],["Module",""],["Proposals",""],["Votes",""],["VotingParameters",""]],"trait":[["Trait",""]],"type":[["Event","`RawEvent` specialized for the configuration `Trait`"]]});

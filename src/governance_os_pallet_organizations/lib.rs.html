@@ -440,46 +440,6 @@
 <span id="437">437</span>
 <span id="438">438</span>
 <span id="439">439</span>
-<span id="440">440</span>
-<span id="441">441</span>
-<span id="442">442</span>
-<span id="443">443</span>
-<span id="444">444</span>
-<span id="445">445</span>
-<span id="446">446</span>
-<span id="447">447</span>
-<span id="448">448</span>
-<span id="449">449</span>
-<span id="450">450</span>
-<span id="451">451</span>
-<span id="452">452</span>
-<span id="453">453</span>
-<span id="454">454</span>
-<span id="455">455</span>
-<span id="456">456</span>
-<span id="457">457</span>
-<span id="458">458</span>
-<span id="459">459</span>
-<span id="460">460</span>
-<span id="461">461</span>
-<span id="462">462</span>
-<span id="463">463</span>
-<span id="464">464</span>
-<span id="465">465</span>
-<span id="466">466</span>
-<span id="467">467</span>
-<span id="468">468</span>
-<span id="469">469</span>
-<span id="470">470</span>
-<span id="471">471</span>
-<span id="472">472</span>
-<span id="473">473</span>
-<span id="474">474</span>
-<span id="475">475</span>
-<span id="476">476</span>
-<span id="477">477</span>
-<span id="478">478</span>
-<span id="479">479</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">/*
  * Copyright 2020 Nuclei Studio OÜ
@@ -513,18 +473,13 @@
     <span class="ident">weights</span>::{<span class="ident">GetDispatchInfo</span>, <span class="ident">Weight</span>},
 };
 <span class="kw">use</span> <span class="ident">frame_system</span>::<span class="ident">ensure_signed</span>;
-<span class="kw">use</span> <span class="ident">governance_os_support</span>::{
-    <span class="ident">ensure_not_err</span>,
-    <span class="ident">traits</span>::{<span class="ident">Currencies</span>, <span class="ident">ReservableCurrencies</span>, <span class="ident">RoleManager</span>, <span class="ident">VotingHooks</span>},
-};
+<span class="kw">use</span> <span class="ident">governance_os_support</span>::<span class="ident">traits</span>::{<span class="ident">ProposalResult</span>, <span class="ident">RoleManager</span>, <span class="ident">VotingRouter</span>};
 <span class="kw">use</span> <span class="ident">sp_runtime</span>::{
-    <span class="ident">traits</span>::{<span class="ident">AccountIdConversion</span>, <span class="ident">Hash</span>, <span class="ident">MaybeSerializeDeserialize</span>, <span class="ident">Member</span>, <span class="ident">StaticLookup</span>},
+    <span class="ident">traits</span>::{<span class="ident">AccountIdConversion</span>, <span class="ident">Hash</span>, <span class="ident">StaticLookup</span>},
     <span class="ident">DispatchError</span>, <span class="ident">DispatchResult</span>, <span class="ident">ModuleId</span>,
 };
 <span class="kw">use</span> <span class="ident">sp_std</span>::{<span class="ident">boxed</span>::<span class="ident">Box</span>, <span class="ident">prelude</span>::<span class="ident">Vec</span>};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime-benchmarks&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">benchmarking</span>;
 <span class="kw">mod</span> <span class="ident">default_weights</span>;
 <span class="kw">mod</span> <span class="ident">details</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
@@ -549,8 +504,7 @@
     <span class="kw">fn</span> <span class="ident">mutate</span>(<span class="ident">b</span>: <span class="ident">u32</span>, <span class="ident">c</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span>;
     <span class="kw">fn</span> <span class="ident">create_proposal</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span>;
     <span class="kw">fn</span> <span class="ident">veto_proposal</span>(<span class="ident">b</span>: <span class="ident">u32</span>, <span class="ident">c</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span>;
-    <span class="kw">fn</span> <span class="ident">decide_on_proposal_favorable</span>(<span class="ident">b</span>: <span class="ident">u32</span>, <span class="ident">c</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span>;
-    <span class="kw">fn</span> <span class="ident">decide_on_proposal_against</span>(<span class="ident">b</span>: <span class="ident">u32</span>, <span class="ident">c</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span>;
+    <span class="kw">fn</span> <span class="ident">decide_on_proposal</span>(<span class="ident">b</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span>;
     <span class="kw">fn</span> <span class="ident">close_proposal</span>(<span class="ident">b</span>: <span class="ident">u32</span>, <span class="ident">c</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Weight</span>;
 }
 
@@ -575,26 +529,9 @@
         <span class="ident">Role</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">RoleManagerOf</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">RoleManager</span><span class="op">&gt;</span>::<span class="ident">Role</span>,
     <span class="op">&gt;</span>;
 
-    <span class="doccomment">/// Pallet handling currencies. Used to represent voting weights.</span>
-    <span class="kw">type</span> <span class="ident">Currencies</span>: <span class="ident">ReservableCurrencies</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">AccountId</span><span class="op">&gt;</span>;
-
-    <span class="doccomment">/// The different kinds of voting system present inside the runtime. For benchmark purposes</span>
-    <span class="doccomment">/// please make sure that the default voting system is the most expensive to use in terms</span>
-    <span class="doccomment">/// of compute resources.</span>
-    <span class="kw">type</span> <span class="ident">VotingSystem</span>: <span class="ident">Parameter</span> <span class="op">+</span> <span class="ident">Member</span> <span class="op">+</span> <span class="ident">MaybeSerializeDeserialize</span> <span class="op">+</span> <span class="ident">Default</span>;
-
-    <span class="doccomment">/// Some arbitrary data that can be added to proposals</span>
-    <span class="kw">type</span> <span class="ident">ProposalMetadata</span>: <span class="ident">Parameter</span>;
-
-    <span class="doccomment">/// Various hooks as implemented for each voting system.</span>
-    <span class="kw">type</span> <span class="ident">VotingHooks</span>: <span class="ident">VotingHooks</span><span class="op">&lt;</span>
-        <span class="ident">AccountId</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">AccountId</span>,
-        <span class="ident">BlockNumber</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">BlockNumber</span>,
-        <span class="ident">Currencies</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">Currencies</span>,
-        <span class="ident">Data</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">ProposalMetadata</span>,
-        <span class="ident">OrganizationId</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">AccountId</span>,
-        <span class="ident">VotingSystem</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">VotingSystem</span>,
-    <span class="op">&gt;</span>;
+    <span class="doccomment">/// VotingRouter implementation to choose between voting systems and route those</span>
+    <span class="doccomment">/// to the right pallets.</span>
+    <span class="kw">type</span> <span class="ident">VotingRouter</span>: <span class="ident">VotingRouter</span><span class="op">&lt;</span><span class="ident">AccountId</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">AccountId</span>, <span class="ident">ProposalId</span> <span class="op">=</span> <span class="ident">ProposalIdOf</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Mostly used for weight computations and not actually enforced. The maximum number</span>
     <span class="doccomment">/// of votes in favor or against we can expect a proposal to have.</span>
@@ -608,20 +545,18 @@
     <span class="kw">type</span> <span class="ident">WeightInfo</span>: <span class="ident">WeightInfo</span>;
 }
 
-<span class="kw">type</span> <span class="ident">BalanceOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span>
-    <span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Trait</span><span class="op">&gt;</span>::<span class="ident">Currencies</span> <span class="kw">as</span> <span class="ident">Currencies</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">frame_system</span>::<span class="ident">Trait</span><span class="op">&gt;</span>::<span class="ident">AccountId</span><span class="op">&gt;</span><span class="op">&gt;</span>::<span class="ident">Balance</span>;
-<span class="kw">type</span> <span class="ident">OrganizationDetailsOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span>
-    <span class="ident">OrganizationDetails</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">frame_system</span>::<span class="ident">Trait</span><span class="op">&gt;</span>::<span class="ident">AccountId</span>, <span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Trait</span><span class="op">&gt;</span>::<span class="ident">VotingSystem</span><span class="op">&gt;</span>;
+<span class="kw">type</span> <span class="ident">OrganizationDetailsOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">OrganizationDetails</span><span class="op">&lt;</span>
+    <span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">frame_system</span>::<span class="ident">Trait</span><span class="op">&gt;</span>::<span class="ident">AccountId</span>,
+    (<span class="ident">VotingSystemIdOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">VotingParametersOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>),
+<span class="op">&gt;</span>;
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">OrganizationsCounter</span> <span class="op">=</span> <span class="ident">u32</span>;
 <span class="kw">type</span> <span class="ident">ProposalIdOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">frame_system</span>::<span class="ident">Trait</span><span class="op">&gt;</span>::<span class="ident">Hash</span>;
-<span class="kw">type</span> <span class="ident">ProposalOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Proposal</span><span class="op">&lt;</span>
-    <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Trait</span><span class="op">&gt;</span>::<span class="ident">ProposalMetadata</span>,
-    <span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">frame_system</span>::<span class="ident">Trait</span><span class="op">&gt;</span>::<span class="ident">AccountId</span>,
-    <span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Trait</span><span class="op">&gt;</span>::<span class="ident">VotingSystem</span>,
-<span class="op">&gt;</span>;
+<span class="kw">type</span> <span class="ident">ProposalOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Proposal</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">frame_system</span>::<span class="ident">Trait</span><span class="op">&gt;</span>::<span class="ident">AccountId</span>, <span class="ident">VotingSystemIdOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 <span class="kw">type</span> <span class="ident">RoleBuilderOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Trait</span><span class="op">&gt;</span>::<span class="ident">RoleBuilder</span>;
 <span class="kw">type</span> <span class="ident">RoleManagerOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Trait</span><span class="op">&gt;</span>::<span class="ident">RoleManager</span>;
+<span class="kw">type</span> <span class="ident">VoteDataOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Trait</span><span class="op">&gt;</span>::<span class="ident">VotingRouter</span> <span class="kw">as</span> <span class="ident">VotingRouter</span><span class="op">&gt;</span>::<span class="ident">VoteData</span>;
+<span class="kw">type</span> <span class="ident">VotingParametersOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Trait</span><span class="op">&gt;</span>::<span class="ident">VotingRouter</span> <span class="kw">as</span> <span class="ident">VotingRouter</span><span class="op">&gt;</span>::<span class="ident">Parameters</span>;
+<span class="kw">type</span> <span class="ident">VotingSystemIdOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Trait</span><span class="op">&gt;</span>::<span class="ident">VotingRouter</span> <span class="kw">as</span> <span class="ident">VotingRouter</span><span class="op">&gt;</span>::<span class="ident">VotingSystemId</span>;
 
 <span class="kw">const</span> <span class="ident">ORGS_MODULE_ID</span>: <span class="ident">ModuleId</span> <span class="op">=</span> <span class="ident">ModuleId</span>(<span class="kw-2">*</span><span class="string">b&quot;gos/orgs&quot;</span>);
 
@@ -648,7 +583,7 @@
         <span class="ident">AccountId</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">frame_system</span>::<span class="ident">Trait</span><span class="op">&gt;</span>::<span class="ident">AccountId</span>,
         <span class="ident">OrganizationDetails</span> <span class="op">=</span> <span class="ident">OrganizationDetailsOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
         <span class="ident">ProposalId</span> <span class="op">=</span> <span class="ident">ProposalIdOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-        <span class="ident">Balance</span> <span class="op">=</span> <span class="ident">BalanceOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+        <span class="ident">VoteData</span> <span class="op">=</span> <span class="ident">VoteDataOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
     {
         <span class="doccomment">/// An organization was created with the following parameters. \[org. address, details\]</span>
         <span class="ident">OrganizationCreated</span>(<span class="ident">AccountId</span>, <span class="ident">OrganizationDetails</span>),
@@ -660,12 +595,12 @@
         <span class="ident">ProposalSubmitted</span>(<span class="ident">AccountId</span>, <span class="ident">ProposalId</span>),
         <span class="doccomment">/// A proposal has been vetoed and removed from the queue of open proposals. \[proposal id\]</span>
         <span class="ident">ProposalVetoed</span>(<span class="ident">ProposalId</span>),
-        <span class="doccomment">/// Somebody just voted on a proposal. \[proposal id, voter, power, support\]</span>
-        <span class="ident">ProposalVoteCasted</span>(<span class="ident">ProposalId</span>, <span class="ident">AccountId</span>, <span class="ident">Balance</span>, <span class="ident">bool</span>),
+        <span class="doccomment">/// Somebody just voted on a proposal. \[proposal id, voter, vote data\]</span>
+        <span class="ident">ProposalVoteCasted</span>(<span class="ident">ProposalId</span>, <span class="ident">AccountId</span>, <span class="ident">VoteData</span>),
         <span class="doccomment">/// A proposal has been executed with the following result. \[proposal id, result\]</span>
         <span class="ident">ProposalExecuted</span>(<span class="ident">ProposalId</span>, <span class="ident">DispatchResult</span>),
         <span class="doccomment">/// A proposal was closed. \[proposal id, wether it passed or not\]</span>
-        <span class="ident">ProposalClosed</span>(<span class="ident">ProposalId</span>, <span class="ident">bool</span>),
+        <span class="ident">ProposalClosed</span>(<span class="ident">ProposalId</span>, <span class="ident">ProposalResult</span>),
     }
 );
 
@@ -749,7 +684,7 @@
         <span class="doccomment">/// Create a proposal for a given organization</span>
         <span class="attribute">#[<span class="ident">weight</span> <span class="op">=</span> <span class="ident">T</span>::<span class="ident">WeightInfo</span>::<span class="ident">create_proposal</span>()]</span>
         <span class="kw">fn</span> <span class="ident">create_proposal</span>(<span class="ident">origin</span>, <span class="ident">org_id</span>: <span class="op">&lt;</span><span class="ident">T</span>::<span class="ident">Lookup</span> <span class="kw">as</span> <span class="ident">StaticLookup</span><span class="op">&gt;</span>::<span class="ident">Source</span>, <span class="ident">call</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Trait</span><span class="op">&gt;</span>::<span class="ident">Call</span><span class="op">&gt;</span>) {
-            <span class="kw">let</span> <span class="ident">who</span> <span class="op">=</span> <span class="ident">ensure_signed</span>(<span class="ident">origin</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">_who</span> <span class="op">=</span> <span class="ident">ensure_signed</span>(<span class="ident">origin</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">target_org_id</span> <span class="op">=</span> <span class="ident">T</span>::<span class="ident">Lookup</span>::<span class="ident">lookup</span>(<span class="ident">org_id</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">details</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">try_get_parameters</span>(<span class="kw-2">&amp;</span><span class="ident">target_org_id</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">proposal_id</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">proposal_id</span>(<span class="kw-2">&amp;</span><span class="ident">target_org_id</span>, <span class="ident">call</span>.<span class="ident">clone</span>());
@@ -757,17 +692,15 @@
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">ProposalDuplicate</span>.<span class="ident">into</span>());
             }
 
-            <span class="kw">let</span> (<span class="ident">maybe_hook_sucessful</span>, <span class="ident">additional_data</span>) <span class="op">=</span> <span class="ident">T</span>::<span class="ident">VotingHooks</span>::<span class="ident">on_create_proposal</span>(<span class="ident">details</span>.<span class="ident">clone</span>().<span class="ident">voting</span>, <span class="kw-2">&amp;</span><span class="ident">who</span>, <span class="ident">frame_system</span>::<span class="ident">Module</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">block_number</span>());
-            <span class="macro">ensure_not_err</span><span class="macro">!</span>(<span class="ident">maybe_hook_sucessful</span>);
+            <span class="ident">T</span>::<span class="ident">VotingRouter</span>::<span class="ident">initiate</span>(<span class="ident">details</span>.<span class="ident">voting</span>.<span class="number">0</span>.<span class="ident">clone</span>(), <span class="ident">proposal_id</span>, <span class="ident">details</span>.<span class="ident">voting</span>.<span class="number">1</span>)<span class="question-mark">?</span>;
 
             <span class="ident">Proposals</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">insert</span>(<span class="kw-2">&amp;</span><span class="ident">proposal_id</span>, <span class="ident">Proposal</span>{
                 <span class="ident">org</span>: <span class="ident">target_org_id</span>.<span class="ident">clone</span>(),
                 <span class="ident">call</span>: <span class="ident">call</span>.<span class="ident">encode</span>(),
-                <span class="ident">metadata</span>: <span class="ident">additional_data</span>,
                 <span class="comment">// Not only does this save us future read weights but it also cover</span>
                 <span class="comment">// the case where an org change voting systems but still has pending</span>
                 <span class="comment">// proposals.</span>
-                <span class="ident">voting</span>: <span class="ident">details</span>.<span class="ident">voting</span>,
+                <span class="ident">voting</span>: <span class="ident">details</span>.<span class="ident">voting</span>.<span class="number">0</span>,
             });
 
             <span class="self">Self</span>::<span class="ident">deposit_event</span>(<span class="ident">RawEvent</span>::<span class="ident">ProposalSubmitted</span>(<span class="ident">target_org_id</span>, <span class="ident">proposal_id</span>));
@@ -781,7 +714,7 @@
             <span class="kw">let</span> <span class="ident">proposal</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">try_get_proposal</span>(<span class="ident">proposal_id</span>)<span class="question-mark">?</span>;
             <span class="macro">ensure</span><span class="macro">!</span>(<span class="ident">proposal</span>.<span class="ident">org</span> <span class="op">=</span><span class="op">=</span> <span class="ident">org_id</span>, <span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">ProposalNotForOrganization</span>);
 
-            <span class="ident">T</span>::<span class="ident">VotingHooks</span>::<span class="ident">on_veto_proposal</span>(<span class="ident">proposal</span>.<span class="ident">voting</span>, <span class="ident">proposal</span>.<span class="ident">metadata</span>)<span class="question-mark">?</span>;
+            <span class="ident">T</span>::<span class="ident">VotingRouter</span>::<span class="ident">veto</span>(<span class="ident">proposal</span>.<span class="ident">voting</span>, <span class="ident">proposal_id</span>)<span class="question-mark">?</span>;
             <span class="ident">Proposals</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">remove</span>(<span class="ident">proposal_id</span>);
 
             <span class="self">Self</span>::<span class="ident">deposit_event</span>(<span class="ident">RawEvent</span>::<span class="ident">ProposalVetoed</span>(<span class="ident">proposal_id</span>));
@@ -789,24 +722,13 @@
 
         <span class="doccomment">/// Vote for or against a given proposal. The caller can choose how much voting power is dedicated</span>
         <span class="doccomment">/// to it via the `power` parameter.</span>
-        <span class="attribute">#[<span class="ident">weight</span> <span class="op">=</span> {
-            <span class="kw">match</span> <span class="ident">in_support</span> {
-                <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">T</span>::<span class="ident">WeightInfo</span>::<span class="ident">decide_on_proposal_favorable</span>(<span class="ident">T</span>::<span class="ident">MaxVotes</span>::<span class="ident">get</span>(), <span class="ident">T</span>::<span class="ident">MaxVotes</span>::<span class="ident">get</span>()),
-                <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">T</span>::<span class="ident">WeightInfo</span>::<span class="ident">decide_on_proposal_against</span>(<span class="ident">T</span>::<span class="ident">MaxVotes</span>::<span class="ident">get</span>(), <span class="ident">T</span>::<span class="ident">MaxVotes</span>::<span class="ident">get</span>()),
-            }
-        }]</span>
-        <span class="kw">fn</span> <span class="ident">decide_on_proposal</span>(<span class="ident">origin</span>, <span class="ident">proposal_id</span>: <span class="ident">ProposalIdOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">power</span>: <span class="ident">BalanceOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">in_support</span>: <span class="ident">bool</span>) {
+        <span class="attribute">#[<span class="ident">weight</span> <span class="op">=</span> <span class="ident">T</span>::<span class="ident">WeightInfo</span>::<span class="ident">decide_on_proposal</span>(<span class="ident">T</span>::<span class="ident">MaxVotes</span>::<span class="ident">get</span>())]</span>
+        <span class="kw">fn</span> <span class="ident">decide_on_proposal</span>(<span class="ident">origin</span>, <span class="ident">proposal_id</span>: <span class="ident">ProposalIdOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">vote_data</span>: <span class="ident">VoteDataOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) {
             <span class="kw">let</span> <span class="ident">voter</span> <span class="op">=</span> <span class="ident">ensure_signed</span>(<span class="ident">origin</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">proposal</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">try_get_proposal</span>(<span class="ident">proposal_id</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> (<span class="ident">maybe_hook_sucessful</span>, <span class="ident">maybe_new_metadata</span>) <span class="op">=</span> <span class="ident">T</span>::<span class="ident">VotingHooks</span>::<span class="ident">on_decide_on_proposal</span>(<span class="ident">proposal</span>.<span class="ident">clone</span>().<span class="ident">voting</span>, <span class="ident">proposal</span>.<span class="ident">clone</span>().<span class="ident">metadata</span>, <span class="kw-2">&amp;</span><span class="ident">voter</span>, <span class="ident">power</span>, <span class="ident">in_support</span>);
-            <span class="macro">ensure_not_err</span><span class="macro">!</span>(<span class="ident">maybe_hook_sucessful</span>);
-            <span class="kw">if</span> <span class="ident">maybe_new_metadata</span> <span class="op">!</span><span class="op">=</span> <span class="ident">proposal</span>.<span class="ident">metadata</span> {
-                <span class="comment">// Save the new metadata, overwriting the previous one</span>
-                <span class="ident">proposal</span>.<span class="ident">metadata</span> <span class="op">=</span> <span class="ident">maybe_new_metadata</span>;
-                <span class="ident">Proposals</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">insert</span>(<span class="ident">proposal_id</span>, <span class="ident">proposal</span>);
-            }
+            <span class="kw">let</span> <span class="ident">proposal</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">try_get_proposal</span>(<span class="ident">proposal_id</span>)<span class="question-mark">?</span>;
 
-            <span class="self">Self</span>::<span class="ident">deposit_event</span>(<span class="ident">RawEvent</span>::<span class="ident">ProposalVoteCasted</span>(<span class="ident">proposal_id</span>, <span class="ident">voter</span>, <span class="ident">power</span>, <span class="ident">in_support</span>));
+            <span class="ident">T</span>::<span class="ident">VotingRouter</span>::<span class="ident">vote</span>(<span class="ident">proposal</span>.<span class="ident">voting</span>, <span class="ident">proposal_id</span>, <span class="kw-2">&amp;</span><span class="ident">voter</span>, <span class="ident">vote_data</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>;
+            <span class="self">Self</span>::<span class="ident">deposit_event</span>(<span class="ident">RawEvent</span>::<span class="ident">ProposalVoteCasted</span>(<span class="ident">proposal_id</span>, <span class="ident">voter</span>, <span class="ident">vote_data</span>));
         }
 
         <span class="doccomment">/// If a proposal passed or failed but is not longer awaiting or waiting for votes it can be closed. Closing</span>
@@ -820,20 +742,18 @@
             <span class="kw">let</span> <span class="ident">decoded_call</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Trait</span><span class="op">&gt;</span>::<span class="ident">Call</span>::<span class="ident">decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">&amp;</span><span class="ident">proposal</span>.<span class="ident">clone</span>().<span class="ident">call</span>[..]).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">ProposalDecodingFailure</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">decoded_call_weight</span> <span class="op">=</span> <span class="ident">decoded_call</span>.<span class="ident">get_dispatch_info</span>().<span class="ident">weight</span>;
             <span class="macro">ensure</span><span class="macro">!</span>(<span class="ident">proposal_weight_bound</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">decoded_call_weight</span>, <span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">TooSmallWeightBound</span>);
-            <span class="macro">ensure</span><span class="macro">!</span>(<span class="ident">T</span>::<span class="ident">VotingHooks</span>::<span class="ident">can_close</span>(<span class="ident">proposal</span>.<span class="ident">clone</span>().<span class="ident">voting</span>, <span class="ident">proposal</span>.<span class="ident">clone</span>().<span class="ident">metadata</span>, <span class="ident">frame_system</span>::<span class="ident">Module</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">block_number</span>()), <span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">ProposalCanNotBeClosed</span>);
 
-            <span class="kw">let</span> <span class="ident">passing</span> <span class="op">=</span> <span class="ident">T</span>::<span class="ident">VotingHooks</span>::<span class="ident">passing</span>(<span class="ident">proposal</span>.<span class="ident">clone</span>().<span class="ident">voting</span>, <span class="ident">proposal</span>.<span class="ident">clone</span>().<span class="ident">metadata</span>);
-            <span class="ident">T</span>::<span class="ident">VotingHooks</span>::<span class="ident">on_close_proposal</span>(<span class="ident">proposal</span>.<span class="ident">clone</span>().<span class="ident">voting</span>, <span class="ident">proposal</span>.<span class="ident">clone</span>().<span class="ident">metadata</span>, <span class="ident">passing</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">proposal_result</span> <span class="op">=</span> <span class="ident">T</span>::<span class="ident">VotingRouter</span>::<span class="ident">close</span>(<span class="ident">proposal</span>.<span class="ident">voting</span>.<span class="ident">clone</span>(), <span class="ident">proposal_id</span>)<span class="question-mark">?</span>;
 
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">external_weight</span>: <span class="ident">Weight</span> <span class="op">=</span> <span class="number">0</span>;
-            <span class="kw">if</span> <span class="ident">passing</span> {
+            <span class="kw">if</span> <span class="ident">proposal_result</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ProposalResult</span>::<span class="ident">Passing</span> {
                 <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">decoded_call</span>.<span class="ident">dispatch</span>(<span class="ident">frame_system</span>::<span class="ident">RawOrigin</span>::<span class="ident">Signed</span>(<span class="ident">proposal</span>.<span class="ident">clone</span>().<span class="ident">org</span>).<span class="ident">into</span>());
                 <span class="self">Self</span>::<span class="ident">deposit_event</span>(<span class="ident">RawEvent</span>::<span class="ident">ProposalExecuted</span>(<span class="ident">proposal_id</span>, <span class="ident">res</span>.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ()).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">error</span>)));
                 <span class="ident">external_weight</span> <span class="op">=</span> <span class="ident">external_weight</span>.<span class="ident">saturating_add</span>(<span class="self">Self</span>::<span class="ident">get_result_weight</span>(<span class="ident">res</span>).<span class="ident">unwrap_or</span>(<span class="ident">decoded_call_weight</span>));
             }
             <span class="ident">Proposals</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">remove</span>(<span class="ident">proposal_id</span>);
 
-            <span class="self">Self</span>::<span class="ident">deposit_event</span>(<span class="ident">RawEvent</span>::<span class="ident">ProposalClosed</span>(<span class="ident">proposal_id</span>, <span class="ident">passing</span>));
+            <span class="self">Self</span>::<span class="ident">deposit_event</span>(<span class="ident">RawEvent</span>::<span class="ident">ProposalClosed</span>(<span class="ident">proposal_id</span>, <span class="ident">proposal_result</span>));
 
             <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">T</span>::<span class="ident">WeightInfo</span>::<span class="ident">close_proposal</span>(<span class="ident">T</span>::<span class="ident">MaxVotes</span>::<span class="ident">get</span>(), <span class="ident">T</span>::<span class="ident">MaxVotes</span>::<span class="ident">get</span>()).<span class="ident">saturating_add</span>(<span class="ident">external_weight</span>)).<span class="ident">into</span>())
         }

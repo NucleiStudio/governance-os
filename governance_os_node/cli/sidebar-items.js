@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["Subcommand",""]],"struct":[["Cli",""]]});
+initSidebarItems({"enum":[["Subcommand",""]],"struct":[["Cli",""],["GeneratePlcrVotesCmd","The `generate-plcr-votes` command used to generate PLCR vote commit and reveal messages."]]});

@@ -265,6 +265,12 @@
 <span id="262">262</span>
 <span id="263">263</span>
 <span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">/*
  * Copyright 2020 Nuclei Studio OÜ
@@ -316,6 +322,7 @@
 <span class="kw">mod</span> <span class="ident">pallets_dorgs</span>;
 <span class="kw">mod</span> <span class="ident">pallets_economics</span>;
 <span class="kw">mod</span> <span class="ident">version</span>;
+<span class="kw">mod</span> <span class="ident">voting_router</span>;
 <span class="kw">mod</span> <span class="ident">weights</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">pallets_consensus</span>::{<span class="ident">AuraId</span>, <span class="ident">GrandpaId</span>, <span class="ident">SessionKeys</span>};
@@ -323,6 +330,9 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">version</span>::<span class="ident">native_version</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">version</span>::<span class="ident">VERSION</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">voting_router</span>::{
+    <span class="ident">CoinVotingParameters</span>, <span class="ident">PlcrVotingParameters</span>, <span class="ident">RuntimeVotingParameters</span>, <span class="ident">RuntimeVotingSystemId</span>,
+};
 
 <span class="macro">construct_runtime</span><span class="macro">!</span>(
     <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Runtime</span>
@@ -347,6 +357,8 @@
 
         <span class="comment">// dOrgs</span>
         <span class="ident">Bylaws</span>: <span class="ident">governance_os_pallet_bylaws</span>::{<span class="ident">Module</span>, <span class="ident">Call</span>, <span class="ident">Storage</span>, <span class="ident">Config</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Event</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>},
+        <span class="ident">CoinVoting</span>: <span class="ident">governance_os_pallet_coin_voting</span>::{<span class="ident">Module</span>, <span class="ident">Call</span>, <span class="ident">Storage</span>},
+        <span class="ident">PlcrVoting</span>: <span class="ident">governance_os_pallet_plcr_voting</span>::{<span class="ident">Module</span>, <span class="ident">Call</span>, <span class="ident">Storage</span>, <span class="ident">Event</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>},
         <span class="ident">Organizations</span>: <span class="ident">governance_os_pallet_organizations</span>::{<span class="ident">Module</span>, <span class="ident">Call</span>, <span class="ident">Storage</span>, <span class="ident">Config</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Event</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>},
     }
 );
@@ -520,7 +532,7 @@
 
             <span class="macro">add_benchmark</span><span class="macro">!</span>(<span class="ident">params</span>, <span class="ident">batches</span>, <span class="ident">frame_system</span>, <span class="ident">SystemBench</span>::<span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>);
             <span class="macro">add_benchmark</span><span class="macro">!</span>(<span class="ident">params</span>, <span class="ident">batches</span>, <span class="ident">governance_os_pallet_bylaws</span>, <span class="ident">Bylaws</span>);
-            <span class="macro">add_benchmark</span><span class="macro">!</span>(<span class="ident">params</span>, <span class="ident">batches</span>, <span class="ident">governance_os_pallet_organizations</span>, <span class="ident">Organizations</span>);
+            <span class="comment">//add_benchmark!(params, batches, governance_os_pallet_organizations, Organizations);</span>
             <span class="macro">add_benchmark</span><span class="macro">!</span>(<span class="ident">params</span>, <span class="ident">batches</span>, <span class="ident">governance_os_pallet_tokens</span>, <span class="ident">Tokens</span>);
             <span class="macro">add_benchmark</span><span class="macro">!</span>(<span class="ident">params</span>, <span class="ident">batches</span>, <span class="ident">pallet_grandpa</span>, <span class="ident">Grandpa</span>);
             <span class="macro">add_benchmark</span><span class="macro">!</span>(<span class="ident">params</span>, <span class="ident">batches</span>, <span class="ident">pallet_timestamp</span>, <span class="ident">Timestamp</span>);
