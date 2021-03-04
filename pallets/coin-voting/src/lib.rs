@@ -64,22 +64,18 @@ type CoinProposalStateOf<T> = ProposalState<
 
 decl_storage! {
     trait Store for Module<T: Trait> as CoinVoting {
+        /// Proposals actively opened and linked to this voting implementation. Erased when closed or vetoed.
         pub Proposals get(fn proposals): map hasher(blake2_128_concat) T::Hash => CoinProposalStateOf<T>;
+        /// Keeps track of locks set on user's balances and to which proposal they were linked to.
         pub Locks get(fn locks): map hasher(blake2_128_concat) LockIdentifierOf<T> => Vec<LockDataOf<T>>;
     }
 }
 
 decl_error! {
     pub enum Error for Module<T: Trait> {
-        /// This proposal ID is already pending a vote, thus it can not
-        /// be created again for now.
-        DuplicatedProposal,
         /// There are not enough tokens in the user's balance to proceed
         /// to this action.
         NotEnoughBalance,
-        /// This proposal was not initialized with this pallet or simply
-        /// does not exists.
-        ProposalNotInitialized,
         /// Proposal cannot be closed yet, it is likely too early.
         CannotClose,
     }
@@ -96,20 +92,15 @@ impl<T: Trait> StandardizedVoting for Module<T> {
     type VoteData = VoteData<BalanceOf<T>>;
     type AccountId = T::AccountId;
 
+    /// Register the proposal in our storage. Does not make any attempt at preventing duplicates
+    /// as we assume this is handled by the calling pallet.
     fn initiate(proposal: Self::ProposalId, parameters: Self::Parameters) -> DispatchResult {
         Proposals::<T>::try_mutate_exists(proposal, |maybe_existing_state| -> DispatchResult {
-            if maybe_existing_state.is_some() {
-                // duplicate detected, we do not want to erase any pending vote's
-                // state and thus fail.
-                return Err(Error::<T>::DuplicatedProposal.into());
-            }
-
             // no duplicates, we can create a new state
             *maybe_existing_state = Some(ProposalState {
                 parameters,
                 total_against: Zero::zero(),
                 total_favorable: Zero::zero(),
-                initialized: true,
                 locks: vec![],
                 created_on: Self::now(),
             });
@@ -120,13 +111,13 @@ impl<T: Trait> StandardizedVoting for Module<T> {
         Ok(())
     }
 
+    /// Record a new vote and set any locks or reserved coins in place.
     fn vote(
         proposal: Self::ProposalId,
         voter: &Self::AccountId,
         data: Self::VoteData,
     ) -> DispatchResult {
         let mut state = Self::proposals(proposal);
-        ensure!(state.initialized, Error::<T>::ProposalNotInitialized);
 
         // We want to prevent votes for user with less coins than they'd like to lock.
         ensure!(
@@ -162,11 +153,15 @@ impl<T: Trait> StandardizedVoting for Module<T> {
         Ok(())
     }
 
+    /// Simply unlock all the coins related to votes for or against a given proposal. Also
+    /// frees any storage associated to it.
     fn veto(proposal: Self::ProposalId) -> DispatchResult {
         // note the use of take instead of get which also deletes the storage
         Self::unlock(Proposals::<T>::take(proposal).locks, proposal)
     }
 
+    /// Checks wether a proposal is passing or not. Then unlock all coins related to it
+    /// and clean the storage.
     fn close(proposal: Self::ProposalId) -> Result<ProposalResult, DispatchError> {
         let state = Proposals::<T>::get(proposal);
 
@@ -198,6 +193,8 @@ impl<T: Trait> StandardizedVoting for Module<T> {
 }
 
 impl<T: Trait> Module<T> {
+    /// Modify the locks related to the `voter` and `proposal`. We provide a hook `on_duplicate_vote_found`
+    /// used to handle cases where we have a similar lock in place.
     fn update_locks<F>(
         voting_currency: CurrencyIdOf<T>,
         voter: &T::AccountId,
@@ -239,6 +236,7 @@ impl<T: Trait> Module<T> {
         Ok(())
     }
 
+    /// Unlock all the coins related to the `proposal`.
     fn unlock(locks: Vec<LockIdentifierOf<T>>, proposal: T::Hash) -> DispatchResult {
         locks
             .iter()
@@ -264,6 +262,9 @@ impl<T: Trait> Module<T> {
         Ok(())
     }
 
+    /// Recompute locks from the `locks` vector. We do not mix locks between the different voting
+    /// strategies and rather sum them up. In general you can consider that we lock the maximum
+    /// amount of coins as listed in `locks`.
     fn rejig_locks(
         locks: Vec<LockDataOf<T>>,
         voting_currency: CurrencyIdOf<T>,
@@ -309,6 +310,8 @@ impl<T: Trait> Module<T> {
         Ok(())
     }
 
+    /// Just a helper function to return the current block number. Simply sexier
+    /// than calling the actual `frame_system::Module::<T>::block_number()` function.
     fn now() -> T::BlockNumber {
         frame_system::Module::<T>::block_number()
     }

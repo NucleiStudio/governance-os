@@ -42,22 +42,6 @@ fn initialize_registers_proposal_hash() {
 }
 
 #[test]
-fn initialize_refuses_duplicate() {
-    ExtBuilder::default().build().execute_with(|| {
-        let mock_hash = H256::default();
-
-        assert_ok!(<PlcrVoting as StandardizedVoting>::initiate(
-            mock_hash,
-            Default::default()
-        ));
-        assert_noop!(
-            <PlcrVoting as StandardizedVoting>::initiate(mock_hash, Default::default()),
-            Error::<Test>::DuplicatedProposal
-        );
-    })
-}
-
-#[test]
 fn vote_normal_flow() {
     ExtBuilder::default()
         .one_hundred_for_alice_n_bob()

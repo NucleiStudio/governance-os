@@ -53,7 +53,8 @@ pub trait StandardizedVoting {
 
     /// A proposal is being created. Handle any eventual registration and trigger
     /// an error if any preconditions are not met. Shall be called before any other
-    /// state changes so that it is safe to fail here.
+    /// state changes so that it is safe to fail here. It is the caller's responsibility
+    /// to try and prevent overwrites or duplicated proposals.
     fn initiate(proposal: Self::ProposalId, parameters: Self::Parameters) -> DispatchResult;
 
     /// Special function to handle the case when a proposal is being vetoed. This
@@ -76,20 +77,39 @@ pub trait StandardizedVoting {
 
 /// Used to route votes and related actions between different voting system implementations.
 pub trait VotingRouter {
+    /// How accounts are represented, used to identify voters.
     type AccountId;
+
+    /// How the runtime defines a voting system. And how users can select it. Typically this
+    /// would be a rust `enum`.
     type VotingSystemId: Parameter;
+
+    /// How the parameters of a voting system are represented and set at the
+    /// organization level. Typically an `enum` to account for all the different
+    /// parameters for the different voting systems.
     type Parameters: Parameter;
+
+    /// How we represent a proposal. Typically a `Hash`.
     type ProposalId: Parameter;
+
+    /// How the runtime represents the different vote data of the different voting systems.
+    /// Typically an `enum` to account for all the different voting systems.
     type VoteData: Parameter;
 
+    /// Route the `initiate` call to the right `StandardizedVoting` implementation based
+    /// on the value of `voting_systems`.
     fn initiate(
         voting_system: Self::VotingSystemId,
         proposal: Self::ProposalId,
         parameters: Self::Parameters,
     ) -> DispatchResult;
 
+    /// Route the `veto` call to the right `StandardizedVoting` implementation based
+    /// on the value of `voting_systems`.
     fn veto(voting_system: Self::VotingSystemId, proposal: Self::ProposalId) -> DispatchResult;
 
+    /// Route the `vote` call to the right `StandardizedVoting` implementation based
+    /// on the value of `voting_systems`.
     fn vote(
         voting_system: Self::VotingSystemId,
         proposal: Self::ProposalId,
@@ -97,6 +117,8 @@ pub trait VotingRouter {
         data: Self::VoteData,
     ) -> DispatchResult;
 
+    /// Route the `close` call to the right `StandardizedVoting` implementation based
+    /// on the value of `voting_systems`.
     fn close(
         voting_system: Self::VotingSystemId,
         proposal: Self::ProposalId,

@@ -43,22 +43,6 @@ fn initialize_registers_proposal_hash() {
 }
 
 #[test]
-fn initialize_refuses_duplicate() {
-    ExtBuilder::default().build().execute_with(|| {
-        let mock_hash = H256::default();
-
-        assert_ok!(<CoinVoting as StandardizedVoting>::initiate(
-            mock_hash,
-            Default::default()
-        ));
-        assert_noop!(
-            <CoinVoting as StandardizedVoting>::initiate(mock_hash, Default::default()),
-            Error::<Test>::DuplicatedProposal
-        );
-    })
-}
-
-#[test]
 fn vote_lock_tokens() {
     ExtBuilder::default()
         .one_hundred_for_alice_n_bob()
@@ -261,25 +245,6 @@ fn vote_fail_if_not_enough_tokens() {
                 }
             ),
             Error::<Test>::NotEnoughBalance
-        );
-    })
-}
-
-#[test]
-fn vote_fail_if_proposal_does_not_exists() {
-    ExtBuilder::default().build().execute_with(|| {
-        let mock_hash = H256::default();
-
-        assert_noop!(
-            <CoinVoting as StandardizedVoting>::vote(
-                mock_hash,
-                &ALICE,
-                VoteData {
-                    in_support: true,
-                    power: 10
-                }
-            ),
-            Error::<Test>::ProposalNotInitialized
         );
     })
 }
