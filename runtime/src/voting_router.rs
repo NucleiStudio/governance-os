@@ -29,6 +29,8 @@ use serde::{Deserialize, Serialize};
 use sp_runtime::{DispatchError, DispatchResult, RuntimeDebug};
 use sp_std::result;
 
+/// An enum to wrap the different voting parameters for all the runtime voting
+/// implementations.
 #[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug)]
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 pub enum RuntimeVotingParameters {
@@ -36,6 +38,8 @@ pub enum RuntimeVotingParameters {
     PlcrVoting(PlcrVotingParameters<BlockNumber, CurrencyId>),
 }
 
+/// An enum to wrap the different vote data for all the runtime voting
+/// implementations.
 #[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug)]
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 pub enum RuntimeVoteData {
@@ -43,6 +47,9 @@ pub enum RuntimeVoteData {
     PlcrVoting(PlcrVoteData<Balance, Hash>),
 }
 
+/// An enum to differentiate between the different runtime voting
+/// implementations. The voting router will use it to select the
+/// right parameters and vote data.
 #[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug)]
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 pub enum RuntimeVotingSystemId {
