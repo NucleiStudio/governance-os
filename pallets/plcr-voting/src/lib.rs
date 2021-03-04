@@ -59,17 +59,17 @@ type PlcrVoteData<Balance, Hash> = VoteData<Balance, Hash>;
 
 decl_storage! {
     trait Store for Module<T: Trait> as PlcrVoting {
+        /// Proposals actively opened and linked to this voting implementation. Erased when closed or vetoed.
         pub Proposals get(fn proposals): map hasher(blake2_128_concat) T::Hash => PlcrProposalStateOf<T>;
+        /// Keeps track of locks set on user's balances and to which proposal they were linked to.
         pub Locks get(fn locks): map hasher(blake2_128_concat) (CurrencyIdOf<T>, T::AccountId) => Vec<(T::Hash, BalanceOf<T>)>;
+        /// Keeps track of the votes casted in favor of or against the different proposals.
         pub Votes get(fn votes): double_map hasher(blake2_128_concat) T::Hash, hasher(blake2_128_concat) T::AccountId => PlcrVoteData<BalanceOf<T>, T::Hash>;
     }
 }
 
 decl_error! {
     pub enum Error for Module<T: Trait> {
-        /// This proposal ID is already pending a vote, thus it can not
-        /// be created again for now.
-        DuplicatedProposal,
         /// The reveal vote does not match our saved commit.
         RevealCommitMismatch,
         /// We were not able to find a commit for the given reveal vote.
@@ -113,14 +113,10 @@ impl<T: Trait> StandardizedVoting for Module<T> {
     type VoteData = VoteData<BalanceOf<T>, T::Hash>;
     type AccountId = T::AccountId;
 
+    /// Register the proposal in our storage. Does not make any attempt at preventing duplicates
+    /// as we assume this is handled by the calling pallet.
     fn initiate(proposal: Self::ProposalId, parameters: Self::Parameters) -> DispatchResult {
         Proposals::<T>::try_mutate_exists(proposal, |maybe_existing_state| -> DispatchResult {
-            if maybe_existing_state.is_some() {
-                // duplicate detected, we do not want to erase any pending vote's
-                // state and thus fail.
-                return Err(Error::<T>::DuplicatedProposal.into());
-            }
-
             // no duplicates, we can create a new state
             *maybe_existing_state = Some(ProposalState {
                 parameters,
@@ -136,10 +132,13 @@ impl<T: Trait> StandardizedVoting for Module<T> {
         Ok(())
     }
 
+    /// Simply unlock voters' tokens and clear the storage.
     fn veto(proposal: Self::ProposalId) -> DispatchResult {
         Self::finalize_proposal(proposal, Self::proposals(proposal))
     }
 
+    /// Handle votes depending on the different phases. We prevent revealing votes before the
+    /// reveal phase and idem for commit votes.
     fn vote(
         proposal: Self::ProposalId,
         voter: &Self::AccountId,
@@ -194,6 +193,8 @@ impl<T: Trait> StandardizedVoting for Module<T> {
         Ok(())
     }
 
+    /// Checks the wether the proposal is passing and then clear the storage plus unlock
+    /// the voters' coins.
     fn close(proposal: Self::ProposalId) -> Result<ProposalResult, DispatchError> {
         let state = Self::proposals(proposal);
         let proposal_expired = Self::now()
@@ -224,10 +225,15 @@ impl<T: Trait> StandardizedVoting for Module<T> {
 }
 
 impl<T: Trait> Module<T> {
+    /// Just a helper function to return the current block number. Simply sexier
+    /// than calling the actual `frame_system::Module::<T>::block_number()` function.
     fn now() -> T::BlockNumber {
         frame_system::Module::<T>::block_number()
     }
 
+    /// Register a new lock of `amount` for `currency` linked to `proposal` for `who`.
+    /// If a lock with similar parameters but a different `amount` exists we will
+    /// replace it and lock or unlock the difference.
     fn lock(
         proposal: T::Hash,
         currency: CurrencyIdOf<T>,
@@ -256,6 +262,7 @@ impl<T: Trait> Module<T> {
         Ok(())
     }
 
+    /// Frees the locked coins of `who` for `currency` related to `proposal`.
     fn unlock(proposal: T::Hash, currency: CurrencyIdOf<T>, who: &T::AccountId) -> DispatchResult {
         let mut lock_data = Locks::<T>::get((currency, who));
         lock_data = lock_data
@@ -276,6 +283,8 @@ impl<T: Trait> Module<T> {
         Ok(())
     }
 
+    /// Read the locks in `locks` and lock the maximum amount of coins for `who` and `currency`.
+    /// Useful to handle cases where people vote on multiple proposals for the same coins.
     fn rejig_locks(
         locks: Vec<(T::Hash, BalanceOf<T>)>,
         currency: CurrencyIdOf<T>,
@@ -301,6 +310,7 @@ impl<T: Trait> Module<T> {
         Ok(())
     }
 
+    /// Clear all the storage related to a proposal.
     fn finalize_proposal(proposal: T::Hash, state: PlcrProposalStateOf<T>) -> DispatchResult {
         Votes::<T>::iter_prefix(proposal).try_for_each(|(account, _vote)| -> DispatchResult {
             Self::unlock(proposal, state.parameters.voting_currency, &account)?;
