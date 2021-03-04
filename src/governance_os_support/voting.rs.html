@@ -105,6 +105,28 @@
 <span id="102">102</span>
 <span id="103">103</span>
 <span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">/*
  * Copyright 2020 Nuclei Studio OÜ
@@ -161,7 +183,8 @@
 
     <span class="doccomment">/// A proposal is being created. Handle any eventual registration and trigger</span>
     <span class="doccomment">/// an error if any preconditions are not met. Shall be called before any other</span>
-    <span class="doccomment">/// state changes so that it is safe to fail here.</span>
+    <span class="doccomment">/// state changes so that it is safe to fail here. It is the caller&#39;s responsibility</span>
+    <span class="doccomment">/// to try and prevent overwrites or duplicated proposals.</span>
     <span class="kw">fn</span> <span class="ident">initiate</span>(<span class="ident">proposal</span>: <span class="self">Self</span>::<span class="ident">ProposalId</span>, <span class="ident">parameters</span>: <span class="self">Self</span>::<span class="ident">Parameters</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span>;
 
     <span class="doccomment">/// Special function to handle the case when a proposal is being vetoed. This</span>
@@ -184,20 +207,39 @@
 
 <span class="doccomment">/// Used to route votes and related actions between different voting system implementations.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">VotingRouter</span> {
+    <span class="doccomment">/// How accounts are represented, used to identify voters.</span>
     <span class="kw">type</span> <span class="ident">AccountId</span>;
+
+    <span class="doccomment">/// How the runtime defines a voting system. And how users can select it. Typically this</span>
+    <span class="doccomment">/// would be a rust `enum`.</span>
     <span class="kw">type</span> <span class="ident">VotingSystemId</span>: <span class="ident">Parameter</span>;
+
+    <span class="doccomment">/// How the parameters of a voting system are represented and set at the</span>
+    <span class="doccomment">/// organization level. Typically an `enum` to account for all the different</span>
+    <span class="doccomment">/// parameters for the different voting systems.</span>
     <span class="kw">type</span> <span class="ident">Parameters</span>: <span class="ident">Parameter</span>;
+
+    <span class="doccomment">/// How we represent a proposal. Typically a `Hash`.</span>
     <span class="kw">type</span> <span class="ident">ProposalId</span>: <span class="ident">Parameter</span>;
+
+    <span class="doccomment">/// How the runtime represents the different vote data of the different voting systems.</span>
+    <span class="doccomment">/// Typically an `enum` to account for all the different voting systems.</span>
     <span class="kw">type</span> <span class="ident">VoteData</span>: <span class="ident">Parameter</span>;
 
+    <span class="doccomment">/// Route the `initiate` call to the right `StandardizedVoting` implementation based</span>
+    <span class="doccomment">/// on the value of `voting_systems`.</span>
     <span class="kw">fn</span> <span class="ident">initiate</span>(
         <span class="ident">voting_system</span>: <span class="self">Self</span>::<span class="ident">VotingSystemId</span>,
         <span class="ident">proposal</span>: <span class="self">Self</span>::<span class="ident">ProposalId</span>,
         <span class="ident">parameters</span>: <span class="self">Self</span>::<span class="ident">Parameters</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span>;
 
+    <span class="doccomment">/// Route the `veto` call to the right `StandardizedVoting` implementation based</span>
+    <span class="doccomment">/// on the value of `voting_systems`.</span>
     <span class="kw">fn</span> <span class="ident">veto</span>(<span class="ident">voting_system</span>: <span class="self">Self</span>::<span class="ident">VotingSystemId</span>, <span class="ident">proposal</span>: <span class="self">Self</span>::<span class="ident">ProposalId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span>;
 
+    <span class="doccomment">/// Route the `vote` call to the right `StandardizedVoting` implementation based</span>
+    <span class="doccomment">/// on the value of `voting_systems`.</span>
     <span class="kw">fn</span> <span class="ident">vote</span>(
         <span class="ident">voting_system</span>: <span class="self">Self</span>::<span class="ident">VotingSystemId</span>,
         <span class="ident">proposal</span>: <span class="self">Self</span>::<span class="ident">ProposalId</span>,
@@ -205,6 +247,8 @@
         <span class="ident">data</span>: <span class="self">Self</span>::<span class="ident">VoteData</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span>;
 
+    <span class="doccomment">/// Route the `close` call to the right `StandardizedVoting` implementation based</span>
+    <span class="doccomment">/// on the value of `voting_systems`.</span>
     <span class="kw">fn</span> <span class="ident">close</span>(
         <span class="ident">voting_system</span>: <span class="self">Self</span>::<span class="ident">VotingSystemId</span>,
         <span class="ident">proposal</span>: <span class="self">Self</span>::<span class="ident">ProposalId</span>,

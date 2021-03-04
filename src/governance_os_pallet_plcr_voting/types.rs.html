@@ -67,6 +67,34 @@
 <span id="64">64</span>
 <span id="65">65</span>
 <span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">/*
  * Copyright 2020 Nuclei Studio OÜ
@@ -84,7 +112,7 @@
  * limitations under the License.
  */</span>
 
-<span class="doccomment">//! Type definitions for the coin based voting pallet.</span>
+<span class="doccomment">//! Type definitions for the plcr voting pallet.</span>
 
 <span class="kw">use</span> <span class="ident">codec</span>::{<span class="ident">Decode</span>, <span class="ident">Encode</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
@@ -94,21 +122,45 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">Default</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">VotingParameters</span><span class="op">&lt;</span><span class="ident">BlockNumber</span>, <span class="ident">CurrencyId</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Defines the duration of the &quot;commit phase&quot;. During this period</span>
+    <span class="doccomment">/// users can submit &quot;commit votes&quot; that are hashed version of their</span>
+    <span class="doccomment">/// votes.</span>
     <span class="kw">pub</span> <span class="ident">commit_duration</span>: <span class="ident">BlockNumber</span>,
+    <span class="doccomment">/// Defines the duration of the &quot;reveal phase&quot;. During this period</span>
+    <span class="doccomment">/// users can submit &quot;reveal votes&quot; that should match their previous</span>
+    <span class="doccomment">/// commits.</span>
     <span class="kw">pub</span> <span class="ident">reveal_duration</span>: <span class="ident">BlockNumber</span>,
 
+    <span class="doccomment">/// Currency used to represent vote &quot;powers&quot;. The more tokens one has</span>
+    <span class="doccomment">/// the more power to tip the balance they have.</span>
     <span class="kw">pub</span> <span class="ident">voting_currency</span>: <span class="ident">CurrencyId</span>,
+    <span class="doccomment">/// Minimum quorum that needs to be met in order for a proposal to be</span>
+    <span class="doccomment">/// considered passing. Should be a percentage value as it is passed to</span>
+    <span class="doccomment">/// `Perbill::from_percent` later on. Quorum is computed from all the</span>
+    <span class="doccomment">/// votes casted. If quorum is set to 50% it means a proposal will pass</span>
+    <span class="doccomment">/// if 50% + 1 of the votes are favorable to it.</span>
     <span class="kw">pub</span> <span class="ident">min_quorum</span>: <span class="ident">u32</span>,
+    <span class="doccomment">/// Minimum participation that needs to be met in order for a proposal</span>
+    <span class="doccomment">/// to be considered passing. Should be a percentage value as it is</span>
+    <span class="doccomment">/// passed to `Perbill::from_percent` later on. If the minimum participation</span>
+    <span class="doccomment">/// is set to 33% it means that at least 33% + 1 of the `voting_currency`</span>
+    <span class="doccomment">/// total supply need to have been used in votes for or against the proposal.</span>
     <span class="kw">pub</span> <span class="ident">min_participation</span>: <span class="ident">u32</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">Default</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ProposalState</span><span class="op">&lt;</span><span class="ident">Balance</span>, <span class="ident">BlockNumber</span>, <span class="ident">CurrencyId</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Parameters that this proposal was created with.</span>
     <span class="kw">pub</span> <span class="ident">parameters</span>: <span class="ident">VotingParameters</span><span class="op">&lt;</span><span class="ident">BlockNumber</span>, <span class="ident">CurrencyId</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// How many tokens where staked against this proposal. Computed only</span>
+    <span class="doccomment">/// from revealed votes.</span>
     <span class="kw">pub</span> <span class="ident">revealed_against</span>: <span class="ident">Balance</span>,
+    <span class="doccomment">/// How many tokens where staked in favor of this proposal. Computed</span>
+    <span class="doccomment">/// only from revealed votes.</span>
     <span class="kw">pub</span> <span class="ident">revealed_favorable</span>: <span class="ident">Balance</span>,
 
+    <span class="doccomment">/// When this proposal was created. Used to compute phases ending blocks.</span>
     <span class="kw">pub</span> <span class="ident">created_on</span>: <span class="ident">BlockNumber</span>,
 }
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Balance</span>: <span class="ident">Saturating</span> <span class="op">+</span> <span class="ident">Copy</span>, <span class="ident">BlockNumber</span>, <span class="ident">CurrencyId</span><span class="op">&gt;</span>
@@ -126,8 +178,12 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">RuntimeDebug</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">VoteData</span><span class="op">&lt;</span><span class="ident">Balance</span>, <span class="ident">Hash</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// A commit vote is the hash of the vote that will be revealed</span>
+    <span class="doccomment">/// later on.</span>
     <span class="ident">Commit</span>(<span class="ident">Hash</span>),
-    <span class="ident">Reveal</span>(<span class="ident">Balance</span>, <span class="ident">bool</span>, <span class="ident">u64</span>), <span class="comment">// Coins locked, support, salt</span>
+    <span class="doccomment">/// The revelation of vote that was previously committed. Fields</span>
+    <span class="doccomment">/// are \[amount of coins locked, support, salt\].</span>
+    <span class="ident">Reveal</span>(<span class="ident">Balance</span>, <span class="ident">bool</span>, <span class="ident">u64</span>),
 }
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Balance</span>: <span class="ident">Default</span>, <span class="ident">Hash</span>: <span class="ident">Default</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">VoteData</span><span class="op">&lt;</span><span class="ident">Balance</span>, <span class="ident">Hash</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {

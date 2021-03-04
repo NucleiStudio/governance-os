@@ -106,6 +106,30 @@
 <span id="103">103</span>
 <span id="104">104</span>
 <span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">/*
  * Copyright 2020 Nuclei Studio OÜ
@@ -138,18 +162,36 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">Default</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">VotingParameters</span><span class="op">&lt;</span><span class="ident">BlockNumber</span>, <span class="ident">CurrencyId</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// How old a proposal can get before it can be closed and considered</span>
+    <span class="doccomment">/// as failing.</span>
     <span class="kw">pub</span> <span class="ident">ttl</span>: <span class="ident">BlockNumber</span>,
+    <span class="doccomment">/// Currency used to represent vote &quot;powers&quot;. The more tokens one has</span>
+    <span class="doccomment">/// the more power to tip the balance they have.</span>
     <span class="kw">pub</span> <span class="ident">voting_currency</span>: <span class="ident">CurrencyId</span>,
+    <span class="doccomment">/// Minimum quorum that needs to be met in order for a proposal to be</span>
+    <span class="doccomment">/// considered passing. Should be a percentage value as it is passed to</span>
+    <span class="doccomment">/// `Perbill::from_percent` later on. Quorum is computed from all the</span>
+    <span class="doccomment">/// votes casted. If quorum is set to 50% it means a proposal will pass</span>
+    <span class="doccomment">/// if 50% + 1 of the votes are favorable to it.</span>
     <span class="kw">pub</span> <span class="ident">min_quorum</span>: <span class="ident">u32</span>,
+    <span class="doccomment">/// Minimum participation that needs to be met in order for a proposal</span>
+    <span class="doccomment">/// to be considered passing. Should be a percentage value as it is</span>
+    <span class="doccomment">/// passed to `Perbill::from_percent` later on. If the minimum participation</span>
+    <span class="doccomment">/// is set to 33% it means that at least 33% + 1 of the `voting_currency`</span>
+    <span class="doccomment">/// total supply need to have been used in votes for or against the proposal.</span>
     <span class="kw">pub</span> <span class="ident">min_participation</span>: <span class="ident">u32</span>,
 
+    <span class="doccomment">/// Defines how we are going to count and register votes.</span>
     <span class="kw">pub</span> <span class="ident">vote_counting_strategy</span>: <span class="ident">VoteCountingStrategy</span>,
 }
 
+<span class="doccomment">/// Various strategies we support to count votes.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">Copy</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">VoteCountingStrategy</span> {
+    <span class="doccomment">/// 1 coin is equal to 1 vote.</span>
     <span class="ident">Simple</span>,
+    <span class="doccomment">/// The price to acquire votes increases quadratically.</span>
     <span class="ident">Quadratic</span>,
 }
 <span class="macro">impl_enum_default</span><span class="macro">!</span>(<span class="ident">VoteCountingStrategy</span>, <span class="ident">Simple</span>);
@@ -157,29 +199,34 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">RuntimeDebug</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">VoteData</span><span class="op">&lt;</span><span class="ident">Balance</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Wether we are favorable to the proposal or opposed to it.</span>
     <span class="kw">pub</span> <span class="ident">in_support</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// How much coins we want to stake on this decision.</span>
     <span class="kw">pub</span> <span class="ident">power</span>: <span class="ident">Balance</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">RuntimeDebug</span>, <span class="ident">Default</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ProposalState</span><span class="op">&lt;</span><span class="ident">Balance</span>, <span class="ident">BlockNumber</span>, <span class="ident">CurrencyId</span>, <span class="ident">LockIdentifier</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Parameters that this proposal was created with.</span>
     <span class="kw">pub</span> <span class="ident">parameters</span>: <span class="ident">VotingParameters</span><span class="op">&lt;</span><span class="ident">BlockNumber</span>, <span class="ident">CurrencyId</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Total amount of votes staked in favor of this proposal.</span>
     <span class="kw">pub</span> <span class="ident">total_favorable</span>: <span class="ident">Balance</span>,
+    <span class="doccomment">/// Total amount of votes staked against this proposal.</span>
     <span class="kw">pub</span> <span class="ident">total_against</span>: <span class="ident">Balance</span>,
 
-    <span class="doccomment">/// Used to detect wether a proposal is ready to accept votes or not</span>
-    <span class="kw">pub</span> <span class="ident">initialized</span>: <span class="ident">bool</span>,
-
-    <span class="doccomment">/// Used to list all opened locks on coins to later free those</span>
+    <span class="doccomment">/// Used to list all opened locks on coins to later free those.</span>
     <span class="kw">pub</span> <span class="ident">locks</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">LockIdentifier</span><span class="op">&gt;</span>,
 
+    <span class="doccomment">/// Record when the proposal was created. Used to know when it is expired</span>
+    <span class="doccomment">/// (when the ttl is over).</span>
     <span class="kw">pub</span> <span class="ident">created_on</span>: <span class="ident">BlockNumber</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Balance</span>: <span class="ident">Saturating</span> <span class="op">+</span> <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">IntegerSquareRoot</span>, <span class="ident">BlockNumber</span>, <span class="ident">CurrencyId</span>, <span class="ident">LockIdentifier</span><span class="op">&gt;</span>
     <span class="ident">ProposalState</span><span class="op">&lt;</span><span class="ident">Balance</span>, <span class="ident">BlockNumber</span>, <span class="ident">CurrencyId</span>, <span class="ident">LockIdentifier</span><span class="op">&gt;</span>
 {
+    <span class="doccomment">/// Record a new vote based on wether it is favorable or not.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">record_vote</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">favorable</span>: <span class="ident">bool</span>, <span class="ident">power</span>: <span class="ident">Balance</span>) {
         <span class="kw">if</span> <span class="ident">favorable</span> {
             <span class="self">self</span>.<span class="ident">total_favorable</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">total_favorable</span>.<span class="ident">saturating_add</span>(<span class="self">self</span>.<span class="ident">real_power</span>(<span class="ident">power</span>));
@@ -188,6 +235,7 @@
         }
     }
 
+    <span class="doccomment">/// Unrecord an existing vote based on wether it was favorable or not.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unrecord_vote</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">favorable</span>: <span class="ident">bool</span>, <span class="ident">power</span>: <span class="ident">Balance</span>) {
         <span class="kw">if</span> <span class="ident">favorable</span> {
             <span class="self">self</span>.<span class="ident">total_favorable</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">total_favorable</span>.<span class="ident">saturating_sub</span>(<span class="self">self</span>.<span class="ident">real_power</span>(<span class="ident">power</span>));

@@ -316,6 +316,9 @@
 <span id="313">313</span>
 <span id="314">314</span>
 <span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">/*
  * Copyright 2020 Nuclei Studio OÜ
@@ -383,22 +386,18 @@
 
 <span class="macro">decl_storage</span><span class="macro">!</span> {
     <span class="kw">trait</span> <span class="ident">Store</span> <span class="kw">for</span> <span class="ident">Module</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Trait</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">CoinVoting</span> {
+        <span class="doccomment">/// Proposals actively opened and linked to this voting implementation. Erased when closed or vetoed.</span>
         <span class="kw">pub</span> <span class="ident">Proposals</span> <span class="ident">get</span>(<span class="kw">fn</span> <span class="ident">proposals</span>): <span class="ident">map</span> <span class="ident">hasher</span>(<span class="ident">blake2_128_concat</span>) <span class="ident">T</span>::<span class="ident">Hash</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">CoinProposalStateOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
+        <span class="doccomment">/// Keeps track of locks set on user&#39;s balances and to which proposal they were linked to.</span>
         <span class="kw">pub</span> <span class="ident">Locks</span> <span class="ident">get</span>(<span class="kw">fn</span> <span class="ident">locks</span>): <span class="ident">map</span> <span class="ident">hasher</span>(<span class="ident">blake2_128_concat</span>) <span class="ident">LockIdentifierOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">LockDataOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>;
     }
 }
 
 <span class="macro">decl_error</span><span class="macro">!</span> {
     <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Error</span> <span class="kw">for</span> <span class="ident">Module</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Trait</span><span class="op">&gt;</span> {
-        <span class="doccomment">/// This proposal ID is already pending a vote, thus it can not</span>
-        <span class="doccomment">/// be created again for now.</span>
-        <span class="ident">DuplicatedProposal</span>,
         <span class="doccomment">/// There are not enough tokens in the user&#39;s balance to proceed</span>
         <span class="doccomment">/// to this action.</span>
         <span class="ident">NotEnoughBalance</span>,
-        <span class="doccomment">/// This proposal was not initialized with this pallet or simply</span>
-        <span class="doccomment">/// does not exists.</span>
-        <span class="ident">ProposalNotInitialized</span>,
         <span class="doccomment">/// Proposal cannot be closed yet, it is likely too early.</span>
         <span class="ident">CannotClose</span>,
     }
@@ -415,20 +414,15 @@
     <span class="kw">type</span> <span class="ident">VoteData</span> <span class="op">=</span> <span class="ident">VoteData</span><span class="op">&lt;</span><span class="ident">BalanceOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>;
     <span class="kw">type</span> <span class="ident">AccountId</span> <span class="op">=</span> <span class="ident">T</span>::<span class="ident">AccountId</span>;
 
+    <span class="doccomment">/// Register the proposal in our storage. Does not make any attempt at preventing duplicates</span>
+    <span class="doccomment">/// as we assume this is handled by the calling pallet.</span>
     <span class="kw">fn</span> <span class="ident">initiate</span>(<span class="ident">proposal</span>: <span class="self">Self</span>::<span class="ident">ProposalId</span>, <span class="ident">parameters</span>: <span class="self">Self</span>::<span class="ident">Parameters</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span> {
         <span class="ident">Proposals</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">try_mutate_exists</span>(<span class="ident">proposal</span>, <span class="op">|</span><span class="ident">maybe_existing_state</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span> {
-            <span class="kw">if</span> <span class="ident">maybe_existing_state</span>.<span class="ident">is_some</span>() {
-                <span class="comment">// duplicate detected, we do not want to erase any pending vote&#39;s</span>
-                <span class="comment">// state and thus fail.</span>
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">DuplicatedProposal</span>.<span class="ident">into</span>());
-            }
-
             <span class="comment">// no duplicates, we can create a new state</span>
             <span class="kw-2">*</span><span class="ident">maybe_existing_state</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ProposalState</span> {
                 <span class="ident">parameters</span>,
                 <span class="ident">total_against</span>: <span class="ident">Zero</span>::<span class="ident">zero</span>(),
                 <span class="ident">total_favorable</span>: <span class="ident">Zero</span>::<span class="ident">zero</span>(),
-                <span class="ident">initialized</span>: <span class="bool-val">true</span>,
                 <span class="ident">locks</span>: <span class="macro">vec</span><span class="macro">!</span>[],
                 <span class="ident">created_on</span>: <span class="self">Self</span>::<span class="ident">now</span>(),
             });
@@ -439,13 +433,13 @@
         <span class="prelude-val">Ok</span>(())
     }
 
+    <span class="doccomment">/// Record a new vote and set any locks or reserved coins in place.</span>
     <span class="kw">fn</span> <span class="ident">vote</span>(
         <span class="ident">proposal</span>: <span class="self">Self</span>::<span class="ident">ProposalId</span>,
         <span class="ident">voter</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">AccountId</span>,
         <span class="ident">data</span>: <span class="self">Self</span>::<span class="ident">VoteData</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">proposals</span>(<span class="ident">proposal</span>);
-        <span class="macro">ensure</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">initialized</span>, <span class="ident">Error</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">ProposalNotInitialized</span>);
 
         <span class="comment">// We want to prevent votes for user with less coins than they&#39;d like to lock.</span>
         <span class="macro">ensure</span><span class="macro">!</span>(
@@ -481,11 +475,15 @@
         <span class="prelude-val">Ok</span>(())
     }
 
+    <span class="doccomment">/// Simply unlock all the coins related to votes for or against a given proposal. Also</span>
+    <span class="doccomment">/// frees any storage associated to it.</span>
     <span class="kw">fn</span> <span class="ident">veto</span>(<span class="ident">proposal</span>: <span class="self">Self</span>::<span class="ident">ProposalId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span> {
         <span class="comment">// note the use of take instead of get which also deletes the storage</span>
         <span class="self">Self</span>::<span class="ident">unlock</span>(<span class="ident">Proposals</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">take</span>(<span class="ident">proposal</span>).<span class="ident">locks</span>, <span class="ident">proposal</span>)
     }
 
+    <span class="doccomment">/// Checks wether a proposal is passing or not. Then unlock all coins related to it</span>
+    <span class="doccomment">/// and clean the storage.</span>
     <span class="kw">fn</span> <span class="ident">close</span>(<span class="ident">proposal</span>: <span class="self">Self</span>::<span class="ident">ProposalId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ProposalResult</span>, <span class="ident">DispatchError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">Proposals</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">get</span>(<span class="ident">proposal</span>);
 
@@ -517,6 +515,8 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Trait</span><span class="op">&gt;</span> <span class="ident">Module</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Modify the locks related to the `voter` and `proposal`. We provide a hook `on_duplicate_vote_found`</span>
+    <span class="doccomment">/// used to handle cases where we have a similar lock in place.</span>
     <span class="kw">fn</span> <span class="ident">update_locks</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
         <span class="ident">voting_currency</span>: <span class="ident">CurrencyIdOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
         <span class="ident">voter</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>::<span class="ident">AccountId</span>,
@@ -558,6 +558,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
+    <span class="doccomment">/// Unlock all the coins related to the `proposal`.</span>
     <span class="kw">fn</span> <span class="ident">unlock</span>(<span class="ident">locks</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">LockIdentifierOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">proposal</span>: <span class="ident">T</span>::<span class="ident">Hash</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span> {
         <span class="ident">locks</span>
             .<span class="ident">iter</span>()
@@ -583,6 +584,9 @@
         <span class="prelude-val">Ok</span>(())
     }
 
+    <span class="doccomment">/// Recompute locks from the `locks` vector. We do not mix locks between the different voting</span>
+    <span class="doccomment">/// strategies and rather sum them up. In general you can consider that we lock the maximum</span>
+    <span class="doccomment">/// amount of coins as listed in `locks`.</span>
     <span class="kw">fn</span> <span class="ident">rejig_locks</span>(
         <span class="ident">locks</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">LockDataOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">voting_currency</span>: <span class="ident">CurrencyIdOf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
@@ -628,6 +632,8 @@
         <span class="prelude-val">Ok</span>(())
     }
 
+    <span class="doccomment">/// Just a helper function to return the current block number. Simply sexier</span>
+    <span class="doccomment">/// than calling the actual `frame_system::Module::&lt;T&gt;::block_number()` function.</span>
     <span class="kw">fn</span> <span class="ident">now</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>::<span class="ident">BlockNumber</span> {
         <span class="ident">frame_system</span>::<span class="ident">Module</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">block_number</span>()
     }
