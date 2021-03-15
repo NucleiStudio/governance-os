@@ -60,12 +60,12 @@ pub struct Conviction<Balance> {
 
 #[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug, Default)]
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
-pub struct ProposalState<Balance, BlockNumber, CurrencyId> {
+pub struct ProposalState<AccountId, Balance, BlockNumber, CurrencyId> {
     /// Parameters that this proposal was created with.
     pub parameters: VotingParameters<BlockNumber, CurrencyId>,
     /// Record when the proposal was created. Used to know when it is expired
     /// (when the ttl is over).
     pub created_on: BlockNumber,
     /// Conviction votes on this proposal.
-    pub convictions: Vec<Conviction<Balance>>,
+    pub convictions: Vec<(AccountId, Conviction<Balance>)>,
 }

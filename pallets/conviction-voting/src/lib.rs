@@ -27,11 +27,11 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use crate::types::ProposalState;
-use frame_support::{decl_error, decl_module, decl_storage, traits::LockIdentifier};
+use frame_support::{decl_error, decl_module, decl_storage, ensure, traits::LockIdentifier};
 use governance_os_support::traits::{
     Currencies, LockableCurrencies, ProposalResult, StandardizedVoting,
 };
-use sp_runtime::{DispatchError, DispatchResult};
+use sp_runtime::{traits::Zero, DispatchError, DispatchResult};
 use sp_std::prelude::*;
 
 #[cfg(test)]
@@ -51,17 +51,25 @@ type BalanceOf<T> =
     <<T as Trait>::Currencies as Currencies<<T as frame_system::Trait>::AccountId>>::Balance;
 type CurrencyIdOf<T> =
     <<T as Trait>::Currencies as Currencies<<T as frame_system::Trait>::AccountId>>::CurrencyId;
-type ConvictionProposalStateOf<T> =
-    ProposalState<BalanceOf<T>, <T as frame_system::Trait>::BlockNumber, CurrencyIdOf<T>>;
+type ConvictionProposalStateOf<T> = ProposalState<
+    <T as frame_system::Trait>::AccountId,
+    BalanceOf<T>,
+    <T as frame_system::Trait>::BlockNumber,
+    CurrencyIdOf<T>,
+>;
 
 decl_storage! {
     trait Store for Module<T: Trait> as PlcrVoting {
         pub Proposals get(fn proposals): map hasher(blake2_128_concat) T::Hash => ConvictionProposalStateOf<T>;
+        pub Locks get(fn locks): map hasher(blake2_128_concat) (CurrencyIdOf<T>, T::AccountId) => Vec<(T::Hash, bool, BalanceOf<T>)>;
     }
 }
 
 decl_error! {
     pub enum Error for Module<T: Trait> {
+        /// There are not enough tokens in the user's balance to proceed
+        /// to this action.
+        NotEnoughBalance,
     }
 }
 
@@ -73,7 +81,7 @@ decl_module! {
 impl<T: Trait> StandardizedVoting for Module<T> {
     type ProposalId = T::Hash;
     type Parameters = VotingParameters<T::BlockNumber, CurrencyIdOf<T>>;
-    type VoteData = ();
+    type VoteData = Conviction<BalanceOf<T>>;
     type AccountId = T::AccountId;
 
     fn initiate(proposal: Self::ProposalId, parameters: Self::Parameters) -> DispatchResult {
@@ -100,7 +108,33 @@ impl<T: Trait> StandardizedVoting for Module<T> {
         voter: &Self::AccountId,
         data: Self::VoteData,
     ) -> DispatchResult {
-        unimplemented!()
+        let mut state = Proposals::<T>::get(proposal);
+
+        ensure!(
+            data.power < T::Currencies::free_balance(state.parameters.voting_currency, voter),
+            Error::<T>::NotEnoughBalance
+        );
+
+        let mut locks = Locks::<T>::get((state.parameters.voting_currency, voter));
+        locks = locks
+            .iter()
+            .cloned()
+            .filter(|(proposal_hash, _support, _power)| *proposal_hash != proposal)
+            .collect::<Vec<_>>();
+        locks.push((proposal, data.in_support, data.power));
+
+        Self::rejig_locks(state.parameters.voting_currency, voter, locks)?;
+
+        state.convictions = state
+            .convictions
+            .iter()
+            .cloned()
+            .filter(|(participant, _)| participant != voter)
+            .collect::<Vec<_>>();
+        state.convictions.push((voter.clone(), data));
+        Proposals::<T>::insert(proposal, state);
+
+        Ok(())
     }
 
     fn close(proposal: Self::ProposalId) -> Result<ProposalResult, DispatchError> {
@@ -111,5 +145,30 @@ impl<T: Trait> StandardizedVoting for Module<T> {
 impl<T: Trait> Module<T> {
     fn now() -> T::BlockNumber {
         frame_system::Module::<T>::block_number()
+    }
+
+    fn rejig_locks(
+        voting_currency: CurrencyIdOf<T>,
+        voter: &T::AccountId,
+        locks: Vec<(T::Hash, bool, BalanceOf<T>)>,
+    ) -> DispatchResult {
+        let max = locks.iter().cloned().fold(
+            Zero::zero(),
+            |acc, (_proposal, _support, power)| {
+                if acc > power {
+                    acc
+                } else {
+                    power
+                }
+            },
+        );
+        if max == Zero::zero() {
+            T::Currencies::remove_lock(voting_currency, CONVICTION_VOTING_LOCK_ID, voter)?;
+        } else {
+            T::Currencies::set_lock(voting_currency, CONVICTION_VOTING_LOCK_ID, voter, max)?;
+        }
+        Locks::<T>::insert((voting_currency, voter), locks);
+
+        Ok(())
     }
 }

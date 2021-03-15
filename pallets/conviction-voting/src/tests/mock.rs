@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-use crate::{CurrencyIdOf, Module, Trait};
+use crate::{CurrencyIdOf, Module, Trait, VotingParameters};
 use governance_os_pallet_tokens::CurrencyDetails;
 use governance_os_support::{
     mock_runtime_with_currencies,
@@ -77,5 +77,15 @@ impl ExtBuilder {
         let mut ext = sp_io::TestExternalities::new(t);
         ext.execute_with(|| System::set_block_number(1));
         ext
+    }
+}
+
+pub fn mock_voting_parameters() -> VotingParameters<BlockNumber, CurrencyIdOf<Test>> {
+    VotingParameters {
+        ttl: 10,
+        voting_currency: TEST_TOKEN_ID,
+        min_quorum: 50,
+        min_participation: 33,
+        decay: 1,
     }
 }
