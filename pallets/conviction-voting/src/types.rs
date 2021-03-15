@@ -19,7 +19,10 @@
 use codec::{Decode, Encode};
 #[cfg(feature = "std")]
 use serde::{Deserialize, Serialize};
-use sp_runtime::RuntimeDebug;
+use sp_runtime::{
+    traits::{Saturating, Zero},
+    RuntimeDebug,
+};
 use sp_std::vec::Vec;
 
 #[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug, Default)]
@@ -67,5 +70,26 @@ pub struct ProposalState<AccountId, Balance, BlockNumber, CurrencyId> {
     /// (when the ttl is over).
     pub created_on: BlockNumber,
     /// Conviction votes on this proposal.
-    pub convictions: Vec<(AccountId, Conviction<Balance>)>,
+    pub convictions: Vec<(AccountId, BlockNumber, Conviction<Balance>)>,
+}
+impl<AccountId: Clone, Balance: Zero + Saturating + Clone, BlockNumber: Clone, CurrencyId>
+    ProposalState<AccountId, Balance, BlockNumber, CurrencyId>
+{
+    /// Compute the amount of conviction for and against the proposal at a
+    /// given block.
+    pub fn compute_convictions(&self, at: BlockNumber) -> (Balance, Balance) {
+        // TODO: for now we do some kind of coin voting only
+        let (favorable, against) = self.convictions.clone().into_iter().fold(
+            (Zero::zero(), Zero::zero()),
+            |acc: (Balance, Balance), (_voter, when, conviction)| {
+                if conviction.in_support {
+                    (acc.0.saturating_add(conviction.power), acc.1)
+                } else {
+                    (acc.0, acc.1.saturating_add(conviction.power))
+                }
+            },
+        );
+
+        (favorable, against)
+    }
 }

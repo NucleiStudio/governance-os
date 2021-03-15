@@ -31,7 +31,10 @@ use frame_support::{decl_error, decl_module, decl_storage, ensure, traits::LockI
 use governance_os_support::traits::{
     Currencies, LockableCurrencies, ProposalResult, StandardizedVoting,
 };
-use sp_runtime::{traits::Zero, DispatchError, DispatchResult};
+use sp_runtime::{
+    traits::{Saturating, Zero},
+    DispatchError, DispatchResult, Perbill,
+};
 use sp_std::prelude::*;
 
 #[cfg(test)]
@@ -70,6 +73,10 @@ decl_error! {
         /// There are not enough tokens in the user's balance to proceed
         /// to this action.
         NotEnoughBalance,
+        /// Some requirements for early closure of the proposal were not
+        /// met. This typically happens if the proposal did not receive
+        /// enough support and is not yet expired.
+        CannotClose,
     }
 }
 
@@ -130,9 +137,9 @@ impl<T: Trait> StandardizedVoting for Module<T> {
             .convictions
             .iter()
             .cloned()
-            .filter(|(participant, _)| participant != voter)
+            .filter(|(participant, _, _)| participant != voter)
             .collect::<Vec<_>>();
-        state.convictions.push((voter.clone(), data));
+        state.convictions.push((voter.clone(), Self::now(), data));
         Proposals::<T>::insert(proposal, state);
 
         Ok(())
@@ -140,10 +147,32 @@ impl<T: Trait> StandardizedVoting for Module<T> {
 
     fn close(proposal: Self::ProposalId) -> Result<ProposalResult, DispatchError> {
         let state = Proposals::<T>::get(proposal);
+
+        let total_supply = T::Currencies::total_issuance(state.parameters.voting_currency);
+        let (favorable, against) = state.compute_convictions(Self::now());
+        let total_participation = favorable.saturating_add(against);
+
+        let enough_participation = total_participation
+            > Perbill::from_percent(state.parameters.min_participation) * total_supply;
+        let enough_quorum =
+            favorable > Perbill::from_percent(state.parameters.min_quorum) * total_participation;
+
+        let result = if enough_participation && enough_quorum {
+            ProposalResult::Passing
+        } else {
+            ProposalResult::Failing
+        };
+
+        let can_close = state.created_on.saturating_add(state.parameters.ttl) < Self::now();
+        ensure!(
+            can_close || result == ProposalResult::Passing,
+            Error::<T>::CannotClose
+        );
+
         Self::finalize(proposal, state)?;
         Proposals::<T>::remove(proposal);
 
-        Ok(ProposalResult::Failing)
+        Ok(result)
     }
 }
 
@@ -190,7 +219,7 @@ impl<T: Trait> Module<T> {
         state
             .convictions
             .iter()
-            .try_for_each(|(voter, _conviction)| -> DispatchResult {
+            .try_for_each(|(voter, _when, _conviction)| -> DispatchResult {
                 let mut locks = Locks::<T>::get((state.parameters.voting_currency, voter));
                 locks = locks
                     .iter()

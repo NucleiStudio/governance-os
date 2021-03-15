@@ -19,7 +19,7 @@ use crate::{Conviction, Error, Locks, Proposals};
 use frame_support::{assert_noop, assert_ok, StorageMap};
 use governance_os_support::{
     testing::{primitives::AccountId, ALICE, BOB, TEST_TOKEN_ID},
-    traits::{LockableCurrencies, StandardizedVoting},
+    traits::{LockableCurrencies, ProposalResult, StandardizedVoting},
 };
 use sp_core::H256;
 
@@ -102,6 +102,7 @@ fn vote_edit_previous_vote() {
                 ConvictionVoting::proposals(mock_hash).convictions,
                 vec![(
                     ALICE,
+                    1,
                     Conviction {
                         in_support: false,
                         power: 15
@@ -162,6 +163,7 @@ fn votes_saved_correctly() {
                 vec![
                     (
                         ALICE,
+                        1,
                         Conviction {
                             in_support: true,
                             power: 10
@@ -169,6 +171,7 @@ fn votes_saved_correctly() {
                     ),
                     (
                         BOB,
+                        1,
                         Conviction {
                             in_support: false,
                             power: 15
@@ -425,3 +428,80 @@ test_close_or_veto!(
     close_free_storage_if_last_proposal,
     close_cleans_storage
 );
+
+#[test]
+fn close_error_if_early() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            let mock_hash = H256::default();
+
+            assert_ok!(<ConvictionVoting as StandardizedVoting>::initiate(
+                mock_hash,
+                mock_voting_parameters()
+            ));
+
+            assert_eq!(
+                ConvictionVoting::close(mock_hash).expect_err("too early and not passing"),
+                Error::<Test>::CannotClose.into()
+            );
+
+            // We did not advance blocks and particpation and quorum criteria are not met
+            assert_noop!(
+                ConvictionVoting::close(mock_hash),
+                Error::<Test>::CannotClose
+            );
+        })
+}
+
+#[test]
+fn close_failing() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            let mock_hash = H256::default();
+
+            assert_ok!(<ConvictionVoting as StandardizedVoting>::initiate(
+                mock_hash,
+                mock_voting_parameters()
+            ));
+
+            System::set_block_number(ConvictionVoting::now() + 12);
+
+            assert_eq!(
+                ConvictionVoting::close(mock_hash).expect("proposal shall fail with no error"),
+                ProposalResult::Failing
+            );
+        })
+}
+
+#[test]
+fn close_passing_early() {
+    ExtBuilder::default()
+        .one_hundred_for_alice_n_bob()
+        .build()
+        .execute_with(|| {
+            let mock_hash = H256::default();
+
+            assert_ok!(<ConvictionVoting as StandardizedVoting>::initiate(
+                mock_hash,
+                mock_voting_parameters()
+            ));
+
+            assert_ok!(<ConvictionVoting as StandardizedVoting>::vote(
+                mock_hash,
+                &ALICE,
+                Conviction {
+                    in_support: true,
+                    power: 99
+                }
+            ));
+
+            assert_eq!(
+                ConvictionVoting::close(mock_hash).expect("proposal shall pass"),
+                ProposalResult::Passing
+            );
+        })
+}
