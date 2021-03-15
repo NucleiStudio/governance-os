@@ -100,7 +100,8 @@ impl<T: Trait> StandardizedVoting for Module<T> {
     }
 
     fn veto(proposal: Self::ProposalId) -> DispatchResult {
-        unimplemented!()
+        // note the take() function instead of the usual get()
+        Self::finalize(proposal, Proposals::<T>::take(proposal))
     }
 
     fn vote(
@@ -138,15 +139,22 @@ impl<T: Trait> StandardizedVoting for Module<T> {
     }
 
     fn close(proposal: Self::ProposalId) -> Result<ProposalResult, DispatchError> {
-        unimplemented!()
+        let state = Proposals::<T>::get(proposal);
+        Self::finalize(proposal, state)?;
+        Proposals::<T>::remove(proposal);
+
+        Ok(ProposalResult::Failing)
     }
 }
 
 impl<T: Trait> Module<T> {
+    /// Simple helper function to return the current block number.
     fn now() -> T::BlockNumber {
         frame_system::Module::<T>::block_number()
     }
 
+    /// Iterates the `locks` vector and lock the maximum amount of coins needed for
+    /// the pair `voting_currency` and `voter`.
     fn rejig_locks(
         voting_currency: CurrencyIdOf<T>,
         voter: &T::AccountId,
@@ -167,7 +175,32 @@ impl<T: Trait> Module<T> {
         } else {
             T::Currencies::set_lock(voting_currency, CONVICTION_VOTING_LOCK_ID, voter, max)?;
         }
-        Locks::<T>::insert((voting_currency, voter), locks);
+        if locks.is_empty() {
+            Locks::<T>::remove((voting_currency, voter));
+        } else {
+            Locks::<T>::insert((voting_currency, voter), locks);
+        }
+
+        Ok(())
+    }
+
+    /// Goes through all the elements related to the passed proposal state and cleans
+    /// up any associated storage elements such as locks.
+    fn finalize(proposal: T::Hash, state: ConvictionProposalStateOf<T>) -> DispatchResult {
+        state
+            .convictions
+            .iter()
+            .try_for_each(|(voter, _conviction)| -> DispatchResult {
+                let mut locks = Locks::<T>::get((state.parameters.voting_currency, voter));
+                locks = locks
+                    .iter()
+                    .cloned()
+                    .filter(|(proposal_hash, _support, _power)| *proposal_hash != proposal)
+                    .collect::<Vec<_>>();
+                Self::rejig_locks(state.parameters.voting_currency, voter, locks)?;
+
+                Ok(())
+            })?;
 
         Ok(())
     }
