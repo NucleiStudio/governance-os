@@ -68,8 +68,74 @@ fn vote_lock_tokens() {
         })
 }
 
+macro_rules! test_vote_edit {
+    ($function:tt, $support:ident, $var:tt) => {
+        #[test]
+        fn $function() {
+            ExtBuilder::default()
+                .one_hundred_for_alice_n_bob()
+                .build()
+                .execute_with(|| {
+                    let mock_hash = H256::default();
+
+                    assert_ok!(<ConvictionVoting as StandardizedVoting>::initiate(
+                        mock_hash,
+                        mock_voting_parameters()
+                    ));
+
+                    assert_ok!(<ConvictionVoting as StandardizedVoting>::vote(
+                        mock_hash,
+                        &ALICE,
+                        Conviction {
+                            in_support: $support,
+                            power: 10
+                        }
+                    ));
+                    assert_eq!(ConvictionVoting::proposals(mock_hash).$var, 10);
+
+                    assert_ok!(<ConvictionVoting as StandardizedVoting>::vote(
+                        mock_hash,
+                        &ALICE,
+                        Conviction {
+                            in_support: $support,
+                            power: 15
+                        }
+                    ));
+
+                    assert_eq!(
+                        ConvictionVoting::proposals(mock_hash).convictions,
+                        vec![(
+                            ALICE,
+                            1,
+                            Conviction {
+                                in_support: $support,
+                                power: 15
+                            }
+                        )]
+                    );
+                    assert_eq!(ConvictionVoting::proposals(mock_hash).$var, 15);
+
+                    assert_eq!(
+                        ConvictionVoting::locks((TEST_TOKEN_ID, &ALICE)),
+                        vec![(mock_hash, $support, 15)]
+                    );
+                    assert_eq!(
+                        <Tokens as LockableCurrencies<AccountId>>::locked_balance(
+                            TEST_TOKEN_ID,
+                            &ALICE
+                        ),
+                        15
+                    );
+                })
+        }
+    };
+}
+
+test_vote_edit!(vote_edit_favorable, true, conviction_for);
+test_vote_edit!(vote_edit_against, false, conviction_against);
+
 #[test]
-fn vote_edit_previous_vote() {
+fn vote_edit_change_our_mind() {
     ExtBuilder::default()
         .one_hundred_for_alice_n_bob()
         .build()
@@ -89,6 +155,9 @@ fn vote_edit_previous_vote() {
                     power: 10
                 }
             ));
+            assert_eq!(ConvictionVoting::proposals(mock_hash).conviction_for, 10);
+            assert_eq!(ConvictionVoting::proposals(mock_hash).conviction_against, 0);
+
             assert_ok!(<ConvictionVoting as StandardizedVoting>::vote(
                 mock_hash,
                 &ALICE,
@@ -97,6 +166,11 @@ fn vote_edit_previous_vote() {
                     power: 15
                 }
             ));
+            assert_eq!(ConvictionVoting::proposals(mock_hash).conviction_for, 0);
+            assert_eq!(
+                ConvictionVoting::proposals(mock_hash).conviction_against,
+                15
+            );
 
             assert_eq!(
                 ConvictionVoting::proposals(mock_hash).convictions,
@@ -178,6 +252,11 @@ fn votes_saved_correctly() {
                         }
                     )
                 ]
+            );
+            assert_eq!(ConvictionVoting::proposals(mock_hash).conviction_for, 10);
+            assert_eq!(
+                ConvictionVoting::proposals(mock_hash).conviction_against,
+                15
             );
         })
 }
@@ -290,7 +369,7 @@ macro_rules! test_close_or_veto {
                         }
                     ));
 
-                    System::set_block_number(ConvictionVoting::now() + 100);
+                    System::set_block_number(ConvictionVoting::now() + 10_000);
                     assert_ok!(ConvictionVoting::$function(mock_hash));
 
                     assert_eq!(
@@ -332,7 +411,7 @@ macro_rules! test_close_or_veto {
                         }
                     ));
 
-                    System::set_block_number(ConvictionVoting::now() + 100);
+                    System::set_block_number(ConvictionVoting::now() + 10_000);
                     assert_ok!(ConvictionVoting::$function(mock_hash));
 
                     assert!(!Locks::<Test>::contains_key((TEST_TOKEN_ID, &ALICE)));
@@ -395,7 +474,7 @@ macro_rules! test_close_or_veto {
                         15
                     );
 
-                    System::set_block_number(ConvictionVoting::now() + 100);
+                    System::set_block_number(ConvictionVoting::now() + 10_000);
                     assert_ok!(ConvictionVoting::$function(mock_hash_1));
 
                     assert_eq!(
@@ -468,7 +547,7 @@ fn close_failing() {
                 mock_voting_parameters()
             ));
 
-            System::set_block_number(ConvictionVoting::now() + 12);
+            System::set_block_number(ConvictionVoting::now() + 10_000);
 
             assert_eq!(
                 ConvictionVoting::close(mock_hash).expect("proposal shall fail with no error"),
@@ -498,6 +577,10 @@ fn close_passing_early() {
                     power: 99
                 }
             ));
+
+            // TTL is 1_000 so we are still early. We need a few blocks for
+            // the conviction to accumulate.
+            System::set_block_number(ConvictionVoting::now() + 500);
 
             assert_eq!(
                 ConvictionVoting::close(mock_hash).expect("proposal shall pass"),

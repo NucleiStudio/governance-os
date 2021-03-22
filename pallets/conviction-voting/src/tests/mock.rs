@@ -23,8 +23,12 @@ use governance_os_support::{
 
 mock_runtime_with_currencies!(Test);
 
+parameter_types! {
+    pub const Decay: (Balance, Balance) = (0, 0);
+}
 impl Trait for Test {
     type Currencies = Tokens;
+    type Decay = Decay;
 }
 
 pub type ConvictionVoting = Module<Test>;
@@ -82,7 +86,7 @@ impl ExtBuilder {
 
 pub fn mock_voting_parameters() -> VotingParameters<BlockNumber, CurrencyIdOf<Test>> {
     VotingParameters {
-        ttl: 10,
+        ttl: 1_000,
         voting_currency: TEST_TOKEN_ID,
         min_quorum: 50,
         min_participation: 33,

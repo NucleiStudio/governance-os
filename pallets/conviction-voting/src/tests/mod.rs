@@ -14,5 +14,6 @@
  * limitations under the License.
  */
 
+mod conviction;
 mod mock;
 mod spec;

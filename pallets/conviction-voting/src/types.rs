@@ -20,10 +20,10 @@ use codec::{Decode, Encode};
 #[cfg(feature = "std")]
 use serde::{Deserialize, Serialize};
 use sp_runtime::{
-    traits::{Saturating, Zero},
-    RuntimeDebug,
+    traits::{CheckedDiv, Saturating, UniqueSaturatedInto, Zero},
+    DispatchError, DispatchResult, RuntimeDebug,
 };
-use sp_std::vec::Vec;
+use sp_std::{result, vec::Vec};
 
 #[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug, Default)]
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
@@ -63,6 +63,17 @@ pub struct Conviction<Balance> {
 
 #[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug, Default)]
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
+pub struct ConvictionSnapshot<Balance, BlockNumber> {
+    /// When was the last snapshot was taken.
+    pub last_snapshot: BlockNumber,
+    /// Amount of favorable conviction.
+    pub favorable: Balance,
+    /// Amount of opposed conviction.
+    pub against: Balance,
+}
+
+#[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug, Default)]
+#[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 pub struct ProposalState<AccountId, Balance, BlockNumber, CurrencyId> {
     /// Parameters that this proposal was created with.
     pub parameters: VotingParameters<BlockNumber, CurrencyId>,
@@ -71,25 +82,37 @@ pub struct ProposalState<AccountId, Balance, BlockNumber, CurrencyId> {
     pub created_on: BlockNumber,
     /// Conviction votes on this proposal.
     pub convictions: Vec<(AccountId, BlockNumber, Conviction<Balance>)>,
+    /// How much tokens are staked in favor of the proposal.
+    pub conviction_for: Balance,
+    /// How much tokens are staked against the proposal.
+    pub conviction_against: Balance,
+    /// Snapshot of our different conviction records. Used to compute
+    /// the current conviction progressively.
+    pub snapshot: ConvictionSnapshot<Balance, BlockNumber>,
 }
-impl<AccountId: Clone, Balance: Zero + Saturating + Clone, BlockNumber: Clone, CurrencyId>
-    ProposalState<AccountId, Balance, BlockNumber, CurrencyId>
+impl<
+        AccountId: Clone,
+        Balance: Zero + Saturating + CheckedDiv + Copy + Clone + From<u32>,
+        BlockNumber: Clone + Copy + Saturating + UniqueSaturatedInto<u32>,
+        CurrencyId,
+    > ProposalState<AccountId, Balance, BlockNumber, CurrencyId>
 {
-    /// Compute the amount of conviction for and against the proposal at a
-    /// given block.
-    pub fn compute_convictions(&self, at: BlockNumber) -> (Balance, Balance) {
-        // TODO: for now we do some kind of coin voting only
-        let (favorable, against) = self.convictions.clone().into_iter().fold(
-            (Zero::zero(), Zero::zero()),
-            |acc: (Balance, Balance), (_voter, when, conviction)| {
-                if conviction.in_support {
-                    (acc.0.saturating_add(conviction.power), acc.1)
-                } else {
-                    (acc.0, acc.1.saturating_add(conviction.power))
-                }
-            },
-        );
+    /// Compute the current amount of conviction for or against the proposal
+    /// and save its latest value in the proposal state. `now` should be the
+    /// current block number. `decay` is the decay variable of the half life
+    /// exponential formula.
+    ///
+    /// Refer to this [work from EthParis](https://hackmd.io/@EtCgawsxS2mC6-Q0rCqhAw/rJMvfgOv4?type=view).
+    pub fn mutate_conviction_snapshot(
+        &mut self,
+        now: BlockNumber,
+        decay: (Balance, Balance),
+    ) -> DispatchResult {
+        let (d, aD) = decay;
 
-        (favorable, against)
+        self.snapshot.favorable = self.conviction_for;
+        self.snapshot.against = self.conviction_against;
+
+        Ok(())
     }
 }

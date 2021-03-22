@@ -26,8 +26,10 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use crate::types::ProposalState;
-use frame_support::{decl_error, decl_module, decl_storage, ensure, traits::LockIdentifier};
+use frame_support::{
+    decl_error, decl_module, decl_storage, ensure,
+    traits::{Get, LockIdentifier},
+};
 use governance_os_support::traits::{
     Currencies, LockableCurrencies, ProposalResult, StandardizedVoting,
 };
@@ -41,13 +43,20 @@ use sp_std::prelude::*;
 mod tests;
 mod types;
 
-pub use types::{Conviction, VotingParameters};
+pub use types::{Conviction, ProposalState, VotingParameters};
 
 pub const CONVICTION_VOTING_LOCK_ID: LockIdentifier = *b"convvote";
 
 pub trait Trait: frame_system::Trait {
     /// Pallet in charge of currencies. Used so that we can lock tokens etc...
     type Currencies: LockableCurrencies<Self::AccountId>;
+    /// Decay constant as part of the conviction voting / decay curve formula.
+    /// Shared among all organizations relying on this pallet.
+    /// Must be expressed in the form `(D, aD)` where `D` is big enough and
+    /// `aD = a * D`, with `a` being the decimal decay constant. Check this
+    /// [document](https://hackmd.io/@EtCgawsxS2mC6-Q0rCqhAw/rJMvfgOv4?type=view#Solidity-implementation)
+    /// for better explanations.
+    type Decay: Get<(BalanceOf<Self>, BalanceOf<Self>)>;
 }
 
 type BalanceOf<T> =
@@ -96,8 +105,7 @@ impl<T: Trait> StandardizedVoting for Module<T> {
             // no duplicates, we can create a new state
             *maybe_existing_state = Some(ProposalState {
                 parameters,
-                created_on: Self::now(),
-                convictions: Vec::new(),
+                ..Default::default()
             });
 
             Ok(())
@@ -133,29 +141,61 @@ impl<T: Trait> StandardizedVoting for Module<T> {
 
         Self::rejig_locks(state.parameters.voting_currency, voter, locks)?;
 
-        state.convictions = state
+        let mut maybe_previous_conviction = None;
+        let mut filtered_convictions = Vec::new();
+        for (participant, when, conviction) in state.convictions {
+            if &participant != voter {
+                filtered_convictions.push((participant, when, conviction));
+            } else {
+                maybe_previous_conviction = Some(conviction);
+            }
+        }
+        state.convictions = filtered_convictions;
+        state
             .convictions
-            .iter()
-            .cloned()
-            .filter(|(participant, _, _)| participant != voter)
-            .collect::<Vec<_>>();
-        state.convictions.push((voter.clone(), Self::now(), data));
+            .push((voter.clone(), Self::now(), data.clone()));
+
+        // Reduce conviction trackers
+        if let Some(previous_conviction) = maybe_previous_conviction {
+            if previous_conviction.in_support {
+                state.conviction_for = state
+                    .conviction_for
+                    .saturating_sub(previous_conviction.power);
+            } else {
+                state.conviction_against = state
+                    .conviction_against
+                    .saturating_sub(previous_conviction.power);
+            }
+        }
+
+        // Update trackers
+        if data.in_support {
+            state.conviction_for = state.conviction_for.saturating_add(data.power);
+        } else {
+            state.conviction_against = state.conviction_against.saturating_add(data.power);
+        }
+
+        // Refresh conviction snapshot
+        state.mutate_conviction_snapshot(Self::now(), T::Decay::get())?;
         Proposals::<T>::insert(proposal, state);
 
         Ok(())
     }
 
     fn close(proposal: Self::ProposalId) -> Result<ProposalResult, DispatchError> {
-        let state = Proposals::<T>::get(proposal);
+        let mut state = Proposals::<T>::get(proposal);
 
         let total_supply = T::Currencies::total_issuance(state.parameters.voting_currency);
-        let (favorable, against) = state.compute_convictions(Self::now());
-        let total_participation = favorable.saturating_add(against);
+        state.mutate_conviction_snapshot(Self::now(), T::Decay::get())?;
+        let total_participation = state
+            .snapshot
+            .favorable
+            .saturating_add(state.snapshot.against);
 
         let enough_participation = total_participation
             > Perbill::from_percent(state.parameters.min_participation) * total_supply;
-        let enough_quorum =
-            favorable > Perbill::from_percent(state.parameters.min_quorum) * total_participation;
+        let enough_quorum = state.snapshot.favorable
+            > Perbill::from_percent(state.parameters.min_quorum) * total_participation;
 
         let result = if enough_participation && enough_quorum {
             ProposalResult::Passing
