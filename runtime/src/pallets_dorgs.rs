@@ -16,7 +16,7 @@
 
 use crate::{voting_router::RuntimeVotingRouter, Bylaws, Call, Event, Runtime, Tokens};
 use frame_support::parameter_types;
-use governance_os_primitives::Role;
+use governance_os_primitives::{Balance, Role};
 
 parameter_types! {
     pub const MaxRoles: u32 = 50;
@@ -32,6 +32,15 @@ impl governance_os_pallet_bylaws::Trait for Runtime {
 
 impl governance_os_pallet_coin_voting::Trait for Runtime {
     type Currencies = Tokens;
+}
+
+parameter_types! {
+    pub const Decay: Balance = 1;
+}
+
+impl governance_os_pallet_conviction_voting::Trait for Runtime {
+    type Currencies = Tokens;
+    type Decay = Decay;
 }
 
 impl governance_os_pallet_plcr_voting::Trait for Runtime {

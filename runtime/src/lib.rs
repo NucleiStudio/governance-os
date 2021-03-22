@@ -84,6 +84,7 @@ construct_runtime!(
         // dOrgs
         Bylaws: governance_os_pallet_bylaws::{Module, Call, Storage, Config<T>, Event<T>},
         CoinVoting: governance_os_pallet_coin_voting::{Module, Call, Storage},
+        ConvictionVoting: governance_os_pallet_conviction_voting::{Module, Call, Storage},
         PlcrVoting: governance_os_pallet_plcr_voting::{Module, Call, Storage, Event<T>},
         Organizations: governance_os_pallet_organizations::{Module, Call, Storage, Config<T>, Event<T>},
     }
