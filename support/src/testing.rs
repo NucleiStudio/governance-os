@@ -35,8 +35,8 @@ parameter_types! {
 }
 
 pub mod primitives {
-    pub type AccountId = u128;
-    pub type Balance = u64;
+    pub type AccountId = u64;
+    pub type Balance = u128;
     pub type CurrencyId = u8;
     pub type BlockNumber = u64;
 }

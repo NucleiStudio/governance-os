@@ -52,11 +52,11 @@ pub trait Trait: frame_system::Trait {
     type Currencies: LockableCurrencies<Self::AccountId>;
     /// Decay constant as part of the conviction voting / decay curve formula.
     /// Shared among all organizations relying on this pallet.
-    /// Must be expressed in the form `(D, aD)` where `D` is big enough and
-    /// `aD = a * D`, with `a` being the decimal decay constant. Check this
+    /// Must be expressed in the form `Decay = a * D` where `D` is `10` and
+    /// `a` is our decay constant. Check this
     /// [document](https://hackmd.io/@EtCgawsxS2mC6-Q0rCqhAw/rJMvfgOv4?type=view#Solidity-implementation)
     /// for better explanations.
-    type Decay: Get<(BalanceOf<Self>, BalanceOf<Self>)>;
+    type Decay: Get<BalanceOf<Self>>;
 }
 
 type BalanceOf<T> =

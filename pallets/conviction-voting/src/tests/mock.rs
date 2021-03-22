@@ -24,7 +24,7 @@ use governance_os_support::{
 mock_runtime_with_currencies!(Test);
 
 parameter_types! {
-    pub const Decay: (Balance, Balance) = (0, 0);
+    pub const Decay: Balance = 1;
 }
 impl Trait for Test {
     type Currencies = Tokens;

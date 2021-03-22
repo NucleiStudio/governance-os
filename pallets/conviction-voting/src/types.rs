@@ -19,11 +19,9 @@
 use codec::{Decode, Encode};
 #[cfg(feature = "std")]
 use serde::{Deserialize, Serialize};
-use sp_runtime::{
-    traits::{CheckedDiv, Saturating, UniqueSaturatedInto, Zero},
-    DispatchError, DispatchResult, RuntimeDebug,
-};
-use sp_std::{result, vec::Vec};
+use sp_arithmetic::traits::BaseArithmetic;
+use sp_runtime::{DispatchResult, RuntimeDebug};
+use sp_std::vec::Vec;
 
 #[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug, Default)]
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
@@ -92,8 +90,8 @@ pub struct ProposalState<AccountId, Balance, BlockNumber, CurrencyId> {
 }
 impl<
         AccountId: Clone,
-        Balance: Zero + Saturating + CheckedDiv + Copy + Clone + From<u32>,
-        BlockNumber: Clone + Copy + Saturating + UniqueSaturatedInto<u32>,
+        Balance: Copy + BaseArithmetic,
+        BlockNumber: Copy + BaseArithmetic,
         CurrencyId,
     > ProposalState<AccountId, Balance, BlockNumber, CurrencyId>
 {
@@ -103,15 +101,29 @@ impl<
     /// exponential formula.
     ///
     /// Refer to this [work from EthParis](https://hackmd.io/@EtCgawsxS2mC6-Q0rCqhAw/rJMvfgOv4?type=view).
+    /// Also view [this 1Hive thread](https://github.com/1Hive/conviction-voting-app/issues/21).
     pub fn mutate_conviction_snapshot(
         &mut self,
         now: BlockNumber,
-        decay: (Balance, Balance),
+        decay: Balance,
     ) -> DispatchResult {
-        let (d, aD) = decay;
+        let d: Balance = 10.into();
+        let a_d = decay;
 
-        self.snapshot.favorable = self.conviction_for;
-        self.snapshot.against = self.conviction_against;
+        let conviction_formula = |previous, staked| {
+            // Past this value, we overflow
+            if now <= 19.into() {
+                let d_now = d.saturating_pow(now.unique_saturated_into());
+                let a_d_now = a_d.saturating_pow(now.unique_saturated_into());
+                (a_d_now * previous + (staked * d * (d_now - a_d_now)) / (d - a_d)) / d_now
+            } else {
+                // We neglect `previous` when `now` is big enough because lim [ a^t ] = 0 when t -> infinity
+                staked * d / (d - a_d)
+            }
+        };
+
+        self.snapshot.favorable = conviction_formula(self.snapshot.favorable, self.conviction_for);
+        self.snapshot.against = conviction_formula(self.snapshot.against, self.conviction_against);
 
         Ok(())
     }

@@ -15,54 +15,45 @@
  */
 
 use super::mock::{mock_voting_parameters, Decay};
-use crate::{Conviction, ProposalState};
-use frame_support::{assert_ok, traits::Get};
-use governance_os_support::testing::{
-    primitives::{AccountId, Balance, BlockNumber, CurrencyId},
-    ALICE, BOB,
-};
+use crate::ProposalState;
+use frame_support::assert_ok;
+use governance_os_support::testing::primitives::{AccountId, Balance, BlockNumber, CurrencyId};
 
 fn mock_state() -> ProposalState<AccountId, Balance, BlockNumber, CurrencyId> {
     ProposalState {
         parameters: mock_voting_parameters(),
-        convictions: vec![
-            (
-                ALICE,
-                0,
-                Conviction {
-                    in_support: true,
-                    power: 100,
-                },
-            ),
-            (
-                BOB,
-                0,
-                Conviction {
-                    in_support: false,
-                    power: 50,
-                },
-            ),
-        ],
+        conviction_for: 1e18 as u128,
+        conviction_against: 1e18 as u128,
         ..Default::default()
     }
 }
 
 #[test]
-fn full_decay() {
+fn more_decay() {
     let mut state = mock_state();
     assert_ok!(state.mutate_conviction_snapshot(100, Decay::get()));
 
-    assert_eq!(state.snapshot.favorable, 100);
-    assert_eq!(state.snapshot.against, 50);
+    // Saturates
+    assert_eq!(state.snapshot.favorable, 1111111111111111111);
+    assert_eq!(state.snapshot.against, 1111111111111111111);
+}
+
+#[test]
+fn full_decay() {
+    let mut state = mock_state();
+    assert_ok!(state.mutate_conviction_snapshot(19, Decay::get()));
+
+    assert_eq!(state.snapshot.favorable, 1111111111111111111);
+    assert_eq!(state.snapshot.against, 1111111111111111111);
 }
 
 #[test]
 fn partial_decay() {
     let mut state = mock_state();
-    assert_ok!(state.mutate_conviction_snapshot(50, Decay::get()));
+    assert_ok!(state.mutate_conviction_snapshot(15, Decay::get()));
 
-    assert_eq!(state.snapshot.favorable, 50);
-    assert_eq!(state.snapshot.against, 25);
+    assert_eq!(state.snapshot.favorable, 1111111111111110000);
+    assert_eq!(state.snapshot.against, 1111111111111110000);
 }
 
 #[test]
