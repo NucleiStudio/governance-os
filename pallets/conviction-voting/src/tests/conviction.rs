@@ -31,7 +31,7 @@ fn mock_state() -> ProposalState<AccountId, Balance, BlockNumber, CurrencyId> {
 #[test]
 fn more_decay() {
     let mut state = mock_state();
-    assert_ok!(state.mutate_conviction_snapshot(100, Decay::get()));
+    assert_ok!(state.mutate_conviction_snapshot(1_000, Decay::get()));
 
     // Saturates
     assert_eq!(state.snapshot.favorable, 1111111111111111111);
@@ -41,7 +41,7 @@ fn more_decay() {
 #[test]
 fn full_decay() {
     let mut state = mock_state();
-    assert_ok!(state.mutate_conviction_snapshot(19, Decay::get()));
+    assert_ok!(state.mutate_conviction_snapshot(190, Decay::get()));
 
     assert_eq!(state.snapshot.favorable, 1111111111111111111);
     assert_eq!(state.snapshot.against, 1111111111111111111);
@@ -50,10 +50,10 @@ fn full_decay() {
 #[test]
 fn partial_decay() {
     let mut state = mock_state();
-    assert_ok!(state.mutate_conviction_snapshot(15, Decay::get()));
+    assert_ok!(state.mutate_conviction_snapshot(50, Decay::get()));
 
-    assert_eq!(state.snapshot.favorable, 1111111111111110000);
-    assert_eq!(state.snapshot.against, 1111111111111110000);
+    assert_eq!(state.snapshot.favorable, 1111100000000000000);
+    assert_eq!(state.snapshot.against, 1111100000000000000);
 }
 
 #[test]

@@ -101,10 +101,14 @@ impl<
         now: BlockNumber,
         decay: Balance,
     ) -> DispatchResult {
+        let time_unit: BlockNumber = 10.into(); // conviction accumulates every 10 blocks, not 1
         let d: Balance = 10.into();
         let a_d = decay;
         // compute time we accumulated conviction for since the creation of the proposal
-        let actual_now = now.saturating_sub(self.created_on);
+        let actual_now = now
+            .saturating_sub(self.created_on)
+            .checked_div(&time_unit)
+            .expect("we control the time_unit constant and shall not set it to 0 ever; qed");
 
         let conviction_formula = |previous, staked| {
             // Past this value, we overflow
