@@ -7,6 +7,13 @@ You will need a few things first:
 1. A running local node, the easiest way to create one is to use this command: `docker run --rm -p 9944:9944 -it eteissonniere/governance-os --dev --tmp --ws-external` or run the command `cargo run -- --dev --tmp` in this repository.
 2. A correctly configured [Polkadot JS UI](https://polkadot.js.org/apps/?rpc=ws%3A%2F%2F127.0.0.1%3A9944#/explorer), you may need the types which you can find [here](../types.json).
 
+## Remarks on the conviction voting formula
+We have implemented the original conviction voting formula from [ETHParis](https://hackmd.io/@EtCgawsxS2mC6-Q0rCqhAw/rJMvfgOv4?type=view) with some quirks. Indeed, we can't simply use an half life decay curve due to the lack (for precision reasons) of floating numbers in our environment and the unavailability of an exponential formula that would compute `y = e^x`. The ETHParis formula is also interesting due to its additive property that allows us to not have to loop over every single votes every time we need to compute the proposal's conviction (which is very interesting for performance reasons).
+
+The main downside of this formula is that after enough time elapsed we will start overflowing our integers, this is why we have to max it at a lower value and otherwise approximate the end result. In our case, we have chose to accumulate conviction every 10 blocks instead of every blocks to limit this downside, but still, after 190 blocks after the proposal creation the formula will saturate the integers. Potential fixes include using alternative formulas (1Hive did some research on this already) and trying to use bigger integers.
+
+We have also chosen to set the decay constant in our runtime configuration (since it is normally a decimal value we actually add a multiplier to it) instead of letting users chose it. This allows us to better control potential effects of the formula and its limitations until we find a better way to implement it.
+
 ## Testing
 ### Create an organization
 Submit the extrinsic `organizations.create` with the following parameters:
