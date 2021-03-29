@@ -44,10 +44,6 @@ pub struct VotingParameters<BlockNumber, CurrencyId> {
     /// is set to 33% it means that at least 33% + 1 of the `voting_currency`
     /// total supply need to have been used in votes for or against the proposal.
     pub min_participation: u32,
-    /// Decay parameter for the half life decay curve used to count vote's
-    /// "conviction". Refer to https://en.wikipedia.org/wiki/Exponential_decay
-    /// for the mathematical explanation.
-    pub decay: u32,
 }
 
 #[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug)]

@@ -90,6 +90,5 @@ pub fn mock_voting_parameters() -> VotingParameters<BlockNumber, CurrencyIdOf<Te
         voting_currency: TEST_TOKEN_ID,
         min_quorum: 50,
         min_participation: 33,
-        decay: 1,
     }
 }
