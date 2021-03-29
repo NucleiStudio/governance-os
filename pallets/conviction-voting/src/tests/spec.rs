@@ -40,6 +40,22 @@ fn initialize_registers_proposal_hash() {
 }
 
 #[test]
+fn initiate_logs_block_number() {
+    ExtBuilder::default().build().execute_with(|| {
+        let mock_hash = H256::default();
+
+        assert_ok!(<ConvictionVoting as StandardizedVoting>::initiate(
+            mock_hash,
+            Default::default()
+        ));
+        assert_eq!(
+            ConvictionVoting::proposals(mock_hash).created_on,
+            ConvictionVoting::now()
+        );
+    })
+}
+
+#[test]
 fn vote_lock_tokens() {
     ExtBuilder::default()
         .one_hundred_for_alice_n_bob()

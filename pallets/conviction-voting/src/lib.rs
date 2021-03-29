@@ -105,6 +105,7 @@ impl<T: Trait> StandardizedVoting for Module<T> {
             // no duplicates, we can create a new state
             *maybe_existing_state = Some(ProposalState {
                 parameters,
+                created_on: Self::now(),
                 ..Default::default()
             });
 
@@ -218,7 +219,7 @@ impl<T: Trait> StandardizedVoting for Module<T> {
 
 impl<T: Trait> Module<T> {
     /// Simple helper function to return the current block number.
-    fn now() -> T::BlockNumber {
+    pub fn now() -> T::BlockNumber {
         frame_system::Module::<T>::block_number()
     }
 
