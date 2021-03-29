@@ -61,9 +61,7 @@ pub struct Conviction<Balance> {
 
 #[derive(Encode, Decode, Clone, PartialEq, Eq, RuntimeDebug, Default)]
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
-pub struct ConvictionSnapshot<Balance, BlockNumber> {
-    /// When was the last snapshot was taken.
-    pub last_snapshot: BlockNumber,
+pub struct ConvictionSnapshot<Balance> {
     /// Amount of favorable conviction.
     pub favorable: Balance,
     /// Amount of opposed conviction.
@@ -86,7 +84,7 @@ pub struct ProposalState<AccountId, Balance, BlockNumber, CurrencyId> {
     pub conviction_against: Balance,
     /// Snapshot of our different conviction records. Used to compute
     /// the current conviction progressively.
-    pub snapshot: ConvictionSnapshot<Balance, BlockNumber>,
+    pub snapshot: ConvictionSnapshot<Balance>,
 }
 impl<
         AccountId: Clone,
@@ -109,12 +107,14 @@ impl<
     ) -> DispatchResult {
         let d: Balance = 10.into();
         let a_d = decay;
+        // compute time we accumulated conviction for since the creation of the proposal
+        let actual_now = now.saturating_sub(self.created_on);
 
         let conviction_formula = |previous, staked| {
             // Past this value, we overflow
-            if now <= 19.into() {
-                let d_now = d.saturating_pow(now.unique_saturated_into());
-                let a_d_now = a_d.saturating_pow(now.unique_saturated_into());
+            if actual_now <= 19.into() {
+                let d_now = d.saturating_pow(actual_now.unique_saturated_into());
+                let a_d_now = a_d.saturating_pow(actual_now.unique_saturated_into());
                 (a_d_now * previous + (staked * d * (d_now - a_d_now)) / (d - a_d)) / d_now
             } else {
                 // We neglect `previous` when `now` is big enough because lim [ a^t ] = 0 when t -> infinity
