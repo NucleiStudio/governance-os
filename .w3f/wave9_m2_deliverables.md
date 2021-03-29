@@ -1,0 +1,8 @@
+| Number | Deliverable | Link | Notes |
+|-|-|-|-|
+| 0a. | License | [../LICENSE](../LICENSE) | We chose the Apache 2.0 license as initially agreed. |
+| 0b. | Documentation | https://nucleistudio.github.io/governance-os/governance_os_node/index.html | The code contains inline rust documentation. Additionally, we use a github action to auto publish it. |
+| 0c. | Testing Guide | [wave9_m1_testing.md](wave9_m1_testing.md) | The guide should cover any manual testing needs for you to confirm the functionalities of the pallets. When it comes to running our unit tests a simple `cargo test --all` should be enough. |
+| 1. | `conviction-voting` pallet | [../pallets/conviction-voting](../pallets/conviction-voting) | This pallet is in charge of handling direct conviction voting operations. We have implemented the first formula developed during ETHParis and later implemented by 1Hive. Due to integer size limitations the conviction may accumulate rather quickly. |
+| 3. | Demonstration Chain | [../runtime](../runtime) and [../node](../node) | We tried to keep the runtime as minimal as possible; it doesn't rely on the `balances` pallet which is **fully replaced** by our `tokens` pallet. We have also defined some default bylaws roles such as `Root` or `CreateCurrencies`. You may need to use the types available in [../types.json](../types.json) when testing. |
+| 4. | Dockerfile | [../Dockerfile](../Dockerfile) | You can build the container as usual. We also have a public image being built thanks to a little overnight [automation system](https://github.com/ETeissonniere/substrate-nodeops/), you can grab the public image under the name [`eteissonniere/governance-os`](https://hub.docker.com/r/eteissonniere/governance-os). |
