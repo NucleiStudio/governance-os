@@ -63,6 +63,7 @@ implementors["gimli"] = [{"text":"impl Copy for Format","synthetic":false,"types
 implementors["governance_os_pallet_bylaws"] = [{"text":"impl&lt;T:&nbsp;Copy + Trait&gt; Copy for Module&lt;T&gt;","synthetic":false,"types":[]}];
 implementors["governance_os_pallet_coin_voting"] = [{"text":"impl Copy for VoteCountingStrategy","synthetic":false,"types":[]},{"text":"impl&lt;T:&nbsp;Copy + Trait&gt; Copy for Module&lt;T&gt;","synthetic":false,"types":[]}];
 implementors["governance_os_pallet_compat"] = [{"text":"impl&lt;T:&nbsp;Copy + Trait&gt; Copy for Module&lt;T&gt;","synthetic":false,"types":[]}];
+implementors["governance_os_pallet_conviction_voting"] = [{"text":"impl&lt;T:&nbsp;Copy + Trait&gt; Copy for Module&lt;T&gt;","synthetic":false,"types":[]}];
 implementors["governance_os_pallet_organizations"] = [{"text":"impl&lt;T:&nbsp;Copy + Trait&gt; Copy for Module&lt;T&gt;","synthetic":false,"types":[]}];
 implementors["governance_os_pallet_plcr_voting"] = [{"text":"impl&lt;Balance:&nbsp;Copy, Hash:&nbsp;Copy&gt; Copy for VoteData&lt;Balance, Hash&gt;","synthetic":false,"types":[]},{"text":"impl&lt;T:&nbsp;Copy + Trait&gt; Copy for Module&lt;T&gt;","synthetic":false,"types":[]}];
 implementors["governance_os_pallet_tokens"] = [{"text":"impl&lt;T:&nbsp;Copy + Trait&gt; Copy for Module&lt;T&gt;","synthetic":false,"types":[]}];

@@ -118,6 +118,21 @@
 <span id="115">115</span>
 <span id="116">116</span>
 <span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">/*
  * Copyright 2020 Nuclei Studio OÜ
@@ -135,10 +150,13 @@
  * limitations under the License.
  */</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">CoinVoting</span>, <span class="ident">PlcrVoting</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">CoinVoting</span>, <span class="ident">ConvictionVoting</span>, <span class="ident">PlcrVoting</span>};
 <span class="kw">use</span> <span class="ident">codec</span>::{<span class="ident">Decode</span>, <span class="ident">Encode</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">governance_os_pallet_coin_voting</span>::{
     <span class="ident">VoteData</span> <span class="kw">as</span> <span class="ident">CoinVoteData</span>, <span class="ident">VotingParameters</span> <span class="kw">as</span> <span class="ident">CoinVotingParameters</span>,
+};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">governance_os_pallet_conviction_voting</span>::{
+    <span class="ident">Conviction</span>, <span class="ident">VotingParameters</span> <span class="kw">as</span> <span class="ident">ConvictionVotingParameters</span>,
 };
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">governance_os_pallet_plcr_voting</span>::{
     <span class="ident">VoteData</span> <span class="kw">as</span> <span class="ident">PlcrVoteData</span>, <span class="ident">VotingParameters</span> <span class="kw">as</span> <span class="ident">PlcrVotingParameters</span>,
@@ -156,6 +174,7 @@
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RuntimeVotingParameters</span> {
     <span class="ident">CoinVoting</span>(<span class="ident">CoinVotingParameters</span><span class="op">&lt;</span><span class="ident">BlockNumber</span>, <span class="ident">CurrencyId</span><span class="op">&gt;</span>),
+    <span class="ident">ConvictionVoting</span>(<span class="ident">ConvictionVotingParameters</span><span class="op">&lt;</span><span class="ident">BlockNumber</span>, <span class="ident">CurrencyId</span><span class="op">&gt;</span>),
     <span class="ident">PlcrVoting</span>(<span class="ident">PlcrVotingParameters</span><span class="op">&lt;</span><span class="ident">BlockNumber</span>, <span class="ident">CurrencyId</span><span class="op">&gt;</span>),
 }
 
@@ -165,6 +184,7 @@
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RuntimeVoteData</span> {
     <span class="ident">CoinVoting</span>(<span class="ident">CoinVoteData</span><span class="op">&lt;</span><span class="ident">Balance</span><span class="op">&gt;</span>),
+    <span class="ident">ConvictionVoting</span>(<span class="ident">Conviction</span><span class="op">&lt;</span><span class="ident">Balance</span><span class="op">&gt;</span>),
     <span class="ident">PlcrVoting</span>(<span class="ident">PlcrVoteData</span><span class="op">&lt;</span><span class="ident">Balance</span>, <span class="ident">Hash</span><span class="op">&gt;</span>),
 }
 
@@ -175,6 +195,7 @@
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RuntimeVotingSystemId</span> {
     <span class="ident">CoinVoting</span>,
+    <span class="ident">ConvictionVoting</span>,
     <span class="ident">PlcrVoting</span>,
 }
 
@@ -195,6 +216,10 @@
             (<span class="ident">RuntimeVotingSystemId</span>::<span class="ident">CoinVoting</span>, <span class="ident">RuntimeVotingParameters</span>::<span class="ident">CoinVoting</span>(<span class="ident">params</span>)) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">CoinVoting</span>::<span class="ident">initiate</span>(<span class="ident">proposal</span>, <span class="ident">params</span>)
             }
+            (
+                <span class="ident">RuntimeVotingSystemId</span>::<span class="ident">ConvictionVoting</span>,
+                <span class="ident">RuntimeVotingParameters</span>::<span class="ident">ConvictionVoting</span>(<span class="ident">params</span>),
+            ) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ConvictionVoting</span>::<span class="ident">initiate</span>(<span class="ident">proposal</span>, <span class="ident">params</span>),
             (<span class="ident">RuntimeVotingSystemId</span>::<span class="ident">PlcrVoting</span>, <span class="ident">RuntimeVotingParameters</span>::<span class="ident">PlcrVoting</span>(<span class="ident">params</span>)) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">PlcrVoting</span>::<span class="ident">initiate</span>(<span class="ident">proposal</span>, <span class="ident">params</span>)
             }
@@ -205,6 +230,7 @@
     <span class="kw">fn</span> <span class="ident">veto</span>(<span class="ident">voting_system</span>: <span class="self">Self</span>::<span class="ident">VotingSystemId</span>, <span class="ident">proposal</span>: <span class="self">Self</span>::<span class="ident">ProposalId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DispatchResult</span> {
         <span class="kw">match</span> <span class="ident">voting_system</span> {
             <span class="ident">RuntimeVotingSystemId</span>::<span class="ident">CoinVoting</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">CoinVoting</span>::<span class="ident">veto</span>(<span class="ident">proposal</span>),
+            <span class="ident">RuntimeVotingSystemId</span>::<span class="ident">ConvictionVoting</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ConvictionVoting</span>::<span class="ident">veto</span>(<span class="ident">proposal</span>),
             <span class="ident">RuntimeVotingSystemId</span>::<span class="ident">PlcrVoting</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PlcrVoting</span>::<span class="ident">veto</span>(<span class="ident">proposal</span>),
         }
     }
@@ -219,6 +245,9 @@
             (<span class="ident">RuntimeVotingSystemId</span>::<span class="ident">CoinVoting</span>, <span class="ident">RuntimeVoteData</span>::<span class="ident">CoinVoting</span>(<span class="ident">data</span>)) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">CoinVoting</span>::<span class="ident">vote</span>(<span class="ident">proposal</span>, <span class="ident">voter</span>, <span class="ident">data</span>)
             }
+            (<span class="ident">RuntimeVotingSystemId</span>::<span class="ident">ConvictionVoting</span>, <span class="ident">RuntimeVoteData</span>::<span class="ident">ConvictionVoting</span>(<span class="ident">data</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">ConvictionVoting</span>::<span class="ident">vote</span>(<span class="ident">proposal</span>, <span class="ident">voter</span>, <span class="ident">data</span>)
+            }
             (<span class="ident">RuntimeVotingSystemId</span>::<span class="ident">PlcrVoting</span>, <span class="ident">RuntimeVoteData</span>::<span class="ident">PlcrVoting</span>(<span class="ident">data</span>)) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">PlcrVoting</span>::<span class="ident">vote</span>(<span class="ident">proposal</span>, <span class="ident">voter</span>, <span class="ident">data</span>)
             }
@@ -232,6 +261,7 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">result</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ProposalResult</span>, <span class="ident">DispatchError</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">voting_system</span> {
             <span class="ident">RuntimeVotingSystemId</span>::<span class="ident">CoinVoting</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">CoinVoting</span>::<span class="ident">close</span>(<span class="ident">proposal</span>),
+            <span class="ident">RuntimeVotingSystemId</span>::<span class="ident">ConvictionVoting</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ConvictionVoting</span>::<span class="ident">close</span>(<span class="ident">proposal</span>),
             <span class="ident">RuntimeVotingSystemId</span>::<span class="ident">PlcrVoting</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">PlcrVoting</span>::<span class="ident">close</span>(<span class="ident">proposal</span>),
         }
     }

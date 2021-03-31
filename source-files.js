@@ -148,6 +148,7 @@ sourcesIndex["governance_os_node"] = {"name":"","files":["chain_spec.rs","cli.rs
 sourcesIndex["governance_os_pallet_bylaws"] = {"name":"","files":["default_weights.rs","lib.rs"]};
 sourcesIndex["governance_os_pallet_coin_voting"] = {"name":"","files":["lib.rs","types.rs"]};
 sourcesIndex["governance_os_pallet_compat"] = {"name":"","files":["lib.rs"]};
+sourcesIndex["governance_os_pallet_conviction_voting"] = {"name":"","files":["lib.rs","types.rs"]};
 sourcesIndex["governance_os_pallet_organizations"] = {"name":"","files":["default_weights.rs","details.rs","lib.rs"]};
 sourcesIndex["governance_os_pallet_plcr_voting"] = {"name":"","files":["lib.rs","types.rs"]};
 sourcesIndex["governance_os_pallet_tokens"] = {"name":"","files":["account_data.rs","adapter.rs","currencies.rs","default_weights.rs","details.rs","imbalances.rs","lib.rs","mutations.rs"]};
