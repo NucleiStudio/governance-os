@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
-use crate::{CoinVoting, PlcrVoting};
+use crate::{CoinVoting, ConvictionVoting, PlcrVoting};
 use codec::{Decode, Encode};
 pub use governance_os_pallet_coin_voting::{
     VoteData as CoinVoteData, VotingParameters as CoinVotingParameters,
+};
+pub use governance_os_pallet_conviction_voting::{
+    Conviction, VotingParameters as ConvictionVotingParameters,
 };
 pub use governance_os_pallet_plcr_voting::{
     VoteData as PlcrVoteData, VotingParameters as PlcrVotingParameters,
@@ -35,6 +38,7 @@ use sp_std::result;
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 pub enum RuntimeVotingParameters {
     CoinVoting(CoinVotingParameters<BlockNumber, CurrencyId>),
+    ConvictionVoting(ConvictionVotingParameters<BlockNumber, CurrencyId>),
     PlcrVoting(PlcrVotingParameters<BlockNumber, CurrencyId>),
 }
 
@@ -44,6 +48,7 @@ pub enum RuntimeVotingParameters {
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 pub enum RuntimeVoteData {
     CoinVoting(CoinVoteData<Balance>),
+    ConvictionVoting(Conviction<Balance>),
     PlcrVoting(PlcrVoteData<Balance, Hash>),
 }
 
@@ -54,6 +59,7 @@ pub enum RuntimeVoteData {
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 pub enum RuntimeVotingSystemId {
     CoinVoting,
+    ConvictionVoting,
     PlcrVoting,
 }
 
@@ -74,6 +80,10 @@ impl VotingRouter for RuntimeVotingRouter {
             (RuntimeVotingSystemId::CoinVoting, RuntimeVotingParameters::CoinVoting(params)) => {
                 CoinVoting::initiate(proposal, params)
             }
+            (
+                RuntimeVotingSystemId::ConvictionVoting,
+                RuntimeVotingParameters::ConvictionVoting(params),
+            ) => ConvictionVoting::initiate(proposal, params),
             (RuntimeVotingSystemId::PlcrVoting, RuntimeVotingParameters::PlcrVoting(params)) => {
                 PlcrVoting::initiate(proposal, params)
             }
@@ -84,6 +94,7 @@ impl VotingRouter for RuntimeVotingRouter {
     fn veto(voting_system: Self::VotingSystemId, proposal: Self::ProposalId) -> DispatchResult {
         match voting_system {
             RuntimeVotingSystemId::CoinVoting => CoinVoting::veto(proposal),
+            RuntimeVotingSystemId::ConvictionVoting => ConvictionVoting::veto(proposal),
             RuntimeVotingSystemId::PlcrVoting => PlcrVoting::veto(proposal),
         }
     }
@@ -98,6 +109,9 @@ impl VotingRouter for RuntimeVotingRouter {
             (RuntimeVotingSystemId::CoinVoting, RuntimeVoteData::CoinVoting(data)) => {
                 CoinVoting::vote(proposal, voter, data)
             }
+            (RuntimeVotingSystemId::ConvictionVoting, RuntimeVoteData::ConvictionVoting(data)) => {
+                ConvictionVoting::vote(proposal, voter, data)
+            }
             (RuntimeVotingSystemId::PlcrVoting, RuntimeVoteData::PlcrVoting(data)) => {
                 PlcrVoting::vote(proposal, voter, data)
             }
@@ -111,6 +125,7 @@ impl VotingRouter for RuntimeVotingRouter {
     ) -> result::Result<ProposalResult, DispatchError> {
         match voting_system {
             RuntimeVotingSystemId::CoinVoting => CoinVoting::close(proposal),
+            RuntimeVotingSystemId::ConvictionVoting => ConvictionVoting::close(proposal),
             RuntimeVotingSystemId::PlcrVoting => PlcrVoting::close(proposal),
         }
     }
