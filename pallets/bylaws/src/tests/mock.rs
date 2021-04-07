@@ -20,7 +20,7 @@ use frame_support::{construct_runtime, parameter_types, traits::GenesisBuild};
 use governance_os_support::{
     impl_enum_default,
     testing::{
-        primitives::{AccountId, BlockNumber, CurrencyId},
+        primitives::{AccountId, BlockNumber},
         ROOT,
     },
 };
@@ -88,11 +88,6 @@ impl frame_system::Config for Test {
 pub enum MockRoles {
     Root,
     RemarkOnly,
-    CreateCurrencies,
-    TransferCurrency(CurrencyId),
-    ManageCurrency(CurrencyId),
-    CreateOrganizations,
-    ApplyAsOrganization(AccountId),
 }
 impl_enum_default!(MockRoles, RemarkOnly);
 impl governance_os_pallet_bylaws::RoleBuilder for MockRoles {
