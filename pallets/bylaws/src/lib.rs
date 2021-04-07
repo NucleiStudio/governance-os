@@ -21,9 +21,7 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use frame_support::{
-    decl_error, decl_event, decl_module, decl_storage, traits::Get, weights::Weight, Parameter,
-};
+use frame_support::{weights::Weight, Parameter};
 use governance_os_support::traits::RoleManager;
 use sp_runtime::{
     traits::{MaybeSerializeDeserialize, Member, StaticLookup},
@@ -36,6 +34,8 @@ mod benchmarking;
 mod default_weights;
 #[cfg(test)]
 mod tests;
+
+pub use pallet::*;
 
 pub trait WeightInfo {
     fn grant_role(b: u32) -> Weight;
@@ -52,71 +52,101 @@ pub trait RoleBuilder {
     /// any other calls.
     fn root() -> Self::Role;
 }
+type RoleBuilderOf<T> = <T as Config>::RoleBuilder;
 
-pub trait Trait: frame_system::Trait {
-    /// Because this pallet emits events, it depends on the runtime's definition of an event.
-    type Event: From<Event<Self>> + Into<<Self as frame_system::Trait>::Event>;
+#[frame_support::pallet]
+pub mod pallet {
+    use super::*;
+    use frame_support::{dispatch::DispatchResultWithPostInfo, pallet_prelude::*};
+    use frame_system::pallet_prelude::*;
 
-    /// Roles defines UNIX like roles that users must be granted before triggering certain calls.
-    type Role: Parameter + Member + MaybeSerializeDeserialize + Ord + Default;
+    #[pallet::pallet]
+    #[pallet::generate_store(pub(super) trait Store)]
+    pub struct Pallet<T>(_);
 
-    /// The weights for this pallet.
-    type WeightInfo: WeightInfo;
+    #[pallet::config]
+    pub trait Config: frame_system::Config {
+        /// Because this pallet emits events, it depends on the runtime's definition of an event.
+        type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
 
-    /// Only used for weight calculations: this is the highest number of roles we expect one account
-    /// to have.
-    type MaxRoles: Get<u32>;
+        /// Roles defines UNIX like roles that users must be granted before triggering certain calls.
+        type Role: Parameter + Member + MaybeSerializeDeserialize + Ord + Default;
 
-    /// Helper for the runtime to specify its custom roles.
-    type RoleBuilder: RoleBuilder<Role = Self::Role>;
-}
+        /// The weights for this pallet.
+        type WeightInfo: WeightInfo;
 
-type RoleBuilderOf<T> = <T as Trait>::RoleBuilder;
+        /// Only used for weight calculations: this is the highest number of roles we expect one account
+        /// to have.
+        type MaxRoles: Get<u32>;
 
-decl_error! {
-    pub enum Error for Module<T: Trait> {
+        /// Helper for the runtime to specify its custom roles.
+        type RoleBuilder: RoleBuilder<Role = Self::Role>;
+    }
+
+    #[pallet::error]
+    pub enum Error<T> {
         /// We were unable to find the indicated role. It was likely not granted to the target.
         RoleNotFound,
         /// Target was already granted this role.
         RoleAlreadyExists,
     }
-}
 
-decl_storage! {
-    trait Store for Module<T: Trait> as Bylaws {
-        /// Roles granted to the different accounts. If a role is granted to `None` this means
-        /// it is granted to all accounts from the runtime.
-        pub Roles get(fn roles): map hasher(blake2_128_concat) Option<T::AccountId> => Vec<T::Role>;
-    }
-    add_extra_genesis {
-        config(roles): Vec<(T::Role, Option<T::AccountId>)>;
-        build(|config: &GenesisConfig<T>| {
-            config.roles.iter().for_each(|(role, target)| drop(<Module<T> as RoleManager>::grant_role(target.as_ref(), role.clone())));
-        })
-    }
-}
+    #[pallet::storage]
+    #[pallet::getter(fn roles)]
+    /// Roles granted to the different accounts. If a role is granted to `None` this means
+    /// it is granted to all accounts from the runtime.
+    pub(super) type Roles<T: Config> =
+        StorageMap<_, Blake2_128Concat, Option<T::AccountId>, Vec<T::Role>, ValueQuery>;
 
-decl_event!(
-    pub enum Event<T>
-    where
-        AccountId = <T as frame_system::Trait>::AccountId,
-        Role = <T as Trait>::Role,
-    {
+    #[pallet::genesis_config]
+    pub struct GenesisConfig<T: Config> {
+        pub roles: Vec<(T::Role, Option<T::AccountId>)>,
+    }
+
+    #[cfg(feature = "std")]
+    impl<T: Config> Default for GenesisConfig<T> {
+        fn default() -> Self {
+            Self {
+                roles: Default::default(),
+            }
+        }
+    }
+
+    #[pallet::genesis_build]
+    impl<T: Config> GenesisBuild<T> for GenesisConfig<T> {
+        fn build(&self) {
+            self.roles.iter().for_each(|(role, target)| {
+                drop(<Pallet<T> as RoleManager>::grant_role(
+                    target.as_ref(),
+                    role.clone(),
+                ))
+            });
+        }
+    }
+
+    #[pallet::event]
+    #[pallet::generate_deposit(pub(super) fn deposit_event)]
+    #[pallet::metadata(T::AccountId = "AccountId", T::Role = "Role")]
+    pub enum Event<T: Config> {
         /// A role has been granted to an account. \[account, role\]
-        RoleGranted(Option<AccountId>, Role),
+        RoleGranted(Option<T::AccountId>, T::Role),
         /// A role has been revoked from an account. \[account, role\]
-        RoleRevoked(Option<AccountId>, Role),
+        RoleRevoked(Option<T::AccountId>, T::Role),
     }
-);
 
-decl_module! {
-    pub struct Module<T: Trait> for enum Call where origin: T::Origin {
-        fn deposit_event() = default;
+    #[pallet::hooks]
+    impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {}
 
+    #[pallet::call]
+    impl<T: Config> Pallet<T> {
         /// Add a `role` to a given account `who`. If `who` is set to `None` this
         /// means that the role is granted to all the accounts of the chain.
-        #[weight = T::WeightInfo::grant_role(T::MaxRoles::get())]
-        fn grant_role(origin, who: Option<<T::Lookup as StaticLookup>::Source>, role: T::Role) {
+        #[pallet::weight(T::WeightInfo::grant_role(T::MaxRoles::get()))]
+        pub(super) fn grant_role(
+            origin: OriginFor<T>,
+            who: Option<<T::Lookup as StaticLookup>::Source>,
+            role: T::Role,
+        ) -> DispatchResultWithPostInfo {
             Self::ensure_has_role(origin, RoleBuilderOf::<T>::manage_roles())?;
 
             let target = match who {
@@ -125,12 +155,18 @@ decl_module! {
             };
 
             <Self as RoleManager>::grant_role(target.as_ref(), role)?;
+
+            Ok(().into())
         }
 
         /// Remove a `role` from a given account `who`. If `who` is set to `None` this means
         /// that the role is revoked for all the accounts of the chain.
-        #[weight = T::WeightInfo::revoke_role(T::MaxRoles::get())]
-        fn revoke_role(origin, who: Option<<T::Lookup as StaticLookup>::Source>, role: T::Role) {
+        #[pallet::weight(T::WeightInfo::revoke_role(T::MaxRoles::get()))]
+        pub(super) fn revoke_role(
+            origin: OriginFor<T>,
+            who: Option<<T::Lookup as StaticLookup>::Source>,
+            role: T::Role,
+        ) -> DispatchResultWithPostInfo {
             Self::ensure_has_role(origin, RoleBuilderOf::<T>::manage_roles())?;
 
             let target = match who {
@@ -139,11 +175,13 @@ decl_module! {
             };
 
             <Self as RoleManager>::revoke_role(target.as_ref(), role)?;
+
+            Ok(().into())
         }
     }
 }
 
-impl<T: Trait> RoleManager for Module<T> {
+impl<T: Config> RoleManager for Pallet<T> {
     type AccountId = T::AccountId;
     type Role = T::Role;
 
@@ -156,7 +194,7 @@ impl<T: Trait> RoleManager for Module<T> {
             }
         })
         .map(|result| {
-            Self::deposit_event(RawEvent::RoleGranted(target.cloned(), role));
+            Self::deposit_event(Event::RoleGranted(target.cloned(), role));
             result
         })
     }
@@ -178,7 +216,7 @@ impl<T: Trait> RoleManager for Module<T> {
             }
         })
         .map(|result| {
-            Self::deposit_event(RawEvent::RoleRevoked(target.cloned(), role));
+            Self::deposit_event(Event::RoleRevoked(target.cloned(), role));
             result
         })
     }
