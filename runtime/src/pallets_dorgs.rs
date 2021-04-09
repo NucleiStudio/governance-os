@@ -22,7 +22,7 @@ parameter_types! {
     pub const MaxRoles: u32 = 50;
 }
 
-impl governance_os_pallet_bylaws::Trait for Runtime {
+impl governance_os_pallet_bylaws::Config for Runtime {
     type Event = Event;
     type Role = Role;
     type WeightInfo = ();
@@ -30,7 +30,7 @@ impl governance_os_pallet_bylaws::Trait for Runtime {
     type RoleBuilder = Role;
 }
 
-impl governance_os_pallet_coin_voting::Trait for Runtime {
+impl governance_os_pallet_coin_voting::Config for Runtime {
     type Currencies = Tokens;
 }
 
@@ -38,12 +38,12 @@ parameter_types! {
     pub const Decay: Balance = 1;
 }
 
-impl governance_os_pallet_conviction_voting::Trait for Runtime {
+impl governance_os_pallet_conviction_voting::Config for Runtime {
     type Currencies = Tokens;
     type Decay = Decay;
 }
 
-impl governance_os_pallet_plcr_voting::Trait for Runtime {
+impl governance_os_pallet_plcr_voting::Config for Runtime {
     type Event = Event;
     type Currencies = Tokens;
 }
@@ -56,7 +56,7 @@ parameter_types! {
     pub const MaxExecutors: u32 = 100;
 }
 
-impl governance_os_pallet_organizations::Trait for Runtime {
+impl governance_os_pallet_organizations::Config for Runtime {
     type Event = Event;
     type Call = Call;
     type RoleManager = Bylaws;

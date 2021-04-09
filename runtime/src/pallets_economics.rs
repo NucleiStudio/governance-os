@@ -18,8 +18,9 @@ use crate::{Bylaws, Event, Runtime};
 use frame_support::{parameter_types, weights::IdentityFee};
 use governance_os_pallet_tokens::NativeCurrencyAdapter;
 use governance_os_primitives::{Balance, CurrencyId, Role};
+use pallet_transaction_payment::CurrencyAdapter;
 
-impl governance_os_pallet_tokens::Trait for Runtime {
+impl governance_os_pallet_tokens::Config for Runtime {
     type Event = Event;
     type Balance = Balance;
     type CurrencyId = CurrencyId;
@@ -39,10 +40,8 @@ parameter_types! {
     pub const TransactionByteFee: Balance = 1;
 }
 
-impl pallet_transaction_payment::Trait for Runtime {
-    type Currency = NativeCurrency;
-    // TODO: split fees between block author and native dOrg
-    type OnTransactionPayment = ();
+impl pallet_transaction_payment::Config for Runtime {
+    type OnChargeTransaction = CurrencyAdapter<NativeCurrency, ()>;
     type TransactionByteFee = TransactionByteFee;
     type WeightToFee = IdentityFee<Balance>;
     type FeeMultiplierUpdate = ();
