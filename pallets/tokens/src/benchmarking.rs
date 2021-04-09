@@ -17,13 +17,13 @@
 use crate::*;
 use frame_benchmarking::{account, benchmarks, whitelisted_caller};
 use frame_system::RawOrigin;
-use governance_os_support::{benchmarking::SEED, traits::Currencies};
+use governance_os_support::traits::Currencies;
 use sp_runtime::traits::StaticLookup;
 use sp_std::prelude::*;
 
-benchmarks! {
-    _ { }
+const SEED: u32 = 0;
 
+benchmarks! {
     create {
         let token_id: T::CurrencyId = T::CurrencyId::default();
         let caller: T::AccountId = whitelisted_caller();
@@ -34,7 +34,7 @@ benchmarks! {
 
     mint {
         let token_id: T::CurrencyId = T::CurrencyId::default();
-        let coins_to_mint: T::Balance = 10_000_000.into();
+        let coins_to_mint: T::Balance = 10_000_000u32.into();
         let caller: T::AccountId = whitelisted_caller();
 
         let _ = Module::<T>::create(RawOrigin::Signed(caller.clone()).into(), token_id, true);
@@ -49,7 +49,7 @@ benchmarks! {
 
     burn {
         let token_id: T::CurrencyId = T::CurrencyId::default();
-        let coins_to_burn: T::Balance = 10_000_000.into();
+        let coins_to_burn: T::Balance = 10_000_000u32.into();
         let caller: T::AccountId = whitelisted_caller();
 
         let to: T::AccountId = account("to", 0, SEED);
@@ -59,8 +59,8 @@ benchmarks! {
         let _ = <Module<T> as Currencies<T::AccountId>>::mint(token_id, &to, coins_to_burn);
     }: _(RawOrigin::Signed(caller.clone()), token_id, to_lookup, coins_to_burn)
     verify {
-        assert_eq!(<Module<T> as Currencies<T::AccountId>>::free_balance(token_id, &to), 0.into());
-        assert_eq!(TotalIssuances::<T>::get(token_id), 0.into());
+        assert_eq!(<Module<T> as Currencies<T::AccountId>>::free_balance(token_id, &to), 0u32.into());
+        assert_eq!(TotalIssuances::<T>::get(token_id), 0u32.into());
     }
 
     update_details {
@@ -82,7 +82,7 @@ benchmarks! {
 
     transfer {
         let token_id: T::CurrencyId = T::CurrencyId::default();
-        let coins_to_transfer: T::Balance = 10_000_000.into();
+        let coins_to_transfer: T::Balance = 10_000_000u32.into();
         let caller: T::AccountId = whitelisted_caller();
         let caller_lookup: <T::Lookup as StaticLookup>::Source = T::Lookup::unlookup(caller.clone());
 
@@ -93,30 +93,19 @@ benchmarks! {
         let to_lookup: <T::Lookup as StaticLookup>::Source = T::Lookup::unlookup(to.clone());
     }: _(RawOrigin::Signed(caller.clone()), token_id, to_lookup, coins_to_transfer)
     verify {
-        assert_eq!(<Module<T> as Currencies<T::AccountId>>::free_balance(token_id, &caller), 0.into());
+        assert_eq!(<Module<T> as Currencies<T::AccountId>>::free_balance(token_id, &caller), 0u32.into());
         assert_eq!(<Module<T> as Currencies<T::AccountId>>::free_balance(token_id, &to), coins_to_transfer);
     }
 }
 
-#[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::mock::{ExtBuilder, Test};
-    use frame_support::assert_ok;
-    use governance_os_support::create_benchmarking_test;
+    use crate::Module as Tokens;
+    use frame_benchmarking::impl_benchmark_test_suite;
 
-    fn new_test_ext() -> sp_io::TestExternalities {
-        ExtBuilder::default().one_hundred_for_alice_n_bob().build()
-    }
-
-    create_benchmarking_test!(new_test_ext, Test, create, test_benchmark_create);
-    create_benchmarking_test!(new_test_ext, Test, mint, test_benchmark_mint);
-    create_benchmarking_test!(new_test_ext, Test, burn, test_benchmark_burn);
-    create_benchmarking_test!(
-        new_test_ext,
-        Test,
-        update_details,
-        test_benchmark_update_details
+    impl_benchmark_test_suite!(
+        Tokens,
+        crate::tests::mock::ExtBuilder::default().build(),
+        crate::tests::mock::Test
     );
-    create_benchmarking_test!(new_test_ext, Test, transfer, test_benchmark_transfer);
 }

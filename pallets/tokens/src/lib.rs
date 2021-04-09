@@ -31,15 +31,10 @@ use frame_support::{
 use frame_system::ensure_signed;
 use governance_os_support::traits::{Currencies, RoleManager};
 use sp_runtime::{
-    traits::{
-        AtLeast32BitUnsigned, CheckedAdd, MaybeSerializeDeserialize, Member, StaticLookup, Zero,
-    },
+    traits::{AtLeast32BitUnsigned, MaybeSerializeDeserialize, Member, StaticLookup, Zero},
     DispatchResult,
 };
 use sp_std::cmp::{Eq, PartialEq};
-
-#[cfg(feature = "std")]
-use sp_std::collections::btree_map::BTreeMap;
 
 #[cfg(feature = "runtime-benchmarks")]
 mod benchmarking;
@@ -82,10 +77,11 @@ pub trait RoleBuilder {
     /// Role for creating currencies.
     fn create_currencies() -> Self::Role;
 }
+type RoleBuilderOf<T> = <T as Config>::RoleBuilder;
 
-pub trait Trait: frame_system::Trait {
+pub trait Config: frame_system::Config {
     /// Because this pallet emits events, it depends on the runtime's definition of an event.
-    type Event: From<Event<Self>> + Into<<Self as frame_system::Trait>::Event>;
+    type Event: From<Event<Self>> + Into<<Self as frame_system::Config>::Event>;
 
     /// The type used to identify currencies
     type CurrencyId: Parameter + Member + Copy + MaybeSerializeDeserialize + Ord + Default;
@@ -113,31 +109,15 @@ pub trait Trait: frame_system::Trait {
     >;
 }
 
-type RoleBuilderOf<T> = <T as Trait>::RoleBuilder;
-type RoleManagerOf<T> = <T as Trait>::RoleManager;
+type RoleManagerOf<T> = <T as Config>::RoleManager;
 
 decl_storage! {
-    trait Store for Module<T: Trait> as Tokens {
+    trait Store for Module<T: Config> as Tokens {
         /// Store the balances holded by an account. By storing the balances under an account (VS storing
         /// the accounts under the currency ids) we can enumerate the tokens holded by an account if needed.
         pub Balances get(fn balances): double_map hasher(blake2_128_concat) T::AccountId, hasher(blake2_128_concat) T::CurrencyId => AccountCurrencyData<T::Balance>;
         pub Locks get(fn locks): double_map hasher(blake2_128_concat) (T::AccountId, T::CurrencyId), hasher(blake2_128_concat) LockIdentifier => T::Balance;
-        pub TotalIssuances get(fn total_issuances) build(|config: &GenesisConfig<T>| {
-            config
-                .endowed_accounts
-                .iter()
-                .map(|(currency_id, _, initial_balance)| (currency_id, initial_balance))
-                .fold(BTreeMap::<T::CurrencyId, T::Balance>::new(), |mut acc, (currency_id, initial_balance)| {
-                    if let Some(issuance) = acc.get_mut(currency_id) {
-                        *issuance = issuance.checked_add(initial_balance).expect("total issuance cannot overflow when building genesis");
-                    } else {
-                        acc.insert(*currency_id, *initial_balance);
-                    }
-                    acc
-                })
-                .into_iter()
-                .collect::<Vec<_>>()
-        }): map hasher(blake2_128_concat) T::CurrencyId => T::Balance;
+        pub TotalIssuances get(fn total_issuances): map hasher(blake2_128_concat) T::CurrencyId => T::Balance;
     }
     add_extra_genesis {
         config(endowed_accounts): Vec<(T::CurrencyId, T::AccountId, T::Balance)>;
@@ -151,8 +131,7 @@ decl_storage! {
             });
 
             config.endowed_accounts.iter().for_each(|(currency_id, account_id, initial_balance)| {
-                Balances::<T>::mutate(account_id, *currency_id, |d| d.free = *initial_balance);
-                frame_system::Module::<T>::inc_ref(&account_id);
+                assert!(<Module<T> as Currencies<T::AccountId>>::mint(*currency_id, account_id, *initial_balance).is_ok());
             });
         })
     }
@@ -161,10 +140,10 @@ decl_storage! {
 decl_event!(
     pub enum Event<T>
     where
-        AccountId = <T as frame_system::Trait>::AccountId,
-        Balance = <T as Trait>::Balance,
-        CurrencyId = <T as Trait>::CurrencyId,
-        CurrencyDetails = CurrencyDetails<<T as frame_system::Trait>::AccountId>,
+        AccountId = <T as frame_system::Config>::AccountId,
+        Balance = <T as Config>::Balance,
+        CurrencyId = <T as Config>::CurrencyId,
+        CurrencyDetails = CurrencyDetails<<T as frame_system::Config>::AccountId>,
     {
         /// A new currency has been created. \[currency id, details\]
         CurrencyCreated(CurrencyId, CurrencyDetails),
@@ -180,7 +159,7 @@ decl_event!(
 );
 
 decl_error! {
-    pub enum Error for Module<T: Trait> {
+    pub enum Error for Module<T: Config> {
         /// This operation will cause total issuance to overflow for the given currency
         TotalIssuanceOverflow,
         /// This operation will cause total issuance to underflow for the given currency
@@ -200,7 +179,7 @@ decl_error! {
 }
 
 decl_module! {
-    pub struct Module<T: Trait> for enum Call where origin: T::Origin {
+    pub struct Module<T: Config> for enum Call where origin: T::Origin {
         type Error = Error<T>;
 
         fn deposit_event() = default;
@@ -272,7 +251,7 @@ decl_module! {
     }
 }
 
-impl<T: Trait> Module<T> {
+impl<T: Config> Module<T> {
     /// Return the `AccountCurrencyData` for the `who` and `currency_id`.
     fn get_currency_account(
         currency_id: T::CurrencyId,

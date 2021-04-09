@@ -57,11 +57,11 @@ fn set_test_token_roles_approprietaly() {
 }
 
 #[test]
-fn new_account_is_created_with_system_ref() {
+fn new_account_is_created_with_ref() {
     ExtBuilder::default()
         .one_hundred_for_alice_n_bob()
         .build()
         .execute_with(|| {
-            assert_eq!(frame_system::Module::<Test>::refs(&ALICE), 1);
+            assert_eq!(frame_system::Pallet::<Test>::consumers(&ALICE), 1);
         })
 }

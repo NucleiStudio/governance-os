@@ -20,7 +20,7 @@ use frame_support::{
     assert_noop, assert_ok,
     traits::{
         BalanceStatus, Currency, ExistenceRequirement, Imbalance, LockableCurrency,
-        ReservableCurrency, SignedImbalance, WithdrawReason, WithdrawReasons,
+        ReservableCurrency, SignedImbalance, WithdrawReasons,
     },
 };
 use governance_os_support::{
@@ -166,7 +166,7 @@ fn withdraw() {
             let imbalance = TokensCurrencyAdapter::withdraw(
                 &ALICE,
                 45,
-                WithdrawReason::Transfer.into(),
+                WithdrawReasons::all(),
                 ExistenceRequirement::KeepAlive,
             )
             .unwrap();
@@ -188,16 +188,11 @@ fn ensure_can_withdraw() {
             assert_ok!(TokensCurrencyAdapter::ensure_can_withdraw(
                 &ALICE,
                 10,
-                WithdrawReason::Transfer.into(),
+                WithdrawReasons::all(),
                 0
             ));
             assert_noop!(
-                TokensCurrencyAdapter::ensure_can_withdraw(
-                    &ALICE,
-                    101,
-                    WithdrawReason::Transfer.into(),
-                    0
-                ),
+                TokensCurrencyAdapter::ensure_can_withdraw(&ALICE, 101, WithdrawReasons::all(), 0),
                 Error::<Test>::BalanceTooLow
             );
         })

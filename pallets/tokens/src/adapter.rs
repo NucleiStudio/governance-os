@@ -17,7 +17,7 @@
 use crate::{
     imbalances::{NegativeImbalance, PositiveImbalance},
     mutations::Mutation,
-    Module, TotalIssuances, Trait,
+    Config, Module, TotalIssuances,
 };
 use frame_support::{
     traits::{
@@ -44,7 +44,7 @@ pub struct NativeCurrencyAdapter<Pallet, GetCurrencyId>(
 impl<Pallet, GetCurrencyId> Currency<Pallet::AccountId>
     for NativeCurrencyAdapter<Pallet, GetCurrencyId>
 where
-    Pallet: Trait,
+    Pallet: Config,
     GetCurrencyId: Get<Pallet::CurrencyId>,
 {
     type Balance = Pallet::Balance;
@@ -204,7 +204,7 @@ where
 impl<Pallet, GetCurrencyId> ReservableCurrency<Pallet::AccountId>
     for NativeCurrencyAdapter<Pallet, GetCurrencyId>
 where
-    Pallet: Trait,
+    Pallet: Config,
     GetCurrencyId: Get<Pallet::CurrencyId>,
 {
     fn can_reserve(who: &Pallet::AccountId, amount: Self::Balance) -> bool {
@@ -256,7 +256,7 @@ where
 impl<Pallet, GetCurrencyId> LockableCurrency<Pallet::AccountId>
     for NativeCurrencyAdapter<Pallet, GetCurrencyId>
 where
-    Pallet: Trait,
+    Pallet: Config,
     GetCurrencyId: Get<Pallet::CurrencyId>,
 {
     type Moment = Pallet::BlockNumber;

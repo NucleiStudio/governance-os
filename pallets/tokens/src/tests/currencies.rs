@@ -324,8 +324,8 @@ fn creating_a_new_account_inc_system_ref() {
             50
         ));
 
-        assert_eq!(frame_system::Module::<Test>::refs(&ALICE), 1);
-        assert_eq!(frame_system::Module::<Test>::refs(&BOB), 1);
+        assert_eq!(frame_system::Pallet::<Test>::consumers(&ALICE), 1);
+        assert_eq!(frame_system::Pallet::<Test>::consumers(&BOB), 1);
     });
 }
 
@@ -356,8 +356,8 @@ fn deleting_an_account_dec_system_ref() {
             100
         ));
 
-        assert_eq!(frame_system::Module::<Test>::refs(&ALICE), 0);
-        assert_eq!(frame_system::Module::<Test>::refs(&BOB), 0);
+        assert_eq!(frame_system::Pallet::<Test>::consumers(&ALICE), 0);
+        assert_eq!(frame_system::Pallet::<Test>::consumers(&BOB), 0);
     });
 }
 
@@ -703,6 +703,8 @@ fn set_new_lock_inc_ref() {
         .one_hundred_for_alice_n_bob()
         .build()
         .execute_with(|| {
+            let prev_consumers = frame_system::Pallet::<Test>::consumers(&ALICE);
+
             assert_ok!(<Tokens as LockableCurrencies<AccountId>>::set_lock(
                 TEST_TOKEN_ID,
                 *b"testtest",
@@ -710,7 +712,10 @@ fn set_new_lock_inc_ref() {
                 60
             ));
 
-            assert_eq!(frame_system::Module::<Test>::refs(&ALICE), 2);
+            assert_eq!(
+                frame_system::Pallet::<Test>::consumers(&ALICE),
+                prev_consumers + 1
+            );
         })
 }
 #[test]
@@ -725,6 +730,8 @@ fn set_existing_lock_does_not_inc_ref() {
                 &ALICE,
                 60
             ));
+
+            let prev_consumers = frame_system::Pallet::<Test>::consumers(&ALICE);
             assert_ok!(<Tokens as LockableCurrencies<AccountId>>::set_lock(
                 TEST_TOKEN_ID,
                 *b"testtest",
@@ -732,7 +739,10 @@ fn set_existing_lock_does_not_inc_ref() {
                 50
             ));
 
-            assert_eq!(frame_system::Module::<Test>::refs(&ALICE), 2);
+            assert_eq!(
+                frame_system::Pallet::<Test>::consumers(&ALICE),
+                prev_consumers
+            );
         })
 }
 
@@ -742,6 +752,7 @@ fn extend_new_lock_inc_ref() {
         .one_hundred_for_alice_n_bob()
         .build()
         .execute_with(|| {
+            let prev_consumers = frame_system::Pallet::<Test>::consumers(&ALICE);
             assert_ok!(<Tokens as LockableCurrencies<AccountId>>::extend_lock(
                 TEST_TOKEN_ID,
                 *b"testtest",
@@ -749,7 +760,10 @@ fn extend_new_lock_inc_ref() {
                 60
             ));
 
-            assert_eq!(frame_system::Module::<Test>::refs(&ALICE), 2);
+            assert_eq!(
+                frame_system::Pallet::<Test>::consumers(&ALICE),
+                prev_consumers + 1
+            );
         })
 }
 
@@ -765,6 +779,8 @@ fn extend_existing_lock_does_not_inc_ref() {
                 &ALICE,
                 50
             ));
+
+            let prev_consumers = frame_system::Pallet::<Test>::consumers(&ALICE);
             assert_ok!(<Tokens as LockableCurrencies<AccountId>>::extend_lock(
                 TEST_TOKEN_ID,
                 *b"testtest",
@@ -772,7 +788,10 @@ fn extend_existing_lock_does_not_inc_ref() {
                 60
             ));
 
-            assert_eq!(frame_system::Module::<Test>::refs(&ALICE), 2);
+            assert_eq!(
+                frame_system::Pallet::<Test>::consumers(&ALICE),
+                prev_consumers
+            );
         })
 }
 
@@ -782,18 +801,28 @@ fn remove_lock_dec_ref() {
         .one_hundred_for_alice_n_bob()
         .build()
         .execute_with(|| {
+            let prev_consumers = frame_system::Pallet::<Test>::consumers(&ALICE);
+
             assert_ok!(<Tokens as LockableCurrencies<AccountId>>::set_lock(
                 TEST_TOKEN_ID,
                 *b"testtest",
                 &ALICE,
                 60
             ));
+            assert_eq!(
+                frame_system::Pallet::<Test>::consumers(&ALICE),
+                prev_consumers + 1
+            );
+
             assert_ok!(<Tokens as LockableCurrencies<AccountId>>::remove_lock(
                 TEST_TOKEN_ID,
                 *b"testtest",
                 &ALICE,
             ));
 
-            assert_eq!(frame_system::Module::<Test>::refs(&ALICE), 1);
+            assert_eq!(
+                frame_system::Pallet::<Test>::consumers(&ALICE),
+                prev_consumers
+            );
         })
 }

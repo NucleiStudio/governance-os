@@ -15,8 +15,8 @@
  */
 
 use crate::{
-    AccountCurrencyData, Balances, Error, RoleBuilder, RoleBuilderOf, RoleManagerOf,
-    TotalIssuances, Trait,
+    AccountCurrencyData, Balances, Config, Error, RoleBuilder, RoleBuilderOf, RoleManagerOf,
+    TotalIssuances,
 };
 use frame_support::{StorageDoubleMap, StorageMap};
 use governance_os_support::traits::RoleManager;
@@ -30,7 +30,7 @@ use sp_std::{collections::btree_map::BTreeMap, marker};
 /// operations done on balances while saving on weight costs by fetching the required data
 /// only when necessary and forwarding errors approprietaly.
 #[derive(Clone)]
-pub struct Mutation<T: Trait> {
+pub struct Mutation<T: Config> {
     currency_id: T::CurrencyId,
     // bools are wether the balance was modified and wether the balance was zero when we first read it.
     balances: BTreeMap<T::AccountId, (AccountCurrencyData<T::Balance>, bool, bool)>,
@@ -38,7 +38,7 @@ pub struct Mutation<T: Trait> {
     coins_burned: T::Balance,
     _phantom: marker::PhantomData<T>,
 }
-impl<T: Trait> Mutation<T> {
+impl<T: Config> Mutation<T> {
     pub fn new_for_currency(currency_id: T::CurrencyId) -> Self {
         Self {
             currency_id: currency_id,
@@ -270,12 +270,26 @@ impl<T: Trait> Mutation<T> {
             .for_each(|(account, balance, snapshot_0)| {
                 if balance.total() == Zero::zero() {
                     if !*snapshot_0 {
-                        frame_system::Module::<T>::dec_ref(account);
+                        if frame_system::Pallet::<T>::dec_providers(account).is_err() {
+                            log::warn!(
+                                target: "runtime::tokens",
+                                "Warning: Attempt to remove lock provider reference failed. \
+                                This is unexpected but should be safe."
+                            );
+                        }
+                        frame_system::Pallet::<T>::dec_consumers(account);
                         Balances::<T>::remove(account, self.currency_id);
                     }
                 } else {
                     if *snapshot_0 {
-                        frame_system::Module::<T>::inc_ref(account);
+                        frame_system::Pallet::<T>::inc_providers(account);
+                        if frame_system::Pallet::<T>::inc_consumers(account).is_err() {
+                            log::warn!(
+                                target: "runtime::tokens",
+                                "Warning: Attempt to introduce lock consumer reference, yet no providers. \
+                                This is unexpected but should be safe."
+                            );
+                        }
                     }
                     Balances::<T>::insert(account, self.currency_id, balance);
                 }

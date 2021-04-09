@@ -26,12 +26,12 @@ use sp_std::{marker, mem, result};
 /// Opaque, move-only struct with private fields that serves as a token denoting that
 /// funds have been created without any equal and opposite accounting.
 #[must_use]
-pub struct PositiveImbalance<T: Trait, GetCurrencyId: Get<T::CurrencyId>>(
+pub struct PositiveImbalance<T: Config, GetCurrencyId: Get<T::CurrencyId>>(
     T::Balance,
     marker::PhantomData<GetCurrencyId>,
 );
 
-impl<T: Trait, GetCurrencyId: Get<T::CurrencyId>> PositiveImbalance<T, GetCurrencyId> {
+impl<T: Config, GetCurrencyId: Get<T::CurrencyId>> PositiveImbalance<T, GetCurrencyId> {
     /// Create a new positive imbalance from a balance.
     pub fn new(amount: T::Balance) -> Self {
         PositiveImbalance(amount, marker::PhantomData::<GetCurrencyId>)
@@ -41,25 +41,25 @@ impl<T: Trait, GetCurrencyId: Get<T::CurrencyId>> PositiveImbalance<T, GetCurren
 /// Opaque, move-only struct with private fields that serves as a token denoting that
 /// funds have been destroyed without any equal and opposite accounting.
 #[must_use]
-pub struct NegativeImbalance<T: Trait, GetCurrencyId: Get<T::CurrencyId>>(
+pub struct NegativeImbalance<T: Config, GetCurrencyId: Get<T::CurrencyId>>(
     T::Balance,
     marker::PhantomData<GetCurrencyId>,
 );
 
-impl<T: Trait, GetCurrencyId: Get<T::CurrencyId>> NegativeImbalance<T, GetCurrencyId> {
+impl<T: Config, GetCurrencyId: Get<T::CurrencyId>> NegativeImbalance<T, GetCurrencyId> {
     /// Create a new negative imbalance from a balance.
     pub fn new(amount: T::Balance) -> Self {
         NegativeImbalance(amount, marker::PhantomData::<GetCurrencyId>)
     }
 }
 
-impl<T: Trait, GetCurrencyId: Get<T::CurrencyId>> TryDrop for PositiveImbalance<T, GetCurrencyId> {
+impl<T: Config, GetCurrencyId: Get<T::CurrencyId>> TryDrop for PositiveImbalance<T, GetCurrencyId> {
     fn try_drop(self) -> result::Result<(), Self> {
         self.drop_zero()
     }
 }
 
-impl<T: Trait, GetCurrencyId: Get<T::CurrencyId>> Imbalance<T::Balance>
+impl<T: Config, GetCurrencyId: Get<T::CurrencyId>> Imbalance<T::Balance>
     for PositiveImbalance<T, GetCurrencyId>
 {
     type Opposite = NegativeImbalance<T, GetCurrencyId>;
@@ -106,13 +106,13 @@ impl<T: Trait, GetCurrencyId: Get<T::CurrencyId>> Imbalance<T::Balance>
     }
 }
 
-impl<T: Trait, GetCurrencyId: Get<T::CurrencyId>> TryDrop for NegativeImbalance<T, GetCurrencyId> {
+impl<T: Config, GetCurrencyId: Get<T::CurrencyId>> TryDrop for NegativeImbalance<T, GetCurrencyId> {
     fn try_drop(self) -> result::Result<(), Self> {
         self.drop_zero()
     }
 }
 
-impl<T: Trait, GetCurrencyId: Get<T::CurrencyId>> Imbalance<T::Balance>
+impl<T: Config, GetCurrencyId: Get<T::CurrencyId>> Imbalance<T::Balance>
     for NegativeImbalance<T, GetCurrencyId>
 {
     type Opposite = PositiveImbalance<T, GetCurrencyId>;
@@ -159,14 +159,14 @@ impl<T: Trait, GetCurrencyId: Get<T::CurrencyId>> Imbalance<T::Balance>
     }
 }
 
-impl<T: Trait, GetCurrencyId: Get<T::CurrencyId>> Drop for PositiveImbalance<T, GetCurrencyId> {
+impl<T: Config, GetCurrencyId: Get<T::CurrencyId>> Drop for PositiveImbalance<T, GetCurrencyId> {
     /// Basic drop handler will just square up the total issuance.
     fn drop(&mut self) {
         <TotalIssuances<T>>::mutate(GetCurrencyId::get(), |v| *v = v.saturating_add(self.0));
     }
 }
 
-impl<T: Trait, GetCurrencyId: Get<T::CurrencyId>> Drop for NegativeImbalance<T, GetCurrencyId> {
+impl<T: Config, GetCurrencyId: Get<T::CurrencyId>> Drop for NegativeImbalance<T, GetCurrencyId> {
     /// Basic drop handler will just square up the total issuance.
     fn drop(&mut self) {
         <TotalIssuances<T>>::mutate(GetCurrencyId::get(), |v| *v = v.saturating_sub(self.0));
