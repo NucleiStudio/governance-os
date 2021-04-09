@@ -40,6 +40,7 @@ pub mod pallet {
     use governance_os_pallet_bylaws::RoleBuilder;
     use governance_os_support::traits::RoleManager;
     use sp_runtime::traits::StaticLookup;
+    use sp_std::boxed::Box;
 
     #[pallet::config]
     pub trait Config: frame_system::Config {
