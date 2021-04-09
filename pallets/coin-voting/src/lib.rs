@@ -39,31 +39,31 @@ pub use types::{VoteCountingStrategy, VoteData, VotingParameters};
 
 pub const COIN_VOTING_LOCK_ID: LockIdentifier = *b"coinvote";
 
-pub trait Trait: frame_system::Trait {
+pub trait Config: frame_system::Config {
     /// Pallet in charge of currencies. Used so that we can lock tokens etc...
     type Currencies: LockableCurrencies<Self::AccountId>;
 }
 
 type BalanceOf<T> =
-    <<T as Trait>::Currencies as Currencies<<T as frame_system::Trait>::AccountId>>::Balance;
+    <<T as Config>::Currencies as Currencies<<T as frame_system::Config>::AccountId>>::Balance;
 type CurrencyIdOf<T> =
-    <<T as Trait>::Currencies as Currencies<<T as frame_system::Trait>::AccountId>>::CurrencyId;
+    <<T as Config>::Currencies as Currencies<<T as frame_system::Config>::AccountId>>::CurrencyId;
 type LockDataOf<T> = (
-    <T as frame_system::Trait>::Hash,
+    <T as frame_system::Config>::Hash,
     bool,
     BalanceOf<T>,
     VoteCountingStrategy,
 );
-type LockIdentifierOf<T> = (CurrencyIdOf<T>, <T as frame_system::Trait>::AccountId);
+type LockIdentifierOf<T> = (CurrencyIdOf<T>, <T as frame_system::Config>::AccountId);
 type CoinProposalStateOf<T> = ProposalState<
     BalanceOf<T>,
-    <T as frame_system::Trait>::BlockNumber,
+    <T as frame_system::Config>::BlockNumber,
     CurrencyIdOf<T>,
     LockIdentifierOf<T>,
 >;
 
 decl_storage! {
-    trait Store for Module<T: Trait> as CoinVoting {
+    trait Store for Module<T: Config> as CoinVoting {
         /// Proposals actively opened and linked to this voting implementation. Erased when closed or vetoed.
         pub Proposals get(fn proposals): map hasher(blake2_128_concat) T::Hash => CoinProposalStateOf<T>;
         /// Keeps track of locks set on user's balances and to which proposal they were linked to.
@@ -72,7 +72,7 @@ decl_storage! {
 }
 
 decl_error! {
-    pub enum Error for Module<T: Trait> {
+    pub enum Error for Module<T: Config> {
         /// There are not enough tokens in the user's balance to proceed
         /// to this action.
         NotEnoughBalance,
@@ -82,11 +82,11 @@ decl_error! {
 }
 
 decl_module! {
-    pub struct Module<T: Trait> for enum Call where origin: T::Origin {
+    pub struct Module<T: Config> for enum Call where origin: T::Origin {
     }
 }
 
-impl<T: Trait> StandardizedVoting for Module<T> {
+impl<T: Config> StandardizedVoting for Module<T> {
     type ProposalId = T::Hash;
     type Parameters = VotingParameters<T::BlockNumber, CurrencyIdOf<T>>;
     type VoteData = VoteData<BalanceOf<T>>;
@@ -192,7 +192,7 @@ impl<T: Trait> StandardizedVoting for Module<T> {
     }
 }
 
-impl<T: Trait> Module<T> {
+impl<T: Config> Module<T> {
     /// Modify the locks related to the `voter` and `proposal`. We provide a hook `on_duplicate_vote_found`
     /// used to handle cases where we have a similar lock in place.
     fn update_locks<F>(
