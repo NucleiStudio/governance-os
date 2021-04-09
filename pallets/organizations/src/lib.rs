@@ -65,9 +65,9 @@ pub trait WeightInfo {
     fn close_proposal(b: u32, c: u32) -> Weight;
 }
 
-pub trait Trait: frame_system::Trait {
+pub trait Config: frame_system::Config {
     /// Because this pallet emits events, it depends on the runtime's definition of an event.
-    type Event: From<Event<Self>> + Into<<Self as frame_system::Trait>::Event>;
+    type Event: From<Event<Self>> + Into<<Self as frame_system::Config>::Event>;
 
     /// Calls triggered from an organization.
     type Call: Parameter
@@ -103,22 +103,22 @@ pub trait Trait: frame_system::Trait {
 }
 
 type OrganizationDetailsOf<T> = OrganizationDetails<
-    <T as frame_system::Trait>::AccountId,
+    <T as frame_system::Config>::AccountId,
     (VotingSystemIdOf<T>, VotingParametersOf<T>),
 >;
 pub type OrganizationsCounter = u32;
-type ProposalIdOf<T> = <T as frame_system::Trait>::Hash;
-type ProposalOf<T> = Proposal<Vec<u8>, <T as frame_system::Trait>::AccountId, VotingSystemIdOf<T>>;
-type RoleBuilderOf<T> = <T as Trait>::RoleBuilder;
-type RoleManagerOf<T> = <T as Trait>::RoleManager;
-type VoteDataOf<T> = <<T as Trait>::VotingRouter as VotingRouter>::VoteData;
-type VotingParametersOf<T> = <<T as Trait>::VotingRouter as VotingRouter>::Parameters;
-type VotingSystemIdOf<T> = <<T as Trait>::VotingRouter as VotingRouter>::VotingSystemId;
+type ProposalIdOf<T> = <T as frame_system::Config>::Hash;
+type ProposalOf<T> = Proposal<Vec<u8>, <T as frame_system::Config>::AccountId, VotingSystemIdOf<T>>;
+type RoleBuilderOf<T> = <T as Config>::RoleBuilder;
+type RoleManagerOf<T> = <T as Config>::RoleManager;
+type VoteDataOf<T> = <<T as Config>::VotingRouter as VotingRouter>::VoteData;
+type VotingParametersOf<T> = <<T as Config>::VotingRouter as VotingRouter>::Parameters;
+type VotingSystemIdOf<T> = <<T as Config>::VotingRouter as VotingRouter>::VotingSystemId;
 
 const ORGS_MODULE_ID: ModuleId = ModuleId(*b"gos/orgs");
 
 decl_storage! {
-    trait Store for Module<T: Trait> as Organizations {
+    trait Store for Module<T: Config> as Organizations {
         pub Counter get(fn counter): OrganizationsCounter = 0;
         pub Parameters get(fn parameters): map hasher(blake2_128_concat) T::AccountId => Option<OrganizationDetailsOf<T>>;
         pub Proposals get(fn proposals): map hasher(blake2_128_concat) ProposalIdOf<T> => Option<ProposalOf<T>>;
@@ -137,7 +137,7 @@ decl_storage! {
 decl_event!(
     pub enum Event<T>
     where
-        AccountId = <T as frame_system::Trait>::AccountId,
+        AccountId = <T as frame_system::Config>::AccountId,
         OrganizationDetails = OrganizationDetailsOf<T>,
         ProposalId = ProposalIdOf<T>,
         VoteData = VoteDataOf<T>,
@@ -162,7 +162,7 @@ decl_event!(
 );
 
 decl_error! {
-    pub enum Error for Module<T: Trait> {
+    pub enum Error for Module<T: Config> {
         /// We have created the maximum number of organizations, a runtime upgrade may
         /// be necessary.
         CounterOverflow,
@@ -185,7 +185,7 @@ decl_error! {
 }
 
 decl_module! {
-    pub struct Module<T: Trait> for enum Call where origin: T::Origin {
+    pub struct Module<T: Config> for enum Call where origin: T::Origin {
         fn deposit_event() = default;
 
         /// Create an organization with the given parameters. An event will be triggered with
@@ -205,7 +205,7 @@ decl_module! {
                 // Two read performed by ensure_has_role
                 .saturating_add(T::DbWeight::get().reads(2))
         ]
-        fn apply_as(origin, org_id: <T::Lookup as StaticLookup>::Source, call: Box<<T as Trait>::Call>) {
+        fn apply_as(origin, org_id: <T::Lookup as StaticLookup>::Source, call: Box<<T as Config>::Call>) {
             let target_org_id = T::Lookup::lookup(org_id)?;
             RoleManagerOf::<T>::ensure_has_role(origin, RoleBuilderOf::<T>::apply_as_organization(&target_org_id))?;
 
@@ -240,7 +240,7 @@ decl_module! {
 
         /// Create a proposal for a given organization
         #[weight = T::WeightInfo::create_proposal()]
-        fn create_proposal(origin, org_id: <T::Lookup as StaticLookup>::Source, call: Box<<T as Trait>::Call>) {
+        fn create_proposal(origin, org_id: <T::Lookup as StaticLookup>::Source, call: Box<<T as Config>::Call>) {
             let _who = ensure_signed(origin)?;
             let target_org_id = T::Lookup::lookup(org_id)?;
             let details = Self::try_get_parameters(&target_org_id)?;
@@ -296,7 +296,7 @@ decl_module! {
         fn close_proposal(origin, proposal_id: ProposalIdOf<T>, proposal_weight_bound: Weight) -> DispatchResultWithPostInfo {
             let _ = ensure_signed(origin)?;
             let proposal = Self::try_get_proposal(proposal_id)?;
-            let decoded_call = <T as Trait>::Call::decode(&mut &proposal.clone().call[..]).map_err(|_| Error::<T>::ProposalDecodingFailure)?;
+            let decoded_call = <T as Config>::Call::decode(&mut &proposal.clone().call[..]).map_err(|_| Error::<T>::ProposalDecodingFailure)?;
             let decoded_call_weight = decoded_call.get_dispatch_info().weight;
             ensure!(proposal_weight_bound >= decoded_call_weight, Error::<T>::TooSmallWeightBound);
 
@@ -317,7 +317,7 @@ decl_module! {
     }
 }
 
-impl<T: Trait> Module<T> {
+impl<T: Config> Module<T> {
     /// A handy helper functions to run two functions on what elements were removed from a
     /// slice and on the added elements. Should be pretty useful when trying to limit
     /// database read and writes since we execute the functions only on the changed elements.
@@ -383,7 +383,7 @@ impl<T: Trait> Module<T> {
     }
 
     /// Hash the block number, org id and proposal together to generate its id
-    fn proposal_id(org_id: &T::AccountId, proposal: Box<<T as Trait>::Call>) -> ProposalIdOf<T> {
+    fn proposal_id(org_id: &T::AccountId, proposal: Box<<T as Config>::Call>) -> ProposalIdOf<T> {
         // Proposals are organization specific and there can not be two identical proposals opened
         // in the same organization.
         T::Hashing::hash_of(&[org_id.encode(), proposal.encode()])
