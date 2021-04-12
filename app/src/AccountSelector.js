@@ -13,7 +13,7 @@ import {
 
 import { useSubstrate } from './substrate-lib';
 
-function Main (props) {
+function Main(props) {
   const { keyring } = useSubstrate();
   const { setAccountAddress } = props;
   const [accountSelected, setAccountSelected] = useState('');
@@ -57,7 +57,7 @@ function Main (props) {
           <Image src={`${process.env.PUBLIC_URL}/assets/substrate-logo.png`} size='mini' />
         </Menu.Menu>
         <Menu.Menu position='right' style={{ alignItems: 'center' }}>
-          { !accountSelected
+          {!accountSelected
             ? <span>
               Add your account with the{' '}
               <a
@@ -68,7 +68,7 @@ function Main (props) {
                 Polkadot JS Extension
               </a>
             </span>
-            : null }
+            : null}
           <CopyToClipboard text={accountSelected}>
             <Button
               basic
@@ -96,7 +96,7 @@ function Main (props) {
   );
 }
 
-function BalanceAnnotation (props) {
+function BalanceAnnotation(props) {
   const { accountSelected } = props;
   const { api } = useSubstrate();
   const [accountBalance, setAccountBalance] = useState(0);
@@ -107,8 +107,8 @@ function BalanceAnnotation (props) {
 
     // If the user has selected an address, create a new subscription
     accountSelected &&
-      api.query.system.account(accountSelected, balance => {
-        setAccountBalance(balance.data.free.toHuman());
+      api.query.tokens.balances(accountSelected, "Native", balance => {
+        setAccountBalance(balance.free.toHuman());
       })
         .then(unsub => {
           unsubscribe = unsub;
@@ -120,13 +120,13 @@ function BalanceAnnotation (props) {
 
   return accountSelected
     ? <Label pointing='left'>
-        <Icon name='money' color='green' />
-        {accountBalance}
-      </Label>
+      <Icon name='money' color='green' />
+      {accountBalance}
+    </Label>
     : null;
 }
 
-export default function AccountSelector (props) {
+export default function AccountSelector(props) {
   const { api, keyring } = useSubstrate();
   return keyring.getPairs && api.query ? <Main {...props} /> : null;
 }

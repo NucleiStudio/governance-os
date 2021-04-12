@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Form, Input, Grid, Label, Icon } from 'semantic-ui-react';
 import { TxButton } from './substrate-lib/components';
 
-export default function Main (props) {
+export default function Main(props) {
   const [status, setStatus] = useState(null);
   const [formState, setFormState] = useState({ addressTo: null, amount: 0 });
   const { accountPair } = props;
@@ -10,7 +10,7 @@ export default function Main (props) {
   const onChange = (_, data) =>
     setFormState(prev => ({ ...prev, [data.state]: data.value }));
 
-  const { addressTo, amount } = formState;
+  const { currencyId, addressTo, amount } = formState;
 
   return (
     <Grid.Column width={8}>
@@ -27,6 +27,16 @@ export default function Main (props) {
           </Label>
         </Form.Field>
 
+        <Form.Field>
+          <Input
+            fluid
+            label='Currency'
+            type='text'
+            placeholder='currency'
+            state='currencyId'
+            onChange={onChange}
+          />
+        </Form.Field>
         <Form.Field>
           <Input
             fluid
@@ -53,10 +63,10 @@ export default function Main (props) {
             type='SIGNED-TX'
             setStatus={setStatus}
             attrs={{
-              palletRpc: 'balances',
+              palletRpc: 'tokens',
               callable: 'transfer',
-              inputParams: [addressTo, amount],
-              paramFields: [true, true]
+              inputParams: [currencyId, addressTo, amount],
+              paramFields: [true, true, true]
             }}
           />
         </Form.Field>

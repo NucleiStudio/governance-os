@@ -3,19 +3,19 @@ import { Table, Grid, Button } from 'semantic-ui-react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { useSubstrate } from './substrate-lib';
 
-export default function Main (props) {
+export default function Main(props) {
   const { api, keyring } = useSubstrate();
   const accounts = keyring.getPairs();
   const [balances, setBalances] = useState({});
 
   useEffect(() => {
-    const addresses = keyring.getPairs().map(account => account.address);
+    const addresses = keyring.getPairs().map(account => [account.address, "Native"]);
     let unsubscribeAll = null;
 
-    api.query.system.account
+    api.query.tokens.balances
       .multi(addresses, balances => {
-        const balancesMap = addresses.reduce((acc, address, index) => ({
-          ...acc, [address]: balances[index].data.free.toHuman()
+        const balancesMap = addresses.reduce((acc, addressAndCurrency, index) => ({
+          ...acc, [addressAndCurrency[0]]: balances[index].free.toHuman()
         }), {});
         setBalances(balancesMap);
       }).then(unsub => {
