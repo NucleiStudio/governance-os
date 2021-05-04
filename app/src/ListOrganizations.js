@@ -3,12 +3,14 @@ import { Table, Grid, Button } from 'semantic-ui-react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { useSubstrate } from './substrate-lib';
 
-function Main() {
+function Main(props) {
   const { api } = useSubstrate();
 
   // The transaction submission status
   const [organizationsDetails, setOrganizationsDetails] = useState([]);
   const [organizationAddresses, setOrganizationAddresses] = useState([]);
+
+  const { setOrgs } = props;
 
   useEffect(() => {
     let unsubscribe;
@@ -23,6 +25,7 @@ function Main() {
         }), {});
 
         setOrganizationsDetails(orgsMap);
+        setOrgs(orgsMap);
       }).then(unsub => {
         unsubscribe = unsub;
       }).catch(console.error);
@@ -80,9 +83,9 @@ function Main() {
   );
 }
 
-export default function ListOrganizations() {
+export default function ListOrganizations(props) {
   const { api } = useSubstrate();
   return api.query.organizations && api.query.organizations.counter
-    ? <Main />
+    ? <Main {...props} />
     : null;
 }

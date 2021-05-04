@@ -8,6 +8,7 @@ import { DeveloperConsole } from './substrate-lib/components';
 import AccountSelector from './AccountSelector';
 import Balances from './Balances';
 import BlockNumber from './BlockNumber';
+import CreateProposal from './CreateProposal';
 import Events from './Events';
 import Interactor from './Interactor';
 import ListOrganizations from './ListOrganizations';
@@ -19,6 +20,7 @@ import Upgrade from './Upgrade';
 
 function Main() {
   const [accountAddress, setAccountAddress] = useState(null);
+  const [orgs, setOrgs] = useState({});
   const { apiState, keyring, keyringState, apiError } = useSubstrate();
   const accountPair =
     accountAddress &&
@@ -66,7 +68,10 @@ function Main() {
             <Balances />
           </Grid.Row>
           <Grid.Row>
-            <ListOrganizations />
+            <ListOrganizations setOrgs={setOrgs} />
+          </Grid.Row>
+          <Grid.Row>
+            <CreateProposal accountPair={accountPair} orgs={orgs} />
           </Grid.Row>
           <Grid.Row>
             <Transfer accountPair={accountPair} />
