@@ -8,6 +8,7 @@ import { DeveloperConsole } from './substrate-lib/components';
 import AccountSelector from './AccountSelector';
 import Balances from './Balances';
 import BlockNumber from './BlockNumber';
+import CreateOrganization from './CreateOrganization';
 import CreateProposal from './CreateProposal';
 import Events from './Events';
 import Interactor from './Interactor';
@@ -70,6 +71,9 @@ function Main() {
           </Grid.Row>
           <Grid.Row>
             <ListOrganizations setOrgs={setOrgs} />
+          </Grid.Row>
+          <Grid.Row>
+            <CreateOrganization accountPair={accountPair} />
           </Grid.Row>
           <Grid.Row>
             <ListProposals orgs={orgs} />
