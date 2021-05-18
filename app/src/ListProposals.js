@@ -53,8 +53,6 @@ function Main(props) {
     const onSelectedProposalChange = (_, { value }) => {
         setSelectedProp(value);
         setPropDetails(allProposals[value]);
-        window.subCall = allProposals[value].call;
-        window.subProp = allProposals[value];
     };
 
     const metadataExplainer = () => {
