@@ -12,6 +12,7 @@ import CreateProposal from './CreateProposal';
 import Events from './Events';
 import Interactor from './Interactor';
 import ListOrganizations from './ListOrganizations';
+import ListProposals from './ListProposals';
 import Metadata from './Metadata';
 import NodeInfo from './NodeInfo';
 import TemplateModule from './TemplateModule';
@@ -71,6 +72,7 @@ function Main() {
             <ListOrganizations setOrgs={setOrgs} />
           </Grid.Row>
           <Grid.Row>
+            <ListProposals orgs={orgs} />
             <CreateProposal accountPair={accountPair} orgs={orgs} />
           </Grid.Row>
           <Grid.Row>
