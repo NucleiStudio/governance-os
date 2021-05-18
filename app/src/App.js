@@ -76,7 +76,7 @@ function Main() {
             <CreateOrganization accountPair={accountPair} />
           </Grid.Row>
           <Grid.Row>
-            <ListProposals orgs={orgs} />
+            <ListProposals accountPair={accountPair} orgs={orgs} />
             <CreateProposal accountPair={accountPair} orgs={orgs} />
           </Grid.Row>
           <Grid.Row>

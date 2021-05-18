@@ -5,7 +5,7 @@ import { TxButton } from './substrate-lib/components';
 
 function Main(props) {
     const { api } = useSubstrate();
-    const { orgs } = props;
+    const { accountPair, orgs } = props;
 
     const [txStatus, setTxStatus] = useState(null);
     const [propsDropdownOptions, setPropsDropdownOptions] = useState([]);
@@ -105,7 +105,7 @@ function Main(props) {
                 </Form.Field>
                 <Form.Field>
                     <Input
-                        placeholder='10'
+                        placeholder='1000000000000'
                         fluid
                         type='number'
                         label='Support'
@@ -115,28 +115,30 @@ function Main(props) {
                 <Form.Field style={{ textAlign: 'center' }}>
                     <Button.Group>
                         <TxButton
+                            accountPair={accountPair}
                             label='Vote For'
                             type='SIGNED-TX'
                             color='green'
                             setStatus={setTxStatus}
                             attrs={{
-                                palletRpc: 'tokens',
-                                callable: 'transfer',
-                                inputParams: ['Native', 'Alice', '1'],
-                                paramFields: [true, true, true]
+                                palletRpc: 'organizations',
+                                callable: 'decideOnProposal',
+                                inputParams: [selectedProp, { [propDetails.voting]: { in_support: true, power: parseInt(support) } }],
+                                paramFields: [true, true]
                             }}
                         />
                         <Button.Or />
                         <TxButton
+                            accountPair={accountPair}
                             label='Vote Against'
                             type='SIGNED-TX'
                             color='red'
                             setStatus={setTxStatus}
                             attrs={{
-                                palletRpc: 'tokens',
-                                callable: 'transfer',
-                                inputParams: ['Native', 'Alice', '1'],
-                                paramFields: [true, true, true]
+                                palletRpc: 'organizations',
+                                callable: 'decideOnProposal',
+                                inputParams: [selectedProp, { [propDetails.voting]: { in_support: false, power: parseInt(support) } }],
+                                paramFields: [true, true]
                             }}
                         />
                     </Button.Group>
