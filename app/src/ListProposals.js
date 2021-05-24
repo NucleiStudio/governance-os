@@ -62,8 +62,6 @@ function Main(props) {
         setSelectedProp(value);
         setPropDetails(allProposals[value]);
 
-        window.call = allProposals[value].call;
-
         if (allProposals[value].voting.toHuman() !== 'PlcrVoting') {
             setUiFlavor('binary');
         } else {
