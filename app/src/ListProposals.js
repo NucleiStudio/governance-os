@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Grid, Message, Dropdown, Form, Input, Button, Label, Icon } from 'semantic-ui-react';
+import { Grid, Message, Dropdown, Form } from 'semantic-ui-react';
 import { useSubstrate } from './substrate-lib';
-import { TxButton } from './substrate-lib/components';
 
 import BinaryVoting from './BinaryVoting';
+import PlcrVoting from './PlcrVoting';
 
 function Main(props) {
     const { api } = useSubstrate();
@@ -11,7 +11,6 @@ function Main(props) {
 
     const [txStatus, setTxStatus] = useState(null);
     const [propsDropdownOptions, setPropsDropdownOptions] = useState([]);
-    const [support, setSupport] = useState(0);
     const [selectedProp, setSelectedProp] = useState(null);
     const [allProposals, setAllProposals] = useState({});
     const [propDetails, setPropDetails] = useState({});
@@ -95,16 +94,17 @@ function Main(props) {
                     />
                 </Form.Field>
                 {
-                    propDetails.voting !== undefined &&
-                    <Form.Field>
-                        <Message
-                            content={`This proposal uses the ${propDetails.voting} voting system.`}
-                        />
-                    </Form.Field>
-                }
-                {
                     uiFlavor === 'binary' &&
                     <BinaryVoting
+                        accountPair={accountPair}
+                        proposalId={selectedProp}
+                        proposalDetails={propDetails}
+                        setTxStatus={setTxStatus}
+                    />
+                }
+                {
+                    uiFlavor === 'plcr' &&
+                    <PlcrVoting
                         accountPair={accountPair}
                         proposalId={selectedProp}
                         proposalDetails={propDetails}
