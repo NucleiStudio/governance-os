@@ -36,6 +36,11 @@ function Main(props) {
         return () => unsubscribe && unsubscribe();
     }, [api.query.organizations.proposals]);
 
+    const parseCall = (call) => {
+        let parsed = api.createType('Call', call);
+        return `${parsed.section}.${parsed.method}(${parsed.args})`;
+    };
+
     const onSelectedOrgChange = (_, { value }) => {
         setSelectedProp(null);
         setPropDetails({});
@@ -47,7 +52,7 @@ function Main(props) {
                 .map((prop) => ({
                     key: prop,
                     value: prop,
-                    text: allProposals[prop].call.toHuman(), // TODO: decode this
+                    text: parseCall(allProposals[prop].call),
                 }))
         );
         setUiFlavor('');
@@ -56,6 +61,8 @@ function Main(props) {
     const onSelectedProposalChange = (_, { value }) => {
         setSelectedProp(value);
         setPropDetails(allProposals[value]);
+
+        window.call = allProposals[value].call;
 
         if (allProposals[value].voting.toHuman() !== 'PlcrVoting') {
             setUiFlavor('binary');
