@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Grid, Message, Dropdown, Form } from 'semantic-ui-react';
+import { Grid, Dropdown, Form } from 'semantic-ui-react';
 import { useSubstrate } from './substrate-lib';
 
 import BinaryVoting from './BinaryVoting';
+import Close from './Close';
 import PlcrVoting from './PlcrVoting';
 
 function Main(props) {
@@ -14,6 +15,7 @@ function Main(props) {
     const [selectedProp, setSelectedProp] = useState(null);
     const [allProposals, setAllProposals] = useState({});
     const [propDetails, setPropDetails] = useState({});
+    const [propWeight, setPropWeight] = useState(0);
     const [uiFlavor, setUiFlavor] = useState('');
 
     useEffect(() => {
@@ -58,15 +60,72 @@ function Main(props) {
         setUiFlavor('');
     };
 
+    const coinVotingCanClose = (proposalHash, cannotCloseCb) => {
+        api.query.coinVoting.proposals(proposalHash, state => {
+            console.log(JSON.stringify(state));
+
+            const currencyId = state.parameters["voting_currency"];
+            const totalParticipation = state["total_favorable"].add(state["total_against"]);
+            const minParticipation = state.parameters["min_participation"] / 100;
+            const minQuorum = state.parameters["min_quorum"] / 100;
+            const totalFavorable = state["total_favorable"];
+            const createdOn = state["created_on"].toNumber();
+            const ttl = state.parameters.ttl.toNumber();
+
+            api.query.tokens.totalIssuances(currencyId, totalSupply => {
+                const enoughParticipation = totalParticipation > minParticipation * totalSupply;
+                const enoughQuorum = totalFavorable > minQuorum * totalParticipation;
+                const proposalPassing = enoughParticipation && enoughQuorum;
+
+                let unsub = null;
+                api.derive.chain.bestNumber(now => {
+                    const proposalExpired = now > createdOn + ttl;
+
+                    if (unsub !== null) {
+                        unsub();
+                    }
+
+                    if (proposalPassing || proposalExpired) {
+                        setUiFlavor('close');
+                    } else {
+                        cannotCloseCb();
+                    }
+                })
+                    .then(u => unsub = u)
+                    .catch(console.error);
+            }).catch(console.error);
+        }).catch(console.error);
+    };
+
+    const canClose = (proposal, proposalHash, cannotCloseCb) => {
+        if (proposal.voting.toHuman() === 'CoinVoting') {
+            coinVotingCanClose(proposalHash, cannotCloseCb);
+        }
+
+        cannotCloseCb();
+    };
+
+    const selectUiFlavor = (proposalHash) => {
+        canClose(allProposals[proposalHash], proposalHash, () => {
+            if (allProposals[proposalHash].voting.toHuman() !== 'PlcrVoting') {
+                setUiFlavor('binary');
+            } else {
+                setUiFlavor('plcr');
+            }
+        });
+    };
+
     const onSelectedProposalChange = (_, { value }) => {
         setSelectedProp(value);
         setPropDetails(allProposals[value]);
+        selectUiFlavor(value);
 
-        if (allProposals[value].voting.toHuman() !== 'PlcrVoting') {
-            setUiFlavor('binary');
-        } else {
-            setUiFlavor('plcr');
-        }
+        // a random address that we are using for our queries
+        const ZERO_ACCOUNT = '5CAUdnwecHGxxyr5vABevAfZ34Fi4AaraDRMwfDQXQ52PXqg';
+        api.tx(api.createType('Call', allProposals[value].call))
+            .paymentInfo(ZERO_ACCOUNT)
+            .then(({ weight }) => setPropWeight(weight))
+            .catch(console.error);
     };
 
     // For some reason `orgs.map` is undefined
@@ -99,6 +158,15 @@ function Main(props) {
                     />
                 </Form.Field>
                 {
+                    uiFlavor === 'close' &&
+                    <Close
+                        accountPair={accountPair}
+                        proposalId={selectedProp}
+                        proposalWeight={propWeight}
+                        setTxStatus={setTxStatus}
+                    />
+                }
+                {
                     uiFlavor === 'binary' &&
                     <BinaryVoting
                         accountPair={accountPair}
@@ -128,5 +196,8 @@ export default function ListProposals(props) {
         api.query.organizations.proposals &&
         api.query.coinVoting &&
         api.query.plcrVoting &&
-        api.query.convictionVoting ? <Main {...props} /> : null;
+        api.query.convictionVoting &&
+        api.query.tokens &&
+        api.query.tokens.totalIssuances &&
+        api.derive.chain.bestNumber ? <Main {...props} /> : null;
 }
