@@ -87,7 +87,7 @@ function Main(props) {
                         attrs={{
                             palletRpc: 'organizations',
                             callable: 'decideOnProposal',
-                            inputParams: [proposalId, { [proposalDetails.voting]: { 'Reveal': [parseInt(support), favorable, parseInt(salt)] } }],
+                            inputParams: [proposalId, { [proposalDetails.voting]: { 'Reveal': [support, favorable, salt] } }],
                             paramFields: [true, true]
                         }}
                     />

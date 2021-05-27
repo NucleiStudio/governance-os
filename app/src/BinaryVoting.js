@@ -22,7 +22,7 @@ function Main(props) {
                     fluid
                     type='number'
                     label='Support'
-                    onChange={setSupport}
+                    onChange={(_, { value }) => setSupport(value)}
                 />
             </Form.Field>
             <Form.Field style={{ textAlign: 'center' }}>
@@ -36,7 +36,7 @@ function Main(props) {
                         attrs={{
                             palletRpc: 'organizations',
                             callable: 'decideOnProposal',
-                            inputParams: [proposalId, { [proposalDetails.voting]: { in_support: true, power: parseInt(support) } }],
+                            inputParams: [proposalId, { [proposalDetails.voting]: { in_support: true, power: support } }],
                             paramFields: [true, true]
                         }}
                     />
