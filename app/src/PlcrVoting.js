@@ -13,7 +13,7 @@ function Main(props) {
     const [salt, setSalt] = useState(0);
 
     const genHash = () => {
-        const payload = api.createType('(Balance, bool, u64)', [parseInt(support), favorable, parseInt(salt)]);
+        const payload = api.createType('(Balance, bool, u64)', [support, favorable, salt]);
         return payload.hash;
     };
 
