@@ -128,11 +128,50 @@ function Main(props) {
         }).catch(console.error);
     };
 
+    const plcrVotingCanClose = (proposalHash, cannotCloseCb) => {
+        api.query.plcrVoting.proposals(proposalHash, state => {
+            console.log(JSON.stringify(state));
+
+            const currencyId = state.parameters["voting_currency"];
+            const totalParticipation = state["revealed_favorable"].add(state["revealed_against"]);
+            const minParticipation = state.parameters["min_participation"] / 100;
+            const minQuorum = state.parameters["min_quorum"] / 100;
+            const totalFavorable = state["revealed_favorable"];
+            const createdOn = state["created_on"].toNumber();
+            const ttl = state.parameters["commit_duration"].add(state.parameters["reveal_duration"]).toNumber();
+
+            api.query.tokens.totalIssuances(currencyId, totalSupply => {
+                const enoughParticipation = totalParticipation > minParticipation * totalSupply;
+                const enoughQuorum = totalFavorable > minQuorum * totalParticipation;
+                const proposalPassing = enoughParticipation && enoughQuorum;
+
+                let unsub = null;
+                api.derive.chain.bestNumber(now => {
+                    const proposalExpired = now > createdOn + ttl;
+
+                    if (unsub !== null) {
+                        unsub();
+                    }
+
+                    if (proposalPassing || proposalExpired) {
+                        setUiFlavor('close');
+                    } else {
+                        cannotCloseCb();
+                    }
+                })
+                    .then(u => unsub = u)
+                    .catch(console.error);
+            }).catch(console.error);
+        }).catch(console.error);
+    };
+
     const canClose = (proposal, proposalHash, cannotCloseCb) => {
         if (proposal.voting.toHuman() === 'CoinVoting') {
             coinVotingCanClose(proposalHash, cannotCloseCb);
         } else if (proposal.voting.toHuman() === 'ConvictionVoting') {
             convictionVotingCanClose(proposalHash, cannotCloseCb);
+        } else if (proposal.voting.toHuman() === 'PlcrVoting') {
+            plcrVotingCanClose(proposalHash, cannotCloseCb);
         } else {
             cannotCloseCb();
         }
