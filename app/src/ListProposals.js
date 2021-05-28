@@ -21,21 +21,28 @@ function Main(props) {
     useEffect(() => {
         let unsubscribe;
 
-        api.query.organizations.proposals.keys().then(proposals => {
-            const proposalIds = proposals.map(({ args: [proposalId] }) => proposalId.toHuman());
+        const interval = setInterval(() => {
+            if (unsubscribe) {
+                // unsub from previous subs
+                unsubscribe();
+            }
 
-            api.query.organizations.proposals.multi(proposalIds, (details) => {
-                const parsedProposals = proposalIds.reduce((acc, propId, index) => ({
-                    ...acc, [propId]: details[index].unwrap()
-                }), {});
+            api.query.organizations.proposals.keys().then(proposals => {
+                const proposalIds = proposals.map(({ args: [proposalId] }) => proposalId.toHuman());
 
-                setAllProposals(parsedProposals);
-            }).then(unsub => {
-                unsubscribe = unsub;
-            }).catch(console.error);
-        });
+                api.query.organizations.proposals.multi(proposalIds, (details) => {
+                    const parsedProposals = proposalIds.reduce((acc, propId, index) => ({
+                        ...acc, [propId]: details[index].unwrap()
+                    }), {});
 
-        return () => unsubscribe && unsubscribe();
+                    setAllProposals(parsedProposals);
+                }).then(unsub => {
+                    unsubscribe = unsub;
+                }).catch(console.error);
+            });
+        }, 2000);
+
+        return () => clearInterval(interval);
     }, [api.query.organizations.proposals]);
 
     const parseCall = (call) => {
