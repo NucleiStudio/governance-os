@@ -15,23 +15,30 @@ function Main(props) {
   useEffect(() => {
     let unsubscribe;
 
-    api.query.organizations.parameters.keys().then(orgs => {
-      const orgAddresses = orgs.map(({ args: [orgId] }) => orgId.toHuman());
-      setOrganizationAddresses(orgAddresses);
+    const interval = setInterval(() => {
+      if (unsubscribe) {
+        // unsub from previous subs
+        unsubscribe();
+      }
 
-      api.query.organizations.parameters.multi(orgAddresses, (details) => {
-        const orgsMap = orgAddresses.reduce((acc, address, index) => ({
-          ...acc, [address]: details[index].toHuman()
-        }), {});
+      api.query.organizations.parameters.keys().then(orgs => {
+        const orgAddresses = orgs.map(({ args: [orgId] }) => orgId.toHuman());
+        setOrganizationAddresses(orgAddresses);
 
-        setOrganizationsDetails(orgsMap);
-        setOrgs(orgsMap);
-      }).then(unsub => {
-        unsubscribe = unsub;
-      }).catch(console.error);
-    });
+        api.query.organizations.parameters.multi(orgAddresses, (details) => {
+          const orgsMap = orgAddresses.reduce((acc, address, index) => ({
+            ...acc, [address]: details[index].toHuman()
+          }), {});
 
-    return () => unsubscribe && unsubscribe();
+          setOrganizationsDetails(orgsMap);
+          setOrgs(orgsMap);
+        }).then(unsub => {
+          unsubscribe = unsub;
+        }).catch(console.error);
+      });
+    }, 2000);
+
+    return () => clearInterval(interval)
   }, [api.query.organizations.parameters]);
 
   return (
