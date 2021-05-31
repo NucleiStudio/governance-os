@@ -7,12 +7,18 @@ import { TxButton } from './substrate-lib/components';
 const argIsOptional = (arg) =>
     arg.type.toString().startsWith('Option<');
 
+/// This component is a patch of the 'Interactor' one from the
+/// substrate frontend template but modified to send transactions
+/// as a new proposal for a chosen organization.
 function Main(props) {
     const { api, jsonrpc } = useSubstrate();
     const { accountPair, orgs } = props;
 
+    // Tx status
     const [status, setStatus] = useState(null);
+    // Which org address we chose
     const [orgAddress, setOrgAddress] = useState(null);
+    // Rest is from the 'Interactor' component
     const [palletRPCs, setPalletRPCs] = useState([]);
     const [callables, setCallables] = useState([]);
     const [paramFields, setParamFields] = useState([]);
@@ -83,7 +89,8 @@ function Main(props) {
         });
     };
 
-    // For some reason `orgs.map` is undefined
+    // For some reason `orgs.map` is undefined, do some wizardy to
+    // enter orgs as a dropdown
     const dropdownOptions = Object.keys(orgs).map((addr) => ({
         key: addr,
         value: addr,

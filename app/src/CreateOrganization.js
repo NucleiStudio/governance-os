@@ -5,12 +5,15 @@ import config from './config';
 import { useSubstrate } from './substrate-lib';
 import { TxButton } from './substrate-lib/components';
 
+/// This component generates a form to create a new organization.
 function Main(props) {
-    const { api } = useSubstrate();
     const { accountPair } = props;
 
+    // Tx status
     const [status, setStatus] = useState(null);
+    // Org parameters that we will send as part of the creation tx
     const [parameters, setParameters] = useState({})
+    // Complete form state which we use to derive the final tx
     const [formState, setFormState] = useState({
         executors: '',
         votingSystem: '',
@@ -18,18 +21,25 @@ function Main(props) {
     });
 
     const onVotingSystemChanged = (_, { value }) => {
+        // Voting system changed. Do some wizardy to get all the parameters
+        // a user has to define. We check the JSON types to do this.
+
         const paramsTypesName = config.types["RuntimeVotingParameters"]["_enum"][value];
         setFormState({ ...formState, votingSystem: value, votingParams: {} });
         setParameters(config.types[paramsTypesName]);
     };
 
     const onParamValueChanged = (_, { label, value }) => {
+        // An org voting parameter changed. Update state.
+
         let paramsCopy = formState.votingParams;
         paramsCopy[label] = value;
 
         setFormState({ ...formState, votingParams: paramsCopy });
     };
 
+    // Go through the JSON types to list and create a dropdown of
+    // our different voting systems.
     const votingSystemsOptions = Object.keys(config.types["RuntimeVotingSystemId"]["_enum"]).map((voting) => ({
         key: voting,
         value: voting,

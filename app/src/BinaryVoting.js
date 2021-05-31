@@ -3,9 +3,13 @@ import { Form, Input, Button, Label, Icon } from 'semantic-ui-react';
 import { useSubstrate } from './substrate-lib';
 import { TxButton } from './substrate-lib/components';
 
+/// This component is in charge of handling votes for Binary Voting systems
+/// such as Conviction and Coin voting. A 'Binary' voting system is a system
+/// where you can either vote yes or no.
 function Main(props) {
     const { accountPair, proposalId, proposalDetails, setTxStatus } = props;
 
+    // Amount of coins supporting the vote
     const [support, setSupport] = useState(0);
 
     return (

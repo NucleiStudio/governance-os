@@ -6,16 +6,30 @@ import BinaryVoting from './BinaryVoting';
 import Close from './Close';
 import PlcrVoting from './PlcrVoting';
 
+/// This component is in charge two things: listing proposals
+/// for each organizations and letting users vote on them.
 function Main(props) {
     const { api } = useSubstrate();
     const { accountPair, orgs } = props;
 
+    // tx status
     const [txStatus, setTxStatus] = useState(null);
+    // dropdown options for each available proposals
     const [propsDropdownOptions, setPropsDropdownOptions] = useState([]);
+    // which proposal we selected, this is used to display the
+    // correct forms
     const [selectedProp, setSelectedProp] = useState(null);
+    // every single proposals in the system
     const [allProposals, setAllProposals] = useState({});
+    // details about the current proposal
     const [propDetails, setPropDetails] = useState({});
+    // computed weight of the current proposal - used for closing
     const [propWeight, setPropWeight] = useState(0);
+    // which 'ui flavor' we want to display, basically wether we
+    // want to:
+    // - present a binary voting form
+    // - present a plcr voting form
+    // - present a close proposal form
     const [uiFlavor, setUiFlavor] = useState('');
 
     useEffect(() => {
@@ -31,11 +45,20 @@ function Main(props) {
                 const proposalIds = proposals.map(({ args: [proposalId] }) => proposalId.toHuman());
 
                 api.query.organizations.proposals.multi(proposalIds, (details) => {
-                    const parsedProposals = proposalIds.reduce((acc, propId, index) => ({
-                        ...acc, [propId]: details[index].unwrap()
-                    }), {});
+                    // due to the timestamp we may have a bit of delay to unsub and
+                    // cleanup the list of `proposalIds` which may lead to unwrapping
+                    // errors, which we definitely want to avoid - so we use a try
+                    // catch to avoid this
 
-                    setAllProposals(parsedProposals);
+                    try {
+                        const parsedProposals = proposalIds.reduce((acc, propId, index) => ({
+                            ...acc, [propId]: details[index].unwrap()
+                        }), {});
+
+                        setAllProposals(parsedProposals);
+                    } catch (err) {
+                        console.error(err);
+                    }
                 }).then(unsub => {
                     unsubscribe = unsub;
                 }).catch(console.error);
@@ -46,13 +69,21 @@ function Main(props) {
     }, [api.query.organizations.proposals]);
 
     const parseCall = (call) => {
+        // parse a call from hexadecimal to a nice string for better UX
+
         let parsed = api.createType('Call', call);
         return `${parsed.section}.${parsed.method}(${parsed.args})`;
     };
 
     const onSelectedOrgChange = (_, { value }) => {
+        // A new org was selected, do a bit of wizardy
+
+        // No proposal is currently selected
         setSelectedProp(null);
+        // If no proposal is selected, there are no details
+        // about it
         setPropDetails({});
+        // Make sure to display only the proposals for this org
         setPropsDropdownOptions(
             Object.keys(allProposals)
                 .filter((prop) => {
@@ -64,10 +95,17 @@ function Main(props) {
                     text: parseCall(allProposals[prop].call),
                 }))
         );
+        // Since no proposal is selected we don't know which
+        // form we can show yet
         setUiFlavor('');
     };
 
     const coinVotingCanClose = (proposalHash, cannotCloseCb) => {
+        // If the proposal can be closed, setUiFlavor to 'close',
+        // otherwise call the cannotCloseCb function.
+        // This basically reimplement the code from the substrate
+        // pallet in JS.
+
         api.query.coinVoting.proposals(proposalHash, state => {
             console.log(JSON.stringify(state));
 
@@ -89,6 +127,8 @@ function Main(props) {
                     const proposalExpired = now > createdOn + ttl;
 
                     if (unsub !== null) {
+                        // Auto unsub, we don't need recurrent block number
+                        // updates
                         unsub();
                     }
 
@@ -105,6 +145,11 @@ function Main(props) {
     };
 
     const convictionVotingCanClose = (proposalHash, cannotCloseCb) => {
+        // If the proposal can be closed, setUiFlavor to 'close',
+        // otherwise call the cannotCloseCb function.
+        // This basically reimplement the code from the substrate
+        // pallet in JS.
+
         // we only support closing a conviction voting proposal once it is expired
         // as conviction accumulates over time, it needs to be computed regularly
         // and this would amount to lot of duplicated code here. in the future,
@@ -121,6 +166,8 @@ function Main(props) {
                 const proposalExpired = now > createdOn + ttl;
 
                 if (unsub !== null) {
+                    // Auto unsub, we don't need recurrent block number
+                    // updates
                     unsub();
                 }
 
@@ -136,6 +183,11 @@ function Main(props) {
     };
 
     const plcrVotingCanClose = (proposalHash, cannotCloseCb) => {
+        // If the proposal can be closed, setUiFlavor to 'close',
+        // otherwise call the cannotCloseCb function.
+        // This basically reimplement the code from the substrate
+        // pallet in JS.
+
         api.query.plcrVoting.proposals(proposalHash, state => {
             console.log(JSON.stringify(state));
 
@@ -157,6 +209,8 @@ function Main(props) {
                     const proposalExpired = now > createdOn + ttl;
 
                     if (unsub !== null) {
+                        // Auto unsub, we don't need recurrent block number
+                        // updates
                         unsub();
                     }
 
@@ -173,6 +227,8 @@ function Main(props) {
     };
 
     const canClose = (proposal, proposalHash, cannotCloseCb) => {
+        // Router between all the other canClose functions. This
+        // routes the proposal to the correct function 
         if (proposal.voting.toHuman() === 'CoinVoting') {
             coinVotingCanClose(proposalHash, cannotCloseCb);
         } else if (proposal.voting.toHuman() === 'ConvictionVoting') {

@@ -2,17 +2,23 @@ import React, { useState } from 'react';
 import { Form, Input, Button, Label, Icon, Dropdown } from 'semantic-ui-react';
 import { useSubstrate } from './substrate-lib';
 import { TxButton } from './substrate-lib/components';
-import { u8aToHex } from '@polkadot/util';
 
+/// This component is in charge of handling votes to the PLCR voting scheme.
+/// It is a bit different from Binary voting since votes have first to be
+/// 'committed' before being 'revealed'.
 function Main(props) {
     const { api } = useSubstrate();
     const { accountPair, proposalId, proposalDetails, setTxStatus } = props;
 
+    // How many coins are used to support the vote
     const [support, setSupport] = useState(0);
+    // Wether we are in favor or against the proposal
     const [favorable, setFavorable] = useState(true);
+    // Salt for the commit / reveal hashing
     const [salt, setSalt] = useState(0);
 
     const genHash = () => {
+        // Leverage the Substrate API to auto hash our tuple type.
         const payload = api.createType('(Balance, bool, u64)', [support, favorable, salt]);
         return payload.hash;
     };

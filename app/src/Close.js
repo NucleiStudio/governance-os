@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
-import { Form, Input, Button, Label, Icon } from 'semantic-ui-react';
+import React from 'react';
+import { Form, Label, Icon } from 'semantic-ui-react';
 import { useSubstrate } from './substrate-lib';
 import { TxButton } from './substrate-lib/components';
 
+/// This component is in charge of handling 'close_proposal'
+/// transactions for a given proposal. It simply presents a
+/// `TxButton` component to send it.
 function Main(props) {
     const { accountPair, proposalId, proposalWeight, setTxStatus } = props;
 

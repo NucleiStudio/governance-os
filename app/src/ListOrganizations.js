@@ -3,13 +3,16 @@ import { Table, Grid, Button } from 'semantic-ui-react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { useSubstrate } from './substrate-lib';
 
+/// A component to display orgs registered on the chain
 function Main(props) {
   const { api } = useSubstrate();
 
   // The transaction submission status
   const [organizationsDetails, setOrganizationsDetails] = useState([]);
+  // List of orgs from the chain state
   const [organizationAddresses, setOrganizationAddresses] = useState([]);
 
+  // A props function which we use to communication new org addresses with
   const { setOrgs } = props;
 
   useEffect(() => {
