@@ -1,15 +1,8 @@
-# Substrate Front End Template
+# Governance OS Frontend
 
-This template allows you to create a front-end application that connects to a
-[Substrate](https://github.com/paritytech/substrate) node back-end with minimal
-configuration. To learn about Substrate itself, visit the
-[Substrate Developer Hub](https://substrate.dev).
+> This work is based on the [Substrate Frontend Template](https://github.com/substrate-developer-hub/substrate-front-end-template) - thanks a lot to the maintainers!
 
-The template is built with [Create React App](https://github.com/facebook/create-react-app)
-and [Polkadot js API](https://polkadot.js.org/api/). Familiarity with these tools
-will be helpful, but the template strives to be self-explanatory.
-
-## Using The Template
+## Using The App
 
 ### Installation
 
@@ -17,14 +10,14 @@ The codebase is installed using [git](https://git-scm.com/) and [yarn](https://y
 
 ```bash
 # Clone the repository
-git clone https://github.com/substrate-developer-hub/substrate-front-end-template.git
-cd substrate-front-end-template
+git clone http://github.com/NucleiStudio/governance-os
+cd governance-os/app
 yarn install
 ```
 
 ## Usage
 
-You can start the template in development mode to connect to a locally running node
+You can start the app in development mode to connect to a locally running node
 
 ```bash
 yarn start
@@ -39,7 +32,7 @@ and open `build/index.html` in your favorite browser.
 
 ## Configuration
 
-The template's configuration is stored in the `src/config` directory, with
+The app's configuration is stored in the `src/config` directory, with
 `common.json` being loaded first, then the environment-specific json file,
 and finally environment variables, with precedence.
 
@@ -71,46 +64,3 @@ There are two ways to specify it:
 
 * With `PROVIDER_SOCKET` in `{common, development, production}.json`.
 * With `rpc=<ws or wss connection>` query paramter after the URL. This overrides the above setting.
-
-## Reusable Components
-
-### useSubstrate Custom Hook
-
-The custom hook `useSubstrate` provides access to the Polkadot js API and thus the
-keyring and the blockchain itself. Specifically it exposes this API.
-
-```js
-{
-  socket,
-  types,
-  keyring,
-  keyringState,
-  api,
-  apiState,
-}
-```
-
-- `socket` - The remote provider socket it is connecting to.
-- `types` - The custom types used in the connected node.
-- `keyring` - A keyring of accounts available to the user.
-- `keyringState` - One of `"READY"` or `"ERROR"` states. `keyring` is valid
-only when `keyringState === "READY"`.
-- `api` - The remote api to the connected node.
-- `apiState` - One of `"CONNECTING"`, `"READY"`, or `"ERROR"` states. `api` is valid
-only when `apiState === "READY"`.
-
-
-### TxButton Component
-
-The [TxButton](./src/substrate-lib/components/TxButton.js) handles basic
-[query](https://polkadot.js.org/api/start/api.query.html) and
-[transaction](https://polkadot.js.org/api/start/api.tx.html) requests to the
-connected node. You can reuse this component for a wide variety of queries and
-transactions. See [src/Transfer.js](./src/Transfer.js) for a transaction example
-and [src/ChainState.js](./src/ChainState.js) for a query example.
-
-### Account Selector
-
-The [Account Selector](./src/AccountSelector.js) provides the user with a unified way to
-select their account from a keyring. If the Balances module is installed in the runtime,
-it also displays the user's token balance. It is included in the template already.
