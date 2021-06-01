@@ -12,7 +12,7 @@ You will need a few things first:
 In order to create an organization you can navigate to the `Create a new Organization` tab, and fill the form fields accordingly:
 1. The first field is a dropdown which should propose you to create an organization with one of the three voting models we support. In our case we chose `CoinVoting`.
 2. After selecting your voting model, new fields should show up to allow you to configure your new organization. In our case we have the ones for the `CoinVoting` voting system:
-   1. `ttl` is set to the arbitrary value of 50. This leaves us with `150` seconds to vote for a proposal before it expires and should be enough for testing purposes.
+   1. `ttl` is set to the arbitrary value of `200`. This leaves us with 10 minutes to vote for a proposal before it expires and should be enough for testing purposes.
    2. We set `voting_currency` to `Native`, this means that the organization will use the default chain currency to represent votes and weights. If we had created an alternative token we could specify it here.
    3. We set `min_quorum` to `50` as usual.
    4. We set `min_participation` to `33` as usual.
