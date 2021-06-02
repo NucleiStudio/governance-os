@@ -20,7 +20,7 @@ const coinVotingState = (state, totalSupply, now) => {
     const proposalExpired = now > createdOn + ttl;
 
     return [proposalPassing, proposalExpired];
-}
+};
 
 /// return wether a proposal will pass or expire for the conviction voting system
 const convictionVotingState = (state, totalSupply, now) => {
@@ -36,10 +36,29 @@ const convictionVotingState = (state, totalSupply, now) => {
     const proposalExpired = now > createdOn + ttl;
 
     return [proposalPassing, proposalExpired];
-}
+};
+
+/// return wether a proposal will pass or expire for the plcr voting system
+const plcrVotingState = (state, totalSupply, now) => {
+    const totalParticipation = state["revealed_favorable"].add(state["revealed_against"]);
+    const minParticipation = state.parameters["min_participation"] / 100;
+    const minQuorum = state.parameters["min_quorum"] / 100;
+    const totalFavorable = state["revealed_favorable"];
+    const createdOn = state["created_on"].toNumber();
+    const ttl = state.parameters["commit_duration"].add(state.parameters["reveal_duration"]).toNumber();
+
+    const enoughParticipation = totalParticipation > minParticipation * totalSupply;
+    const enoughQuorum = totalFavorable > minQuorum * totalParticipation;
+    const proposalPassing = enoughParticipation && enoughQuorum;
+
+    const proposalExpired = now > createdOn + ttl;
+
+    return [proposalPassing, proposalExpired];
+};
 
 export {
     parseCall,
     coinVotingState,
-    convictionVotingState
+    convictionVotingState,
+    plcrVotingState,
 };

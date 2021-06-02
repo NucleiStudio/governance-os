@@ -2,7 +2,7 @@ import { ApiPromise, WsProvider } from '@polkadot/api';
 import { bnToBn } from '@polkadot/util';
 
 import config from '../config';
-import { parseCall, coinVotingState, convictionVotingState } from '../helpers';
+import { parseCall, coinVotingState, convictionVotingState, plcrVotingState } from '../helpers';
 
 describe('helpers test suite', () => {
     describe('parseCall', () => {
@@ -114,6 +114,68 @@ describe('helpers test suite', () => {
             const totalSupply = bnToBn('2000000000000000000');
 
             const [passing, expired] = convictionVotingState(unCloseableState, totalSupply, 0);
+
+            expect(passing).toEqual(false);
+            expect(expired).toEqual(false);
+        });
+    });
+
+    describe('plcrVotingState', () => {
+        it('expired', () => {
+            const expiredState = {
+                parameters: {
+                    commit_duration: bnToBn(20),
+                    reveal_duration: bnToBn(20),
+                    min_quorum: 50,
+                    min_participation: 33
+                },
+                revealed_against: bnToBn('0'),
+                revealed_favorable: bnToBn('0'),
+                created_on: bnToBn('0')
+            };
+            const totalSupply = bnToBn('2000000000000000000');
+
+            const [passing, expired] = plcrVotingState(expiredState, totalSupply, 1000);
+
+            expect(passing).toEqual(false);
+            expect(expired).toEqual(true);
+        });
+
+        it('is passing', () => {
+            const passingState = {
+                parameters: {
+                    commit_duration: bnToBn(20),
+                    reveal_duration: bnToBn(20),
+                    min_quorum: 50,
+                    min_participation: 33
+                },
+                revealed_against: bnToBn('0'),
+                revealed_favorable: bnToBn('1000000000000000000'),
+                created_on: bnToBn('0')
+            };
+            const totalSupply = bnToBn('2000000000000000000');
+
+            const [passing, expired] = plcrVotingState(passingState, totalSupply, 0);
+
+            expect(passing).toEqual(true);
+            expect(expired).toEqual(false);
+        });
+
+        it('needs to wait', () => {
+            const unCloseableState = {
+                parameters: {
+                    commit_duration: bnToBn(20),
+                    reveal_duration: bnToBn(20),
+                    min_quorum: 50,
+                    min_participation: 33
+                },
+                revealed_against: bnToBn('0'),
+                revealed_favorable: bnToBn('0'),
+                created_on: bnToBn('0')
+            };
+            const totalSupply = bnToBn('2000000000000000000');
+
+            const [passing, expired] = plcrVotingState(unCloseableState, totalSupply, 0);
 
             expect(passing).toEqual(false);
             expect(expired).toEqual(false);
