@@ -6,7 +6,7 @@ import BinaryVoting from './BinaryVoting';
 import Close from './Close';
 import PlcrVoting from './PlcrVoting';
 
-import { parseCall } from './helpers';
+import { parseCall, coinVotingState } from './helpers';
 
 /// This component is in charge two things: listing proposals
 /// for each organizations and letting users vote on them.
@@ -108,27 +108,17 @@ function Main(props) {
             console.log(JSON.stringify(state));
 
             const currencyId = state.parameters["voting_currency"];
-            const totalParticipation = state["total_favorable"].add(state["total_against"]);
-            const minParticipation = state.parameters["min_participation"] / 100;
-            const minQuorum = state.parameters["min_quorum"] / 100;
-            const totalFavorable = state["total_favorable"];
-            const createdOn = state["created_on"].toNumber();
-            const ttl = state.parameters.ttl.toNumber();
 
             api.query.tokens.totalIssuances(currencyId, totalSupply => {
-                const enoughParticipation = totalParticipation > minParticipation * totalSupply;
-                const enoughQuorum = totalFavorable > minQuorum * totalParticipation;
-                const proposalPassing = enoughParticipation && enoughQuorum;
-
                 let unsub = null;
                 api.derive.chain.bestNumber(now => {
-                    const proposalExpired = now > createdOn + ttl;
-
                     if (unsub !== null) {
                         // Auto unsub, we don't need recurrent block number
                         // updates
                         unsub();
                     }
+
+                    const [proposalPassing, proposalExpired] = coinVotingState(state, totalSupply, now);
 
                     if (proposalPassing || proposalExpired) {
                         setUiFlavor('close');
