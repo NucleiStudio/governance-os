@@ -64,3 +64,14 @@ There are two ways to specify it:
 
 * With `PROVIDER_SOCKET` in `{common, development, production}.json`.
 * With `rpc=<ws or wss connection>` query paramter after the URL. This overrides the above setting.
+
+## Unit Tests
+1. You need to be running a local node in dev mode, use `cargo run -- --dev --tmp --rpc-cors all` from the root directory to start one.
+2. Just run the tests from this directory: `yarn test`. It should display something similar to what's below at the end:
+   ```
+   Test Suites: 2 passed, 2 total
+   Tests:       11 passed, 11 total
+   Snapshots:   0 total
+   Time:        1.9 s, estimated 7 s
+   Ran all test suites.
+   ```
