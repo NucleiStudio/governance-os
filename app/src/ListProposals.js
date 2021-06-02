@@ -6,6 +6,8 @@ import BinaryVoting from './BinaryVoting';
 import Close from './Close';
 import PlcrVoting from './PlcrVoting';
 
+import { parseCall } from './helpers';
+
 /// This component is in charge two things: listing proposals
 /// for each organizations and letting users vote on them.
 function Main(props) {
@@ -68,13 +70,6 @@ function Main(props) {
         return () => clearInterval(interval);
     }, [api.query.organizations.proposals]);
 
-    const parseCall = (call) => {
-        // parse a call from hexadecimal to a nice string for better UX
-
-        let parsed = api.createType('Call', call);
-        return `${parsed.section}.${parsed.method}(${parsed.args})`;
-    };
-
     const onSelectedOrgChange = (_, { value }) => {
         // A new org was selected, do a bit of wizardy
 
@@ -92,9 +87,12 @@ function Main(props) {
                 .map((prop) => ({
                     key: prop,
                     value: prop,
-                    text: parseCall(allProposals[prop].call),
+                    text: parseCall(api, allProposals[prop].call),
                 }))
         );
+
+        console.log(JSON.stringify(allProposals));
+
         // Since no proposal is selected we don't know which
         // form we can show yet
         setUiFlavor('');
