@@ -6,7 +6,7 @@ import BinaryVoting from './BinaryVoting';
 import Close from './Close';
 import PlcrVoting from './PlcrVoting';
 
-import { parseCall, coinVotingState } from './helpers';
+import { parseCall, coinVotingState, convictionVotingState } from './helpers';
 
 /// This component is in charge two things: listing proposals
 /// for each organizations and letting users vote on them.
@@ -138,35 +138,31 @@ function Main(props) {
         // This basically reimplement the code from the substrate
         // pallet in JS.
 
-        // we only support closing a conviction voting proposal once it is expired
-        // as conviction accumulates over time, it needs to be computed regularly
-        // and this would amount to lot of duplicated code here. in the future,
-        // we may add a RPC call for it.
-
         api.query.convictionVoting.proposals(proposalHash, state => {
             console.log(JSON.stringify(state));
 
-            const createdOn = state["created_on"].toNumber();
-            const ttl = state.parameters.ttl.toNumber();
+            const currencyId = state.parameters["voting_currency"];
 
-            let unsub = null;
-            api.derive.chain.bestNumber(now => {
-                const proposalExpired = now > createdOn + ttl;
+            api.query.tokens.totalIssuances(currencyId, totalSupply => {
+                let unsub = null;
+                api.derive.chain.bestNumber(now => {
+                    if (unsub !== null) {
+                        // Auto unsub, we don't need recurrent block number
+                        // updates
+                        unsub();
+                    }
 
-                if (unsub !== null) {
-                    // Auto unsub, we don't need recurrent block number
-                    // updates
-                    unsub();
-                }
+                    const [proposalPassing, proposalExpired] = convictionVotingState(state, totalSupply, now);
 
-                if (proposalExpired) {
-                    setUiFlavor('close');
-                } else {
-                    cannotCloseCb();
-                }
-            })
-                .then(u => unsub = u)
-                .catch(console.error);
+                    if (proposalPassing || proposalExpired) {
+                        setUiFlavor('close');
+                    } else {
+                        cannotCloseCb();
+                    }
+                })
+                    .then(u => unsub = u)
+                    .catch(console.error);
+            }).catch(console.error);
         }).catch(console.error);
     };
 

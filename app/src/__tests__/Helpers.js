@@ -2,7 +2,7 @@ import { ApiPromise, WsProvider } from '@polkadot/api';
 import { bnToBn } from '@polkadot/util';
 
 import config from '../config';
-import { parseCall, coinVotingState } from '../helpers';
+import { parseCall, coinVotingState, convictionVotingState } from '../helpers';
 
 describe('helpers test suite', () => {
     describe('parseCall', () => {
@@ -78,6 +78,42 @@ describe('helpers test suite', () => {
             const totalSupply = bnToBn('2000000000000000000');
 
             const [passing, expired] = coinVotingState(unCloseableState, totalSupply, 0);
+
+            expect(passing).toEqual(false);
+            expect(expired).toEqual(false);
+        });
+    });
+
+    describe('convictionVotingState', () => {
+        it('is expired', () => {
+            const expiredState = {
+                parameters: {
+                    ttl: bnToBn('20'),
+                    min_quorum: 50,
+                    min_participation: 33
+                },
+                created_on: bnToBn('0')
+            };
+            const totalSupply = bnToBn('2000000000000000000');
+
+            const [passing, expired] = convictionVotingState(expiredState, totalSupply, 1000);
+
+            expect(passing).toEqual(false);
+            expect(expired).toEqual(true);
+        });
+
+        it('needs to wait', () => {
+            const unCloseableState = {
+                parameters: {
+                    ttl: bnToBn('20'),
+                    min_quorum: 50,
+                    min_participation: 33
+                },
+                created_on: bnToBn('0')
+            };
+            const totalSupply = bnToBn('2000000000000000000');
+
+            const [passing, expired] = convictionVotingState(unCloseableState, totalSupply, 0);
 
             expect(passing).toEqual(false);
             expect(expired).toEqual(false);

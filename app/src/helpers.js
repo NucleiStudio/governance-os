@@ -22,7 +22,24 @@ const coinVotingState = (state, totalSupply, now) => {
     return [proposalPassing, proposalExpired];
 }
 
+/// return wether a proposal will pass or expire for the conviction voting system
+const convictionVotingState = (state, totalSupply, now) => {
+    // we only support closing a conviction voting proposal once it is expired
+    // as conviction accumulates over time, it needs to be computed regularly
+    // and this would amount to lot of duplicated code here. in the future,
+    // we may add a RPC call for it.
+    const proposalPassing = false;
+
+    const createdOn = state["created_on"].toNumber();
+    const ttl = state.parameters.ttl.toNumber();
+
+    const proposalExpired = now > createdOn + ttl;
+
+    return [proposalPassing, proposalExpired];
+}
+
 export {
     parseCall,
-    coinVotingState
+    coinVotingState,
+    convictionVotingState
 };
