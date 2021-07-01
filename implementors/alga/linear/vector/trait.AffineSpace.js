@@ -1,3 +1,0 @@
-(function() {var implementors = {};
-implementors["nalgebra"] = [{"text":"impl&lt;N:&nbsp;Scalar + Field, D:&nbsp;DimName&gt; AffineSpace for Point&lt;N, D&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;N: Scalar + Field,<br>&nbsp;&nbsp;&nbsp;&nbsp;DefaultAllocator: Allocator&lt;N, D&gt;,&nbsp;</span>","synthetic":false,"types":[]}];
-if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

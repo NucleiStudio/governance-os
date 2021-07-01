@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/jsonrpc-client-transports-15.1.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/jsonrpc-client-transports-15.1.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../jsonrpc_client_transports/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../jsonrpc_client_transports/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -520,13 +520,13 @@
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">missing_docs</span>)]</span>
 
 <span class="kw">use</span> <span class="ident">failure</span>::{<span class="ident">format_err</span>, <span class="ident">Fail</span>};
-<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">sync</span>::{<span class="ident">mpsc</span>, <span class="ident">oneshot</span>};
+<span class="kw">use</span> <span class="ident">futures::sync</span>::{<span class="ident">mpsc</span>, <span class="ident">oneshot</span>};
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">future</span>, <span class="ident">prelude</span>::<span class="kw-2">*</span>};
 <span class="kw">use</span> <span class="ident">jsonrpc_core</span>::{<span class="ident">Error</span>, <span class="ident">Params</span>};
-<span class="kw">use</span> <span class="ident">serde</span>::<span class="ident">de</span>::<span class="ident">DeserializeOwned</span>;
-<span class="kw">use</span> <span class="ident">serde</span>::<span class="ident">Serialize</span>;
-<span class="kw">use</span> <span class="ident">serde_json</span>::<span class="ident">Value</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">marker</span>::<span class="ident">PhantomData</span>;
+<span class="kw">use</span> <span class="ident">serde::de::DeserializeOwned</span>;
+<span class="kw">use</span> <span class="ident">serde::Serialize</span>;
+<span class="kw">use</span> <span class="ident">serde_json::Value</span>;
+<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">transports</span>;
 
@@ -541,18 +541,18 @@
 	<span class="ident">JsonRpcError</span>(<span class="ident">Error</span>),
 	<span class="doccomment">/// Failure to parse server response.</span>
 	<span class="attribute">#[<span class="ident">fail</span>(<span class="ident">display</span> <span class="op">=</span> <span class="string">&quot;Failed to parse server response as {}: {}&quot;</span>, <span class="ident">_0</span>, <span class="ident">_1</span>)]</span>
-	<span class="ident">ParseError</span>(<span class="ident">String</span>, <span class="ident">failure</span>::<span class="ident">Error</span>),
+	<span class="ident">ParseError</span>(<span class="ident">String</span>, <span class="ident">failure::Error</span>),
 	<span class="doccomment">/// Request timed out.</span>
 	<span class="attribute">#[<span class="ident">fail</span>(<span class="ident">display</span> <span class="op">=</span> <span class="string">&quot;Request timed out&quot;</span>)]</span>
 	<span class="ident">Timeout</span>,
 	<span class="doccomment">/// Not rpc specific errors.</span>
 	<span class="attribute">#[<span class="ident">fail</span>(<span class="ident">display</span> <span class="op">=</span> <span class="string">&quot;{}&quot;</span>, <span class="ident">_0</span>)]</span>
-	<span class="ident">Other</span>(<span class="ident">failure</span>::<span class="ident">Error</span>),
+	<span class="ident">Other</span>(<span class="ident">failure::Error</span>),
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RpcError</span> {
 	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">error</span>: <span class="ident">Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-		<span class="ident">RpcError</span>::<span class="ident">JsonRpcError</span>(<span class="ident">error</span>)
+		<span class="ident">RpcError::JsonRpcError</span>(<span class="ident">error</span>)
 	}
 }
 
@@ -564,7 +564,7 @@
 	<span class="ident">params</span>: <span class="ident">Params</span>,
 	<span class="doccomment">/// The oneshot channel to send the result of the rpc</span>
 	<span class="doccomment">/// call to.</span>
-	<span class="ident">sender</span>: <span class="ident">oneshot</span>::<span class="ident">Sender</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Value</span>, <span class="ident">RpcError</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+	<span class="ident">sender</span>: <span class="ident">oneshot::Sender</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Value</span>, <span class="ident">RpcError</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="doccomment">/// An RPC notification.</span>
@@ -592,7 +592,7 @@
 	<span class="doccomment">/// The subscription to subscribe to.</span>
 	<span class="ident">subscription</span>: <span class="ident">Subscription</span>,
 	<span class="doccomment">/// The channel to send notifications to.</span>
-	<span class="ident">sender</span>: <span class="ident">mpsc</span>::<span class="ident">Sender</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Value</span>, <span class="ident">RpcError</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+	<span class="ident">sender</span>: <span class="ident">mpsc::Sender</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Value</span>, <span class="ident">RpcError</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="doccomment">/// A message sent to the `RpcClient`.</span>
@@ -607,49 +607,49 @@
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">CallMessage</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RpcMessage</span> {
 	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">msg</span>: <span class="ident">CallMessage</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-		<span class="ident">RpcMessage</span>::<span class="ident">Call</span>(<span class="ident">msg</span>)
+		<span class="ident">RpcMessage::Call</span>(<span class="ident">msg</span>)
 	}
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">NotifyMessage</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RpcMessage</span> {
 	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">msg</span>: <span class="ident">NotifyMessage</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-		<span class="ident">RpcMessage</span>::<span class="ident">Notify</span>(<span class="ident">msg</span>)
+		<span class="ident">RpcMessage::Notify</span>(<span class="ident">msg</span>)
 	}
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SubscribeMessage</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RpcMessage</span> {
 	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">msg</span>: <span class="ident">SubscribeMessage</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-		<span class="ident">RpcMessage</span>::<span class="ident">Subscribe</span>(<span class="ident">msg</span>)
+		<span class="ident">RpcMessage::Subscribe</span>(<span class="ident">msg</span>)
 	}
 }
 
 <span class="doccomment">/// A channel to a `RpcClient`.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RpcChannel</span>(<span class="ident">mpsc</span>::<span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">RpcMessage</span><span class="op">&gt;</span>);
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RpcChannel</span>(<span class="ident">mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RpcMessage</span><span class="op">&gt;</span>);
 
 <span class="kw">impl</span> <span class="ident">RpcChannel</span> {
 	<span class="kw">fn</span> <span class="ident">send</span>(
 		<span class="kw-2">&amp;</span><span class="self">self</span>,
 		<span class="ident">msg</span>: <span class="ident">RpcMessage</span>,
-	) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">mpsc</span>::<span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">RpcMessage</span><span class="op">&gt;</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">mpsc</span>::<span class="ident">SendError</span><span class="op">&lt;</span><span class="ident">RpcMessage</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+	) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RpcMessage</span><span class="op">&gt;</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">mpsc::SendError</span><span class="op">&lt;</span><span class="ident">RpcMessage</span><span class="op">&gt;</span><span class="op">&gt;</span> {
 		<span class="self">self</span>.<span class="number">0</span>.<span class="ident">to_owned</span>().<span class="ident">send</span>(<span class="ident">msg</span>)
 	}
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">mpsc</span>::<span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">RpcMessage</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RpcChannel</span> {
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">sender</span>: <span class="ident">mpsc</span>::<span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">RpcMessage</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RpcMessage</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RpcChannel</span> {
+	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">sender</span>: <span class="ident">mpsc::Sender</span><span class="op">&lt;</span><span class="ident">RpcMessage</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
 		<span class="ident">RpcChannel</span>(<span class="ident">sender</span>)
 	}
 }
 
 <span class="doccomment">/// The future returned by the rpc call.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RpcFuture</span> {
-	<span class="ident">recv</span>: <span class="ident">oneshot</span>::<span class="ident">Receiver</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Value</span>, <span class="ident">RpcError</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+	<span class="ident">recv</span>: <span class="ident">oneshot::Receiver</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Value</span>, <span class="ident">RpcError</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">RpcFuture</span> {
 	<span class="doccomment">/// Creates a new `RpcFuture`.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">recv</span>: <span class="ident">oneshot</span>::<span class="ident">Receiver</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Value</span>, <span class="ident">RpcError</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">recv</span>: <span class="ident">oneshot::Receiver</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Value</span>, <span class="ident">RpcError</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
 		<span class="ident">RpcFuture</span> { <span class="ident">recv</span> }
 	}
 }
@@ -658,25 +658,25 @@
 	<span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">Value</span>;
 	<span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">RpcError</span>;
 
-	<span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Async</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Item</span><span class="op">&gt;</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Async</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Item</span><span class="op">&gt;</span>, <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span> {
 		<span class="comment">// TODO should timeout (#410)</span>
 		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">recv</span>.<span class="ident">poll</span>() {
-			<span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">value</span>))) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="ident">value</span>)),
-			<span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">error</span>))) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">error</span>),
-			<span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>),
-			<span class="prelude-val">Err</span>(<span class="ident">error</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">RpcError</span>::<span class="ident">Other</span>(<span class="ident">error</span>.<span class="ident">into</span>())),
+			<span class="prelude-val">Ok</span>(<span class="ident">Async::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">value</span>))) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Async::Ready</span>(<span class="ident">value</span>)),
+			<span class="prelude-val">Ok</span>(<span class="ident">Async::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">error</span>))) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">error</span>),
+			<span class="prelude-val">Ok</span>(<span class="ident">Async::NotReady</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Async::NotReady</span>),
+			<span class="prelude-val">Err</span>(<span class="ident">error</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">RpcError::Other</span>(<span class="ident">error</span>.<span class="ident">into</span>())),
 		}
 	}
 }
 
 <span class="doccomment">/// The stream returned by a subscribe.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SubscriptionStream</span> {
-	<span class="ident">recv</span>: <span class="ident">mpsc</span>::<span class="ident">Receiver</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Value</span>, <span class="ident">RpcError</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+	<span class="ident">recv</span>: <span class="ident">mpsc::Receiver</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Value</span>, <span class="ident">RpcError</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">SubscriptionStream</span> {
 	<span class="doccomment">/// Crates a new `SubscriptionStream`.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">recv</span>: <span class="ident">mpsc</span>::<span class="ident">Receiver</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Value</span>, <span class="ident">RpcError</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">recv</span>: <span class="ident">mpsc::Receiver</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Value</span>, <span class="ident">RpcError</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
 		<span class="ident">SubscriptionStream</span> { <span class="ident">recv</span> }
 	}
 }
@@ -685,13 +685,13 @@
 	<span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">Value</span>;
 	<span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">RpcError</span>;
 
-	<span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Async</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Item</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Async</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Item</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span> {
 		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">recv</span>.<span class="ident">poll</span>() {
-			<span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">value</span>)))) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">value</span>))),
-			<span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">error</span>)))) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">error</span>),
-			<span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">None</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">None</span>)),
-			<span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Async</span>::<span class="ident">NotReady</span>),
-			<span class="prelude-val">Err</span>(()) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">RpcError</span>::<span class="ident">Other</span>(<span class="macro">format_err</span><span class="macro">!</span>(<span class="string">&quot;mpsc channel returned an error.&quot;</span>))),
+			<span class="prelude-val">Ok</span>(<span class="ident">Async::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">value</span>)))) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Async::Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">value</span>))),
+			<span class="prelude-val">Ok</span>(<span class="ident">Async::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">error</span>)))) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">error</span>),
+			<span class="prelude-val">Ok</span>(<span class="ident">Async::Ready</span>(<span class="prelude-val">None</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Async::Ready</span>(<span class="prelude-val">None</span>)),
+			<span class="prelude-val">Ok</span>(<span class="ident">Async::NotReady</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Async::NotReady</span>),
+			<span class="prelude-val">Err</span>(()) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">RpcError::Other</span>(<span class="macro">format_err!</span>(<span class="string">&quot;mpsc channel returned an error.&quot;</span>))),
 		}
 	}
 }
@@ -718,13 +718,13 @@
 	<span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span>;
 	<span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">RpcError</span>;
 
-	<span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Async</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Item</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Async</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Item</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span> {
 		<span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">poll</span>()<span class="question-mark">?</span> {
-			<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">value</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serde_json</span>::<span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">value</span>)
-				.<span class="ident">map</span>(<span class="op">|</span><span class="ident">result</span><span class="op">|</span> <span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">result</span>)))
-				.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error</span><span class="op">|</span> <span class="ident">RpcError</span>::<span class="ident">ParseError</span>(<span class="self">self</span>.<span class="ident">returns</span>.<span class="ident">into</span>(), <span class="ident">error</span>.<span class="ident">into</span>()))<span class="question-mark">?</span>,
-			<span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="prelude-val">None</span>),
-			<span class="ident">Async</span>::<span class="ident">NotReady</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Async</span>::<span class="ident">NotReady</span>,
+			<span class="ident">Async::Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">value</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serde_json::from_value</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">value</span>)
+				.<span class="ident">map</span>(<span class="op">|</span><span class="ident">result</span><span class="op">|</span> <span class="ident">Async::Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">result</span>)))
+				.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error</span><span class="op">|</span> <span class="ident">RpcError::ParseError</span>(<span class="self">self</span>.<span class="ident">returns</span>.<span class="ident">into</span>(), <span class="ident">error</span>.<span class="ident">into</span>()))<span class="question-mark">?</span>,
+			<span class="ident">Async::Ready</span>(<span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Async::Ready</span>(<span class="prelude-val">None</span>),
+			<span class="ident">Async::NotReady</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Async::NotReady</span>,
 		};
 		<span class="prelude-val">Ok</span>(<span class="ident">result</span>)
 	}
@@ -743,7 +743,7 @@
 <span class="kw">impl</span> <span class="ident">RawClient</span> {
 	<span class="doccomment">/// Call RPC method with raw JSON.</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">call_method</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">method</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="ident">Params</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Value</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">RpcError</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">oneshot</span>::<span class="ident">channel</span>();
+		<span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">oneshot::channel</span>();
 		<span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">CallMessage</span> {
 			<span class="ident">method</span>: <span class="ident">method</span>.<span class="ident">into</span>(),
 			<span class="ident">params</span>,
@@ -751,8 +751,8 @@
 		};
 		<span class="self">self</span>.<span class="number">0</span>
 			.<span class="ident">send</span>(<span class="ident">msg</span>.<span class="ident">into</span>())
-			.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error</span><span class="op">|</span> <span class="ident">RpcError</span>::<span class="ident">Other</span>(<span class="ident">error</span>.<span class="ident">into</span>()))
-			.<span class="ident">and_then</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">RpcFuture</span>::<span class="ident">new</span>(<span class="ident">receiver</span>))
+			.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error</span><span class="op">|</span> <span class="ident">RpcError::Other</span>(<span class="ident">error</span>.<span class="ident">into</span>()))
+			.<span class="ident">and_then</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">RpcFuture::new</span>(<span class="ident">receiver</span>))
 	}
 
 	<span class="doccomment">/// Send RPC notification with raw JSON.</span>
@@ -764,7 +764,7 @@
 		<span class="self">self</span>.<span class="number">0</span>
 			.<span class="ident">send</span>(<span class="ident">msg</span>.<span class="ident">into</span>())
 			.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
-			.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error</span><span class="op">|</span> <span class="ident">RpcError</span>::<span class="ident">Other</span>(<span class="ident">error</span>.<span class="ident">into</span>()))
+			.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error</span><span class="op">|</span> <span class="ident">RpcError::Other</span>(<span class="ident">error</span>.<span class="ident">into</span>()))
 	}
 
 	<span class="doccomment">/// Subscribe to topic with raw JSON.</span>
@@ -775,7 +775,7 @@
 		<span class="ident">notification</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
 		<span class="ident">unsubscribe</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">SubscriptionStream</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">RpcError</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">mpsc</span>::<span class="ident">channel</span>(<span class="number">0</span>);
+		<span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">mpsc::channel</span>(<span class="number">0</span>);
 		<span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">SubscribeMessage</span> {
 			<span class="ident">subscription</span>: <span class="ident">Subscription</span> {
 				<span class="ident">subscribe</span>: <span class="ident">subscribe</span>.<span class="ident">into</span>(),
@@ -787,8 +787,8 @@
 		};
 		<span class="self">self</span>.<span class="number">0</span>
 			.<span class="ident">send</span>(<span class="ident">msg</span>.<span class="ident">into</span>())
-			.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error</span><span class="op">|</span> <span class="ident">RpcError</span>::<span class="ident">Other</span>(<span class="ident">error</span>.<span class="ident">into</span>()))
-			.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">SubscriptionStream</span>::<span class="ident">new</span>(<span class="ident">receiver</span>))
+			.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error</span><span class="op">|</span> <span class="ident">RpcError::Other</span>(<span class="ident">error</span>.<span class="ident">into</span>()))
+			.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">SubscriptionStream::new</span>(<span class="ident">receiver</span>))
 	}
 }
 
@@ -816,41 +816,41 @@
 		<span class="ident">args</span>: <span class="ident">T</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">R</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">RpcError</span><span class="op">&gt;</span> {
 		<span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span>
-			<span class="ident">serde_json</span>::<span class="ident">to_value</span>(<span class="ident">args</span>).<span class="ident">expect</span>(<span class="string">&quot;Only types with infallible serialisation can be used for JSON-RPC&quot;</span>);
+			<span class="ident">serde_json::to_value</span>(<span class="ident">args</span>).<span class="ident">expect</span>(<span class="string">&quot;Only types with infallible serialisation can be used for JSON-RPC&quot;</span>);
 		<span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">args</span> {
-			<span class="ident">Value</span>::<span class="ident">Array</span>(<span class="ident">vec</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Params</span>::<span class="ident">Array</span>(<span class="ident">vec</span>),
-			<span class="ident">Value</span>::<span class="ident">Null</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Params</span>::<span class="prelude-val">None</span>,
-			<span class="ident">Value</span>::<span class="ident">Object</span>(<span class="ident">map</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Params</span>::<span class="ident">Map</span>(<span class="ident">map</span>),
+			<span class="ident">Value::Array</span>(<span class="ident">vec</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Params::Array</span>(<span class="ident">vec</span>),
+			<span class="ident">Value::Null</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Params::None</span>,
+			<span class="ident">Value::Object</span>(<span class="ident">map</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Params::Map</span>(<span class="ident">map</span>),
 			<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
-				<span class="kw">return</span> <span class="ident">future</span>::<span class="ident">Either</span>::<span class="ident">A</span>(<span class="ident">future</span>::<span class="ident">err</span>(<span class="ident">RpcError</span>::<span class="ident">Other</span>(<span class="macro">format_err</span><span class="macro">!</span>(
+				<span class="kw">return</span> <span class="ident">future::Either::A</span>(<span class="ident">future::err</span>(<span class="ident">RpcError::Other</span>(<span class="macro">format_err!</span>(
 					<span class="string">&quot;RPC params should serialize to a JSON array, JSON object or null&quot;</span>
 				))))
 			}
 		};
 
-		<span class="ident">future</span>::<span class="ident">Either</span>::<span class="ident">B</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">call_method</span>(<span class="ident">method</span>, <span class="ident">params</span>).<span class="ident">and_then</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">value</span>: <span class="ident">Value</span><span class="op">|</span> {
-			<span class="ident">log</span>::<span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;response: {:?}&quot;</span>, <span class="ident">value</span>);
+		<span class="ident">future::Either::B</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">call_method</span>(<span class="ident">method</span>, <span class="ident">params</span>).<span class="ident">and_then</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">value</span>: <span class="ident">Value</span><span class="op">|</span> {
+			<span class="macro">log::debug!</span>(<span class="string">&quot;response: {:?}&quot;</span>, <span class="ident">value</span>);
 			<span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span>
-				<span class="ident">serde_json</span>::<span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">value</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error</span><span class="op">|</span> <span class="ident">RpcError</span>::<span class="ident">ParseError</span>(<span class="ident">returns</span>.<span class="ident">into</span>(), <span class="ident">error</span>.<span class="ident">into</span>()));
-			<span class="ident">future</span>::<span class="ident">done</span>(<span class="ident">result</span>)
+				<span class="ident">serde_json::from_value</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">value</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error</span><span class="op">|</span> <span class="ident">RpcError::ParseError</span>(<span class="ident">returns</span>.<span class="ident">into</span>(), <span class="ident">error</span>.<span class="ident">into</span>()));
+			<span class="ident">future::done</span>(<span class="ident">result</span>)
 		}))
 	}
 
 	<span class="doccomment">/// Call RPC with serialization of request only.</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">notify</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Serialize</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">method</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">args</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (), <span class="ident">Error</span> <span class="op">=</span> <span class="ident">RpcError</span><span class="op">&gt;</span> {
 		<span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span>
-			<span class="ident">serde_json</span>::<span class="ident">to_value</span>(<span class="ident">args</span>).<span class="ident">expect</span>(<span class="string">&quot;Only types with infallible serialisation can be used for JSON-RPC&quot;</span>);
+			<span class="ident">serde_json::to_value</span>(<span class="ident">args</span>).<span class="ident">expect</span>(<span class="string">&quot;Only types with infallible serialisation can be used for JSON-RPC&quot;</span>);
 		<span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">args</span> {
-			<span class="ident">Value</span>::<span class="ident">Array</span>(<span class="ident">vec</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Params</span>::<span class="ident">Array</span>(<span class="ident">vec</span>),
-			<span class="ident">Value</span>::<span class="ident">Null</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Params</span>::<span class="prelude-val">None</span>,
+			<span class="ident">Value::Array</span>(<span class="ident">vec</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Params::Array</span>(<span class="ident">vec</span>),
+			<span class="ident">Value::Null</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Params::None</span>,
 			<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
-				<span class="kw">return</span> <span class="ident">future</span>::<span class="ident">Either</span>::<span class="ident">A</span>(<span class="ident">future</span>::<span class="ident">err</span>(<span class="ident">RpcError</span>::<span class="ident">Other</span>(<span class="macro">format_err</span><span class="macro">!</span>(
+				<span class="kw">return</span> <span class="ident">future::Either::A</span>(<span class="ident">future::err</span>(<span class="ident">RpcError::Other</span>(<span class="macro">format_err!</span>(
 					<span class="string">&quot;RPC params should serialize to a JSON array, or null&quot;</span>
 				))))
 			}
 		};
 
-		<span class="ident">future</span>::<span class="ident">Either</span>::<span class="ident">B</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">notify</span>(<span class="ident">method</span>, <span class="ident">params</span>))
+		<span class="ident">future::Either::B</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">notify</span>(<span class="ident">method</span>, <span class="ident">params</span>))
 	}
 
 	<span class="doccomment">/// Subscribe with serialization of request and deserialization of response.</span>
@@ -862,14 +862,14 @@
 		<span class="ident">unsubscribe</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
 		<span class="ident">returns</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">TypedSubscriptionStream</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">RpcError</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">serde_json</span>::<span class="ident">to_value</span>(<span class="ident">subscribe_params</span>)
+		<span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">serde_json::to_value</span>(<span class="ident">subscribe_params</span>)
 			.<span class="ident">expect</span>(<span class="string">&quot;Only types with infallible serialisation can be used for JSON-RPC&quot;</span>);
 
 		<span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">args</span> {
-			<span class="ident">Value</span>::<span class="ident">Array</span>(<span class="ident">vec</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Params</span>::<span class="ident">Array</span>(<span class="ident">vec</span>),
-			<span class="ident">Value</span>::<span class="ident">Null</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Params</span>::<span class="prelude-val">None</span>,
+			<span class="ident">Value::Array</span>(<span class="ident">vec</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Params::Array</span>(<span class="ident">vec</span>),
+			<span class="ident">Value::Null</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Params::None</span>,
 			<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
-				<span class="kw">return</span> <span class="ident">future</span>::<span class="ident">Either</span>::<span class="ident">A</span>(<span class="ident">future</span>::<span class="ident">err</span>(<span class="ident">RpcError</span>::<span class="ident">Other</span>(<span class="macro">format_err</span><span class="macro">!</span>(
+				<span class="kw">return</span> <span class="ident">future::Either::A</span>(<span class="ident">future::err</span>(<span class="ident">RpcError::Other</span>(<span class="macro">format_err!</span>(
 					<span class="string">&quot;RPC params should serialize to a JSON array, or null&quot;</span>
 				))))
 			}
@@ -878,20 +878,20 @@
 		<span class="kw">let</span> <span class="ident">typed_stream</span> <span class="op">=</span> <span class="self">self</span>
 			.<span class="number">0</span>
 			.<span class="ident">subscribe</span>(<span class="ident">subscribe</span>, <span class="ident">params</span>, <span class="ident">topic</span>, <span class="ident">unsubscribe</span>)
-			.<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">stream</span><span class="op">|</span> <span class="ident">TypedSubscriptionStream</span>::<span class="ident">new</span>(<span class="ident">stream</span>, <span class="ident">returns</span>));
-		<span class="ident">future</span>::<span class="ident">Either</span>::<span class="ident">B</span>(<span class="ident">typed_stream</span>)
+			.<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">stream</span><span class="op">|</span> <span class="ident">TypedSubscriptionStream::new</span>(<span class="ident">stream</span>, <span class="ident">returns</span>));
+		<span class="ident">future::Either::B</span>(<span class="ident">typed_stream</span>)
 	}
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
 	<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-	<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">transports</span>::<span class="ident">local</span>;
+	<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::transports::local</span>;
 	<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">RpcChannel</span>, <span class="ident">RpcError</span>, <span class="ident">TypedClient</span>};
 	<span class="kw">use</span> <span class="ident">jsonrpc_core</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">core</span>, <span class="ident">IoHandler</span>};
 	<span class="kw">use</span> <span class="ident">jsonrpc_pubsub</span>::{<span class="ident">PubSubHandler</span>, <span class="ident">Subscriber</span>, <span class="ident">SubscriptionId</span>};
-	<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">atomic</span>::{<span class="ident">AtomicBool</span>, <span class="ident">Ordering</span>};
-	<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Arc</span>;
+	<span class="kw">use</span> <span class="ident">std::sync::atomic</span>::{<span class="ident">AtomicBool</span>, <span class="ident">Ordering</span>};
+	<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
 	<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 	<span class="kw">struct</span> <span class="ident">AddClient</span>(<span class="ident">TypedClient</span>);
@@ -914,40 +914,40 @@
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">test_client_terminates</span>() {
-		<span class="kw">crate</span>::<span class="ident">logger</span>::<span class="ident">init_log</span>();
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">handler</span> <span class="op">=</span> <span class="ident">IoHandler</span>::<span class="ident">new</span>();
+		<span class="kw">crate</span><span class="ident">::logger::init_log</span>();
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">handler</span> <span class="op">=</span> <span class="ident">IoHandler::new</span>();
 		<span class="ident">handler</span>.<span class="ident">add_method</span>(<span class="string">&quot;add&quot;</span>, <span class="op">|</span><span class="ident">params</span>: <span class="ident">Params</span><span class="op">|</span> {
 			<span class="kw">let</span> (<span class="ident">a</span>, <span class="ident">b</span>) <span class="op">=</span> <span class="ident">params</span>.<span class="ident">parse</span>::<span class="op">&lt;</span>(<span class="ident">u64</span>, <span class="ident">u64</span>)<span class="op">&gt;</span>()<span class="question-mark">?</span>;
 			<span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">a</span> <span class="op">+</span> <span class="ident">b</span>;
-			<span class="prelude-val">Ok</span>(<span class="ident">jsonrpc_core</span>::<span class="ident">to_value</span>(<span class="ident">res</span>).<span class="ident">unwrap</span>())
+			<span class="prelude-val">Ok</span>(<span class="ident">jsonrpc_core::to_value</span>(<span class="ident">res</span>).<span class="ident">unwrap</span>())
 		});
 
-		<span class="kw">let</span> (<span class="ident">client</span>, <span class="ident">rpc_client</span>) <span class="op">=</span> <span class="ident">local</span>::<span class="ident">connect</span>::<span class="op">&lt;</span><span class="ident">AddClient</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">handler</span>);
+		<span class="kw">let</span> (<span class="ident">client</span>, <span class="ident">rpc_client</span>) <span class="op">=</span> <span class="ident">local::connect</span>::<span class="op">&lt;</span><span class="ident">AddClient</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">handler</span>);
 		<span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="ident">client</span>
 			.<span class="ident">clone</span>()
 			.<span class="ident">add</span>(<span class="number">3</span>, <span class="number">4</span>)
 			.<span class="ident">and_then</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">res</span><span class="op">|</span> <span class="ident">client</span>.<span class="ident">add</span>(<span class="ident">res</span>, <span class="number">5</span>))
 			.<span class="ident">join</span>(<span class="ident">rpc_client</span>)
 			.<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">res</span>, ())<span class="op">|</span> {
-				<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">res</span>, <span class="number">12</span>);
+				<span class="macro">assert_eq!</span>(<span class="ident">res</span>, <span class="number">12</span>);
 			})
 			.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> {
-				<span class="macro">eprintln</span><span class="macro">!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">err</span>);
-				<span class="macro">assert</span><span class="macro">!</span>(<span class="bool-val">false</span>);
+				<span class="macro">eprintln!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">err</span>);
+				<span class="macro">assert!</span>(<span class="bool-val">false</span>);
 			});
-		<span class="ident">tokio</span>::<span class="ident">run</span>(<span class="ident">fut</span>);
+		<span class="ident">tokio::run</span>(<span class="ident">fut</span>);
 	}
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">should_send_notification</span>() {
-		<span class="kw">crate</span>::<span class="ident">logger</span>::<span class="ident">init_log</span>();
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">handler</span> <span class="op">=</span> <span class="ident">IoHandler</span>::<span class="ident">new</span>();
+		<span class="kw">crate</span><span class="ident">::logger::init_log</span>();
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">handler</span> <span class="op">=</span> <span class="ident">IoHandler::new</span>();
 		<span class="ident">handler</span>.<span class="ident">add_notification</span>(<span class="string">&quot;completed&quot;</span>, <span class="op">|</span><span class="ident">params</span>: <span class="ident">Params</span><span class="op">|</span> {
 			<span class="kw">let</span> (<span class="ident">success</span>,) <span class="op">=</span> <span class="ident">params</span>.<span class="ident">parse</span>::<span class="op">&lt;</span>(<span class="ident">bool</span>,)<span class="op">&gt;</span>().<span class="ident">expect</span>(<span class="string">&quot;expected to receive one boolean&quot;</span>);
-			<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">success</span>, <span class="bool-val">true</span>);
+			<span class="macro">assert_eq!</span>(<span class="ident">success</span>, <span class="bool-val">true</span>);
 		});
 
-		<span class="kw">let</span> (<span class="ident">client</span>, <span class="ident">rpc_client</span>) <span class="op">=</span> <span class="ident">local</span>::<span class="ident">connect</span>::<span class="op">&lt;</span><span class="ident">AddClient</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">handler</span>);
+		<span class="kw">let</span> (<span class="ident">client</span>, <span class="ident">rpc_client</span>) <span class="op">=</span> <span class="ident">local::connect</span>::<span class="op">&lt;</span><span class="ident">AddClient</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">handler</span>);
 		<span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="ident">client</span>
 			.<span class="ident">clone</span>()
 			.<span class="ident">completed</span>(<span class="bool-val">true</span>)
@@ -955,34 +955,34 @@
 			.<span class="ident">join</span>(<span class="ident">rpc_client</span>)
 			.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
 			.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> {
-				<span class="macro">eprintln</span><span class="macro">!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">err</span>);
-				<span class="macro">assert</span><span class="macro">!</span>(<span class="bool-val">false</span>);
+				<span class="macro">eprintln!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">err</span>);
+				<span class="macro">assert!</span>(<span class="bool-val">false</span>);
 			});
-		<span class="ident">tokio</span>::<span class="ident">run</span>(<span class="ident">fut</span>);
+		<span class="ident">tokio::run</span>(<span class="ident">fut</span>);
 	}
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">should_handle_subscription</span>() {
-		<span class="kw">crate</span>::<span class="ident">logger</span>::<span class="ident">init_log</span>();
+		<span class="kw">crate</span><span class="ident">::logger::init_log</span>();
 		<span class="comment">// given</span>
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">handler</span> <span class="op">=</span> <span class="ident">PubSubHandler</span>::<span class="op">&lt;</span><span class="ident">local</span>::<span class="ident">LocalMeta</span>, <span class="kw">_</span><span class="op">&gt;</span>::<span class="ident">default</span>();
-		<span class="kw">let</span> <span class="ident">called</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">AtomicBool</span>::<span class="ident">new</span>(<span class="bool-val">false</span>));
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">handler</span> <span class="op">=</span> <span class="ident">PubSubHandler</span>::<span class="op">&lt;</span><span class="ident">local::LocalMeta</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="ident">::default</span>();
+		<span class="kw">let</span> <span class="ident">called</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">AtomicBool::new</span>(<span class="bool-val">false</span>));
 		<span class="kw">let</span> <span class="ident">called2</span> <span class="op">=</span> <span class="ident">called</span>.<span class="ident">clone</span>();
 		<span class="ident">handler</span>.<span class="ident">add_subscription</span>(
 			<span class="string">&quot;hello&quot;</span>,
 			(<span class="string">&quot;subscribe_hello&quot;</span>, <span class="op">|</span><span class="ident">params</span>, <span class="ident">_meta</span>, <span class="ident">subscriber</span>: <span class="ident">Subscriber</span><span class="op">|</span> {
-				<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">params</span>, <span class="ident">core</span>::<span class="ident">Params</span>::<span class="prelude-val">None</span>);
+				<span class="macro">assert_eq!</span>(<span class="ident">params</span>, <span class="ident">core::Params::None</span>);
 				<span class="kw">let</span> <span class="ident">sink</span> <span class="op">=</span> <span class="ident">subscriber</span>
-					.<span class="ident">assign_id</span>(<span class="ident">SubscriptionId</span>::<span class="ident">Number</span>(<span class="number">5</span>))
+					.<span class="ident">assign_id</span>(<span class="ident">SubscriptionId::Number</span>(<span class="number">5</span>))
 					.<span class="ident">expect</span>(<span class="string">&quot;assigned subscription id&quot;</span>);
-				<span class="ident">std</span>::<span class="ident">thread</span>::<span class="ident">spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
+				<span class="ident">std::thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
 					<span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">3</span> {
-						<span class="ident">std</span>::<span class="ident">thread</span>::<span class="ident">sleep</span>(<span class="ident">std</span>::<span class="ident">time</span>::<span class="ident">Duration</span>::<span class="ident">from_millis</span>(<span class="number">100</span>));
-						<span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">serde_json</span>::<span class="macro">json</span><span class="macro">!</span>({
+						<span class="ident">std::thread::sleep</span>(<span class="ident">std::time::Duration::from_millis</span>(<span class="number">100</span>));
+						<span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="macro">serde_json::json!</span>({
 							<span class="string">&quot;subscription&quot;</span>: <span class="number">5</span>,
-							<span class="string">&quot;result&quot;</span>: <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">i</span>],
+							<span class="string">&quot;result&quot;</span>: <span class="macro">vec!</span>[<span class="ident">i</span>],
 						});
-						<span class="ident">sink</span>.<span class="ident">notify</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">value</span>).<span class="ident">unwrap</span>())
+						<span class="ident">sink</span>.<span class="ident">notify</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">value</span>).<span class="ident">unwrap</span>())
 							.<span class="ident">wait</span>()
 							.<span class="ident">expect</span>(<span class="string">&quot;sent notification&quot;</span>);
 					}
@@ -990,15 +990,15 @@
 			}),
 			(<span class="string">&quot;unsubscribe_hello&quot;</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">id</span>, <span class="ident">_meta</span><span class="op">|</span> {
 				<span class="comment">// Should be called because session is dropped.</span>
-				<span class="ident">called2</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">Ordering</span>::<span class="ident">SeqCst</span>);
-				<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">id</span>, <span class="ident">SubscriptionId</span>::<span class="ident">Number</span>(<span class="number">5</span>));
-				<span class="ident">future</span>::<span class="ident">ok</span>(<span class="ident">core</span>::<span class="ident">Value</span>::<span class="ident">Bool</span>(<span class="bool-val">true</span>))
+				<span class="ident">called2</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">Ordering::SeqCst</span>);
+				<span class="macro">assert_eq!</span>(<span class="ident">id</span>, <span class="ident">SubscriptionId::Number</span>(<span class="number">5</span>));
+				<span class="ident">future::ok</span>(<span class="ident">core::Value::Bool</span>(<span class="bool-val">true</span>))
 			}),
 		);
 
 		<span class="comment">// when</span>
-		<span class="kw">let</span> (<span class="ident">client</span>, <span class="ident">rpc_client</span>) <span class="op">=</span> <span class="ident">local</span>::<span class="ident">connect_with_pubsub</span>::<span class="op">&lt;</span><span class="ident">TypedClient</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">handler</span>);
-		<span class="kw">let</span> <span class="ident">received</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Mutex</span>::<span class="ident">new</span>(<span class="macro">vec</span><span class="macro">!</span>[]));
+		<span class="kw">let</span> (<span class="ident">client</span>, <span class="ident">rpc_client</span>) <span class="op">=</span> <span class="ident">local::connect_with_pubsub</span>::<span class="op">&lt;</span><span class="ident">TypedClient</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">handler</span>);
+		<span class="kw">let</span> <span class="ident">received</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">std::sync::Mutex::new</span>(<span class="macro">vec!</span>[]));
 		<span class="kw">let</span> <span class="ident">r2</span> <span class="op">=</span> <span class="ident">received</span>.<span class="ident">clone</span>();
 		<span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="ident">client</span>
 			.<span class="ident">subscribe</span>::<span class="op">&lt;</span><span class="kw">_</span>, (<span class="ident">u32</span>,)<span class="op">&gt;</span>(<span class="string">&quot;subscribe_hello&quot;</span>, (), <span class="string">&quot;hello&quot;</span>, <span class="string">&quot;unsubscribe_hello&quot;</span>, <span class="string">&quot;u32&quot;</span>)
@@ -1010,23 +1010,24 @@
 						<span class="ident">r2</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">push</span>(<span class="ident">result</span>.<span class="ident">unwrap</span>());
 					})
 					.<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-						<span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Expected message not received.&quot;</span>);
+						<span class="macro">panic!</span>(<span class="string">&quot;Expected message not received.&quot;</span>);
 					})
 			})
 			.<span class="ident">join</span>(<span class="ident">rpc_client</span>)
 			.<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">res</span>, <span class="kw">_</span>)<span class="op">|</span> {
-				<span class="ident">log</span>::<span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;ok {:?}&quot;</span>, <span class="ident">res</span>);
+				<span class="macro">log::info!</span>(<span class="string">&quot;ok {:?}&quot;</span>, <span class="ident">res</span>);
 			})
 			.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> {
-				<span class="ident">log</span>::<span class="macro">error</span><span class="macro">!</span>(<span class="string">&quot;err {:?}&quot;</span>, <span class="ident">err</span>);
+				<span class="macro">log::error!</span>(<span class="string">&quot;err {:?}&quot;</span>, <span class="ident">err</span>);
 			});
-		<span class="ident">tokio</span>::<span class="ident">run</span>(<span class="ident">fut</span>);
-		<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">called</span>.<span class="ident">load</span>(<span class="ident">Ordering</span>::<span class="ident">SeqCst</span>), <span class="bool-val">true</span>);
-		<span class="macro">assert</span><span class="macro">!</span>(
+		<span class="ident">tokio::run</span>(<span class="ident">fut</span>);
+		<span class="macro">assert_eq!</span>(<span class="ident">called</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>), <span class="bool-val">true</span>);
+		<span class="macro">assert!</span>(
 			<span class="op">!</span><span class="ident">received</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">is_empty</span>(),
 			<span class="string">&quot;Expected at least one received item.&quot;</span>
 		);
 	}
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "jsonrpc_client_transports";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="jsonrpc_client_transports" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

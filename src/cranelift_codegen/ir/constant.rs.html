@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/cranelift-codegen-0.66.0/src/ir/constant.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>constant.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/cranelift-codegen-0.69.0/src/ir/constant.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>constant.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../cranelift_codegen/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../cranelift_codegen/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -528,6 +528,11 @@
 <span id="525">525</span>
 <span id="526">526</span>
 <span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Constants</span>
 <span class="doccomment">//!</span>
@@ -539,16 +544,16 @@
 <span class="doccomment">//! - ensuring alignment of constants within the pool,</span>
 <span class="doccomment">//! - bucketing constants by size.</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">ir</span>::<span class="ident">immediates</span>::{<span class="ident">IntoBytes</span>, <span class="ident">V128Imm</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">ir</span>::<span class="ident">Constant</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">HashMap</span>;
-<span class="kw">use</span> <span class="ident">alloc</span>::<span class="ident">collections</span>::<span class="ident">BTreeMap</span>;
-<span class="kw">use</span> <span class="ident">alloc</span>::<span class="ident">vec</span>::<span class="ident">Vec</span>;
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">fmt</span>;
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">iter</span>::<span class="ident">FromIterator</span>;
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">slice</span>::<span class="ident">Iter</span>;
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">str</span>::{<span class="ident">from_utf8</span>, <span class="ident">FromStr</span>};
-<span class="kw">use</span> <span class="ident">cranelift_entity</span>::<span class="ident">EntityRef</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::ir::immediates</span>::{<span class="ident">IntoBytes</span>, <span class="ident">V128Imm</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::ir::Constant</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::HashMap</span>;
+<span class="kw">use</span> <span class="ident">alloc::collections::BTreeMap</span>;
+<span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
+<span class="kw">use</span> <span class="ident">core::fmt</span>;
+<span class="kw">use</span> <span class="ident">core::iter::FromIterator</span>;
+<span class="kw">use</span> <span class="ident">core::slice::Iter</span>;
+<span class="kw">use</span> <span class="ident">core::str</span>::{<span class="ident">from_utf8</span>, <span class="ident">FromStr</span>};
+<span class="kw">use</span> <span class="ident">cranelift_entity::EntityRef</span>;
 
 <span class="doccomment">/// This type describes the actual constant data. Note that the bytes stored in this structure are</span>
 <span class="doccomment">/// expected to be in little-endian order; this is due to ease-of-use when interacting with</span>
@@ -594,6 +599,11 @@
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">is_empty</span>()
     }
 
+    <span class="doccomment">/// Return the data as a slice.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_slice</span>()
+    }
+
     <span class="doccomment">/// Convert the data to a vector.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_vec</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="number">0</span>
@@ -615,7 +625,7 @@
     <span class="doccomment">/// in the high-order byte slots.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expand_to</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">expected_size</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">expected_size</span> {
-            <span class="macro">panic</span><span class="macro">!</span>(
+            <span class="macro">panic!</span>(
                 <span class="string">&quot;The constant data is already expanded beyond {} bytes&quot;</span>,
                 <span class="ident">expected_size</span>
             )
@@ -625,7 +635,7 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">ConstantData</span> {
+<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ConstantData</span> {
     <span class="doccomment">/// Print the constant data in hexadecimal format, e.g. 0x000102030405060708090a0b0c0d0e0f.</span>
     <span class="doccomment">/// This function will flip the stored order of bytes--little-endian--to the more readable</span>
     <span class="doccomment">/// big-endian ordering.</span>
@@ -635,11 +645,11 @@
     <span class="doccomment">/// let data = ConstantData::from([3, 2, 1, 0, 0].as_ref()); // note the little-endian order</span>
     <span class="doccomment">/// assert_eq!(data.to_string(), &quot;0x0000010203&quot;);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_empty</span>() {
-            <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;0x&quot;</span>)<span class="question-mark">?</span>;
+            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;0x&quot;</span>)<span class="question-mark">?</span>;
             <span class="kw">for</span> <span class="ident">b</span> <span class="kw">in</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">iter</span>().<span class="ident">rev</span>() {
-                <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;{:02x}&quot;</span>, <span class="ident">b</span>)<span class="question-mark">?</span>;
+                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{:02x}&quot;</span>, <span class="ident">b</span>)<span class="question-mark">?</span>;
             }
         }
         <span class="prelude-val">Ok</span>(())
@@ -676,11 +686,11 @@
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">cleaned</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">32</span> {
             <span class="prelude-val">Err</span>(<span class="string">&quot;Hexadecimal string has too many digits to fit in a 128-bit vector&quot;</span>)
         } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">with_capacity</span>((<span class="ident">s</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">2</span>) <span class="op">/</span> <span class="number">2</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>((<span class="ident">s</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">2</span>) <span class="op">/</span> <span class="number">2</span>);
             <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> (<span class="number">0</span>..<span class="ident">cleaned</span>.<span class="ident">len</span>()).<span class="ident">step_by</span>(<span class="number">2</span>) {
                 <span class="kw">let</span> <span class="ident">pair</span> <span class="op">=</span> <span class="ident">from_utf8</span>(<span class="kw-2">&amp;</span><span class="ident">cleaned</span>[<span class="ident">i</span>..<span class="ident">i</span> <span class="op">+</span> <span class="number">2</span>])
                     .<span class="ident">or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Unable to parse hexadecimal pair as UTF-8&quot;</span>))<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">byte</span> <span class="op">=</span> <span class="ident">u8</span>::<span class="ident">from_str_radix</span>(<span class="ident">pair</span>, <span class="number">16</span>)
+                <span class="kw">let</span> <span class="ident">byte</span> <span class="op">=</span> <span class="ident">u8::from_str_radix</span>(<span class="ident">pair</span>, <span class="number">16</span>)
                     .<span class="ident">or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Unable to parse as hexadecimal&quot;</span>))<span class="question-mark">?</span>;
                 <span class="ident">buffer</span>.<span class="ident">insert</span>(<span class="number">0</span>, <span class="ident">byte</span>);
             }
@@ -737,8 +747,8 @@
     <span class="doccomment">/// Create a new constant pool instance.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
-            <span class="ident">handles_to_values</span>: <span class="ident">BTreeMap</span>::<span class="ident">new</span>(),
-            <span class="ident">values_to_handles</span>: <span class="ident">HashMap</span>::<span class="ident">new</span>(),
+            <span class="ident">handles_to_values</span>: <span class="ident">BTreeMap::new</span>(),
+            <span class="ident">values_to_handles</span>: <span class="ident">HashMap::new</span>(),
         }
     }
 
@@ -755,7 +765,7 @@
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">values_to_handles</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">constant_value</span>) {
             <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">values_to_handles</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">constant_value</span>).<span class="ident">unwrap</span>()
         } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">constant_handle</span> <span class="op">=</span> <span class="ident">Constant</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">len</span>());
+            <span class="kw">let</span> <span class="ident">constant_handle</span> <span class="op">=</span> <span class="ident">Constant::new</span>(<span class="self">self</span>.<span class="ident">len</span>());
             <span class="self">self</span>.<span class="ident">set</span>(<span class="ident">constant_handle</span>, <span class="ident">constant_value</span>);
             <span class="ident">constant_handle</span>
         }
@@ -763,7 +773,7 @@
 
     <span class="doccomment">/// Retrieve the constant data given a handle.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">constant_handle</span>: <span class="ident">Constant</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">ConstantData</span> {
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">handles_to_values</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">constant_handle</span>));
+        <span class="macro">assert!</span>(<span class="self">self</span>.<span class="ident">handles_to_values</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">constant_handle</span>));
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">handles_to_values</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">constant_handle</span>).<span class="ident">unwrap</span>().<span class="ident">data</span>
     }
 
@@ -773,9 +783,9 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">constant_handle</span>: <span class="ident">Constant</span>, <span class="ident">constant_value</span>: <span class="ident">ConstantData</span>) {
         <span class="kw">let</span> <span class="ident">replaced</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">handles_to_values</span>.<span class="ident">insert</span>(
             <span class="ident">constant_handle</span>,
-            <span class="ident">ConstantPoolEntry</span>::<span class="ident">new</span>(<span class="ident">constant_value</span>.<span class="ident">clone</span>()),
+            <span class="ident">ConstantPoolEntry::new</span>(<span class="ident">constant_value</span>.<span class="ident">clone</span>()),
         );
-        <span class="macro">assert</span><span class="macro">!</span>(
+        <span class="macro">assert!</span>(
             <span class="ident">replaced</span>.<span class="ident">is_none</span>(),
             <span class="string">&quot;attempted to overwrite an existing constant {:?}: {:?} =&gt; {:?}&quot;</span>,
             <span class="ident">constant_handle</span>,
@@ -789,7 +799,7 @@
     <span class="doccomment">/// Assign an offset to a given constant, where the offset is the number of bytes from the</span>
     <span class="doccomment">/// beginning of the function to the beginning of the constant data inside the pool.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_offset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">constant_handle</span>: <span class="ident">Constant</span>, <span class="ident">constant_offset</span>: <span class="ident">ConstantOffset</span>) {
-        <span class="macro">assert</span><span class="macro">!</span>(
+        <span class="macro">assert!</span>(
             <span class="self">self</span>.<span class="ident">handles_to_values</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">constant_handle</span>),
             <span class="string">&quot;A constant handle must have already been inserted into the pool; perhaps a \
              constant pool was created outside of the pool?&quot;</span>
@@ -839,146 +849,146 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">string</span>::<span class="ident">ToString</span>;
+    <span class="kw">use</span> <span class="ident">std::string::ToString</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">empty</span>() {
-        <span class="kw">let</span> <span class="ident">sut</span> <span class="op">=</span> <span class="ident">ConstantPool</span>::<span class="ident">new</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sut</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+        <span class="kw">let</span> <span class="ident">sut</span> <span class="op">=</span> <span class="ident">ConstantPool::new</span>();
+        <span class="macro">assert_eq!</span>(<span class="ident">sut</span>.<span class="ident">len</span>(), <span class="number">0</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">insert</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sut</span> <span class="op">=</span> <span class="ident">ConstantPool</span>::<span class="ident">new</span>();
-        <span class="ident">sut</span>.<span class="ident">insert</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].<span class="ident">into</span>());
-        <span class="ident">sut</span>.<span class="ident">insert</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>].<span class="ident">into</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sut</span>.<span class="ident">len</span>(), <span class="number">2</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sut</span> <span class="op">=</span> <span class="ident">ConstantPool::new</span>();
+        <span class="ident">sut</span>.<span class="ident">insert</span>(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].<span class="ident">into</span>());
+        <span class="ident">sut</span>.<span class="ident">insert</span>(<span class="macro">vec!</span>[<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>].<span class="ident">into</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">sut</span>.<span class="ident">len</span>(), <span class="number">2</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">insert_duplicate</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sut</span> <span class="op">=</span> <span class="ident">ConstantPool</span>::<span class="ident">new</span>();
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">sut</span>.<span class="ident">insert</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].<span class="ident">into</span>());
-        <span class="ident">sut</span>.<span class="ident">insert</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>].<span class="ident">into</span>());
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">sut</span>.<span class="ident">insert</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].<span class="ident">into</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">a</span>, <span class="ident">b</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sut</span> <span class="op">=</span> <span class="ident">ConstantPool::new</span>();
+        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">sut</span>.<span class="ident">insert</span>(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].<span class="ident">into</span>());
+        <span class="ident">sut</span>.<span class="ident">insert</span>(<span class="macro">vec!</span>[<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>].<span class="ident">into</span>());
+        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">sut</span>.<span class="ident">insert</span>(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].<span class="ident">into</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">a</span>, <span class="ident">b</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">clear</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sut</span> <span class="op">=</span> <span class="ident">ConstantPool</span>::<span class="ident">new</span>();
-        <span class="ident">sut</span>.<span class="ident">insert</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].<span class="ident">into</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sut</span>.<span class="ident">len</span>(), <span class="number">1</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sut</span> <span class="op">=</span> <span class="ident">ConstantPool::new</span>();
+        <span class="ident">sut</span>.<span class="ident">insert</span>(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].<span class="ident">into</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">sut</span>.<span class="ident">len</span>(), <span class="number">1</span>);
 
         <span class="ident">sut</span>.<span class="ident">clear</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sut</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">sut</span>.<span class="ident">len</span>(), <span class="number">0</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">iteration_order</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sut</span> <span class="op">=</span> <span class="ident">ConstantPool</span>::<span class="ident">new</span>();
-        <span class="ident">sut</span>.<span class="ident">insert</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].<span class="ident">into</span>());
-        <span class="ident">sut</span>.<span class="ident">insert</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>].<span class="ident">into</span>());
-        <span class="ident">sut</span>.<span class="ident">insert</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].<span class="ident">into</span>());
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sut</span> <span class="op">=</span> <span class="ident">ConstantPool::new</span>();
+        <span class="ident">sut</span>.<span class="ident">insert</span>(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].<span class="ident">into</span>());
+        <span class="ident">sut</span>.<span class="ident">insert</span>(<span class="macro">vec!</span>[<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>].<span class="ident">into</span>());
+        <span class="ident">sut</span>.<span class="ident">insert</span>(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].<span class="ident">into</span>());
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">sut</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">v</span>)<span class="op">|</span> <span class="ident">v</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ConstantData</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">data</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="kw-2">&amp;</span><span class="macro">vec</span><span class="macro">!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="macro">vec</span><span class="macro">!</span>[<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>].<span class="ident">into</span>()]);
+        <span class="macro">assert_eq!</span>(<span class="ident">data</span>, <span class="macro">vec!</span>[<span class="kw-2">&amp;</span><span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="macro">vec!</span>[<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>].<span class="ident">into</span>()]);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">get</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sut</span> <span class="op">=</span> <span class="ident">ConstantPool</span>::<span class="ident">new</span>();
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sut</span> <span class="op">=</span> <span class="ident">ConstantPool::new</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];
         <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">sut</span>.<span class="ident">insert</span>(<span class="ident">data</span>.<span class="ident">clone</span>().<span class="ident">into</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sut</span>.<span class="ident">get</span>(<span class="ident">handle</span>), <span class="kw-2">&amp;</span><span class="ident">data</span>.<span class="ident">into</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">sut</span>.<span class="ident">get</span>(<span class="ident">handle</span>), <span class="kw-2">&amp;</span><span class="ident">data</span>.<span class="ident">into</span>());
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">set</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sut</span> <span class="op">=</span> <span class="ident">ConstantPool</span>::<span class="ident">new</span>();
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">Constant</span>::<span class="ident">with_number</span>(<span class="number">42</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sut</span> <span class="op">=</span> <span class="ident">ConstantPool::new</span>();
+        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">Constant::with_number</span>(<span class="number">42</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];
         <span class="ident">sut</span>.<span class="ident">set</span>(<span class="ident">handle</span>, <span class="ident">data</span>.<span class="ident">clone</span>().<span class="ident">into</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sut</span>.<span class="ident">get</span>(<span class="ident">handle</span>), <span class="kw-2">&amp;</span><span class="ident">data</span>.<span class="ident">into</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">sut</span>.<span class="ident">get</span>(<span class="ident">handle</span>), <span class="kw-2">&amp;</span><span class="ident">data</span>.<span class="ident">into</span>());
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="attribute">#[<span class="ident">should_panic</span>]</span>
     <span class="kw">fn</span> <span class="ident">disallow_overwriting_constant</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sut</span> <span class="op">=</span> <span class="ident">ConstantPool</span>::<span class="ident">new</span>();
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">Constant</span>::<span class="ident">with_number</span>(<span class="number">42</span>).<span class="ident">unwrap</span>();
-        <span class="ident">sut</span>.<span class="ident">set</span>(<span class="ident">handle</span>, <span class="macro">vec</span><span class="macro">!</span>[].<span class="ident">into</span>());
-        <span class="ident">sut</span>.<span class="ident">set</span>(<span class="ident">handle</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="number">1</span>].<span class="ident">into</span>());
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sut</span> <span class="op">=</span> <span class="ident">ConstantPool::new</span>();
+        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">Constant::with_number</span>(<span class="number">42</span>).<span class="ident">unwrap</span>();
+        <span class="ident">sut</span>.<span class="ident">set</span>(<span class="ident">handle</span>, <span class="macro">vec!</span>[].<span class="ident">into</span>());
+        <span class="ident">sut</span>.<span class="ident">set</span>(<span class="ident">handle</span>, <span class="macro">vec!</span>[<span class="number">1</span>].<span class="ident">into</span>());
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="attribute">#[<span class="ident">should_panic</span>]</span>
     <span class="kw">fn</span> <span class="ident">get_nonexistent_constant</span>() {
-        <span class="kw">let</span> <span class="ident">sut</span> <span class="op">=</span> <span class="ident">ConstantPool</span>::<span class="ident">new</span>();
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">Constant</span>::<span class="ident">with_number</span>(<span class="number">42</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">sut</span> <span class="op">=</span> <span class="ident">ConstantPool::new</span>();
+        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">Constant::with_number</span>(<span class="number">42</span>).<span class="ident">unwrap</span>();
         <span class="ident">sut</span>.<span class="ident">get</span>(<span class="ident">a</span>); <span class="comment">// panics, only use constants returned by ConstantPool</span>
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">get_offset</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sut</span> <span class="op">=</span> <span class="ident">ConstantPool</span>::<span class="ident">new</span>();
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">sut</span>.<span class="ident">insert</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="number">1</span>].<span class="ident">into</span>());
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sut</span> <span class="op">=</span> <span class="ident">ConstantPool::new</span>();
+        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">sut</span>.<span class="ident">insert</span>(<span class="macro">vec!</span>[<span class="number">1</span>].<span class="ident">into</span>());
         <span class="ident">sut</span>.<span class="ident">set_offset</span>(<span class="ident">a</span>, <span class="number">42</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sut</span>.<span class="ident">get_offset</span>(<span class="ident">a</span>), <span class="number">42</span>)
+        <span class="macro">assert_eq!</span>(<span class="ident">sut</span>.<span class="ident">get_offset</span>(<span class="ident">a</span>), <span class="number">42</span>)
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="attribute">#[<span class="ident">should_panic</span>]</span>
     <span class="kw">fn</span> <span class="ident">get_nonexistent_offset</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sut</span> <span class="op">=</span> <span class="ident">ConstantPool</span>::<span class="ident">new</span>();
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">sut</span>.<span class="ident">insert</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="number">1</span>].<span class="ident">into</span>());
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sut</span> <span class="op">=</span> <span class="ident">ConstantPool::new</span>();
+        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">sut</span>.<span class="ident">insert</span>(<span class="macro">vec!</span>[<span class="number">1</span>].<span class="ident">into</span>());
         <span class="ident">sut</span>.<span class="ident">get_offset</span>(<span class="ident">a</span>); <span class="comment">// panics, set_offset should have been called</span>
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">display_constant_data</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">ConstantData</span>::<span class="ident">from</span>([<span class="number">0</span>].<span class="ident">as_ref</span>()).<span class="ident">to_string</span>(), <span class="string">&quot;0x00&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">ConstantData</span>::<span class="ident">from</span>([<span class="number">42</span>].<span class="ident">as_ref</span>()).<span class="ident">to_string</span>(), <span class="string">&quot;0x2a&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
-            <span class="ident">ConstantData</span>::<span class="ident">from</span>([<span class="number">3</span>, <span class="number">2</span>, <span class="number">1</span>, <span class="number">0</span>].<span class="ident">as_ref</span>()).<span class="ident">to_string</span>(),
+        <span class="macro">assert_eq!</span>(<span class="ident">ConstantData::from</span>([<span class="number">0</span>].<span class="ident">as_ref</span>()).<span class="ident">to_string</span>(), <span class="string">&quot;0x00&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">ConstantData::from</span>([<span class="number">42</span>].<span class="ident">as_ref</span>()).<span class="ident">to_string</span>(), <span class="string">&quot;0x2a&quot;</span>);
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">ConstantData::from</span>([<span class="number">3</span>, <span class="number">2</span>, <span class="number">1</span>, <span class="number">0</span>].<span class="ident">as_ref</span>()).<span class="ident">to_string</span>(),
             <span class="string">&quot;0x00010203&quot;</span>
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
-            <span class="ident">ConstantData</span>::<span class="ident">from</span>(<span class="number">3735928559u32</span>.<span class="ident">to_le_bytes</span>().<span class="ident">as_ref</span>()).<span class="ident">to_string</span>(),
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">ConstantData::from</span>(<span class="number">3735928559u32</span>.<span class="ident">to_le_bytes</span>().<span class="ident">as_ref</span>()).<span class="ident">to_string</span>(),
             <span class="string">&quot;0xdeadbeef&quot;</span>
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
-            <span class="ident">ConstantData</span>::<span class="ident">from</span>(<span class="number">0x0102030405060708u64</span>.<span class="ident">to_le_bytes</span>().<span class="ident">as_ref</span>()).<span class="ident">to_string</span>(),
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">ConstantData::from</span>(<span class="number">0x0102030405060708u64</span>.<span class="ident">to_le_bytes</span>().<span class="ident">as_ref</span>()).<span class="ident">to_string</span>(),
             <span class="string">&quot;0x0102030405060708&quot;</span>
         );
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">iterate_over_constant_data</span>() {
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">ConstantData</span>::<span class="ident">from</span>([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].<span class="ident">as_ref</span>());
+        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">ConstantData::from</span>([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].<span class="ident">as_ref</span>());
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">iter</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">next</span>(), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">1</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">next</span>(), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">2</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">next</span>(), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">3</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">next</span>(), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">next</span>(), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">next</span>(), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">2</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">next</span>(), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">3</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">next</span>(), <span class="prelude-val">None</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">add_to_constant_data</span>() {
-        <span class="kw">let</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">ConstantData</span>::<span class="ident">from</span>([<span class="number">1</span>, <span class="number">2</span>].<span class="ident">as_ref</span>());
-        <span class="kw">let</span> <span class="ident">e</span> <span class="op">=</span> <span class="ident">d</span>.<span class="ident">append</span>(<span class="ident">i16</span>::<span class="ident">from</span>(<span class="number">3u8</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">e</span>.<span class="ident">into_vec</span>(), <span class="macro">vec</span><span class="macro">!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">0</span>])
+        <span class="kw">let</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">ConstantData::from</span>([<span class="number">1</span>, <span class="number">2</span>].<span class="ident">as_ref</span>());
+        <span class="kw">let</span> <span class="ident">e</span> <span class="op">=</span> <span class="ident">d</span>.<span class="ident">append</span>(<span class="ident">i16::from</span>(<span class="number">3u8</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">e</span>.<span class="ident">into_vec</span>(), <span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">0</span>])
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">extend_constant_data</span>() {
-        <span class="kw">let</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">ConstantData</span>::<span class="ident">from</span>([<span class="number">1</span>, <span class="number">2</span>].<span class="ident">as_ref</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">d</span>.<span class="ident">expand_to</span>(<span class="number">4</span>).<span class="ident">into_vec</span>(), <span class="macro">vec</span><span class="macro">!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">0</span>, <span class="number">0</span>])
+        <span class="kw">let</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">ConstantData::from</span>([<span class="number">1</span>, <span class="number">2</span>].<span class="ident">as_ref</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">expand_to</span>(<span class="number">4</span>).<span class="ident">into_vec</span>(), <span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">0</span>, <span class="number">0</span>])
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="attribute">#[<span class="ident">should_panic</span>]</span>
     <span class="kw">fn</span> <span class="ident">extend_constant_data_to_invalid_length</span>() {
-        <span class="ident">ConstantData</span>::<span class="ident">from</span>([<span class="number">1</span>, <span class="number">2</span>].<span class="ident">as_ref</span>()).<span class="ident">expand_to</span>(<span class="number">1</span>);
+        <span class="ident">ConstantData::from</span>([<span class="number">1</span>, <span class="number">2</span>].<span class="ident">as_ref</span>()).<span class="ident">expand_to</span>(<span class="number">1</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -986,18 +996,18 @@
         <span class="comment">// Verify that parsing of `from` succeeds and stringifies to `to`.</span>
         <span class="kw">fn</span> <span class="ident">parse_ok</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">to</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
             <span class="kw">let</span> <span class="ident">parsed</span> <span class="op">=</span> <span class="ident">from</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">ConstantData</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">parsed</span>.<span class="ident">to_string</span>(), <span class="ident">to</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">parsed</span>.<span class="ident">to_string</span>(), <span class="ident">to</span>);
         }
 
         <span class="comment">// Verify that parsing of `from` fails with `error_msg`.</span>
         <span class="kw">fn</span> <span class="ident">parse_err</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">error_msg</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
             <span class="kw">let</span> <span class="ident">parsed</span> <span class="op">=</span> <span class="ident">from</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">ConstantData</span><span class="op">&gt;</span>();
-            <span class="macro">assert</span><span class="macro">!</span>(
+            <span class="macro">assert!</span>(
                 <span class="ident">parsed</span>.<span class="ident">is_err</span>(),
                 <span class="string">&quot;Expected a parse error but parsing succeeded: {}&quot;</span>,
                 <span class="ident">from</span>
             );
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">parsed</span>.<span class="ident">err</span>().<span class="ident">unwrap</span>(), <span class="ident">error_msg</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">parsed</span>.<span class="ident">err</span>().<span class="ident">unwrap</span>(), <span class="ident">error_msg</span>);
         }
 
         <span class="ident">parse_ok</span>(<span class="string">&quot;0x00&quot;</span>, <span class="string">&quot;0x00&quot;</span>);
@@ -1024,9 +1034,9 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">verify_stored_bytes_in_constant_data</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="string">&quot;0x01&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">ConstantData</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>().<span class="ident">into_vec</span>(), [<span class="number">1</span>]);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">ConstantData</span>::<span class="ident">from</span>([<span class="number">1</span>, <span class="number">0</span>].<span class="ident">as_ref</span>()).<span class="number">0</span>, [<span class="number">1</span>, <span class="number">0</span>]);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">ConstantData</span>::<span class="ident">from</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]).<span class="number">0</span>, [<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]);
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;0x01&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">ConstantData</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>().<span class="ident">into_vec</span>(), [<span class="number">1</span>]);
+        <span class="macro">assert_eq!</span>(<span class="ident">ConstantData::from</span>([<span class="number">1</span>, <span class="number">0</span>].<span class="ident">as_ref</span>()).<span class="number">0</span>, [<span class="number">1</span>, <span class="number">0</span>]);
+        <span class="macro">assert_eq!</span>(<span class="ident">ConstantData::from</span>(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]).<span class="number">0</span>, [<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -1038,23 +1048,24 @@
                 .<span class="ident">into_vec</span>()
         }
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">parse_to_uimm128</span>(<span class="string">&quot;0x42&quot;</span>),
             [<span class="number">0x42</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">parse_to_uimm128</span>(<span class="string">&quot;0x00&quot;</span>),
             [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">parse_to_uimm128</span>(<span class="string">&quot;0x12345678&quot;</span>),
             [<span class="number">0x78</span>, <span class="number">0x56</span>, <span class="number">0x34</span>, <span class="number">0x12</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">parse_to_uimm128</span>(<span class="string">&quot;0x1234_5678&quot;</span>),
             [<span class="number">0x78</span>, <span class="number">0x56</span>, <span class="number">0x34</span>, <span class="number">0x12</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]
         );
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "cranelift_codegen";</script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="cranelift_codegen" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
+    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script></body></html>

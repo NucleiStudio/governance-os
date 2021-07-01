@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pwasm-utils-0.14.0/src/stack_height/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pwasm-utils-0.14.0/src/stack_height/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../pwasm_utils/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../pwasm_utils/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -465,16 +465,16 @@
 <span class="doccomment">//!   between the frames.</span>
 <span class="doccomment">//! - upon entry into the function entire stack frame is allocated.</span>
 
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">string</span>::<span class="ident">String</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">vec</span>::<span class="ident">Vec</span>;
+<span class="kw">use</span> <span class="ident">std::string::String</span>;
+<span class="kw">use</span> <span class="ident">std::vec::Vec</span>;
 
-<span class="kw">use</span> <span class="ident">parity_wasm</span>::<span class="ident">elements</span>::{<span class="self">self</span>, <span class="ident">Type</span>};
-<span class="kw">use</span> <span class="ident">parity_wasm</span>::<span class="ident">builder</span>;
+<span class="kw">use</span> <span class="ident">parity_wasm::elements</span>::{<span class="self">self</span>, <span class="ident">Type</span>};
+<span class="kw">use</span> <span class="ident">parity_wasm::builder</span>;
 
 <span class="doccomment">/// Macro to generate preamble and postamble.</span>
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">instrument_call</span> {
+<span class="macro">macro_rules!</span> <span class="ident">instrument_call</span> {
 	(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">callee_idx</span>: <span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">callee_stack_cost</span>: <span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">stack_height_global_idx</span>: <span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">stack_limit</span>: <span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {{
-		<span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">parity_wasm</span>::<span class="ident">elements</span>::<span class="ident">Instruction</span>::<span class="kw-2">*</span>;
+		<span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::parity_wasm::elements::Instruction</span>::<span class="kw-2">*</span>;
 		[
 			<span class="comment">// stack_height += stack_cost(F)</span>
 			<span class="ident">GetGlobal</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">stack_height_global_idx</span>),
@@ -485,7 +485,7 @@
 			<span class="ident">GetGlobal</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">stack_height_global_idx</span>),
 			<span class="ident">I32Const</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">stack_limit</span> <span class="kw">as</span> <span class="ident">i32</span>),
 			<span class="ident">I32GtU</span>,
-			<span class="ident">If</span>(<span class="ident">elements</span>::<span class="ident">BlockType</span>::<span class="ident">NoResult</span>),
+			<span class="ident">If</span>(<span class="ident">elements::BlockType::NoResult</span>),
 			<span class="ident">Unreachable</span>,
 			<span class="ident">End</span>,
 			<span class="comment">// Original call</span>
@@ -539,9 +539,9 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Returns `Err` if module is invalid and can&#39;t be</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inject_limiter</span>(
-	<span class="kw-2">mut</span> <span class="ident">module</span>: <span class="ident">elements</span>::<span class="ident">Module</span>,
+	<span class="kw-2">mut</span> <span class="ident">module</span>: <span class="ident">elements::Module</span>,
 	<span class="ident">stack_limit</span>: <span class="ident">u32</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">elements</span>::<span class="ident">Module</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">elements::Module</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
 	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">Context</span> {
 		<span class="ident">stack_height_global_idx</span>: <span class="ident">generate_stack_height_global</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">module</span>),
 		<span class="ident">func_stack_costs</span>: <span class="ident">compute_stack_costs</span>(<span class="kw-2">&amp;</span><span class="ident">module</span>)<span class="question-mark">?</span>,
@@ -549,31 +549,31 @@
 	};
 
 	<span class="ident">instrument_functions</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">module</span>)<span class="question-mark">?</span>;
-	<span class="kw">let</span> <span class="ident">module</span> <span class="op">=</span> <span class="ident">thunk</span>::<span class="ident">generate_thunks</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="ident">module</span>)<span class="question-mark">?</span>;
+	<span class="kw">let</span> <span class="ident">module</span> <span class="op">=</span> <span class="ident">thunk::generate_thunks</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="ident">module</span>)<span class="question-mark">?</span>;
 
 	<span class="prelude-val">Ok</span>(<span class="ident">module</span>)
 }
 
 <span class="doccomment">/// Generate a new global that will be used for tracking current stack height.</span>
-<span class="kw">fn</span> <span class="ident">generate_stack_height_global</span>(<span class="ident">module</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">elements</span>::<span class="ident">Module</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
-	<span class="kw">let</span> <span class="ident">global_entry</span> <span class="op">=</span> <span class="ident">builder</span>::<span class="ident">global</span>()
+<span class="kw">fn</span> <span class="ident">generate_stack_height_global</span>(<span class="ident">module</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">elements::Module</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+	<span class="kw">let</span> <span class="ident">global_entry</span> <span class="op">=</span> <span class="ident">builder::global</span>()
 		.<span class="ident">value_type</span>()
 		.<span class="ident">i32</span>()
 		.<span class="ident">mutable</span>()
-		.<span class="ident">init_expr</span>(<span class="ident">elements</span>::<span class="ident">Instruction</span>::<span class="ident">I32Const</span>(<span class="number">0</span>))
+		.<span class="ident">init_expr</span>(<span class="ident">elements::Instruction::I32Const</span>(<span class="number">0</span>))
 		.<span class="ident">build</span>();
 
 	<span class="comment">// Try to find an existing global section.</span>
 	<span class="kw">for</span> <span class="ident">section</span> <span class="kw">in</span> <span class="ident">module</span>.<span class="ident">sections_mut</span>() {
-		<span class="kw">if</span> <span class="kw">let</span> <span class="ident">elements</span>::<span class="ident">Section</span>::<span class="ident">Global</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">gs</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">section</span> {
+		<span class="kw">if</span> <span class="kw">let</span> <span class="ident">elements::Section::Global</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">gs</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">section</span> {
 			<span class="ident">gs</span>.<span class="ident">entries_mut</span>().<span class="ident">push</span>(<span class="ident">global_entry</span>);
 			<span class="kw">return</span> (<span class="ident">gs</span>.<span class="ident">entries</span>().<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">-</span> <span class="number">1</span>;
 		}
 	}
 
 	<span class="comment">// Existing section not found, create one!</span>
-	<span class="ident">module</span>.<span class="ident">sections_mut</span>().<span class="ident">push</span>(<span class="ident">elements</span>::<span class="ident">Section</span>::<span class="ident">Global</span>(
-		<span class="ident">elements</span>::<span class="ident">GlobalSection</span>::<span class="ident">with_entries</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="ident">global_entry</span>]),
+	<span class="ident">module</span>.<span class="ident">sections_mut</span>().<span class="ident">push</span>(<span class="ident">elements::Section::Global</span>(
+		<span class="ident">elements::GlobalSection::with_entries</span>(<span class="macro">vec!</span>[<span class="ident">global_entry</span>]),
 	));
 	<span class="number">0</span>
 }
@@ -581,8 +581,8 @@
 <span class="doccomment">/// Calculate stack costs for all functions.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Returns a vector with a stack cost for each function, including imports.</span>
-<span class="kw">fn</span> <span class="ident">compute_stack_costs</span>(<span class="ident">module</span>: <span class="kw-2">&amp;</span><span class="ident">elements</span>::<span class="ident">Module</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-	<span class="kw">let</span> <span class="ident">func_imports</span> <span class="op">=</span> <span class="ident">module</span>.<span class="ident">import_count</span>(<span class="ident">elements</span>::<span class="ident">ImportCountType</span>::<span class="ident">Function</span>);
+<span class="kw">fn</span> <span class="ident">compute_stack_costs</span>(<span class="ident">module</span>: <span class="kw-2">&amp;</span><span class="ident">elements::Module</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+	<span class="kw">let</span> <span class="ident">func_imports</span> <span class="op">=</span> <span class="ident">module</span>.<span class="ident">import_count</span>(<span class="ident">elements::ImportCountType::Function</span>);
 
 	<span class="comment">// TODO: optimize!</span>
 	(<span class="number">0</span>..<span class="ident">module</span>.<span class="ident">functions_space</span>())
@@ -600,10 +600,10 @@
 <span class="doccomment">/// Stack cost of the given *defined* function is the sum of it&#39;s locals count (that is,</span>
 <span class="doccomment">/// number of arguments plus number of local variables) and the maximal stack</span>
 <span class="doccomment">/// height.</span>
-<span class="kw">fn</span> <span class="ident">compute_stack_cost</span>(<span class="ident">func_idx</span>: <span class="ident">u32</span>, <span class="ident">module</span>: <span class="kw-2">&amp;</span><span class="ident">elements</span>::<span class="ident">Module</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">compute_stack_cost</span>(<span class="ident">func_idx</span>: <span class="ident">u32</span>, <span class="ident">module</span>: <span class="kw-2">&amp;</span><span class="ident">elements::Module</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
 	<span class="comment">// To calculate the cost of a function we need to convert index from</span>
 	<span class="comment">// function index space to defined function spaces.</span>
-	<span class="kw">let</span> <span class="ident">func_imports</span> <span class="op">=</span> <span class="ident">module</span>.<span class="ident">import_count</span>(<span class="ident">elements</span>::<span class="ident">ImportCountType</span>::<span class="ident">Function</span>) <span class="kw">as</span> <span class="ident">u32</span>;
+	<span class="kw">let</span> <span class="ident">func_imports</span> <span class="op">=</span> <span class="ident">module</span>.<span class="ident">import_count</span>(<span class="ident">elements::ImportCountType::Function</span>) <span class="kw">as</span> <span class="ident">u32</span>;
 	<span class="kw">let</span> <span class="ident">defined_func_idx</span> <span class="op">=</span> <span class="ident">func_idx</span>.<span class="ident">checked_sub</span>(<span class="ident">func_imports</span>).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
 		<span class="ident">Error</span>(<span class="string">&quot;This should be a index of a defined function&quot;</span>.<span class="ident">into</span>())
 	})<span class="question-mark">?</span>;
@@ -618,7 +618,7 @@
 	<span class="kw">let</span> <span class="ident">locals_count</span> <span class="op">=</span> <span class="ident">body</span>.<span class="ident">locals</span>().<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>;
 
 	<span class="kw">let</span> <span class="ident">max_stack_height</span> <span class="op">=</span>
-		<span class="ident">max_height</span>::<span class="ident">compute</span>(
+		<span class="ident">max_height::compute</span>(
 			<span class="ident">defined_func_idx</span>,
 			<span class="ident">module</span>
 		)<span class="question-mark">?</span>;
@@ -626,9 +626,9 @@
 	<span class="prelude-val">Ok</span>(<span class="ident">locals_count</span> <span class="op">+</span> <span class="ident">max_stack_height</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">instrument_functions</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span>, <span class="ident">module</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">elements</span>::<span class="ident">Module</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">instrument_functions</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span>, <span class="ident">module</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">elements::Module</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
 	<span class="kw">for</span> <span class="ident">section</span> <span class="kw">in</span> <span class="ident">module</span>.<span class="ident">sections_mut</span>() {
-		<span class="kw">if</span> <span class="kw">let</span> <span class="ident">elements</span>::<span class="ident">Section</span>::<span class="ident">Code</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">code_section</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">section</span> {
+		<span class="kw">if</span> <span class="kw">let</span> <span class="ident">elements::Section::Code</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">code_section</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">section</span> {
 			<span class="kw">for</span> <span class="ident">func_body</span> <span class="kw">in</span> <span class="ident">code_section</span>.<span class="ident">bodies_mut</span>() {
 				<span class="kw">let</span> <span class="ident">opcodes</span> <span class="op">=</span> <span class="ident">func_body</span>.<span class="ident">code_mut</span>();
 				<span class="ident">instrument_function</span>(<span class="ident">ctx</span>, <span class="ident">opcodes</span>)<span class="question-mark">?</span>;
@@ -666,9 +666,9 @@
 <span class="doccomment">/// ```</span>
 <span class="kw">fn</span> <span class="ident">instrument_function</span>(
 	<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span>,
-	<span class="ident">instructions</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">elements</span>::<span class="ident">Instructions</span>,
+	<span class="ident">instructions</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">elements::Instructions</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-	<span class="kw">use</span> <span class="ident">parity_wasm</span>::<span class="ident">elements</span>::<span class="ident">Instruction</span>::<span class="kw-2">*</span>;
+	<span class="kw">use</span> <span class="ident">parity_wasm::elements::Instruction</span>::<span class="kw-2">*</span>;
 
 	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="number">0</span>;
 	<span class="kw">loop</span> {
@@ -692,22 +692,22 @@
 						.<span class="ident">stack_cost</span>(<span class="kw-2">*</span><span class="ident">callee_idx</span>)
 						.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span>
 							<span class="ident">Error</span>(
-								<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Call to function that out-of-bounds: {}&quot;</span>, <span class="ident">callee_idx</span>)
+								<span class="macro">format!</span>(<span class="string">&quot;Call to function that out-of-bounds: {}&quot;</span>, <span class="ident">callee_idx</span>)
 							)
 						)<span class="question-mark">?</span>;
 
 					<span class="comment">// Instrument only calls to a functions which stack_cost is</span>
 					<span class="comment">// non-zero.</span>
 					<span class="kw">if</span> <span class="ident">callee_stack_cost</span> <span class="op">&gt;</span> <span class="number">0</span> {
-						<span class="ident">Action</span>::<span class="ident">InstrumentCall</span> {
+						<span class="ident">Action::InstrumentCall</span> {
 							<span class="ident">callee_idx</span>: <span class="kw-2">*</span><span class="ident">callee_idx</span>,
 							<span class="ident">callee_stack_cost</span>,
 						}
 					} <span class="kw">else</span> {
-						<span class="ident">Action</span>::<span class="ident">Nop</span>
+						<span class="ident">Action::Nop</span>
 					}
 				},
-				<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Action</span>::<span class="ident">Nop</span>,
+				<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Action::Nop</span>,
 			}
 		};
 
@@ -715,8 +715,8 @@
 			<span class="comment">// We need to wrap a `call idx` instruction</span>
 			<span class="comment">// with a code that adjusts stack height counter</span>
 			<span class="comment">// and then restores it.</span>
-			<span class="ident">Action</span>::<span class="ident">InstrumentCall</span> { <span class="ident">callee_idx</span>, <span class="ident">callee_stack_cost</span> } <span class="op">=</span><span class="op">&gt;</span> {
-				<span class="kw">let</span> <span class="ident">new_seq</span> <span class="op">=</span> <span class="macro">instrument_call</span><span class="macro">!</span>(
+			<span class="ident">Action::InstrumentCall</span> { <span class="ident">callee_idx</span>, <span class="ident">callee_stack_cost</span> } <span class="op">=</span><span class="op">&gt;</span> {
+				<span class="kw">let</span> <span class="ident">new_seq</span> <span class="op">=</span> <span class="macro">instrument_call!</span>(
 					<span class="ident">callee_idx</span>,
 					<span class="ident">callee_stack_cost</span> <span class="kw">as</span> <span class="ident">i32</span>,
 					<span class="ident">ctx</span>.<span class="ident">stack_height_global_idx</span>(),
@@ -748,15 +748,15 @@
 
 <span class="kw">fn</span> <span class="ident">resolve_func_type</span>(
 	<span class="ident">func_idx</span>: <span class="ident">u32</span>,
-	<span class="ident">module</span>: <span class="kw-2">&amp;</span><span class="ident">elements</span>::<span class="ident">Module</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">elements</span>::<span class="ident">FunctionType</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+	<span class="ident">module</span>: <span class="kw-2">&amp;</span><span class="ident">elements::Module</span>,
+) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">elements::FunctionType</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
 	<span class="kw">let</span> <span class="ident">types</span> <span class="op">=</span> <span class="ident">module</span>.<span class="ident">type_section</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">ts</span><span class="op">|</span> <span class="ident">ts</span>.<span class="ident">types</span>()).<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span>[]);
 	<span class="kw">let</span> <span class="ident">functions</span> <span class="op">=</span> <span class="ident">module</span>
 		.<span class="ident">function_section</span>()
 		.<span class="ident">map</span>(<span class="op">|</span><span class="ident">fs</span><span class="op">|</span> <span class="ident">fs</span>.<span class="ident">entries</span>())
 		.<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span>[]);
 
-	<span class="kw">let</span> <span class="ident">func_imports</span> <span class="op">=</span> <span class="ident">module</span>.<span class="ident">import_count</span>(<span class="ident">elements</span>::<span class="ident">ImportCountType</span>::<span class="ident">Function</span>);
+	<span class="kw">let</span> <span class="ident">func_imports</span> <span class="op">=</span> <span class="ident">module</span>.<span class="ident">import_count</span>(<span class="ident">elements::ImportCountType::Function</span>);
 	<span class="kw">let</span> <span class="ident">sig_idx</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">func_idx</span> <span class="op">&lt;</span> <span class="ident">func_imports</span> <span class="kw">as</span> <span class="ident">u32</span> {
 		<span class="ident">module</span>
 			.<span class="ident">import_section</span>()
@@ -764,7 +764,7 @@
 			.<span class="ident">entries</span>()
 			.<span class="ident">iter</span>()
 			.<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">entry</span><span class="op">|</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">entry</span>.<span class="ident">external</span>() {
-				<span class="ident">elements</span>::<span class="ident">External</span>::<span class="ident">Function</span>(<span class="kw-2">ref</span> <span class="ident">idx</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">idx</span>),
+				<span class="ident">elements::External::Function</span>(<span class="kw-2">ref</span> <span class="ident">idx</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">idx</span>),
 				<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
 			})
 			.<span class="ident">nth</span>(<span class="ident">func_idx</span> <span class="kw">as</span> <span class="ident">usize</span>)
@@ -776,11 +776,11 @@
 	} <span class="kw">else</span> {
 		<span class="ident">functions</span>
 			.<span class="ident">get</span>(<span class="ident">func_idx</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="ident">func_imports</span>)
-			.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Error</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Function at index {} is not defined&quot;</span>, <span class="ident">func_idx</span>)))<span class="question-mark">?</span>
+			.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Error</span>(<span class="macro">format!</span>(<span class="string">&quot;Function at index {} is not defined&quot;</span>, <span class="ident">func_idx</span>)))<span class="question-mark">?</span>
 			.<span class="ident">type_ref</span>()
 	};
-	<span class="kw">let</span> <span class="ident">Type</span>::<span class="ident">Function</span>(<span class="kw-2">ref</span> <span class="ident">ty</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">types</span>.<span class="ident">get</span>(<span class="ident">sig_idx</span> <span class="kw">as</span> <span class="ident">usize</span>).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-		<span class="ident">Error</span>(<span class="macro">format</span><span class="macro">!</span>(
+	<span class="kw">let</span> <span class="ident">Type::Function</span>(<span class="kw-2">ref</span> <span class="ident">ty</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">types</span>.<span class="ident">get</span>(<span class="ident">sig_idx</span> <span class="kw">as</span> <span class="ident">usize</span>).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
+		<span class="ident">Error</span>(<span class="macro">format!</span>(
 			<span class="string">&quot;Signature {} (specified by func {}) isn&#39;t defined&quot;</span>,
 			<span class="ident">sig_idx</span>, <span class="ident">func_idx</span>
 		))
@@ -791,17 +791,17 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
 	<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">wabt</span>;
-	<span class="kw">use</span> <span class="ident">parity_wasm</span>::<span class="ident">elements</span>;
+	<span class="kw">use</span> <span class="ident">parity_wasm::elements</span>;
 	<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
-	<span class="kw">fn</span> <span class="ident">parse_wat</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">elements</span>::<span class="ident">Module</span> {
-		<span class="ident">elements</span>::<span class="ident">deserialize_buffer</span>(<span class="kw-2">&amp;</span><span class="ident">wabt</span>::<span class="ident">wat2wasm</span>(<span class="ident">source</span>).<span class="ident">expect</span>(<span class="string">&quot;Failed to wat2wasm&quot;</span>))
+	<span class="kw">fn</span> <span class="ident">parse_wat</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">elements::Module</span> {
+		<span class="ident">elements::deserialize_buffer</span>(<span class="kw-2">&amp;</span><span class="ident">wabt::wat2wasm</span>(<span class="ident">source</span>).<span class="ident">expect</span>(<span class="string">&quot;Failed to wat2wasm&quot;</span>))
 			.<span class="ident">expect</span>(<span class="string">&quot;Failed to deserialize the module&quot;</span>)
 	}
 
-	<span class="kw">fn</span> <span class="ident">validate_module</span>(<span class="ident">module</span>: <span class="ident">elements</span>::<span class="ident">Module</span>) {
-		<span class="kw">let</span> <span class="ident">binary</span> <span class="op">=</span> <span class="ident">elements</span>::<span class="ident">serialize</span>(<span class="ident">module</span>).<span class="ident">expect</span>(<span class="string">&quot;Failed to serialize&quot;</span>);
-		<span class="ident">wabt</span>::<span class="ident">Module</span>::<span class="ident">read_binary</span>(<span class="kw-2">&amp;</span><span class="ident">binary</span>, <span class="kw-2">&amp;</span><span class="ident">Default</span>::<span class="ident">default</span>())
+	<span class="kw">fn</span> <span class="ident">validate_module</span>(<span class="ident">module</span>: <span class="ident">elements::Module</span>) {
+		<span class="kw">let</span> <span class="ident">binary</span> <span class="op">=</span> <span class="ident">elements::serialize</span>(<span class="ident">module</span>).<span class="ident">expect</span>(<span class="string">&quot;Failed to serialize&quot;</span>);
+		<span class="ident">wabt::Module::read_binary</span>(<span class="kw-2">&amp;</span><span class="ident">binary</span>, <span class="kw-2">&amp;</span><span class="ident">Default::default</span>())
 			.<span class="ident">expect</span>(<span class="string">&quot;Wabt failed to read final binary&quot;</span>)
 			.<span class="ident">validate</span>()
 			.<span class="ident">expect</span>(<span class="string">&quot;Invalid module&quot;</span>);
@@ -827,4 +827,5 @@
 	}
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "pwasm_utils";</script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="pwasm_utils" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
+    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script></body></html>

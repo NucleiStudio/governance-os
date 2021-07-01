@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/curve25519-dalek-2.1.0/src/edwards.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>edwards.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/curve25519-dalek-3.0.2/src/edwards.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>edwards.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../curve25519_dalek/index.html'><div class='logo-container'><img src='https://doc.dalek.rs/assets/dalek-logo-clear.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../curve25519_dalek/index.html'><div class='logo-container'><img src='https://doc.dalek.rs/assets/dalek-logo-clear.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1531,41 +1531,41 @@
 <span class="comment">// affine and projective cakes and eat both of them too.</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
 
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">borrow</span>::<span class="ident">Borrow</span>;
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">fmt</span>::<span class="ident">Debug</span>;
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">iter</span>::<span class="ident">Iterator</span>;
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">iter</span>::<span class="ident">Sum</span>;
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">ops</span>::{<span class="ident">Add</span>, <span class="ident">Neg</span>, <span class="ident">Sub</span>};
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">ops</span>::{<span class="ident">AddAssign</span>, <span class="ident">SubAssign</span>};
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">ops</span>::{<span class="ident">Mul</span>, <span class="ident">MulAssign</span>};
+<span class="kw">use</span> <span class="ident">core::borrow::Borrow</span>;
+<span class="kw">use</span> <span class="ident">core::fmt::Debug</span>;
+<span class="kw">use</span> <span class="ident">core::iter::Iterator</span>;
+<span class="kw">use</span> <span class="ident">core::iter::Sum</span>;
+<span class="kw">use</span> <span class="ident">core::ops</span>::{<span class="ident">Add</span>, <span class="ident">Neg</span>, <span class="ident">Sub</span>};
+<span class="kw">use</span> <span class="ident">core::ops</span>::{<span class="ident">AddAssign</span>, <span class="ident">SubAssign</span>};
+<span class="kw">use</span> <span class="ident">core::ops</span>::{<span class="ident">Mul</span>, <span class="ident">MulAssign</span>};
 
-<span class="kw">use</span> <span class="ident">subtle</span>::<span class="ident">Choice</span>;
-<span class="kw">use</span> <span class="ident">subtle</span>::<span class="ident">ConditionallyNegatable</span>;
-<span class="kw">use</span> <span class="ident">subtle</span>::<span class="ident">ConditionallySelectable</span>;
-<span class="kw">use</span> <span class="ident">subtle</span>::<span class="ident">ConstantTimeEq</span>;
+<span class="kw">use</span> <span class="ident">subtle::Choice</span>;
+<span class="kw">use</span> <span class="ident">subtle::ConditionallyNegatable</span>;
+<span class="kw">use</span> <span class="ident">subtle::ConditionallySelectable</span>;
+<span class="kw">use</span> <span class="ident">subtle::ConstantTimeEq</span>;
 
 <span class="kw">use</span> <span class="ident">constants</span>;
 
-<span class="kw">use</span> <span class="ident">field</span>::<span class="ident">FieldElement</span>;
-<span class="kw">use</span> <span class="ident">scalar</span>::<span class="ident">Scalar</span>;
+<span class="kw">use</span> <span class="ident">field::FieldElement</span>;
+<span class="kw">use</span> <span class="ident">scalar::Scalar</span>;
 
-<span class="kw">use</span> <span class="ident">montgomery</span>::<span class="ident">MontgomeryPoint</span>;
+<span class="kw">use</span> <span class="ident">montgomery::MontgomeryPoint</span>;
 
-<span class="kw">use</span> <span class="ident">backend</span>::<span class="ident">serial</span>::<span class="ident">curve_models</span>::<span class="ident">AffineNielsPoint</span>;
-<span class="kw">use</span> <span class="ident">backend</span>::<span class="ident">serial</span>::<span class="ident">curve_models</span>::<span class="ident">CompletedPoint</span>;
-<span class="kw">use</span> <span class="ident">backend</span>::<span class="ident">serial</span>::<span class="ident">curve_models</span>::<span class="ident">ProjectiveNielsPoint</span>;
-<span class="kw">use</span> <span class="ident">backend</span>::<span class="ident">serial</span>::<span class="ident">curve_models</span>::<span class="ident">ProjectivePoint</span>;
+<span class="kw">use</span> <span class="ident">backend::serial::curve_models::AffineNielsPoint</span>;
+<span class="kw">use</span> <span class="ident">backend::serial::curve_models::CompletedPoint</span>;
+<span class="kw">use</span> <span class="ident">backend::serial::curve_models::ProjectiveNielsPoint</span>;
+<span class="kw">use</span> <span class="ident">backend::serial::curve_models::ProjectivePoint</span>;
 
-<span class="kw">use</span> <span class="ident">window</span>::<span class="ident">LookupTable</span>;
+<span class="kw">use</span> <span class="ident">window::LookupTable</span>;
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_imports</span>)]</span>
 <span class="kw">use</span> <span class="ident">prelude</span>::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident">traits</span>::<span class="ident">ValidityCheck</span>;
+<span class="kw">use</span> <span class="ident">traits::ValidityCheck</span>;
 <span class="kw">use</span> <span class="ident">traits</span>::{<span class="ident">Identity</span>, <span class="ident">IsIdentity</span>};
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">traits</span>::<span class="ident">MultiscalarMul</span>;
+<span class="kw">use</span> <span class="ident">traits::MultiscalarMul</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
 <span class="kw">use</span> <span class="ident">traits</span>::{<span class="ident">VartimeMultiscalarMul</span>, <span class="ident">VartimePrecomputedMultiscalarMul</span>};
 
@@ -1573,12 +1573,12 @@
     <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;simd_backend&quot;</span>,
     <span class="ident">any</span>(<span class="ident">target_feature</span> <span class="op">=</span> <span class="string">&quot;avx2&quot;</span>, <span class="ident">target_feature</span> <span class="op">=</span> <span class="string">&quot;avx512ifma&quot;</span>)
 )))]</span>
-<span class="kw">use</span> <span class="ident">backend</span>::<span class="ident">serial</span>::<span class="ident">scalar_mul</span>;
+<span class="kw">use</span> <span class="ident">backend::serial::scalar_mul</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(
     <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;simd_backend&quot;</span>,
     <span class="ident">any</span>(<span class="ident">target_feature</span> <span class="op">=</span> <span class="string">&quot;avx2&quot;</span>, <span class="ident">target_feature</span> <span class="op">=</span> <span class="string">&quot;avx512ifma&quot;</span>)
 ))]</span>
-<span class="kw">use</span> <span class="ident">backend</span>::<span class="ident">vector</span>::<span class="ident">scalar_mul</span>;
+<span class="kw">use</span> <span class="ident">backend::vector::scalar_mul</span>;
 
 <span class="comment">// ------------------------------------------------------------------------</span>
 <span class="comment">// Compressed points</span>
@@ -1599,8 +1599,8 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">CompressedEdwardsY</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> ::<span class="ident">core</span>::<span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> ::<span class="ident">core</span>::<span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
-        <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;CompressedEdwardsY: {:?}&quot;</span>, <span class="self">self</span>.<span class="ident">as_bytes</span>())
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">::core::fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">::core::fmt::Result</span> {
+        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;CompressedEdwardsY: {:?}&quot;</span>, <span class="self">self</span>.<span class="ident">as_bytes</span>())
     }
 }
 
@@ -1620,18 +1620,18 @@
     <span class="doccomment">/// Returns `None` if the input is not the \\(y\\)-coordinate of a</span>
     <span class="doccomment">/// curve point.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decompress</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EdwardsPoint</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">Y</span> <span class="op">=</span> <span class="ident">FieldElement</span>::<span class="ident">from_bytes</span>(<span class="self">self</span>.<span class="ident">as_bytes</span>());
-        <span class="kw">let</span> <span class="ident">Z</span> <span class="op">=</span> <span class="ident">FieldElement</span>::<span class="ident">one</span>();
+        <span class="kw">let</span> <span class="ident">Y</span> <span class="op">=</span> <span class="ident">FieldElement::from_bytes</span>(<span class="self">self</span>.<span class="ident">as_bytes</span>());
+        <span class="kw">let</span> <span class="ident">Z</span> <span class="op">=</span> <span class="ident">FieldElement::one</span>();
         <span class="kw">let</span> <span class="ident">YY</span> <span class="op">=</span> <span class="ident">Y</span>.<span class="ident">square</span>();
         <span class="kw">let</span> <span class="ident">u</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">YY</span> <span class="op">-</span> <span class="kw-2">&amp;</span><span class="ident">Z</span>;                            <span class="comment">// u =  y²-1</span>
-        <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="kw-2">&amp;</span>(<span class="kw-2">&amp;</span><span class="ident">YY</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">constants</span>::<span class="ident">EDWARDS_D</span>) <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">Z</span>; <span class="comment">// v = dy²+1</span>
-        <span class="kw">let</span> (<span class="ident">is_valid_y_coord</span>, <span class="kw-2">mut</span> <span class="ident">X</span>) <span class="op">=</span> <span class="ident">FieldElement</span>::<span class="ident">sqrt_ratio_i</span>(<span class="kw-2">&amp;</span><span class="ident">u</span>, <span class="kw-2">&amp;</span><span class="ident">v</span>);
+        <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="kw-2">&amp;</span>(<span class="kw-2">&amp;</span><span class="ident">YY</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">constants::EDWARDS_D</span>) <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">Z</span>; <span class="comment">// v = dy²+1</span>
+        <span class="kw">let</span> (<span class="ident">is_valid_y_coord</span>, <span class="kw-2">mut</span> <span class="ident">X</span>) <span class="op">=</span> <span class="ident">FieldElement::sqrt_ratio_i</span>(<span class="kw-2">&amp;</span><span class="ident">u</span>, <span class="kw-2">&amp;</span><span class="ident">v</span>);
 
         <span class="kw">if</span> <span class="ident">is_valid_y_coord</span>.<span class="ident">unwrap_u8</span>() <span class="op">!</span><span class="op">=</span> <span class="number">1u8</span> { <span class="kw">return</span> <span class="prelude-val">None</span>; }
 
          <span class="comment">// FieldElement::sqrt_ratio_i always returns the nonnegative square root,</span>
          <span class="comment">// so we negate according to the supplied sign bit.</span>
-        <span class="kw">let</span> <span class="ident">compressed_sign_bit</span> <span class="op">=</span> <span class="ident">Choice</span>::<span class="ident">from</span>(<span class="self">self</span>.<span class="ident">as_bytes</span>()[<span class="number">31</span>] <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">7</span>);
+        <span class="kw">let</span> <span class="ident">compressed_sign_bit</span> <span class="op">=</span> <span class="ident">Choice::from</span>(<span class="self">self</span>.<span class="ident">as_bytes</span>()[<span class="number">31</span>] <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">7</span>);
         <span class="ident">X</span>.<span class="ident">conditional_negate</span>(<span class="ident">compressed_sign_bit</span>);
 
         <span class="prelude-val">Some</span>(<span class="ident">EdwardsPoint</span>{ <span class="ident">X</span>, <span class="ident">Y</span>, <span class="ident">Z</span>, <span class="ident">T</span>: <span class="kw-2">&amp;</span><span class="ident">X</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">Y</span> })
@@ -1649,14 +1649,14 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="self">self</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Serializer</span>, <span class="ident">Deserializer</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::<span class="ident">de</span>::<span class="ident">Visitor</span>;
+<span class="kw">use</span> <span class="ident">serde::de::Visitor</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">EdwardsPoint</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S</span>::<span class="prelude-val">Ok</span>, <span class="ident">S</span>::<span class="ident">Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
         <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">Serializer</span>
     {
-        <span class="kw">use</span> <span class="ident">serde</span>::<span class="ident">ser</span>::<span class="ident">SerializeTuple</span>;
+        <span class="kw">use</span> <span class="ident">serde::ser::SerializeTuple</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tup</span> <span class="op">=</span> <span class="ident">serializer</span>.<span class="ident">serialize_tuple</span>(<span class="number">32</span>)<span class="question-mark">?</span>;
         <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">compress</span>().<span class="ident">as_bytes</span>().<span class="ident">iter</span>() {
             <span class="ident">tup</span>.<span class="ident">serialize_element</span>(<span class="ident">byte</span>)<span class="question-mark">?</span>;
@@ -1667,10 +1667,10 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">CompressedEdwardsY</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S</span>::<span class="prelude-val">Ok</span>, <span class="ident">S</span>::<span class="ident">Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
         <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">Serializer</span>
     {
-        <span class="kw">use</span> <span class="ident">serde</span>::<span class="ident">ser</span>::<span class="ident">SerializeTuple</span>;
+        <span class="kw">use</span> <span class="ident">serde::ser::SerializeTuple</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tup</span> <span class="op">=</span> <span class="ident">serializer</span>.<span class="ident">serialize_tuple</span>(<span class="number">32</span>)<span class="question-mark">?</span>;
         <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">as_bytes</span>().<span class="ident">iter</span>() {
             <span class="ident">tup</span>.<span class="ident">serialize_element</span>(<span class="ident">byte</span>)<span class="question-mark">?</span>;
@@ -1681,7 +1681,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EdwardsPoint</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D</span>::<span class="ident">Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
         <span class="kw">where</span> <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>
     {
         <span class="kw">struct</span> <span class="ident">EdwardsPointVisitor</span>;
@@ -1689,21 +1689,21 @@
         <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EdwardsPointVisitor</span> {
             <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>;
 
-            <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> ::<span class="ident">core</span>::<span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> ::<span class="ident">core</span>::<span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+            <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">::core::fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">::core::fmt::Result</span> {
                 <span class="ident">formatter</span>.<span class="ident">write_str</span>(<span class="string">&quot;a valid point in Edwards y + sign format&quot;</span>)
             }
 
-            <span class="kw">fn</span> <span class="ident">visit_seq</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">seq</span>: <span class="ident">A</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">EdwardsPoint</span>, <span class="ident">A</span>::<span class="ident">Error</span><span class="op">&gt;</span>
-                <span class="kw">where</span> <span class="ident">A</span>: <span class="ident">serde</span>::<span class="ident">de</span>::<span class="ident">SeqAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>
+            <span class="kw">fn</span> <span class="ident">visit_seq</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">seq</span>: <span class="ident">A</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">EdwardsPoint</span>, <span class="ident">A::Error</span><span class="op">&gt;</span>
+                <span class="kw">where</span> <span class="ident">A</span>: <span class="ident">serde::de::SeqAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>
             {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">32</span>];
                 <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">32</span> {
                     <span class="ident">bytes</span>[<span class="ident">i</span>] <span class="op">=</span> <span class="ident">seq</span>.<span class="ident">next_element</span>()<span class="question-mark">?</span>
-                        .<span class="ident">ok_or</span>(<span class="ident">serde</span>::<span class="ident">de</span>::<span class="ident">Error</span>::<span class="ident">invalid_length</span>(<span class="ident">i</span>, <span class="kw-2">&amp;</span><span class="string">&quot;expected 32 bytes&quot;</span>))<span class="question-mark">?</span>;
+                        .<span class="ident">ok_or</span>(<span class="ident">serde::de::Error::invalid_length</span>(<span class="ident">i</span>, <span class="kw-2">&amp;</span><span class="string">&quot;expected 32 bytes&quot;</span>))<span class="question-mark">?</span>;
                 }
                 <span class="ident">CompressedEdwardsY</span>(<span class="ident">bytes</span>)
                     .<span class="ident">decompress</span>()
-                    .<span class="ident">ok_or</span>(<span class="ident">serde</span>::<span class="ident">de</span>::<span class="ident">Error</span>::<span class="ident">custom</span>(<span class="string">&quot;decompression failed&quot;</span>))
+                    .<span class="ident">ok_or</span>(<span class="ident">serde::de::Error::custom</span>(<span class="string">&quot;decompression failed&quot;</span>))
             }
         }
 
@@ -1713,7 +1713,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CompressedEdwardsY</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D</span>::<span class="ident">Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
         <span class="kw">where</span> <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>
     {
         <span class="kw">struct</span> <span class="ident">CompressedEdwardsYVisitor</span>;
@@ -1721,17 +1721,17 @@
         <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CompressedEdwardsYVisitor</span> {
             <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="ident">CompressedEdwardsY</span>;
 
-            <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> ::<span class="ident">core</span>::<span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> ::<span class="ident">core</span>::<span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+            <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">::core::fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">::core::fmt::Result</span> {
                 <span class="ident">formatter</span>.<span class="ident">write_str</span>(<span class="string">&quot;32 bytes of data&quot;</span>)
             }
 
-            <span class="kw">fn</span> <span class="ident">visit_seq</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">seq</span>: <span class="ident">A</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CompressedEdwardsY</span>, <span class="ident">A</span>::<span class="ident">Error</span><span class="op">&gt;</span>
-                <span class="kw">where</span> <span class="ident">A</span>: <span class="ident">serde</span>::<span class="ident">de</span>::<span class="ident">SeqAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>
+            <span class="kw">fn</span> <span class="ident">visit_seq</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">seq</span>: <span class="ident">A</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CompressedEdwardsY</span>, <span class="ident">A::Error</span><span class="op">&gt;</span>
+                <span class="kw">where</span> <span class="ident">A</span>: <span class="ident">serde::de::SeqAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>
             {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">32</span>];
                 <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">32</span> {
                     <span class="ident">bytes</span>[<span class="ident">i</span>] <span class="op">=</span> <span class="ident">seq</span>.<span class="ident">next_element</span>()<span class="question-mark">?</span>
-                        .<span class="ident">ok_or</span>(<span class="ident">serde</span>::<span class="ident">de</span>::<span class="ident">Error</span>::<span class="ident">invalid_length</span>(<span class="ident">i</span>, <span class="kw-2">&amp;</span><span class="string">&quot;expected 32 bytes&quot;</span>))<span class="question-mark">?</span>;
+                        .<span class="ident">ok_or</span>(<span class="ident">serde::de::Error::invalid_length</span>(<span class="ident">i</span>, <span class="kw-2">&amp;</span><span class="string">&quot;expected 32 bytes&quot;</span>))<span class="question-mark">?</span>;
                 }
                 <span class="prelude-val">Ok</span>(<span class="ident">CompressedEdwardsY</span>(<span class="ident">bytes</span>))
             }
@@ -1770,7 +1770,7 @@
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">CompressedEdwardsY</span> {
     <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CompressedEdwardsY</span> {
-        <span class="ident">CompressedEdwardsY</span>::<span class="ident">identity</span>()
+        <span class="ident">CompressedEdwardsY::identity</span>()
     }
 }
 
@@ -1792,17 +1792,17 @@
 <span class="kw">impl</span> <span class="ident">Identity</span> <span class="kw">for</span> <span class="ident">EdwardsPoint</span> {
     <span class="kw">fn</span> <span class="ident">identity</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">EdwardsPoint</span> {
         <span class="ident">EdwardsPoint</span> {
-            <span class="ident">X</span>: <span class="ident">FieldElement</span>::<span class="ident">zero</span>(),
-            <span class="ident">Y</span>: <span class="ident">FieldElement</span>::<span class="ident">one</span>(),
-            <span class="ident">Z</span>: <span class="ident">FieldElement</span>::<span class="ident">one</span>(),
-            <span class="ident">T</span>: <span class="ident">FieldElement</span>::<span class="ident">zero</span>(),
+            <span class="ident">X</span>: <span class="ident">FieldElement::zero</span>(),
+            <span class="ident">Y</span>: <span class="ident">FieldElement::one</span>(),
+            <span class="ident">Z</span>: <span class="ident">FieldElement::one</span>(),
+            <span class="ident">T</span>: <span class="ident">FieldElement::zero</span>(),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">EdwardsPoint</span> {
     <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">EdwardsPoint</span> {
-        <span class="ident">EdwardsPoint</span>::<span class="ident">identity</span>()
+        <span class="ident">EdwardsPoint::identity</span>()
     }
 }
 
@@ -1826,10 +1826,10 @@
 <span class="kw">impl</span> <span class="ident">ConditionallySelectable</span> <span class="kw">for</span> <span class="ident">EdwardsPoint</span> {
     <span class="kw">fn</span> <span class="ident">conditional_select</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">EdwardsPoint</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">EdwardsPoint</span>, <span class="ident">choice</span>: <span class="ident">Choice</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">EdwardsPoint</span> {
         <span class="ident">EdwardsPoint</span> {
-            <span class="ident">X</span>: <span class="ident">FieldElement</span>::<span class="ident">conditional_select</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>.<span class="ident">X</span>, <span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="ident">X</span>, <span class="ident">choice</span>),
-            <span class="ident">Y</span>: <span class="ident">FieldElement</span>::<span class="ident">conditional_select</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>.<span class="ident">Y</span>, <span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="ident">Y</span>, <span class="ident">choice</span>),
-            <span class="ident">Z</span>: <span class="ident">FieldElement</span>::<span class="ident">conditional_select</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>.<span class="ident">Z</span>, <span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="ident">Z</span>, <span class="ident">choice</span>),
-            <span class="ident">T</span>: <span class="ident">FieldElement</span>::<span class="ident">conditional_select</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>.<span class="ident">T</span>, <span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="ident">T</span>, <span class="ident">choice</span>),
+            <span class="ident">X</span>: <span class="ident">FieldElement::conditional_select</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>.<span class="ident">X</span>, <span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="ident">X</span>, <span class="ident">choice</span>),
+            <span class="ident">Y</span>: <span class="ident">FieldElement::conditional_select</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>.<span class="ident">Y</span>, <span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="ident">Y</span>, <span class="ident">choice</span>),
+            <span class="ident">Z</span>: <span class="ident">FieldElement::conditional_select</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>.<span class="ident">Z</span>, <span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="ident">Z</span>, <span class="ident">choice</span>),
+            <span class="ident">T</span>: <span class="ident">FieldElement::conditional_select</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>.<span class="ident">T</span>, <span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="ident">T</span>, <span class="ident">choice</span>),
         }
     }
 }
@@ -1870,7 +1870,7 @@
             <span class="ident">Y_plus_X</span>:  <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">Y</span> <span class="op">+</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">X</span>,
             <span class="ident">Y_minus_X</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">Y</span> <span class="op">-</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">X</span>,
             <span class="ident">Z</span>:          <span class="self">self</span>.<span class="ident">Z</span>,
-            <span class="ident">T2d</span>:       <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">T</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">constants</span>::<span class="ident">EDWARDS_D2</span>,
+            <span class="ident">T2d</span>:       <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">T</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">constants::EDWARDS_D2</span>,
         }
     }
 
@@ -1892,7 +1892,7 @@
         <span class="kw">let</span> <span class="ident">recip</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">Z</span>.<span class="ident">invert</span>();
         <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">X</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">recip</span>;
         <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">Y</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">recip</span>;
-        <span class="kw">let</span> <span class="ident">xy2d</span> <span class="op">=</span> <span class="kw-2">&amp;</span>(<span class="kw-2">&amp;</span><span class="ident">x</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">y</span>) <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">constants</span>::<span class="ident">EDWARDS_D2</span>;
+        <span class="kw">let</span> <span class="ident">xy2d</span> <span class="op">=</span> <span class="kw-2">&amp;</span>(<span class="kw-2">&amp;</span><span class="ident">x</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">y</span>) <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">constants::EDWARDS_D2</span>;
         <span class="ident">AffineNielsPoint</span>{
             <span class="ident">y_plus_x</span>:  <span class="kw-2">&amp;</span><span class="ident">y</span> <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">x</span>,
             <span class="ident">y_minus_x</span>: <span class="kw-2">&amp;</span><span class="ident">y</span> <span class="op">-</span> <span class="kw-2">&amp;</span><span class="ident">x</span>,
@@ -1956,7 +1956,7 @@
     }
 }
 
-<span class="macro">define_add_variants</span><span class="macro">!</span>(<span class="ident">LHS</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>, <span class="ident">RHS</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>);
+<span class="macro">define_add_variants!</span>(<span class="ident">LHS</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>, <span class="ident">RHS</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>);
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">AddAssign</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">EdwardsPoint</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EdwardsPoint</span> {
     <span class="kw">fn</span> <span class="ident">add_assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_rhs</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">EdwardsPoint</span>) {
@@ -1964,7 +1964,7 @@
     }
 }
 
-<span class="macro">define_add_assign_variants</span><span class="macro">!</span>(<span class="ident">LHS</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>, <span class="ident">RHS</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>);
+<span class="macro">define_add_assign_variants!</span>(<span class="ident">LHS</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>, <span class="ident">RHS</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>);
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">EdwardsPoint</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">EdwardsPoint</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>;
@@ -1973,7 +1973,7 @@
     }
 }
 
-<span class="macro">define_sub_variants</span><span class="macro">!</span>(<span class="ident">LHS</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>, <span class="ident">RHS</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>);
+<span class="macro">define_sub_variants!</span>(<span class="ident">LHS</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>, <span class="ident">RHS</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>);
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">SubAssign</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">EdwardsPoint</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EdwardsPoint</span> {
     <span class="kw">fn</span> <span class="ident">sub_assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_rhs</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">EdwardsPoint</span>) {
@@ -1981,7 +1981,7 @@
     }
 }
 
-<span class="macro">define_sub_assign_variants</span><span class="macro">!</span>(<span class="ident">LHS</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>, <span class="ident">RHS</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>);
+<span class="macro">define_sub_assign_variants!</span>(<span class="ident">LHS</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>, <span class="ident">RHS</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>);
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Sum</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EdwardsPoint</span>
 <span class="kw">where</span>
@@ -1991,7 +1991,7 @@
     <span class="kw">where</span>
         <span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>
     {
-        <span class="ident">iter</span>.<span class="ident">fold</span>(<span class="ident">EdwardsPoint</span>::<span class="ident">identity</span>(), <span class="op">|</span><span class="ident">acc</span>, <span class="ident">item</span><span class="op">|</span> <span class="ident">acc</span> <span class="op">+</span> <span class="ident">item</span>.<span class="ident">borrow</span>())
+        <span class="ident">iter</span>.<span class="ident">fold</span>(<span class="ident">EdwardsPoint::identity</span>(), <span class="op">|</span><span class="ident">acc</span>, <span class="ident">item</span><span class="op">|</span> <span class="ident">acc</span> <span class="op">+</span> <span class="ident">item</span>.<span class="ident">borrow</span>())
     }
 }
 
@@ -2032,10 +2032,10 @@
     }
 }
 
-<span class="macro">define_mul_assign_variants</span><span class="macro">!</span>(<span class="ident">LHS</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>, <span class="ident">RHS</span> <span class="op">=</span> <span class="ident">Scalar</span>);
+<span class="macro">define_mul_assign_variants!</span>(<span class="ident">LHS</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>, <span class="ident">RHS</span> <span class="op">=</span> <span class="ident">Scalar</span>);
 
-<span class="macro">define_mul_variants</span><span class="macro">!</span>(<span class="ident">LHS</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>, <span class="ident">RHS</span> <span class="op">=</span> <span class="ident">Scalar</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>);
-<span class="macro">define_mul_variants</span><span class="macro">!</span>(<span class="ident">LHS</span> <span class="op">=</span> <span class="ident">Scalar</span>, <span class="ident">RHS</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>);
+<span class="macro">define_mul_variants!</span>(<span class="ident">LHS</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>, <span class="ident">RHS</span> <span class="op">=</span> <span class="ident">Scalar</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>);
+<span class="macro">define_mul_variants!</span>(<span class="ident">LHS</span> <span class="op">=</span> <span class="ident">Scalar</span>, <span class="ident">RHS</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>);
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">Mul</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">Scalar</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">EdwardsPoint</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>;
@@ -2044,7 +2044,7 @@
     <span class="doccomment">/// For scalar multiplication of a basepoint,</span>
     <span class="doccomment">/// `EdwardsBasepointTable` is approximately 4x faster.</span>
     <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">scalar</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">Scalar</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">EdwardsPoint</span> {
-        <span class="ident">scalar_mul</span>::<span class="ident">variable_base</span>::<span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">scalar</span>)
+        <span class="ident">scalar_mul::variable_base::mul</span>(<span class="self">self</span>, <span class="ident">scalar</span>)
     }
 }
 
@@ -2074,9 +2074,9 @@
     <span class="kw">fn</span> <span class="ident">multiscalar_mul</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">J</span><span class="op">&gt;</span>(<span class="ident">scalars</span>: <span class="ident">I</span>, <span class="ident">points</span>: <span class="ident">J</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">EdwardsPoint</span>
     <span class="kw">where</span>
         <span class="ident">I</span>: <span class="ident">IntoIterator</span>,
-        <span class="ident">I</span>::<span class="ident">Item</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">Scalar</span><span class="op">&gt;</span>,
+        <span class="ident">I::Item</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">Scalar</span><span class="op">&gt;</span>,
         <span class="ident">J</span>: <span class="ident">IntoIterator</span>,
-        <span class="ident">J</span>::<span class="ident">Item</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">EdwardsPoint</span><span class="op">&gt;</span>,
+        <span class="ident">J::Item</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">EdwardsPoint</span><span class="op">&gt;</span>,
     {
         <span class="comment">// Sanity-check lengths of input iterators</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">scalars</span> <span class="op">=</span> <span class="ident">scalars</span>.<span class="ident">into_iter</span>();
@@ -2087,15 +2087,15 @@
         <span class="kw">let</span> (<span class="ident">p_lo</span>, <span class="ident">p_hi</span>) <span class="op">=</span> <span class="ident">points</span>.<span class="ident">by_ref</span>().<span class="ident">size_hint</span>();
 
         <span class="comment">// They should all be equal</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">s_lo</span>, <span class="ident">p_lo</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">s_hi</span>, <span class="prelude-val">Some</span>(<span class="ident">s_lo</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">p_hi</span>, <span class="prelude-val">Some</span>(<span class="ident">p_lo</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">s_lo</span>, <span class="ident">p_lo</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">s_hi</span>, <span class="prelude-val">Some</span>(<span class="ident">s_lo</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">p_hi</span>, <span class="prelude-val">Some</span>(<span class="ident">p_lo</span>));
 
         <span class="comment">// Now we know there&#39;s a single size.  When we do</span>
         <span class="comment">// size-dependent algorithm dispatch, use this as the hint.</span>
         <span class="kw">let</span> <span class="ident">_size</span> <span class="op">=</span> <span class="ident">s_lo</span>;
 
-        <span class="ident">scalar_mul</span>::<span class="ident">straus</span>::<span class="ident">Straus</span>::<span class="ident">multiscalar_mul</span>(<span class="ident">scalars</span>, <span class="ident">points</span>)
+        <span class="ident">scalar_mul::straus::Straus::multiscalar_mul</span>(<span class="ident">scalars</span>, <span class="ident">points</span>)
     }
 }
 
@@ -2106,7 +2106,7 @@
     <span class="kw">fn</span> <span class="ident">optional_multiscalar_mul</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">J</span><span class="op">&gt;</span>(<span class="ident">scalars</span>: <span class="ident">I</span>, <span class="ident">points</span>: <span class="ident">J</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EdwardsPoint</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">I</span>: <span class="ident">IntoIterator</span>,
-        <span class="ident">I</span>::<span class="ident">Item</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">Scalar</span><span class="op">&gt;</span>,
+        <span class="ident">I::Item</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">Scalar</span><span class="op">&gt;</span>,
         <span class="ident">J</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EdwardsPoint</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
         <span class="comment">// Sanity-check lengths of input iterators</span>
@@ -2118,18 +2118,18 @@
         <span class="kw">let</span> (<span class="ident">p_lo</span>, <span class="ident">p_hi</span>) <span class="op">=</span> <span class="ident">points</span>.<span class="ident">by_ref</span>().<span class="ident">size_hint</span>();
 
         <span class="comment">// They should all be equal</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">s_lo</span>, <span class="ident">p_lo</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">s_hi</span>, <span class="prelude-val">Some</span>(<span class="ident">s_lo</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">p_hi</span>, <span class="prelude-val">Some</span>(<span class="ident">p_lo</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">s_lo</span>, <span class="ident">p_lo</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">s_hi</span>, <span class="prelude-val">Some</span>(<span class="ident">s_lo</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">p_hi</span>, <span class="prelude-val">Some</span>(<span class="ident">p_lo</span>));
 
         <span class="comment">// Now we know there&#39;s a single size.</span>
         <span class="comment">// Use this as the hint to decide which algorithm to use.</span>
         <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">s_lo</span>;
 
         <span class="kw">if</span> <span class="ident">size</span> <span class="op">&lt;</span> <span class="number">190</span> {
-            <span class="ident">scalar_mul</span>::<span class="ident">straus</span>::<span class="ident">Straus</span>::<span class="ident">optional_multiscalar_mul</span>(<span class="ident">scalars</span>, <span class="ident">points</span>)
+            <span class="ident">scalar_mul::straus::Straus::optional_multiscalar_mul</span>(<span class="ident">scalars</span>, <span class="ident">points</span>)
         } <span class="kw">else</span> {
-            <span class="ident">scalar_mul</span>::<span class="ident">pippenger</span>::<span class="ident">Pippenger</span>::<span class="ident">optional_multiscalar_mul</span>(<span class="ident">scalars</span>, <span class="ident">points</span>)
+            <span class="ident">scalar_mul::pippenger::Pippenger::optional_multiscalar_mul</span>(<span class="ident">scalars</span>, <span class="ident">points</span>)
         }
     }
 }
@@ -2139,7 +2139,7 @@
 <span class="comment">// decouple stability of the inner type from the stability of the</span>
 <span class="comment">// outer type.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">VartimeEdwardsPrecomputation</span>(<span class="ident">scalar_mul</span>::<span class="ident">precomputed_straus</span>::<span class="ident">VartimePrecomputedStraus</span>);
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">VartimeEdwardsPrecomputation</span>(<span class="ident">scalar_mul::precomputed_straus::VartimePrecomputedStraus</span>);
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">VartimePrecomputedMultiscalarMul</span> <span class="kw">for</span> <span class="ident">VartimeEdwardsPrecomputation</span> {
@@ -2148,9 +2148,9 @@
     <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">static_points</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">I</span>: <span class="ident">IntoIterator</span>,
-        <span class="ident">I</span>::<span class="ident">Item</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Point</span><span class="op">&gt;</span>,
+        <span class="ident">I::Item</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Point</span><span class="op">&gt;</span>,
     {
-        <span class="self">Self</span>(<span class="ident">scalar_mul</span>::<span class="ident">precomputed_straus</span>::<span class="ident">VartimePrecomputedStraus</span>::<span class="ident">new</span>(<span class="ident">static_points</span>))
+        <span class="self">Self</span>(<span class="ident">scalar_mul::precomputed_straus::VartimePrecomputedStraus::new</span>(<span class="ident">static_points</span>))
     }
 
     <span class="kw">fn</span> <span class="ident">optional_mixed_multiscalar_mul</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">J</span>, <span class="ident">K</span><span class="op">&gt;</span>(
@@ -2158,13 +2158,13 @@
         <span class="ident">static_scalars</span>: <span class="ident">I</span>,
         <span class="ident">dynamic_scalars</span>: <span class="ident">J</span>,
         <span class="ident">dynamic_points</span>: <span class="ident">K</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Point</span><span class="op">&gt;</span>
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Point</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">I</span>: <span class="ident">IntoIterator</span>,
-        <span class="ident">I</span>::<span class="ident">Item</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">Scalar</span><span class="op">&gt;</span>,
+        <span class="ident">I::Item</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">Scalar</span><span class="op">&gt;</span>,
         <span class="ident">J</span>: <span class="ident">IntoIterator</span>,
-        <span class="ident">J</span>::<span class="ident">Item</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">Scalar</span><span class="op">&gt;</span>,
-        <span class="ident">K</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Point</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">J::Item</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">Scalar</span><span class="op">&gt;</span>,
+        <span class="ident">K</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Point</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
         <span class="self">self</span>.<span class="number">0</span>
             .<span class="ident">optional_mixed_multiscalar_mul</span>(<span class="ident">static_scalars</span>, <span class="ident">dynamic_scalars</span>, <span class="ident">dynamic_points</span>)
@@ -2178,7 +2178,7 @@
         <span class="ident">A</span>: <span class="kw-2">&amp;</span><span class="ident">EdwardsPoint</span>,
         <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">Scalar</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">EdwardsPoint</span> {
-        <span class="ident">scalar_mul</span>::<span class="ident">vartime_double_base</span>::<span class="ident">mul</span>(<span class="ident">a</span>, <span class="ident">A</span>, <span class="ident">b</span>)
+        <span class="ident">scalar_mul::vartime_double_base::mul</span>(<span class="ident">a</span>, <span class="ident">A</span>, <span class="ident">b</span>)
     }
 }
 
@@ -2192,7 +2192,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EdwardsBasepointTable</span>(<span class="kw">pub</span>(<span class="kw">crate</span>) [<span class="ident">LookupTable</span><span class="op">&lt;</span><span class="ident">AffineNielsPoint</span><span class="op">&gt;</span>; <span class="number">32</span>]);
 
 <span class="kw">impl</span> <span class="ident">EdwardsBasepointTable</span> {
-    <span class="doccomment">/// The computation uses Pippeneger&#39;s algorithm, as described on</span>
+    <span class="doccomment">/// The computation uses Pippenger&#39;s algorithm, as described on</span>
     <span class="doccomment">/// page 13 of the Ed25519 paper.  Write the scalar \\(a\\) in radix \\(16\\) with</span>
     <span class="doccomment">/// coefficients in \\([-8,8)\\), i.e.,</span>
     <span class="doccomment">/// $$</span>
@@ -2223,7 +2223,7 @@
         <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">scalar</span>.<span class="ident">to_radix_16</span>();
 
         <span class="kw">let</span> <span class="ident">tables</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">P</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>::<span class="ident">identity</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">P</span> <span class="op">=</span> <span class="ident">EdwardsPoint::identity</span>();
 
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> (<span class="number">0</span>..<span class="number">64</span>).<span class="ident">filter</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">%</span> <span class="number">2</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span>) {
             <span class="ident">P</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="ident">P</span> <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">tables</span>[<span class="ident">i</span><span class="op">/</span><span class="number">2</span>].<span class="ident">select</span>(<span class="ident">a</span>[<span class="ident">i</span>])).<span class="ident">to_extended</span>();
@@ -2264,11 +2264,11 @@
     <span class="doccomment">/// Create a table of precomputed multiples of `basepoint`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create</span>(<span class="ident">basepoint</span>: <span class="kw-2">&amp;</span><span class="ident">EdwardsPoint</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">EdwardsBasepointTable</span> {
         <span class="comment">// XXX use init_with</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">EdwardsBasepointTable</span>([<span class="ident">LookupTable</span>::<span class="ident">default</span>(); <span class="number">32</span>]);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">EdwardsBasepointTable</span>([<span class="ident">LookupTable::default</span>(); <span class="number">32</span>]);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">P</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">basepoint</span>;
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">32</span> {
             <span class="comment">// P = (16^2)^i * B</span>
-            <span class="ident">table</span>.<span class="number">0</span>[<span class="ident">i</span>] <span class="op">=</span> <span class="ident">LookupTable</span>::<span class="ident">from</span>(<span class="kw-2">&amp;</span><span class="ident">P</span>);
+            <span class="ident">table</span>.<span class="number">0</span>[<span class="ident">i</span>] <span class="op">=</span> <span class="ident">LookupTable::from</span>(<span class="kw-2">&amp;</span><span class="ident">P</span>);
             <span class="ident">P</span> <span class="op">=</span> <span class="ident">P</span>.<span class="ident">mul_by_pow_2</span>(<span class="number">8</span>);
         }
         <span class="ident">table</span>
@@ -2278,7 +2278,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">basepoint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">EdwardsPoint</span> {
         <span class="comment">// self.0[0].select(1) = 1*(16^2)^0*B</span>
         <span class="comment">// but as an `AffineNielsPoint`, so add identity to convert to extended.</span>
-        (<span class="kw-2">&amp;</span><span class="ident">EdwardsPoint</span>::<span class="ident">identity</span>() <span class="op">+</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>[<span class="number">0</span>].<span class="ident">select</span>(<span class="number">1</span>)).<span class="ident">to_extended</span>()
+        (<span class="kw-2">&amp;</span><span class="ident">EdwardsPoint::identity</span>() <span class="op">+</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>[<span class="number">0</span>].<span class="ident">select</span>(<span class="number">1</span>)).<span class="ident">to_extended</span>()
     }
 }
 
@@ -2290,7 +2290,7 @@
 
     <span class="doccomment">/// Compute \\([2\^k] P \\) by successive doublings. Requires \\( k &gt; 0 \\).</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">mul_by_pow_2</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">k</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">EdwardsPoint</span> {
-        <span class="macro">debug_assert</span><span class="macro">!</span>( <span class="ident">k</span> <span class="op">&gt;</span> <span class="number">0</span> );
+        <span class="macro">debug_assert!</span>( <span class="ident">k</span> <span class="op">&gt;</span> <span class="number">0</span> );
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r</span>: <span class="ident">CompletedPoint</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">to_projective</span>();
         <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..(<span class="ident">k</span><span class="op">-</span><span class="number">1</span>) {
@@ -2354,7 +2354,7 @@
     <span class="doccomment">/// assert_eq!((P+Q).is_torsion_free(), false);</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_torsion_free</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        (<span class="self">self</span> <span class="op">*</span> <span class="ident">constants</span>::<span class="ident">BASEPOINT_ORDER</span>).<span class="ident">is_identity</span>()
+        (<span class="self">self</span> <span class="op">*</span> <span class="ident">constants::BASEPOINT_ORDER</span>).<span class="ident">is_identity</span>()
     }
 }
 
@@ -2363,19 +2363,19 @@
 <span class="comment">// ------------------------------------------------------------------------</span>
 
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">EdwardsPoint</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> ::<span class="ident">core</span>::<span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> ::<span class="ident">core</span>::<span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
-        <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;EdwardsPoint{{\n\tX: {:?},\n\tY: {:?},\n\tZ: {:?},\n\tT: {:?}\n}}&quot;</span>,
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">::core::fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">::core::fmt::Result</span> {
+        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;EdwardsPoint{{\n\tX: {:?},\n\tY: {:?},\n\tZ: {:?},\n\tT: {:?}\n}}&quot;</span>,
                <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">X</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">Y</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">Z</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">T</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">EdwardsBasepointTable</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> ::<span class="ident">core</span>::<span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> ::<span class="ident">core</span>::<span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
-        <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;EdwardsBasepointTable([\n&quot;</span>)<span class="question-mark">?</span>;
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">::core::fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">::core::fmt::Result</span> {
+        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;EdwardsBasepointTable([\n&quot;</span>)<span class="question-mark">?</span>;
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">32</span> {
-            <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;\t{:?},\n&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>[<span class="ident">i</span>])<span class="question-mark">?</span>;
+            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;\t{:?},\n&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>[<span class="ident">i</span>])<span class="question-mark">?</span>;
         }
-        <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;])&quot;</span>)
+        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;])&quot;</span>)
     }
 }
 
@@ -2385,9 +2385,9 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="ident">field</span>::<span class="ident">FieldElement</span>;
-    <span class="kw">use</span> <span class="ident">scalar</span>::<span class="ident">Scalar</span>;
-    <span class="kw">use</span> <span class="ident">subtle</span>::<span class="ident">ConditionallySelectable</span>;
+    <span class="kw">use</span> <span class="ident">field::FieldElement</span>;
+    <span class="kw">use</span> <span class="ident">scalar::Scalar</span>;
+    <span class="kw">use</span> <span class="ident">subtle::ConditionallySelectable</span>;
     <span class="kw">use</span> <span class="ident">constants</span>;
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
@@ -2449,71 +2449,71 @@
     <span class="doccomment">/// Test round-trip decompression for the basepoint.</span>
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">basepoint_decompression_compression</span>() {
-        <span class="kw">let</span> <span class="ident">base_X</span> <span class="op">=</span> <span class="ident">FieldElement</span>::<span class="ident">from_bytes</span>(<span class="kw-2">&amp;</span><span class="ident">BASE_X_COORD_BYTES</span>);
-        <span class="kw">let</span> <span class="ident">bp</span> <span class="op">=</span> <span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_COMPRESSED</span>.<span class="ident">decompress</span>().<span class="ident">unwrap</span>();
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">bp</span>.<span class="ident">is_valid</span>());
+        <span class="kw">let</span> <span class="ident">base_X</span> <span class="op">=</span> <span class="ident">FieldElement::from_bytes</span>(<span class="kw-2">&amp;</span><span class="ident">BASE_X_COORD_BYTES</span>);
+        <span class="kw">let</span> <span class="ident">bp</span> <span class="op">=</span> <span class="ident">constants::ED25519_BASEPOINT_COMPRESSED</span>.<span class="ident">decompress</span>().<span class="ident">unwrap</span>();
+        <span class="macro">assert!</span>(<span class="ident">bp</span>.<span class="ident">is_valid</span>());
         <span class="comment">// Check that decompression actually gives the correct X coordinate</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">base_X</span>, <span class="ident">bp</span>.<span class="ident">X</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">bp</span>.<span class="ident">compress</span>(), <span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_COMPRESSED</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">base_X</span>, <span class="ident">bp</span>.<span class="ident">X</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">bp</span>.<span class="ident">compress</span>(), <span class="ident">constants::ED25519_BASEPOINT_COMPRESSED</span>);
     }
 
     <span class="doccomment">/// Test sign handling in decompression</span>
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">decompression_sign_handling</span>() {
         <span class="comment">// Manually set the high bit of the last byte to flip the sign</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">minus_basepoint_bytes</span> <span class="op">=</span> <span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_COMPRESSED</span>.<span class="ident">as_bytes</span>().<span class="ident">clone</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">minus_basepoint_bytes</span> <span class="op">=</span> <span class="ident">constants::ED25519_BASEPOINT_COMPRESSED</span>.<span class="ident">as_bytes</span>().<span class="ident">clone</span>();
         <span class="ident">minus_basepoint_bytes</span>[<span class="number">31</span>] <span class="op">|</span><span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">7</span>;
         <span class="kw">let</span> <span class="ident">minus_basepoint</span> <span class="op">=</span> <span class="ident">CompressedEdwardsY</span>(<span class="ident">minus_basepoint_bytes</span>)
                               .<span class="ident">decompress</span>().<span class="ident">unwrap</span>();
         <span class="comment">// Test projective coordinates exactly since we know they should</span>
         <span class="comment">// only differ by a flipped sign.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">minus_basepoint</span>.<span class="ident">X</span>, <span class="op">-</span>(<span class="kw-2">&amp;</span><span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_POINT</span>.<span class="ident">X</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">minus_basepoint</span>.<span class="ident">Y</span>,    <span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_POINT</span>.<span class="ident">Y</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">minus_basepoint</span>.<span class="ident">Z</span>,    <span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_POINT</span>.<span class="ident">Z</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">minus_basepoint</span>.<span class="ident">T</span>, <span class="op">-</span>(<span class="kw-2">&amp;</span><span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_POINT</span>.<span class="ident">T</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">minus_basepoint</span>.<span class="ident">X</span>, <span class="op">-</span>(<span class="kw-2">&amp;</span><span class="ident">constants::ED25519_BASEPOINT_POINT</span>.<span class="ident">X</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">minus_basepoint</span>.<span class="ident">Y</span>,    <span class="ident">constants::ED25519_BASEPOINT_POINT</span>.<span class="ident">Y</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">minus_basepoint</span>.<span class="ident">Z</span>,    <span class="ident">constants::ED25519_BASEPOINT_POINT</span>.<span class="ident">Z</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">minus_basepoint</span>.<span class="ident">T</span>, <span class="op">-</span>(<span class="kw-2">&amp;</span><span class="ident">constants::ED25519_BASEPOINT_POINT</span>.<span class="ident">T</span>));
     }
 
     <span class="doccomment">/// Test that computing 1*basepoint gives the correct basepoint.</span>
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">basepoint_mult_one_vs_basepoint</span>() {
-        <span class="kw">let</span> <span class="ident">bp</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_TABLE</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">Scalar</span>::<span class="ident">one</span>();
+        <span class="kw">let</span> <span class="ident">bp</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">constants::ED25519_BASEPOINT_TABLE</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">Scalar::one</span>();
         <span class="kw">let</span> <span class="ident">compressed</span> <span class="op">=</span> <span class="ident">bp</span>.<span class="ident">compress</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">compressed</span>, <span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_COMPRESSED</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">compressed</span>, <span class="ident">constants::ED25519_BASEPOINT_COMPRESSED</span>);
     }
 
     <span class="doccomment">/// Test that `EdwardsBasepointTable::basepoint()` gives the correct basepoint.</span>
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">basepoint_table_basepoint_function_correct</span>() {
-        <span class="kw">let</span> <span class="ident">bp</span> <span class="op">=</span> <span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_TABLE</span>.<span class="ident">basepoint</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">bp</span>.<span class="ident">compress</span>(), <span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_COMPRESSED</span>);
+        <span class="kw">let</span> <span class="ident">bp</span> <span class="op">=</span> <span class="ident">constants::ED25519_BASEPOINT_TABLE</span>.<span class="ident">basepoint</span>();
+        <span class="macro">assert_eq!</span>(<span class="ident">bp</span>.<span class="ident">compress</span>(), <span class="ident">constants::ED25519_BASEPOINT_COMPRESSED</span>);
     }
 
     <span class="doccomment">/// Test `impl Add&lt;EdwardsPoint&gt; for EdwardsPoint`</span>
     <span class="doccomment">/// using basepoint + basepoint versus the 2*basepoint constant.</span>
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">basepoint_plus_basepoint_vs_basepoint2</span>() {
-        <span class="kw">let</span> <span class="ident">bp</span> <span class="op">=</span> <span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_POINT</span>;
+        <span class="kw">let</span> <span class="ident">bp</span> <span class="op">=</span> <span class="ident">constants::ED25519_BASEPOINT_POINT</span>;
         <span class="kw">let</span> <span class="ident">bp_added</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">bp</span> <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">bp</span>;
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">bp_added</span>.<span class="ident">compress</span>(), <span class="ident">BASE2_CMPRSSD</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">bp_added</span>.<span class="ident">compress</span>(), <span class="ident">BASE2_CMPRSSD</span>);
     }
 
     <span class="doccomment">/// Test `impl Add&lt;ProjectiveNielsPoint&gt; for EdwardsPoint`</span>
     <span class="doccomment">/// using the basepoint, basepoint2 constants</span>
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">basepoint_plus_basepoint_projective_niels_vs_basepoint2</span>() {
-        <span class="kw">let</span> <span class="ident">bp</span> <span class="op">=</span> <span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_POINT</span>;
+        <span class="kw">let</span> <span class="ident">bp</span> <span class="op">=</span> <span class="ident">constants::ED25519_BASEPOINT_POINT</span>;
         <span class="kw">let</span> <span class="ident">bp_added</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="ident">bp</span> <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">bp</span>.<span class="ident">to_projective_niels</span>()).<span class="ident">to_extended</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">bp_added</span>.<span class="ident">compress</span>(), <span class="ident">BASE2_CMPRSSD</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">bp_added</span>.<span class="ident">compress</span>(), <span class="ident">BASE2_CMPRSSD</span>);
     }
 
     <span class="doccomment">/// Test `impl Add&lt;AffineNielsPoint&gt; for EdwardsPoint`</span>
     <span class="doccomment">/// using the basepoint, basepoint2 constants</span>
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">basepoint_plus_basepoint_affine_niels_vs_basepoint2</span>() {
-        <span class="kw">let</span> <span class="ident">bp</span> <span class="op">=</span> <span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_POINT</span>;
+        <span class="kw">let</span> <span class="ident">bp</span> <span class="op">=</span> <span class="ident">constants::ED25519_BASEPOINT_POINT</span>;
         <span class="kw">let</span> <span class="ident">bp_affine_niels</span> <span class="op">=</span> <span class="ident">bp</span>.<span class="ident">to_affine_niels</span>();
         <span class="kw">let</span> <span class="ident">bp_added</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="ident">bp</span> <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">bp_affine_niels</span>).<span class="ident">to_extended</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">bp_added</span>.<span class="ident">compress</span>(), <span class="ident">BASE2_CMPRSSD</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">bp_added</span>.<span class="ident">compress</span>(), <span class="ident">BASE2_CMPRSSD</span>);
     }
 
     <span class="doccomment">/// Check that equality of `EdwardsPoints` handles projective</span>
@@ -2521,152 +2521,152 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">extended_point_equality_handles_scaling</span>() {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">two_bytes</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">32</span>]; <span class="ident">two_bytes</span>[<span class="number">0</span>] <span class="op">=</span> <span class="number">2</span>;
-        <span class="kw">let</span> <span class="ident">id1</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>::<span class="ident">identity</span>();
+        <span class="kw">let</span> <span class="ident">id1</span> <span class="op">=</span> <span class="ident">EdwardsPoint::identity</span>();
         <span class="kw">let</span> <span class="ident">id2</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>{
-            <span class="ident">X</span>: <span class="ident">FieldElement</span>::<span class="ident">zero</span>(),
-            <span class="ident">Y</span>: <span class="ident">FieldElement</span>::<span class="ident">from_bytes</span>(<span class="kw-2">&amp;</span><span class="ident">two_bytes</span>),
-            <span class="ident">Z</span>: <span class="ident">FieldElement</span>::<span class="ident">from_bytes</span>(<span class="kw-2">&amp;</span><span class="ident">two_bytes</span>),
-            <span class="ident">T</span>: <span class="ident">FieldElement</span>::<span class="ident">zero</span>()
+            <span class="ident">X</span>: <span class="ident">FieldElement::zero</span>(),
+            <span class="ident">Y</span>: <span class="ident">FieldElement::from_bytes</span>(<span class="kw-2">&amp;</span><span class="ident">two_bytes</span>),
+            <span class="ident">Z</span>: <span class="ident">FieldElement::from_bytes</span>(<span class="kw-2">&amp;</span><span class="ident">two_bytes</span>),
+            <span class="ident">T</span>: <span class="ident">FieldElement::zero</span>()
         };
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">id1</span>.<span class="ident">ct_eq</span>(<span class="kw-2">&amp;</span><span class="ident">id2</span>).<span class="ident">unwrap_u8</span>(), <span class="number">1u8</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">id1</span>.<span class="ident">ct_eq</span>(<span class="kw-2">&amp;</span><span class="ident">id2</span>).<span class="ident">unwrap_u8</span>(), <span class="number">1u8</span>);
     }
 
     <span class="doccomment">/// Sanity check for conversion to precomputed points</span>
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">to_affine_niels_clears_denominators</span>() {
         <span class="comment">// construct a point as aB so it has denominators (ie. Z != 1)</span>
-        <span class="kw">let</span> <span class="ident">aB</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_TABLE</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">A_SCALAR</span>;
+        <span class="kw">let</span> <span class="ident">aB</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">constants::ED25519_BASEPOINT_TABLE</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">A_SCALAR</span>;
         <span class="kw">let</span> <span class="ident">aB_affine_niels</span> <span class="op">=</span> <span class="ident">aB</span>.<span class="ident">to_affine_niels</span>();
-        <span class="kw">let</span> <span class="ident">also_aB</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="ident">EdwardsPoint</span>::<span class="ident">identity</span>() <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">aB_affine_niels</span>).<span class="ident">to_extended</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(     <span class="ident">aB</span>.<span class="ident">compress</span>(),
+        <span class="kw">let</span> <span class="ident">also_aB</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="ident">EdwardsPoint::identity</span>() <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">aB_affine_niels</span>).<span class="ident">to_extended</span>();
+        <span class="macro">assert_eq!</span>(     <span class="ident">aB</span>.<span class="ident">compress</span>(),
                    <span class="ident">also_aB</span>.<span class="ident">compress</span>());
     }
 
     <span class="doccomment">/// Test basepoint_mult versus a known scalar multiple from ed25519.py</span>
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">basepoint_mult_vs_ed25519py</span>() {
-        <span class="kw">let</span> <span class="ident">aB</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_TABLE</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">A_SCALAR</span>;
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">aB</span>.<span class="ident">compress</span>(), <span class="ident">A_TIMES_BASEPOINT</span>);
+        <span class="kw">let</span> <span class="ident">aB</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">constants::ED25519_BASEPOINT_TABLE</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">A_SCALAR</span>;
+        <span class="macro">assert_eq!</span>(<span class="ident">aB</span>.<span class="ident">compress</span>(), <span class="ident">A_TIMES_BASEPOINT</span>);
     }
 
     <span class="doccomment">/// Test that multiplication by the basepoint order kills the basepoint</span>
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">basepoint_mult_by_basepoint_order</span>() {
-        <span class="kw">let</span> <span class="ident">B</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_TABLE</span>;
-        <span class="kw">let</span> <span class="ident">should_be_id</span> <span class="op">=</span> <span class="ident">B</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">constants</span>::<span class="ident">BASEPOINT_ORDER</span>;
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">should_be_id</span>.<span class="ident">is_identity</span>());
+        <span class="kw">let</span> <span class="ident">B</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">constants::ED25519_BASEPOINT_TABLE</span>;
+        <span class="kw">let</span> <span class="ident">should_be_id</span> <span class="op">=</span> <span class="ident">B</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">constants::BASEPOINT_ORDER</span>;
+        <span class="macro">assert!</span>(<span class="ident">should_be_id</span>.<span class="ident">is_identity</span>());
     }
 
     <span class="doccomment">/// Test precomputed basepoint mult</span>
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_precomputed_basepoint_mult</span>() {
-        <span class="kw">let</span> <span class="ident">aB_1</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_TABLE</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">A_SCALAR</span>;
-        <span class="kw">let</span> <span class="ident">aB_2</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_POINT</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">A_SCALAR</span>;
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">aB_1</span>.<span class="ident">compress</span>(), <span class="ident">aB_2</span>.<span class="ident">compress</span>());
+        <span class="kw">let</span> <span class="ident">aB_1</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">constants::ED25519_BASEPOINT_TABLE</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">A_SCALAR</span>;
+        <span class="kw">let</span> <span class="ident">aB_2</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">constants::ED25519_BASEPOINT_POINT</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">A_SCALAR</span>;
+        <span class="macro">assert_eq!</span>(<span class="ident">aB_1</span>.<span class="ident">compress</span>(), <span class="ident">aB_2</span>.<span class="ident">compress</span>());
     }
 
     <span class="doccomment">/// Test scalar_mul versus a known scalar multiple from ed25519.py</span>
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">scalar_mul_vs_ed25519py</span>() {
-        <span class="kw">let</span> <span class="ident">aB</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_POINT</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">A_SCALAR</span>;
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">aB</span>.<span class="ident">compress</span>(), <span class="ident">A_TIMES_BASEPOINT</span>);
+        <span class="kw">let</span> <span class="ident">aB</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">constants::ED25519_BASEPOINT_POINT</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">A_SCALAR</span>;
+        <span class="macro">assert_eq!</span>(<span class="ident">aB</span>.<span class="ident">compress</span>(), <span class="ident">A_TIMES_BASEPOINT</span>);
     }
 
     <span class="doccomment">/// Test basepoint.double() versus the 2*basepoint constant.</span>
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">basepoint_double_vs_basepoint2</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_POINT</span>.<span class="ident">double</span>().<span class="ident">compress</span>(),
+        <span class="macro">assert_eq!</span>(<span class="ident">constants::ED25519_BASEPOINT_POINT</span>.<span class="ident">double</span>().<span class="ident">compress</span>(),
                    <span class="ident">BASE2_CMPRSSD</span>);
     }
 
     <span class="doccomment">/// Test that computing 2*basepoint is the same as basepoint.double()</span>
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">basepoint_mult_two_vs_basepoint2</span>() {
-        <span class="kw">let</span> <span class="ident">two</span> <span class="op">=</span> <span class="ident">Scalar</span>::<span class="ident">from</span>(<span class="number">2u64</span>);
-        <span class="kw">let</span> <span class="ident">bp2</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_TABLE</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">two</span>;
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">bp2</span>.<span class="ident">compress</span>(), <span class="ident">BASE2_CMPRSSD</span>);
+        <span class="kw">let</span> <span class="ident">two</span> <span class="op">=</span> <span class="ident">Scalar::from</span>(<span class="number">2u64</span>);
+        <span class="kw">let</span> <span class="ident">bp2</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">constants::ED25519_BASEPOINT_TABLE</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">two</span>;
+        <span class="macro">assert_eq!</span>(<span class="ident">bp2</span>.<span class="ident">compress</span>(), <span class="ident">BASE2_CMPRSSD</span>);
     }
 
     <span class="doccomment">/// Check that converting to projective and then back to extended round-trips.</span>
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">basepoint_projective_extended_round_trip</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_POINT</span>
+        <span class="macro">assert_eq!</span>(<span class="ident">constants::ED25519_BASEPOINT_POINT</span>
                        .<span class="ident">to_projective</span>().<span class="ident">to_extended</span>().<span class="ident">compress</span>(),
-                   <span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_COMPRESSED</span>);
+                   <span class="ident">constants::ED25519_BASEPOINT_COMPRESSED</span>);
     }
 
     <span class="doccomment">/// Test computing 16*basepoint vs mul_by_pow_2(4)</span>
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">basepoint16_vs_mul_by_pow_2_4</span>() {
-        <span class="kw">let</span> <span class="ident">bp16</span> <span class="op">=</span> <span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_POINT</span>.<span class="ident">mul_by_pow_2</span>(<span class="number">4</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">bp16</span>.<span class="ident">compress</span>(), <span class="ident">BASE16_CMPRSSD</span>);
+        <span class="kw">let</span> <span class="ident">bp16</span> <span class="op">=</span> <span class="ident">constants::ED25519_BASEPOINT_POINT</span>.<span class="ident">mul_by_pow_2</span>(<span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">bp16</span>.<span class="ident">compress</span>(), <span class="ident">BASE16_CMPRSSD</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">impl_sum</span>() {
 
         <span class="comment">// Test that sum works for non-empty iterators</span>
-        <span class="kw">let</span> <span class="ident">BASE</span> <span class="op">=</span> <span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_POINT</span>;
+        <span class="kw">let</span> <span class="ident">BASE</span> <span class="op">=</span> <span class="ident">constants::ED25519_BASEPOINT_POINT</span>;
 
-        <span class="kw">let</span> <span class="ident">s1</span> <span class="op">=</span> <span class="ident">Scalar</span>::<span class="ident">from</span>(<span class="number">999u64</span>);
+        <span class="kw">let</span> <span class="ident">s1</span> <span class="op">=</span> <span class="ident">Scalar::from</span>(<span class="number">999u64</span>);
         <span class="kw">let</span> <span class="ident">P1</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">BASE</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">s1</span>;
 
-        <span class="kw">let</span> <span class="ident">s2</span> <span class="op">=</span> <span class="ident">Scalar</span>::<span class="ident">from</span>(<span class="number">333u64</span>);
+        <span class="kw">let</span> <span class="ident">s2</span> <span class="op">=</span> <span class="ident">Scalar::from</span>(<span class="number">333u64</span>);
         <span class="kw">let</span> <span class="ident">P2</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">BASE</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">s2</span>;
 
-        <span class="kw">let</span> <span class="ident">vec</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">P1</span>.<span class="ident">clone</span>(), <span class="ident">P2</span>.<span class="ident">clone</span>()];
+        <span class="kw">let</span> <span class="ident">vec</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">P1</span>.<span class="ident">clone</span>(), <span class="ident">P2</span>.<span class="ident">clone</span>()];
         <span class="kw">let</span> <span class="ident">sum</span>: <span class="ident">EdwardsPoint</span> <span class="op">=</span> <span class="ident">vec</span>.<span class="ident">iter</span>().<span class="ident">sum</span>();
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sum</span>, <span class="ident">P1</span> <span class="op">+</span> <span class="ident">P2</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">sum</span>, <span class="ident">P1</span> <span class="op">+</span> <span class="ident">P2</span>);
 
         <span class="comment">// Test that sum works for the empty iterator</span>
-        <span class="kw">let</span> <span class="ident">empty_vector</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EdwardsPoint</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[];
+        <span class="kw">let</span> <span class="ident">empty_vector</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EdwardsPoint</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[];
         <span class="kw">let</span> <span class="ident">sum</span>: <span class="ident">EdwardsPoint</span> <span class="op">=</span> <span class="ident">empty_vector</span>.<span class="ident">iter</span>().<span class="ident">sum</span>();
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sum</span>, <span class="ident">EdwardsPoint</span>::<span class="ident">identity</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">sum</span>, <span class="ident">EdwardsPoint::identity</span>());
 
         <span class="comment">// Test that sum works on owning iterators</span>
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">Scalar</span>::<span class="ident">from</span>(<span class="number">2u64</span>);
+        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">Scalar::from</span>(<span class="number">2u64</span>);
         <span class="kw">let</span> <span class="ident">mapped</span> <span class="op">=</span> <span class="ident">vec</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">*</span> <span class="ident">s</span>);
         <span class="kw">let</span> <span class="ident">sum</span>: <span class="ident">EdwardsPoint</span> <span class="op">=</span> <span class="ident">mapped</span>.<span class="ident">sum</span>();
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sum</span>, <span class="kw-2">&amp;</span><span class="ident">P1</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">s</span> <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">P2</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">s</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">sum</span>, <span class="kw-2">&amp;</span><span class="ident">P1</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">s</span> <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">P2</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">s</span>);
       }
 
 
     <span class="doccomment">/// Test that the conditional assignment trait works for AffineNielsPoints.</span>
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">conditional_assign_for_affine_niels_point</span>() {
-        <span class="kw">let</span> <span class="ident">id</span>     <span class="op">=</span> <span class="ident">AffineNielsPoint</span>::<span class="ident">identity</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p1</span> <span class="op">=</span> <span class="ident">AffineNielsPoint</span>::<span class="ident">identity</span>();
-        <span class="kw">let</span> <span class="ident">bp</span>     <span class="op">=</span> <span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_POINT</span>.<span class="ident">to_affine_niels</span>();
+        <span class="kw">let</span> <span class="ident">id</span>     <span class="op">=</span> <span class="ident">AffineNielsPoint::identity</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p1</span> <span class="op">=</span> <span class="ident">AffineNielsPoint::identity</span>();
+        <span class="kw">let</span> <span class="ident">bp</span>     <span class="op">=</span> <span class="ident">constants::ED25519_BASEPOINT_POINT</span>.<span class="ident">to_affine_niels</span>();
 
-        <span class="ident">p1</span>.<span class="ident">conditional_assign</span>(<span class="kw-2">&amp;</span><span class="ident">bp</span>, <span class="ident">Choice</span>::<span class="ident">from</span>(<span class="number">0</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">p1</span>, <span class="ident">id</span>);
-        <span class="ident">p1</span>.<span class="ident">conditional_assign</span>(<span class="kw-2">&amp;</span><span class="ident">bp</span>, <span class="ident">Choice</span>::<span class="ident">from</span>(<span class="number">1</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">p1</span>, <span class="ident">bp</span>);
+        <span class="ident">p1</span>.<span class="ident">conditional_assign</span>(<span class="kw-2">&amp;</span><span class="ident">bp</span>, <span class="ident">Choice::from</span>(<span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">p1</span>, <span class="ident">id</span>);
+        <span class="ident">p1</span>.<span class="ident">conditional_assign</span>(<span class="kw-2">&amp;</span><span class="ident">bp</span>, <span class="ident">Choice::from</span>(<span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">p1</span>, <span class="ident">bp</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">is_small_order</span>() {
         <span class="comment">// The basepoint has large prime order</span>
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_POINT</span>.<span class="ident">is_small_order</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">constants::ED25519_BASEPOINT_POINT</span>.<span class="ident">is_small_order</span>());
         <span class="comment">// constants::EIGHT_TORSION has all points of small order.</span>
-        <span class="kw">for</span> <span class="ident">torsion_point</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">constants</span>::<span class="ident">EIGHT_TORSION</span> {
-            <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">torsion_point</span>.<span class="ident">is_small_order</span>());
+        <span class="kw">for</span> <span class="ident">torsion_point</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">constants::EIGHT_TORSION</span> {
+            <span class="macro">assert!</span>(<span class="ident">torsion_point</span>.<span class="ident">is_small_order</span>());
         }
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">compressed_identity</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">EdwardsPoint</span>::<span class="ident">identity</span>().<span class="ident">compress</span>(),
-                   <span class="ident">CompressedEdwardsY</span>::<span class="ident">identity</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">EdwardsPoint::identity</span>().<span class="ident">compress</span>(),
+                   <span class="ident">CompressedEdwardsY::identity</span>());
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">is_identity</span>() {
-        <span class="macro">assert</span><span class="macro">!</span>(   <span class="ident">EdwardsPoint</span>::<span class="ident">identity</span>().<span class="ident">is_identity</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_POINT</span>.<span class="ident">is_identity</span>());
+        <span class="macro">assert!</span>(   <span class="ident">EdwardsPoint::identity</span>().<span class="ident">is_identity</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">constants::ED25519_BASEPOINT_POINT</span>.<span class="ident">is_identity</span>());
     }
 
     <span class="doccomment">/// Rust&#39;s debug builds have overflow and underflow trapping,</span>
@@ -2681,7 +2681,7 @@
     <span class="doccomment">/// the type system and prove correctness).</span>
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">monte_carlo_overflow_underflow_debug_assert_test</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">P</span> <span class="op">=</span> <span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_POINT</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">P</span> <span class="op">=</span> <span class="ident">constants::ED25519_BASEPOINT_POINT</span>;
         <span class="comment">// N.B. each scalar_mul does 1407 field mults, 1024 field squarings,</span>
         <span class="comment">// so this does ~ 1M of each operation.</span>
         <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">1_000</span> {
@@ -2691,26 +2691,26 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">scalarmult_extended_point_works_both_ways</span>() {
-        <span class="kw">let</span> <span class="ident">G</span>: <span class="ident">EdwardsPoint</span> <span class="op">=</span> <span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_POINT</span>;
+        <span class="kw">let</span> <span class="ident">G</span>: <span class="ident">EdwardsPoint</span> <span class="op">=</span> <span class="ident">constants::ED25519_BASEPOINT_POINT</span>;
         <span class="kw">let</span> <span class="ident">s</span>: <span class="ident">Scalar</span> <span class="op">=</span> <span class="ident">A_SCALAR</span>;
 
         <span class="kw">let</span> <span class="ident">P1</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">G</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">s</span>;
         <span class="kw">let</span> <span class="ident">P2</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">s</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">G</span>;
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">P1</span>.<span class="ident">compress</span>().<span class="ident">to_bytes</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">P2</span>.<span class="ident">compress</span>().<span class="ident">to_bytes</span>());
+        <span class="macro">assert!</span>(<span class="ident">P1</span>.<span class="ident">compress</span>().<span class="ident">to_bytes</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">P2</span>.<span class="ident">compress</span>().<span class="ident">to_bytes</span>());
     }
 
     <span class="comment">// A single iteration of a consistency check for MSM.</span>
     <span class="kw">fn</span> <span class="ident">multiscalar_consistency_iter</span>(<span class="ident">n</span>: <span class="ident">usize</span>) {
-        <span class="kw">use</span> <span class="ident">core</span>::<span class="ident">iter</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">rand</span>::<span class="ident">thread_rng</span>();
+        <span class="kw">use</span> <span class="ident">core::iter</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">rand::thread_rng</span>();
 
         <span class="comment">// Construct random coefficients x0, ..., x_{n-1},</span>
         <span class="comment">// followed by some extra hardcoded ones.</span>
         <span class="kw">let</span> <span class="ident">xs</span> <span class="op">=</span> (<span class="number">0</span>..<span class="ident">n</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Scalar</span>::<span class="ident">random</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rng</span>))
+            .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Scalar::random</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rng</span>))
             <span class="comment">// The largest scalar allowed by the type system, 2^255-1</span>
-            .<span class="ident">chain</span>(<span class="ident">iter</span>::<span class="ident">once</span>(<span class="ident">Scalar</span>::<span class="ident">from_bits</span>([<span class="number">0xff</span>; <span class="number">32</span>])))
+            .<span class="ident">chain</span>(<span class="ident">iter::once</span>(<span class="ident">Scalar::from_bits</span>([<span class="number">0xff</span>; <span class="number">32</span>])))
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
         <span class="kw">let</span> <span class="ident">check</span> <span class="op">=</span> <span class="ident">xs</span>.<span class="ident">iter</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">xi</span><span class="op">|</span> <span class="ident">xi</span> <span class="op">*</span> <span class="ident">xi</span>)
@@ -2718,18 +2718,18 @@
 
         <span class="comment">// Construct points G_i = x_i * B</span>
         <span class="kw">let</span> <span class="ident">Gs</span> <span class="op">=</span> <span class="ident">xs</span>.<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">xi</span><span class="op">|</span> <span class="ident">xi</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_TABLE</span>)
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">xi</span><span class="op">|</span> <span class="ident">xi</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">constants::ED25519_BASEPOINT_TABLE</span>)
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
         <span class="comment">// Compute H1 = &lt;xs, Gs&gt; (consttime)</span>
-        <span class="kw">let</span> <span class="ident">H1</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>::<span class="ident">multiscalar_mul</span>(<span class="kw-2">&amp;</span><span class="ident">xs</span>, <span class="kw-2">&amp;</span><span class="ident">Gs</span>);
+        <span class="kw">let</span> <span class="ident">H1</span> <span class="op">=</span> <span class="ident">EdwardsPoint::multiscalar_mul</span>(<span class="kw-2">&amp;</span><span class="ident">xs</span>, <span class="kw-2">&amp;</span><span class="ident">Gs</span>);
         <span class="comment">// Compute H2 = &lt;xs, Gs&gt; (vartime)</span>
-        <span class="kw">let</span> <span class="ident">H2</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>::<span class="ident">vartime_multiscalar_mul</span>(<span class="kw-2">&amp;</span><span class="ident">xs</span>, <span class="kw-2">&amp;</span><span class="ident">Gs</span>);
+        <span class="kw">let</span> <span class="ident">H2</span> <span class="op">=</span> <span class="ident">EdwardsPoint::vartime_multiscalar_mul</span>(<span class="kw-2">&amp;</span><span class="ident">xs</span>, <span class="kw-2">&amp;</span><span class="ident">Gs</span>);
         <span class="comment">// Compute H3 = &lt;xs, Gs&gt; = sum(xi^2) * B</span>
-        <span class="kw">let</span> <span class="ident">H3</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">check</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_TABLE</span>;
+        <span class="kw">let</span> <span class="ident">H3</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">check</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">constants::ED25519_BASEPOINT_TABLE</span>;
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">H1</span>, <span class="ident">H3</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">H2</span>, <span class="ident">H3</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">H1</span>, <span class="ident">H3</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">H2</span>, <span class="ident">H3</span>);
     }
 
     <span class="comment">// Use different multiscalar sizes to hit different internal</span>
@@ -2769,16 +2769,16 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">vartime_precomputed_vs_nonprecomputed_multiscalar</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">rand</span>::<span class="ident">thread_rng</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">rand::thread_rng</span>();
 
-        <span class="kw">let</span> <span class="ident">B</span> <span class="op">=</span> <span class="kw-2">&amp;</span>::<span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_TABLE</span>;
+        <span class="kw">let</span> <span class="ident">B</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">::constants::ED25519_BASEPOINT_TABLE</span>;
 
         <span class="kw">let</span> <span class="ident">static_scalars</span> <span class="op">=</span> (<span class="number">0</span>..<span class="number">128</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Scalar</span>::<span class="ident">random</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rng</span>))
+            .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Scalar::random</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rng</span>))
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
         <span class="kw">let</span> <span class="ident">dynamic_scalars</span> <span class="op">=</span> (<span class="number">0</span>..<span class="number">128</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Scalar</span>::<span class="ident">random</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rng</span>))
+            .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Scalar::random</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rng</span>))
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
         <span class="kw">let</span> <span class="ident">check_scalar</span>: <span class="ident">Scalar</span> <span class="op">=</span> <span class="ident">static_scalars</span>
@@ -2790,7 +2790,7 @@
         <span class="kw">let</span> <span class="ident">static_points</span> <span class="op">=</span> <span class="ident">static_scalars</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span> <span class="op">*</span> <span class="ident">B</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
         <span class="kw">let</span> <span class="ident">dynamic_points</span> <span class="op">=</span> <span class="ident">dynamic_scalars</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span> <span class="op">*</span> <span class="ident">B</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
-        <span class="kw">let</span> <span class="ident">precomputation</span> <span class="op">=</span> <span class="ident">VartimeEdwardsPrecomputation</span>::<span class="ident">new</span>(<span class="ident">static_points</span>.<span class="ident">iter</span>());
+        <span class="kw">let</span> <span class="ident">precomputation</span> <span class="op">=</span> <span class="ident">VartimeEdwardsPrecomputation::new</span>(<span class="ident">static_points</span>.<span class="ident">iter</span>());
 
         <span class="kw">let</span> <span class="ident">P</span> <span class="op">=</span> <span class="ident">precomputation</span>.<span class="ident">vartime_mixed_multiscalar_mul</span>(
             <span class="kw-2">&amp;</span><span class="ident">static_scalars</span>,
@@ -2798,16 +2798,16 @@
             <span class="kw-2">&amp;</span><span class="ident">dynamic_points</span>,
         );
 
-        <span class="kw">use</span> <span class="ident">traits</span>::<span class="ident">VartimeMultiscalarMul</span>;
-        <span class="kw">let</span> <span class="ident">Q</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>::<span class="ident">vartime_multiscalar_mul</span>(
+        <span class="kw">use</span> <span class="ident">traits::VartimeMultiscalarMul</span>;
+        <span class="kw">let</span> <span class="ident">Q</span> <span class="op">=</span> <span class="ident">EdwardsPoint::vartime_multiscalar_mul</span>(
             <span class="ident">static_scalars</span>.<span class="ident">iter</span>().<span class="ident">chain</span>(<span class="ident">dynamic_scalars</span>.<span class="ident">iter</span>()),
             <span class="ident">static_points</span>.<span class="ident">iter</span>().<span class="ident">chain</span>(<span class="ident">dynamic_points</span>.<span class="ident">iter</span>()),
         );
 
         <span class="kw">let</span> <span class="ident">R</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">check_scalar</span> <span class="op">*</span> <span class="ident">B</span>;
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">P</span>.<span class="ident">compress</span>(), <span class="ident">R</span>.<span class="ident">compress</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Q</span>.<span class="ident">compress</span>(), <span class="ident">R</span>.<span class="ident">compress</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">P</span>.<span class="ident">compress</span>(), <span class="ident">R</span>.<span class="ident">compress</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">Q</span>.<span class="ident">compress</span>(), <span class="ident">R</span>.<span class="ident">compress</span>());
     }
 
     <span class="kw">mod</span> <span class="ident">vartime</span> {
@@ -2818,33 +2818,33 @@
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">double_scalar_mul_basepoint_vs_ed25519py</span>() {
             <span class="kw">let</span> <span class="ident">A</span> <span class="op">=</span> <span class="ident">A_TIMES_BASEPOINT</span>.<span class="ident">decompress</span>().<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>::<span class="ident">vartime_double_scalar_mul_basepoint</span>(<span class="kw-2">&amp;</span><span class="ident">A_SCALAR</span>, <span class="kw-2">&amp;</span><span class="ident">A</span>, <span class="kw-2">&amp;</span><span class="ident">B_SCALAR</span>);
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">result</span>.<span class="ident">compress</span>(), <span class="ident">DOUBLE_SCALAR_MULT_RESULT</span>);
+            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">EdwardsPoint::vartime_double_scalar_mul_basepoint</span>(<span class="kw-2">&amp;</span><span class="ident">A_SCALAR</span>, <span class="kw-2">&amp;</span><span class="ident">A</span>, <span class="kw-2">&amp;</span><span class="ident">B_SCALAR</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">result</span>.<span class="ident">compress</span>(), <span class="ident">DOUBLE_SCALAR_MULT_RESULT</span>);
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">multiscalar_mul_vs_ed25519py</span>() {
             <span class="kw">let</span> <span class="ident">A</span> <span class="op">=</span> <span class="ident">A_TIMES_BASEPOINT</span>.<span class="ident">decompress</span>().<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>::<span class="ident">vartime_multiscalar_mul</span>(
+            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">EdwardsPoint::vartime_multiscalar_mul</span>(
                 <span class="kw-2">&amp;</span>[<span class="ident">A_SCALAR</span>, <span class="ident">B_SCALAR</span>],
-                <span class="kw-2">&amp;</span>[<span class="ident">A</span>, <span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_POINT</span>]
+                <span class="kw-2">&amp;</span>[<span class="ident">A</span>, <span class="ident">constants::ED25519_BASEPOINT_POINT</span>]
             );
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">result</span>.<span class="ident">compress</span>(), <span class="ident">DOUBLE_SCALAR_MULT_RESULT</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">result</span>.<span class="ident">compress</span>(), <span class="ident">DOUBLE_SCALAR_MULT_RESULT</span>);
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">multiscalar_mul_vartime_vs_consttime</span>() {
             <span class="kw">let</span> <span class="ident">A</span> <span class="op">=</span> <span class="ident">A_TIMES_BASEPOINT</span>.<span class="ident">decompress</span>().<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">result_vartime</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>::<span class="ident">vartime_multiscalar_mul</span>(
+            <span class="kw">let</span> <span class="ident">result_vartime</span> <span class="op">=</span> <span class="ident">EdwardsPoint::vartime_multiscalar_mul</span>(
                 <span class="kw-2">&amp;</span>[<span class="ident">A_SCALAR</span>, <span class="ident">B_SCALAR</span>],
-                <span class="kw-2">&amp;</span>[<span class="ident">A</span>, <span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_POINT</span>]
+                <span class="kw-2">&amp;</span>[<span class="ident">A</span>, <span class="ident">constants::ED25519_BASEPOINT_POINT</span>]
             );
-            <span class="kw">let</span> <span class="ident">result_consttime</span> <span class="op">=</span> <span class="ident">EdwardsPoint</span>::<span class="ident">multiscalar_mul</span>(
+            <span class="kw">let</span> <span class="ident">result_consttime</span> <span class="op">=</span> <span class="ident">EdwardsPoint::multiscalar_mul</span>(
                 <span class="kw-2">&amp;</span>[<span class="ident">A_SCALAR</span>, <span class="ident">B_SCALAR</span>],
-                <span class="kw-2">&amp;</span>[<span class="ident">A</span>, <span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_POINT</span>]
+                <span class="kw-2">&amp;</span>[<span class="ident">A</span>, <span class="ident">constants::ED25519_BASEPOINT_POINT</span>]
             );
 
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">result_vartime</span>.<span class="ident">compress</span>(), <span class="ident">result_consttime</span>.<span class="ident">compress</span>());
+            <span class="macro">assert_eq!</span>(<span class="ident">result_vartime</span>.<span class="ident">compress</span>(), <span class="ident">result_consttime</span>.<span class="ident">compress</span>());
         }
     }
 
@@ -2853,24 +2853,25 @@
     <span class="kw">fn</span> <span class="ident">serde_bincode_basepoint_roundtrip</span>() {
         <span class="kw">use</span> <span class="ident">bincode</span>;
 
-        <span class="kw">let</span> <span class="ident">encoded</span> <span class="op">=</span> <span class="ident">bincode</span>::<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_POINT</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">enc_compressed</span> <span class="op">=</span> <span class="ident">bincode</span>::<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_COMPRESSED</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">encoded</span>, <span class="ident">enc_compressed</span>);
+        <span class="kw">let</span> <span class="ident">encoded</span> <span class="op">=</span> <span class="ident">bincode::serialize</span>(<span class="kw-2">&amp;</span><span class="ident">constants::ED25519_BASEPOINT_POINT</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">enc_compressed</span> <span class="op">=</span> <span class="ident">bincode::serialize</span>(<span class="kw-2">&amp;</span><span class="ident">constants::ED25519_BASEPOINT_COMPRESSED</span>).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq!</span>(<span class="ident">encoded</span>, <span class="ident">enc_compressed</span>);
 
         <span class="comment">// Check that the encoding is 32 bytes exactly</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">encoded</span>.<span class="ident">len</span>(), <span class="number">32</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">encoded</span>.<span class="ident">len</span>(), <span class="number">32</span>);
 
-        <span class="kw">let</span> <span class="ident">dec_uncompressed</span>: <span class="ident">EdwardsPoint</span> <span class="op">=</span> <span class="ident">bincode</span>::<span class="ident">deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">encoded</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">dec_compressed</span>: <span class="ident">CompressedEdwardsY</span> <span class="op">=</span> <span class="ident">bincode</span>::<span class="ident">deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">encoded</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">dec_uncompressed</span>: <span class="ident">EdwardsPoint</span> <span class="op">=</span> <span class="ident">bincode::deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">encoded</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">dec_compressed</span>: <span class="ident">CompressedEdwardsY</span> <span class="op">=</span> <span class="ident">bincode::deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">encoded</span>).<span class="ident">unwrap</span>();
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">dec_uncompressed</span>, <span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_POINT</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">dec_compressed</span>, <span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_COMPRESSED</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">dec_uncompressed</span>, <span class="ident">constants::ED25519_BASEPOINT_POINT</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">dec_compressed</span>, <span class="ident">constants::ED25519_BASEPOINT_COMPRESSED</span>);
 
         <span class="comment">// Check that the encoding itself matches the usual one</span>
-        <span class="kw">let</span> <span class="ident">raw_bytes</span> <span class="op">=</span> <span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_COMPRESSED</span>.<span class="ident">as_bytes</span>();
-        <span class="kw">let</span> <span class="ident">bp</span>: <span class="ident">EdwardsPoint</span> <span class="op">=</span> <span class="ident">bincode</span>::<span class="ident">deserialize</span>(<span class="ident">raw_bytes</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">bp</span>, <span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_POINT</span>);
+        <span class="kw">let</span> <span class="ident">raw_bytes</span> <span class="op">=</span> <span class="ident">constants::ED25519_BASEPOINT_COMPRESSED</span>.<span class="ident">as_bytes</span>();
+        <span class="kw">let</span> <span class="ident">bp</span>: <span class="ident">EdwardsPoint</span> <span class="op">=</span> <span class="ident">bincode::deserialize</span>(<span class="ident">raw_bytes</span>).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq!</span>(<span class="ident">bp</span>, <span class="ident">constants::ED25519_BASEPOINT_POINT</span>);
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "curve25519_dalek";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="curve25519_dalek" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/statrs-0.10.0/src/statistics/iter_statistics.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>iter_statistics.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/statrs-0.12.0/src/statistics/iter_statistics.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>iter_statistics.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../statrs/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../statrs/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -403,21 +403,22 @@
 <span id="400">400</span>
 <span id="401">401</span>
 <span id="402">402</span>
+<span id="403">403</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="ident">error</span>::<span class="ident">StatsError</span>;
-<span class="kw">use</span> <span class="ident">statistics</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">borrow</span>::<span class="ident">Borrow</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">f64</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::error::StatsError</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::statistics</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">std::borrow::Borrow</span>;
+<span class="kw">use</span> <span class="ident">std::f64</span>;
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Statistics</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">T</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">IntoIterator</span>,
-    <span class="ident">T</span>::<span class="ident">Item</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
+    <span class="ident">T::Item</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
 {
     <span class="kw">fn</span> <span class="ident">min</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into_iter</span>();
         <span class="kw">match</span> <span class="ident">iter</span>.<span class="ident">next</span>() {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f64</span>::<span class="ident">NAN</span>,
+            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f64::NAN</span>,
             <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">iter</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">x</span>.<span class="ident">borrow</span>()).<span class="ident">fold</span>(<span class="kw-2">*</span><span class="ident">x</span>.<span class="ident">borrow</span>(), <span class="op">|</span><span class="ident">acc</span>, <span class="ident">x</span><span class="op">|</span> {
                 <span class="kw">if</span> <span class="ident">x</span> <span class="op">&lt;</span> <span class="ident">acc</span> <span class="op">|</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">is_nan</span>() {
                     <span class="ident">x</span>
@@ -431,7 +432,7 @@
     <span class="kw">fn</span> <span class="ident">max</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into_iter</span>();
         <span class="kw">match</span> <span class="ident">iter</span>.<span class="ident">next</span>() {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f64</span>::<span class="ident">NAN</span>,
+            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f64::NAN</span>,
             <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">iter</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">x</span>.<span class="ident">borrow</span>()).<span class="ident">fold</span>(<span class="kw-2">*</span><span class="ident">x</span>.<span class="ident">borrow</span>(), <span class="op">|</span><span class="ident">acc</span>, <span class="ident">x</span><span class="op">|</span> {
                 <span class="kw">if</span> <span class="ident">x</span> <span class="op">&gt;</span> <span class="ident">acc</span> <span class="op">|</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">is_nan</span>() {
                     <span class="ident">x</span>
@@ -445,7 +446,7 @@
     <span class="kw">fn</span> <span class="ident">abs_min</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into_iter</span>();
         <span class="kw">match</span> <span class="ident">iter</span>.<span class="ident">next</span>() {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f64</span>::<span class="ident">NAN</span>,
+            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f64::NAN</span>,
             <span class="prelude-val">Some</span>(<span class="ident">init</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">iter</span>
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">borrow</span>().<span class="ident">abs</span>())
                 .<span class="ident">fold</span>(<span class="ident">init</span>.<span class="ident">borrow</span>().<span class="ident">abs</span>(), <span class="op">|</span><span class="ident">acc</span>, <span class="ident">x</span><span class="op">|</span> {
@@ -461,7 +462,7 @@
     <span class="kw">fn</span> <span class="ident">abs_max</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into_iter</span>();
         <span class="kw">match</span> <span class="ident">iter</span>.<span class="ident">next</span>() {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f64</span>::<span class="ident">NAN</span>,
+            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f64::NAN</span>,
             <span class="prelude-val">Some</span>(<span class="ident">init</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">iter</span>
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">borrow</span>().<span class="ident">abs</span>())
                 .<span class="ident">fold</span>(<span class="ident">init</span>.<span class="ident">borrow</span>().<span class="ident">abs</span>(), <span class="op">|</span><span class="ident">acc</span>, <span class="ident">x</span><span class="op">|</span> {
@@ -484,7 +485,7 @@
         <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;</span> <span class="number">0.0</span> {
             <span class="ident">mean</span>
         } <span class="kw">else</span> {
-            <span class="ident">f64</span>::<span class="ident">NAN</span>
+            <span class="ident">f64::NAN</span>
         }
     }
 
@@ -498,7 +499,7 @@
         <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;</span> <span class="number">0.0</span> {
             (<span class="ident">sum</span> <span class="op">/</span> <span class="ident">i</span>).<span class="ident">exp</span>()
         } <span class="kw">else</span> {
-            <span class="ident">f64</span>::<span class="ident">NAN</span>
+            <span class="ident">f64::NAN</span>
         }
     }
 
@@ -510,21 +511,21 @@
 
             <span class="kw">let</span> <span class="ident">borrow</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">x</span>.<span class="ident">borrow</span>();
             <span class="kw">if</span> <span class="ident">borrow</span> <span class="op">&lt;</span> <span class="number">0f64</span> {
-                <span class="kw">return</span> <span class="ident">f64</span>::<span class="ident">NAN</span>;
+                <span class="kw">return</span> <span class="ident">f64::NAN</span>;
             }
             <span class="ident">sum</span> <span class="op">+</span><span class="op">=</span> <span class="number">1.0</span> <span class="op">/</span> <span class="ident">borrow</span>;
         }
         <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;</span> <span class="number">0.0</span> {
             <span class="ident">i</span> <span class="op">/</span> <span class="ident">sum</span>
         } <span class="kw">else</span> {
-            <span class="ident">f64</span>::<span class="ident">NAN</span>
+            <span class="ident">f64::NAN</span>
         }
     }
 
     <span class="kw">fn</span> <span class="ident">variance</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into_iter</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sum</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">iter</span>.<span class="ident">next</span>() {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f64</span>::<span class="ident">NAN</span>,
+            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f64::NAN</span>,
             <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">x</span>.<span class="ident">borrow</span>(),
         };
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="number">1.0</span>;
@@ -540,7 +541,7 @@
         <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;</span> <span class="number">1.0</span> {
             <span class="ident">variance</span> <span class="op">/</span> (<span class="ident">i</span> <span class="op">-</span> <span class="number">1.0</span>)
         } <span class="kw">else</span> {
-            <span class="ident">f64</span>::<span class="ident">NAN</span>
+            <span class="ident">f64::NAN</span>
         }
     }
 
@@ -551,7 +552,7 @@
     <span class="kw">fn</span> <span class="ident">population_variance</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into_iter</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sum</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">iter</span>.<span class="ident">next</span>() {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">f64</span>::<span class="ident">NAN</span>,
+            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">f64::NAN</span>,
             <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">x</span>.<span class="ident">borrow</span>(),
         };
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="number">1.0</span>;
@@ -581,7 +582,7 @@
         <span class="kw">for</span> <span class="ident">x</span> <span class="kw">in</span> <span class="self">self</span> {
             <span class="kw">let</span> <span class="ident">borrow</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">x</span>.<span class="ident">borrow</span>();
             <span class="kw">let</span> <span class="ident">borrow2</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">iter</span>.<span class="ident">next</span>() {
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">StatsError</span>::<span class="ident">ContainersMustBeSameLength</span>)),
+                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">StatsError::ContainersMustBeSameLength</span>)),
                 <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">x</span>.<span class="ident">borrow</span>(),
             };
             <span class="kw">let</span> <span class="ident">old_mean2</span> <span class="op">=</span> <span class="ident">mean2</span>;
@@ -591,13 +592,13 @@
             <span class="ident">comoment</span> <span class="op">+</span><span class="op">=</span> (<span class="ident">borrow</span> <span class="op">-</span> <span class="ident">mean1</span>) <span class="op">*</span> (<span class="ident">borrow2</span> <span class="op">-</span> <span class="ident">old_mean2</span>);
         }
         <span class="kw">if</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">is_some</span>() {
-            <span class="macro">panic</span><span class="macro">!</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">StatsError</span>::<span class="ident">ContainersMustBeSameLength</span>));
+            <span class="macro">panic!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">StatsError::ContainersMustBeSameLength</span>));
         }
 
         <span class="kw">if</span> <span class="ident">n</span> <span class="op">&gt;</span> <span class="number">1.0</span> {
             <span class="ident">comoment</span> <span class="op">/</span> (<span class="ident">n</span> <span class="op">-</span> <span class="number">1.0</span>)
         } <span class="kw">else</span> {
-            <span class="ident">f64</span>::<span class="ident">NAN</span>
+            <span class="ident">f64::NAN</span>
         }
     }
 
@@ -611,7 +612,7 @@
         <span class="kw">for</span> <span class="ident">x</span> <span class="kw">in</span> <span class="self">self</span> {
             <span class="kw">let</span> <span class="ident">borrow</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">x</span>.<span class="ident">borrow</span>();
             <span class="kw">let</span> <span class="ident">borrow2</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">iter</span>.<span class="ident">next</span>() {
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">StatsError</span>::<span class="ident">ContainersMustBeSameLength</span>)),
+                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">StatsError::ContainersMustBeSameLength</span>)),
                 <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">x</span>.<span class="ident">borrow</span>(),
             };
             <span class="kw">let</span> <span class="ident">old_mean2</span> <span class="op">=</span> <span class="ident">mean2</span>;
@@ -621,12 +622,12 @@
             <span class="ident">comoment</span> <span class="op">+</span><span class="op">=</span> (<span class="ident">borrow</span> <span class="op">-</span> <span class="ident">mean1</span>) <span class="op">*</span> (<span class="ident">borrow2</span> <span class="op">-</span> <span class="ident">old_mean2</span>);
         }
         <span class="kw">if</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">is_some</span>() {
-            <span class="macro">panic</span><span class="macro">!</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">StatsError</span>::<span class="ident">ContainersMustBeSameLength</span>));
+            <span class="macro">panic!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">StatsError::ContainersMustBeSameLength</span>));
         }
         <span class="kw">if</span> <span class="ident">n</span> <span class="op">&gt;</span> <span class="number">0.0</span> {
             <span class="ident">comoment</span> <span class="op">/</span> <span class="ident">n</span>
         } <span class="kw">else</span> {
-            <span class="ident">f64</span>::<span class="ident">NAN</span>
+            <span class="ident">f64::NAN</span>
         }
     }
 
@@ -641,7 +642,7 @@
         <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;</span> <span class="number">0.0</span> {
             <span class="ident">mean</span>.<span class="ident">sqrt</span>()
         } <span class="kw">else</span> {
-            <span class="ident">f64</span>::<span class="ident">NAN</span>
+            <span class="ident">f64::NAN</span>
         }
     }
 }
@@ -649,73 +650,74 @@
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">rustfmt</span>, <span class="ident">rustfmt_skip</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">f64</span>::<span class="ident">consts</span>;
-    <span class="kw">use</span> <span class="ident">rand</span>::{<span class="ident">SeedableRng</span>, <span class="ident">StdRng</span>};
-    <span class="kw">use</span> <span class="ident">rand</span>::<span class="ident">distributions</span>::<span class="ident">Distribution</span>;
-    <span class="kw">use</span> <span class="ident">distribution</span>::<span class="ident">Normal</span>;
-    <span class="kw">use</span> <span class="ident">statistics</span>::<span class="ident">Statistics</span>;
-    <span class="kw">use</span> <span class="ident">generate</span>::{<span class="ident">InfinitePeriodic</span>, <span class="ident">InfiniteSinusoidal</span>};
-    <span class="kw">use</span> <span class="ident">testing</span>;
+    <span class="kw">use</span> <span class="ident">std::f64::consts</span>;
+    <span class="kw">use</span> <span class="ident">rand::rngs::StdRng</span>;
+    <span class="kw">use</span> <span class="ident">rand</span>::{<span class="ident">SeedableRng</span>};
+    <span class="kw">use</span> <span class="ident">rand::distributions::Distribution</span>;
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::distribution::Normal</span>;
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::statistics::Statistics</span>;
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::generate</span>::{<span class="ident">InfinitePeriodic</span>, <span class="ident">InfiniteSinusoidal</span>};
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::testing</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_mean</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing</span>::<span class="ident">load_data</span>(<span class="string">&quot;nist/lottery.txt&quot;</span>);
-        <span class="macro">assert_almost_eq</span><span class="macro">!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">mean</span>(), <span class="number">518.958715596330</span>, <span class="number">1e-12</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing::load_data</span>(<span class="string">&quot;nist/lottery.txt&quot;</span>);
+        <span class="macro">assert_almost_eq!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">mean</span>(), <span class="number">518.958715596330</span>, <span class="number">1e-12</span>);
 
-        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing</span>::<span class="ident">load_data</span>(<span class="string">&quot;nist/lew.txt&quot;</span>);
-        <span class="macro">assert_almost_eq</span><span class="macro">!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">mean</span>(), <span class="op">-</span><span class="number">177.435000000000</span>, <span class="number">1e-13</span>);
+        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing::load_data</span>(<span class="string">&quot;nist/lew.txt&quot;</span>);
+        <span class="macro">assert_almost_eq!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">mean</span>(), <span class="op">-</span><span class="number">177.435000000000</span>, <span class="number">1e-13</span>);
 
-        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing</span>::<span class="ident">load_data</span>(<span class="string">&quot;nist/mavro.txt&quot;</span>);
-        <span class="macro">assert_almost_eq</span><span class="macro">!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">mean</span>(), <span class="number">2.00185600000000</span>, <span class="number">1e-15</span>);
+        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing::load_data</span>(<span class="string">&quot;nist/mavro.txt&quot;</span>);
+        <span class="macro">assert_almost_eq!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">mean</span>(), <span class="number">2.00185600000000</span>, <span class="number">1e-15</span>);
 
-        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing</span>::<span class="ident">load_data</span>(<span class="string">&quot;nist/michaelso.txt&quot;</span>);
-        <span class="macro">assert_almost_eq</span><span class="macro">!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">mean</span>(), <span class="number">299.852400000000</span>, <span class="number">1e-13</span>);
+        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing::load_data</span>(<span class="string">&quot;nist/michaelso.txt&quot;</span>);
+        <span class="macro">assert_almost_eq!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">mean</span>(), <span class="number">299.852400000000</span>, <span class="number">1e-13</span>);
 
-        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing</span>::<span class="ident">load_data</span>(<span class="string">&quot;nist/numacc1.txt&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">mean</span>(), <span class="number">10000002.0</span>);
+        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing::load_data</span>(<span class="string">&quot;nist/numacc1.txt&quot;</span>);
+        <span class="macro">assert_eq!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">mean</span>(), <span class="number">10000002.0</span>);
 
-        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing</span>::<span class="ident">load_data</span>(<span class="string">&quot;nist/numacc2.txt&quot;</span>);
-        <span class="macro">assert_almost_eq</span><span class="macro">!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">mean</span>(), <span class="number">1.2</span>, <span class="number">1e-15</span>);
+        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing::load_data</span>(<span class="string">&quot;nist/numacc2.txt&quot;</span>);
+        <span class="macro">assert_almost_eq!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">mean</span>(), <span class="number">1.2</span>, <span class="number">1e-15</span>);
 
-        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing</span>::<span class="ident">load_data</span>(<span class="string">&quot;nist/numacc3.txt&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">mean</span>(), <span class="number">1000000.2</span>);
+        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing::load_data</span>(<span class="string">&quot;nist/numacc3.txt&quot;</span>);
+        <span class="macro">assert_eq!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">mean</span>(), <span class="number">1000000.2</span>);
 
-        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing</span>::<span class="ident">load_data</span>(<span class="string">&quot;nist/numacc4.txt&quot;</span>);
-        <span class="macro">assert_almost_eq</span><span class="macro">!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">mean</span>(), <span class="number">10000000.2</span>, <span class="number">1e-8</span>);
+        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing::load_data</span>(<span class="string">&quot;nist/numacc4.txt&quot;</span>);
+        <span class="macro">assert_almost_eq!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">mean</span>(), <span class="number">10000000.2</span>, <span class="number">1e-8</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_std_dev</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing</span>::<span class="ident">load_data</span>(<span class="string">&quot;nist/lottery.txt&quot;</span>);
-        <span class="macro">assert_almost_eq</span><span class="macro">!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">std_dev</span>(), <span class="number">291.699727470969</span>, <span class="number">1e-13</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing::load_data</span>(<span class="string">&quot;nist/lottery.txt&quot;</span>);
+        <span class="macro">assert_almost_eq!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">std_dev</span>(), <span class="number">291.699727470969</span>, <span class="number">1e-13</span>);
 
-        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing</span>::<span class="ident">load_data</span>(<span class="string">&quot;nist/lew.txt&quot;</span>);
-        <span class="macro">assert_almost_eq</span><span class="macro">!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">std_dev</span>(), <span class="number">277.332168044316</span>, <span class="number">1e-12</span>);
+        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing::load_data</span>(<span class="string">&quot;nist/lew.txt&quot;</span>);
+        <span class="macro">assert_almost_eq!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">std_dev</span>(), <span class="number">277.332168044316</span>, <span class="number">1e-12</span>);
 
-        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing</span>::<span class="ident">load_data</span>(<span class="string">&quot;nist/mavro.txt&quot;</span>);
-        <span class="macro">assert_almost_eq</span><span class="macro">!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">std_dev</span>(), <span class="number">0.000429123454003053</span>, <span class="number">1e-15</span>);
+        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing::load_data</span>(<span class="string">&quot;nist/mavro.txt&quot;</span>);
+        <span class="macro">assert_almost_eq!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">std_dev</span>(), <span class="number">0.000429123454003053</span>, <span class="number">1e-15</span>);
 
-        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing</span>::<span class="ident">load_data</span>(<span class="string">&quot;nist/michaelso.txt&quot;</span>);
-        <span class="macro">assert_almost_eq</span><span class="macro">!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">std_dev</span>(), <span class="number">0.0790105478190518</span>, <span class="number">1e-13</span>);
+        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing::load_data</span>(<span class="string">&quot;nist/michaelso.txt&quot;</span>);
+        <span class="macro">assert_almost_eq!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">std_dev</span>(), <span class="number">0.0790105478190518</span>, <span class="number">1e-13</span>);
 
-        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing</span>::<span class="ident">load_data</span>(<span class="string">&quot;nist/numacc1.txt&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">std_dev</span>(), <span class="number">1.0</span>);
+        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing::load_data</span>(<span class="string">&quot;nist/numacc1.txt&quot;</span>);
+        <span class="macro">assert_eq!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">std_dev</span>(), <span class="number">1.0</span>);
 
-        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing</span>::<span class="ident">load_data</span>(<span class="string">&quot;nist/numacc2.txt&quot;</span>);
-        <span class="macro">assert_almost_eq</span><span class="macro">!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">std_dev</span>(), <span class="number">0.1</span>, <span class="number">1e-16</span>);
+        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing::load_data</span>(<span class="string">&quot;nist/numacc2.txt&quot;</span>);
+        <span class="macro">assert_almost_eq!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">std_dev</span>(), <span class="number">0.1</span>, <span class="number">1e-16</span>);
 
-        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing</span>::<span class="ident">load_data</span>(<span class="string">&quot;nist/numacc3.txt&quot;</span>);
-        <span class="macro">assert_almost_eq</span><span class="macro">!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">std_dev</span>(), <span class="number">0.1</span>, <span class="number">1e-10</span>);
+        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing::load_data</span>(<span class="string">&quot;nist/numacc3.txt&quot;</span>);
+        <span class="macro">assert_almost_eq!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">std_dev</span>(), <span class="number">0.1</span>, <span class="number">1e-10</span>);
 
-        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing</span>::<span class="ident">load_data</span>(<span class="string">&quot;nist/numacc4.txt&quot;</span>);
-        <span class="macro">assert_almost_eq</span><span class="macro">!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">std_dev</span>(), <span class="number">0.1</span>, <span class="number">1e-9</span>);
+        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing::load_data</span>(<span class="string">&quot;nist/numacc4.txt&quot;</span>);
+        <span class="macro">assert_almost_eq!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">std_dev</span>(), <span class="number">0.1</span>, <span class="number">1e-9</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_min_max_short</span>() {
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> [<span class="op">-</span><span class="number">1.0</span>, <span class="number">5.0</span>, <span class="number">0.0</span>, <span class="op">-</span><span class="number">3.0</span>, <span class="number">10.0</span>, <span class="op">-</span><span class="number">0.5</span>, <span class="number">4.0</span>];
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">data</span>.<span class="ident">min</span>(), <span class="op">-</span><span class="number">3.0</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">data</span>.<span class="ident">max</span>(), <span class="number">10.0</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">min</span>(), <span class="op">-</span><span class="number">3.0</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">max</span>(), <span class="number">10.0</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -724,87 +726,88 @@
             <span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>, <span class="number">10</span>, <span class="number">11</span>, <span class="number">12</span>, <span class="number">13</span>, <span class="number">14</span>, <span class="number">15</span>, <span class="number">16</span>, <span class="number">17</span>, <span class="number">18</span>,
             <span class="number">19</span>, <span class="number">20</span>, <span class="number">21</span>, <span class="number">22</span>, <span class="number">23</span>, <span class="number">24</span>, <span class="number">25</span>, <span class="number">26</span>, <span class="number">27</span>, <span class="number">28</span>, <span class="number">29</span>, <span class="number">30</span>, <span class="number">31</span>
         ];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rng</span>: <span class="ident">StdRng</span> <span class="op">=</span> <span class="ident">SeedableRng</span>::<span class="ident">from_seed</span>(<span class="ident">seed</span>);
-        <span class="kw">let</span> <span class="ident">normal</span> <span class="op">=</span> <span class="ident">Normal</span>::<span class="ident">new</span>(<span class="number">1e9</span>, <span class="number">2.0</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rng</span>: <span class="ident">StdRng</span> <span class="op">=</span> <span class="ident">SeedableRng::from_seed</span>(<span class="ident">seed</span>);
+        <span class="kw">let</span> <span class="ident">normal</span> <span class="op">=</span> <span class="ident">Normal::new</span>(<span class="number">1e9</span>, <span class="number">2.0</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">samples</span> <span class="op">=</span> (<span class="number">0</span>..<span class="number">10000</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">normal</span>.<span class="ident">sample</span>::<span class="op">&lt;</span><span class="ident">StdRng</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rng</span>)).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-        <span class="macro">assert_almost_eq</span><span class="macro">!</span>((<span class="kw-2">&amp;</span><span class="ident">samples</span>).<span class="ident">mean</span>(), <span class="number">1e9</span>, <span class="number">10.0</span>);
-        <span class="macro">assert_almost_eq</span><span class="macro">!</span>((<span class="kw-2">&amp;</span><span class="ident">samples</span>).<span class="ident">variance</span>(), <span class="number">4.0</span>, <span class="number">0.1</span>);
-        <span class="macro">assert_almost_eq</span><span class="macro">!</span>((<span class="kw-2">&amp;</span><span class="ident">samples</span>).<span class="ident">std_dev</span>(), <span class="number">2.0</span>, <span class="number">0.01</span>);
-        <span class="macro">assert_almost_eq</span><span class="macro">!</span>((<span class="kw-2">&amp;</span><span class="ident">samples</span>).<span class="ident">quadratic_mean</span>(), <span class="number">1e9</span>, <span class="number">10.0</span>);
+        <span class="macro">assert_almost_eq!</span>((<span class="kw-2">&amp;</span><span class="ident">samples</span>).<span class="ident">mean</span>(), <span class="number">1e9</span>, <span class="number">10.0</span>);
+        <span class="macro">assert_almost_eq!</span>((<span class="kw-2">&amp;</span><span class="ident">samples</span>).<span class="ident">variance</span>(), <span class="number">4.0</span>, <span class="number">0.1</span>);
+        <span class="macro">assert_almost_eq!</span>((<span class="kw-2">&amp;</span><span class="ident">samples</span>).<span class="ident">std_dev</span>(), <span class="number">2.0</span>, <span class="number">0.01</span>);
+        <span class="macro">assert_almost_eq!</span>((<span class="kw-2">&amp;</span><span class="ident">samples</span>).<span class="ident">quadratic_mean</span>(), <span class="number">1e9</span>, <span class="number">10.0</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_covariance_consistent_with_variance</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing</span>::<span class="ident">load_data</span>(<span class="string">&quot;nist/lottery.txt&quot;</span>);
-        <span class="macro">assert_almost_eq</span><span class="macro">!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">variance</span>(), (<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">covariance</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>), <span class="number">1e-10</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing::load_data</span>(<span class="string">&quot;nist/lottery.txt&quot;</span>);
+        <span class="macro">assert_almost_eq!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">variance</span>(), (<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">covariance</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>), <span class="number">1e-10</span>);
 
-        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing</span>::<span class="ident">load_data</span>(<span class="string">&quot;nist/lew.txt&quot;</span>);
-        <span class="macro">assert_almost_eq</span><span class="macro">!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">variance</span>(), (<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">covariance</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>), <span class="number">1e-10</span>);
+        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing::load_data</span>(<span class="string">&quot;nist/lew.txt&quot;</span>);
+        <span class="macro">assert_almost_eq!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">variance</span>(), (<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">covariance</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>), <span class="number">1e-10</span>);
 
-        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing</span>::<span class="ident">load_data</span>(<span class="string">&quot;nist/mavro.txt&quot;</span>);
-        <span class="macro">assert_almost_eq</span><span class="macro">!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">variance</span>(), (<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">covariance</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>), <span class="number">1e-10</span>);
+        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing::load_data</span>(<span class="string">&quot;nist/mavro.txt&quot;</span>);
+        <span class="macro">assert_almost_eq!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">variance</span>(), (<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">covariance</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>), <span class="number">1e-10</span>);
 
-        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing</span>::<span class="ident">load_data</span>(<span class="string">&quot;nist/michaelso.txt&quot;</span>);
-        <span class="macro">assert_almost_eq</span><span class="macro">!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">variance</span>(), (<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">covariance</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>), <span class="number">1e-10</span>);
+        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing::load_data</span>(<span class="string">&quot;nist/michaelso.txt&quot;</span>);
+        <span class="macro">assert_almost_eq!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">variance</span>(), (<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">covariance</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>), <span class="number">1e-10</span>);
 
-        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing</span>::<span class="ident">load_data</span>(<span class="string">&quot;nist/numacc1.txt&quot;</span>);
-        <span class="macro">assert_almost_eq</span><span class="macro">!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">variance</span>(), (<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">covariance</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>), <span class="number">1e-10</span>);
+        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing::load_data</span>(<span class="string">&quot;nist/numacc1.txt&quot;</span>);
+        <span class="macro">assert_almost_eq!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">variance</span>(), (<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">covariance</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>), <span class="number">1e-10</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_pop_covar_consistent_with_pop_var</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing</span>::<span class="ident">load_data</span>(<span class="string">&quot;nist/lottery.txt&quot;</span>);
-        <span class="macro">assert_almost_eq</span><span class="macro">!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">population_variance</span>(), (<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">population_covariance</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>), <span class="number">1e-10</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing::load_data</span>(<span class="string">&quot;nist/lottery.txt&quot;</span>);
+        <span class="macro">assert_almost_eq!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">population_variance</span>(), (<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">population_covariance</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>), <span class="number">1e-10</span>);
 
-        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing</span>::<span class="ident">load_data</span>(<span class="string">&quot;nist/lew.txt&quot;</span>);
-        <span class="macro">assert_almost_eq</span><span class="macro">!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">population_variance</span>(), (<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">population_covariance</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>), <span class="number">1e-10</span>);
+        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing::load_data</span>(<span class="string">&quot;nist/lew.txt&quot;</span>);
+        <span class="macro">assert_almost_eq!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">population_variance</span>(), (<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">population_covariance</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>), <span class="number">1e-10</span>);
 
-        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing</span>::<span class="ident">load_data</span>(<span class="string">&quot;nist/mavro.txt&quot;</span>);
-        <span class="macro">assert_almost_eq</span><span class="macro">!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">population_variance</span>(), (<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">population_covariance</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>), <span class="number">1e-10</span>);
+        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing::load_data</span>(<span class="string">&quot;nist/mavro.txt&quot;</span>);
+        <span class="macro">assert_almost_eq!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">population_variance</span>(), (<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">population_covariance</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>), <span class="number">1e-10</span>);
 
-        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing</span>::<span class="ident">load_data</span>(<span class="string">&quot;nist/michaelso.txt&quot;</span>);
-        <span class="macro">assert_almost_eq</span><span class="macro">!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">population_variance</span>(), (<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">population_covariance</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>), <span class="number">1e-10</span>);
+        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing::load_data</span>(<span class="string">&quot;nist/michaelso.txt&quot;</span>);
+        <span class="macro">assert_almost_eq!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">population_variance</span>(), (<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">population_covariance</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>), <span class="number">1e-10</span>);
 
-        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing</span>::<span class="ident">load_data</span>(<span class="string">&quot;nist/numacc1.txt&quot;</span>);
-        <span class="macro">assert_almost_eq</span><span class="macro">!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">population_variance</span>(), (<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">population_covariance</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>), <span class="number">1e-10</span>);
+        <span class="ident">data</span> <span class="op">=</span> <span class="ident">testing::load_data</span>(<span class="string">&quot;nist/numacc1.txt&quot;</span>);
+        <span class="macro">assert_almost_eq!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">population_variance</span>(), (<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">population_covariance</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>), <span class="number">1e-10</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_covariance_is_symmetric</span>() {
-        <span class="kw">let</span> <span class="ident">data_a</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">testing</span>::<span class="ident">load_data</span>(<span class="string">&quot;nist/lottery.txt&quot;</span>)[<span class="number">0</span>..<span class="number">200</span>];
-        <span class="kw">let</span> <span class="ident">data_b</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">testing</span>::<span class="ident">load_data</span>(<span class="string">&quot;nist/lew.txt&quot;</span>)[<span class="number">0</span>..<span class="number">200</span>];
-        <span class="macro">assert_almost_eq</span><span class="macro">!</span>(<span class="ident">data_a</span>.<span class="ident">covariance</span>(<span class="ident">data_b</span>), <span class="ident">data_b</span>.<span class="ident">covariance</span>(<span class="ident">data_a</span>), <span class="number">1e-10</span>);
-        <span class="macro">assert_almost_eq</span><span class="macro">!</span>(<span class="ident">data_a</span>.<span class="ident">population_covariance</span>(<span class="ident">data_b</span>), <span class="ident">data_b</span>.<span class="ident">population_covariance</span>(<span class="ident">data_a</span>), <span class="number">1e-11</span>);
+        <span class="kw">let</span> <span class="ident">data_a</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">testing::load_data</span>(<span class="string">&quot;nist/lottery.txt&quot;</span>)[<span class="number">0</span>..<span class="number">200</span>];
+        <span class="kw">let</span> <span class="ident">data_b</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">testing::load_data</span>(<span class="string">&quot;nist/lew.txt&quot;</span>)[<span class="number">0</span>..<span class="number">200</span>];
+        <span class="macro">assert_almost_eq!</span>(<span class="ident">data_a</span>.<span class="ident">covariance</span>(<span class="ident">data_b</span>), <span class="ident">data_b</span>.<span class="ident">covariance</span>(<span class="ident">data_a</span>), <span class="number">1e-10</span>);
+        <span class="macro">assert_almost_eq!</span>(<span class="ident">data_a</span>.<span class="ident">population_covariance</span>(<span class="ident">data_b</span>), <span class="ident">data_b</span>.<span class="ident">population_covariance</span>(<span class="ident">data_a</span>), <span class="number">1e-11</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_empty_data_returns_nan</span>() {
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> [<span class="number">0.0</span>; <span class="number">0</span>];
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">data</span>.<span class="ident">min</span>().<span class="ident">is_nan</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">data</span>.<span class="ident">max</span>().<span class="ident">is_nan</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">data</span>.<span class="ident">mean</span>().<span class="ident">is_nan</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">data</span>.<span class="ident">quadratic_mean</span>().<span class="ident">is_nan</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">data</span>.<span class="ident">variance</span>().<span class="ident">is_nan</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">data</span>.<span class="ident">population_variance</span>().<span class="ident">is_nan</span>());
+        <span class="macro">assert!</span>(<span class="ident">data</span>.<span class="ident">min</span>().<span class="ident">is_nan</span>());
+        <span class="macro">assert!</span>(<span class="ident">data</span>.<span class="ident">max</span>().<span class="ident">is_nan</span>());
+        <span class="macro">assert!</span>(<span class="ident">data</span>.<span class="ident">mean</span>().<span class="ident">is_nan</span>());
+        <span class="macro">assert!</span>(<span class="ident">data</span>.<span class="ident">quadratic_mean</span>().<span class="ident">is_nan</span>());
+        <span class="macro">assert!</span>(<span class="ident">data</span>.<span class="ident">variance</span>().<span class="ident">is_nan</span>());
+        <span class="macro">assert!</span>(<span class="ident">data</span>.<span class="ident">population_variance</span>().<span class="ident">is_nan</span>());
     }
 
     <span class="comment">// TODO: test github issue 137 (Math.NET)</span>
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_large_samples</span>() {
-        <span class="kw">let</span> <span class="ident">shorter</span> <span class="op">=</span> <span class="ident">InfinitePeriodic</span>::<span class="ident">default</span>(<span class="number">4.0</span>, <span class="number">1.0</span>).<span class="ident">take</span>(<span class="number">4</span><span class="kw-2">*</span><span class="number">4096</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-        <span class="kw">let</span> <span class="ident">longer</span> <span class="op">=</span> <span class="ident">InfinitePeriodic</span>::<span class="ident">default</span>(<span class="number">4.0</span>, <span class="number">1.0</span>).<span class="ident">take</span>(<span class="number">4</span><span class="kw-2">*</span><span class="number">32768</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-        <span class="macro">assert_almost_eq</span><span class="macro">!</span>((<span class="kw-2">&amp;</span><span class="ident">shorter</span>).<span class="ident">mean</span>(), <span class="number">0.375</span>, <span class="number">1e-14</span>);
-        <span class="macro">assert_almost_eq</span><span class="macro">!</span>((<span class="kw-2">&amp;</span><span class="ident">longer</span>).<span class="ident">mean</span>(), <span class="number">0.375</span>, <span class="number">1e-14</span>);
-        <span class="macro">assert_almost_eq</span><span class="macro">!</span>((<span class="kw-2">&amp;</span><span class="ident">shorter</span>).<span class="ident">quadratic_mean</span>(), (<span class="number">0.21875f64</span>).<span class="ident">sqrt</span>(), <span class="number">1e-14</span>);
-        <span class="macro">assert_almost_eq</span><span class="macro">!</span>((<span class="kw-2">&amp;</span><span class="ident">longer</span>).<span class="ident">quadratic_mean</span>(), (<span class="number">0.21875f64</span>).<span class="ident">sqrt</span>(), <span class="number">1e-14</span>);
+        <span class="kw">let</span> <span class="ident">shorter</span> <span class="op">=</span> <span class="ident">InfinitePeriodic::default</span>(<span class="number">4.0</span>, <span class="number">1.0</span>).<span class="ident">take</span>(<span class="number">4</span><span class="kw-2">*</span><span class="number">4096</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+        <span class="kw">let</span> <span class="ident">longer</span> <span class="op">=</span> <span class="ident">InfinitePeriodic::default</span>(<span class="number">4.0</span>, <span class="number">1.0</span>).<span class="ident">take</span>(<span class="number">4</span><span class="kw-2">*</span><span class="number">32768</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+        <span class="macro">assert_almost_eq!</span>((<span class="kw-2">&amp;</span><span class="ident">shorter</span>).<span class="ident">mean</span>(), <span class="number">0.375</span>, <span class="number">1e-14</span>);
+        <span class="macro">assert_almost_eq!</span>((<span class="kw-2">&amp;</span><span class="ident">longer</span>).<span class="ident">mean</span>(), <span class="number">0.375</span>, <span class="number">1e-14</span>);
+        <span class="macro">assert_almost_eq!</span>((<span class="kw-2">&amp;</span><span class="ident">shorter</span>).<span class="ident">quadratic_mean</span>(), (<span class="number">0.21875f64</span>).<span class="ident">sqrt</span>(), <span class="number">1e-14</span>);
+        <span class="macro">assert_almost_eq!</span>((<span class="kw-2">&amp;</span><span class="ident">longer</span>).<span class="ident">quadratic_mean</span>(), (<span class="number">0.21875f64</span>).<span class="ident">sqrt</span>(), <span class="number">1e-14</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_quadratic_mean_of_sinusoidal</span>() {
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">InfiniteSinusoidal</span>::<span class="ident">default</span>(<span class="number">64.0</span>, <span class="number">16.0</span>, <span class="number">2.0</span>).<span class="ident">take</span>(<span class="number">128</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-        <span class="macro">assert_almost_eq</span><span class="macro">!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">quadratic_mean</span>(), <span class="number">2.0</span> <span class="op">/</span> <span class="ident">consts</span>::<span class="ident">SQRT_2</span>, <span class="number">1e-15</span>);
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">InfiniteSinusoidal::default</span>(<span class="number">64.0</span>, <span class="number">16.0</span>, <span class="number">2.0</span>).<span class="ident">take</span>(<span class="number">128</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+        <span class="macro">assert_almost_eq!</span>((<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">quadratic_mean</span>(), <span class="number">2.0</span> <span class="op">/</span> <span class="ident">consts::SQRT_2</span>, <span class="number">1e-15</span>);
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "statrs";</script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="statrs" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
+    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script></body></html>

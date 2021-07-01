@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Call",""],["Event",""]],"struct":[["Pallet",""]],"trait":[["Config",""]],"type":[["Module","Type alias to `Pallet`, to be used by `construct_runtime`."],["RoleBuilderOf",""],["RoleManagerOf",""]]});

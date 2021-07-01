@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sc-service-0.8.0/src/metrics.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>metrics.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sc-service-0.9.0/src/metrics.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>metrics.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../sc_service/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../sc_service/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -342,7 +342,7 @@
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// This file is part of Substrate.</span>
 
-<span class="comment">// Copyright (C) 2020 Parity Technologies (UK) Ltd.</span>
+<span class="comment">// Copyright (C) 2020-2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// SPDX-License-Identifier: GPL-3.0-or-later WITH Classpath-exception-2.0</span>
 
 <span class="comment">// This program is free software: you can redistribute it and/or modify</span>
@@ -358,22 +358,22 @@
 <span class="comment">// You should have received a copy of the GNU General Public License</span>
 <span class="comment">// along with this program. If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert</span>::<span class="ident">TryFrom</span>, <span class="ident">time</span>::<span class="ident">SystemTime</span>};
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert::TryFrom</span>, <span class="ident">time::SystemTime</span>};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">NetworkStatus</span>, <span class="ident">NetworkState</span>, <span class="ident">NetworkStatusSinks</span>, <span class="ident">config</span>::<span class="ident">Configuration</span>};
-<span class="kw">use</span> <span class="ident">futures_timer</span>::<span class="ident">Delay</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">NetworkStatus</span>, <span class="ident">NetworkState</span>, <span class="ident">NetworkStatusSinks</span>, <span class="ident">config::Configuration</span>};
+<span class="kw">use</span> <span class="ident">futures_timer::Delay</span>;
 <span class="kw">use</span> <span class="ident">prometheus_endpoint</span>::{<span class="ident">register</span>, <span class="ident">Gauge</span>, <span class="ident">U64</span>, <span class="ident">Registry</span>, <span class="ident">PrometheusError</span>, <span class="ident">Opts</span>, <span class="ident">GaugeVec</span>};
 <span class="kw">use</span> <span class="ident">sc_telemetry</span>::{<span class="ident">telemetry</span>, <span class="ident">SUBSTRATE_INFO</span>};
-<span class="kw">use</span> <span class="ident">sp_api</span>::<span class="ident">ProvideRuntimeApi</span>;
-<span class="kw">use</span> <span class="ident">sp_runtime</span>::<span class="ident">traits</span>::{<span class="ident">NumberFor</span>, <span class="ident">Block</span>, <span class="ident">SaturatedConversion</span>, <span class="ident">UniqueSaturatedInto</span>};
+<span class="kw">use</span> <span class="ident">sp_api::ProvideRuntimeApi</span>;
+<span class="kw">use</span> <span class="ident">sp_runtime::traits</span>::{<span class="ident">NumberFor</span>, <span class="ident">Block</span>, <span class="ident">SaturatedConversion</span>, <span class="ident">UniqueSaturatedInto</span>};
 <span class="kw">use</span> <span class="ident">sp_transaction_pool</span>::{<span class="ident">PoolStatus</span>, <span class="ident">MaintainedTransactionPool</span>};
-<span class="kw">use</span> <span class="ident">sp_utils</span>::<span class="ident">metrics</span>::<span class="ident">register_globals</span>;
-<span class="kw">use</span> <span class="ident">sp_utils</span>::<span class="ident">mpsc</span>::<span class="ident">TracingUnboundedReceiver</span>;
+<span class="kw">use</span> <span class="ident">sp_utils::metrics::register_globals</span>;
+<span class="kw">use</span> <span class="ident">sp_utils::mpsc::TracingUnboundedReceiver</span>;
 <span class="kw">use</span> <span class="ident">sc_client_api</span>::{<span class="ident">ClientInfo</span>, <span class="ident">UsageProvider</span>};
-<span class="kw">use</span> <span class="ident">sc_network</span>::<span class="ident">config</span>::<span class="ident">Role</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Arc</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">time</span>::<span class="ident">Duration</span>;
-<span class="kw">use</span> <span class="ident">wasm_timer</span>::<span class="ident">Instant</span>;
+<span class="kw">use</span> <span class="ident">sc_network::config::Role</span>;
+<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
+<span class="kw">use</span> <span class="ident">wasm_timer::Instant</span>;
 
 <span class="kw">struct</span> <span class="ident">PrometheusMetrics</span> {
 	<span class="comment">// generic info</span>
@@ -394,8 +394,8 @@
 		<span class="ident">version</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
 		<span class="ident">roles</span>: <span class="ident">u64</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">PrometheusError</span><span class="op">&gt;</span> {
-		<span class="ident">register</span>(<span class="ident">Gauge</span>::<span class="op">&lt;</span><span class="ident">U64</span><span class="op">&gt;</span>::<span class="ident">with_opts</span>(
-			<span class="ident">Opts</span>::<span class="ident">new</span>(
+		<span class="ident">register</span>(<span class="ident">Gauge</span>::<span class="op">&lt;</span><span class="ident">U64</span><span class="op">&gt;</span><span class="ident">::with_opts</span>(
+			<span class="ident">Opts::new</span>(
 				<span class="string">&quot;build_info&quot;</span>,
 				<span class="string">&quot;A metric with a constant &#39;1&#39; value labeled by name, version&quot;</span>
 			)
@@ -403,43 +403,43 @@
 				.<span class="ident">const_label</span>(<span class="string">&quot;version&quot;</span>, <span class="ident">version</span>)
 		)<span class="question-mark">?</span>, <span class="kw-2">&amp;</span><span class="ident">registry</span>)<span class="question-mark">?</span>.<span class="ident">set</span>(<span class="number">1</span>);
 
-		<span class="ident">register</span>(<span class="ident">Gauge</span>::<span class="op">&lt;</span><span class="ident">U64</span><span class="op">&gt;</span>::<span class="ident">new</span>(
+		<span class="ident">register</span>(<span class="ident">Gauge</span>::<span class="op">&lt;</span><span class="ident">U64</span><span class="op">&gt;</span><span class="ident">::new</span>(
 			<span class="string">&quot;node_roles&quot;</span>, <span class="string">&quot;The roles the node is running as&quot;</span>,
 		)<span class="question-mark">?</span>, <span class="kw-2">&amp;</span><span class="ident">registry</span>)<span class="question-mark">?</span>.<span class="ident">set</span>(<span class="ident">roles</span>);
 
 		<span class="ident">register_globals</span>(<span class="ident">registry</span>)<span class="question-mark">?</span>;
 
-		<span class="kw">let</span> <span class="ident">start_time_since_epoch</span> <span class="op">=</span> <span class="ident">SystemTime</span>::<span class="ident">now</span>().<span class="ident">duration_since</span>(<span class="ident">SystemTime</span>::<span class="ident">UNIX_EPOCH</span>)
+		<span class="kw">let</span> <span class="ident">start_time_since_epoch</span> <span class="op">=</span> <span class="ident">SystemTime::now</span>().<span class="ident">duration_since</span>(<span class="ident">SystemTime::UNIX_EPOCH</span>)
 			.<span class="ident">unwrap_or_default</span>();
-		<span class="ident">register</span>(<span class="ident">Gauge</span>::<span class="op">&lt;</span><span class="ident">U64</span><span class="op">&gt;</span>::<span class="ident">new</span>(
+		<span class="ident">register</span>(<span class="ident">Gauge</span>::<span class="op">&lt;</span><span class="ident">U64</span><span class="op">&gt;</span><span class="ident">::new</span>(
 			<span class="string">&quot;process_start_time_seconds&quot;</span>,
 			<span class="string">&quot;Number of seconds between the UNIX epoch and the moment the process started&quot;</span>,
 		)<span class="question-mark">?</span>, <span class="ident">registry</span>)<span class="question-mark">?</span>.<span class="ident">set</span>(<span class="ident">start_time_since_epoch</span>.<span class="ident">as_secs</span>());
 
 		<span class="prelude-val">Ok</span>(<span class="self">Self</span> {
 			<span class="comment">// generic internals</span>
-			<span class="ident">block_height</span>: <span class="ident">register</span>(<span class="ident">GaugeVec</span>::<span class="ident">new</span>(
-				<span class="ident">Opts</span>::<span class="ident">new</span>(<span class="string">&quot;block_height&quot;</span>, <span class="string">&quot;Block height info of the chain&quot;</span>),
+			<span class="ident">block_height</span>: <span class="ident">register</span>(<span class="ident">GaugeVec::new</span>(
+				<span class="ident">Opts::new</span>(<span class="string">&quot;block_height&quot;</span>, <span class="string">&quot;Block height info of the chain&quot;</span>),
 				<span class="kw-2">&amp;</span>[<span class="string">&quot;status&quot;</span>]
 			)<span class="question-mark">?</span>, <span class="ident">registry</span>)<span class="question-mark">?</span>,
 
-			<span class="ident">number_leaves</span>: <span class="ident">register</span>(<span class="ident">Gauge</span>::<span class="ident">new</span>(
+			<span class="ident">number_leaves</span>: <span class="ident">register</span>(<span class="ident">Gauge::new</span>(
 				<span class="string">&quot;number_leaves&quot;</span>, <span class="string">&quot;Number of known chain leaves (aka forks)&quot;</span>,
 			)<span class="question-mark">?</span>, <span class="ident">registry</span>)<span class="question-mark">?</span>,
 
-			<span class="ident">ready_transactions_number</span>: <span class="ident">register</span>(<span class="ident">Gauge</span>::<span class="ident">new</span>(
+			<span class="ident">ready_transactions_number</span>: <span class="ident">register</span>(<span class="ident">Gauge::new</span>(
 				<span class="string">&quot;ready_transactions_number&quot;</span>, <span class="string">&quot;Number of transactions in the ready queue&quot;</span>,
 			)<span class="question-mark">?</span>, <span class="ident">registry</span>)<span class="question-mark">?</span>,
 
 			<span class="comment">// I/ O</span>
-			<span class="ident">database_cache</span>: <span class="ident">register</span>(<span class="ident">Gauge</span>::<span class="ident">new</span>(
+			<span class="ident">database_cache</span>: <span class="ident">register</span>(<span class="ident">Gauge::new</span>(
 				<span class="string">&quot;database_cache_bytes&quot;</span>, <span class="string">&quot;RocksDB cache size in bytes&quot;</span>,
 			)<span class="question-mark">?</span>, <span class="ident">registry</span>)<span class="question-mark">?</span>,
-			<span class="ident">state_cache</span>: <span class="ident">register</span>(<span class="ident">Gauge</span>::<span class="ident">new</span>(
+			<span class="ident">state_cache</span>: <span class="ident">register</span>(<span class="ident">Gauge::new</span>(
 				<span class="string">&quot;state_cache_bytes&quot;</span>, <span class="string">&quot;State cache size in bytes&quot;</span>,
 			)<span class="question-mark">?</span>, <span class="ident">registry</span>)<span class="question-mark">?</span>,
-			<span class="ident">state_db</span>: <span class="ident">register</span>(<span class="ident">GaugeVec</span>::<span class="ident">new</span>(
-				<span class="ident">Opts</span>::<span class="ident">new</span>(<span class="string">&quot;state_db_cache_bytes&quot;</span>, <span class="string">&quot;State DB cache in bytes&quot;</span>),
+			<span class="ident">state_db</span>: <span class="ident">register</span>(<span class="ident">GaugeVec::new</span>(
+				<span class="ident">Opts::new</span>(<span class="string">&quot;state_db_cache_bytes&quot;</span>, <span class="string">&quot;State DB cache in bytes&quot;</span>),
 				<span class="kw-2">&amp;</span>[<span class="string">&quot;subtype&quot;</span>]
 			)<span class="question-mark">?</span>, <span class="ident">registry</span>)<span class="question-mark">?</span>,
 		})
@@ -464,7 +464,7 @@
 			<span class="ident">metrics</span>: <span class="prelude-val">None</span>,
 			<span class="ident">last_total_bytes_inbound</span>: <span class="number">0</span>,
 			<span class="ident">last_total_bytes_outbound</span>: <span class="number">0</span>,
-			<span class="ident">last_update</span>: <span class="ident">Instant</span>::<span class="ident">now</span>(),
+			<span class="ident">last_update</span>: <span class="ident">Instant::now</span>(),
 		}
 	}
 
@@ -475,13 +475,13 @@
 		<span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">Configuration</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">PrometheusError</span><span class="op">&gt;</span> {
 		<span class="kw">let</span> <span class="ident">role_bits</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">config</span>.<span class="ident">role</span> {
-			<span class="ident">Role</span>::<span class="ident">Full</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1u64</span>,
-			<span class="ident">Role</span>::<span class="ident">Light</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">2u64</span>,
-			<span class="ident">Role</span>::<span class="ident">Sentry</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="number">3u64</span>,
-			<span class="ident">Role</span>::<span class="ident">Authority</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="number">4u64</span>,
+			<span class="ident">Role::Full</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1u64</span>,
+			<span class="ident">Role::Light</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">2u64</span>,
+			<span class="ident">Role::Sentry</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="number">3u64</span>,
+			<span class="ident">Role::Authority</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="number">4u64</span>,
 		};
 
-		<span class="ident">PrometheusMetrics</span>::<span class="ident">setup</span>(
+		<span class="ident">PrometheusMetrics::setup</span>(
 			<span class="ident">registry</span>,
 			<span class="kw-2">&amp;</span><span class="ident">config</span>.<span class="ident">network</span>.<span class="ident">node_name</span>,
 			<span class="kw-2">&amp;</span><span class="ident">config</span>.<span class="ident">impl_version</span>,
@@ -491,14 +491,14 @@
 			<span class="ident">metrics</span>: <span class="prelude-val">Some</span>(<span class="ident">p</span>),
 			<span class="ident">last_total_bytes_inbound</span>: <span class="number">0</span>,
 			<span class="ident">last_total_bytes_outbound</span>: <span class="number">0</span>,
-			<span class="ident">last_update</span>: <span class="ident">Instant</span>::<span class="ident">now</span>(),
+			<span class="ident">last_update</span>: <span class="ident">Instant::now</span>(),
 		})
 	}
 
 	<span class="doccomment">/// Returns a never-ending `Future` that performs the</span>
 	<span class="doccomment">/// metric and telemetry updates with information from</span>
 	<span class="doccomment">/// the given sources.</span>
-	<span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">run</span><span class="op">&lt;</span><span class="ident">TBl</span>, <span class="ident">TExPool</span>, <span class="ident">TCl</span><span class="op">&gt;</span>(
+	<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run</span><span class="op">&lt;</span><span class="ident">TBl</span>, <span class="ident">TExPool</span>, <span class="ident">TCl</span><span class="op">&gt;</span>(
 		<span class="kw-2">mut</span> <span class="self">self</span>,
 		<span class="ident">client</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">TCl</span><span class="op">&gt;</span>,
 		<span class="ident">transactions</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">TExPool</span><span class="op">&gt;</span>,
@@ -506,14 +506,14 @@
 	) <span class="kw">where</span>
 		<span class="ident">TBl</span>: <span class="ident">Block</span>,
 		<span class="ident">TCl</span>: <span class="ident">ProvideRuntimeApi</span><span class="op">&lt;</span><span class="ident">TBl</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">UsageProvider</span><span class="op">&lt;</span><span class="ident">TBl</span><span class="op">&gt;</span>,
-		<span class="ident">TExPool</span>: <span class="ident">MaintainedTransactionPool</span><span class="op">&lt;</span><span class="ident">Block</span> <span class="op">=</span> <span class="ident">TBl</span>, <span class="ident">Hash</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">TBl</span> <span class="kw">as</span> <span class="ident">Block</span><span class="op">&gt;</span>::<span class="ident">Hash</span><span class="op">&gt;</span>,
+		<span class="ident">TExPool</span>: <span class="ident">MaintainedTransactionPool</span><span class="op">&lt;</span><span class="ident">Block</span> <span class="op">=</span> <span class="ident">TBl</span>, <span class="ident">Hash</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">TBl</span> <span class="kw">as</span> <span class="ident">Block</span><span class="op">&gt;</span><span class="ident">::Hash</span><span class="op">&gt;</span>,
 	{
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">timer</span> <span class="op">=</span> <span class="ident">Delay</span>::<span class="ident">new</span>(<span class="ident">Duration</span>::<span class="ident">from_secs</span>(<span class="number">0</span>));
-		<span class="kw">let</span> <span class="ident">timer_interval</span> <span class="op">=</span> <span class="ident">Duration</span>::<span class="ident">from_secs</span>(<span class="number">5</span>);
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">timer</span> <span class="op">=</span> <span class="ident">Delay::new</span>(<span class="ident">Duration::from_secs</span>(<span class="number">0</span>));
+		<span class="kw">let</span> <span class="ident">timer_interval</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="number">5</span>);
 
 		<span class="comment">// Metric and telemetry update interval.</span>
 		<span class="kw">let</span> <span class="ident">net_status_interval</span> <span class="op">=</span> <span class="ident">timer_interval</span>;
-		<span class="kw">let</span> <span class="ident">net_state_interval</span> <span class="op">=</span> <span class="ident">Duration</span>::<span class="ident">from_secs</span>(<span class="number">30</span>);
+		<span class="kw">let</span> <span class="ident">net_state_interval</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="number">30</span>);
 
 		<span class="comment">// Source of network information.</span>
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">net_status_rx</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">network</span>.<span class="ident">status_stream</span>(<span class="ident">net_status_interval</span>));
@@ -521,19 +521,19 @@
 
 		<span class="kw">loop</span> {
 			<span class="comment">// Wait for the next tick of the timer.</span>
-			(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">timer</span>).<span class="ident">await</span>;
+			(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">timer</span>).<span class="kw">await</span>;
 
 			<span class="comment">// Try to get the latest network information.</span>
 			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">net_status</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">net_state</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 			<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">rx</span>) <span class="op">=</span> <span class="ident">net_status_rx</span>.<span class="ident">as_mut</span>() {
-				<span class="kw">match</span> <span class="self">Self</span>::<span class="ident">latest</span>(<span class="ident">rx</span>) {
+				<span class="kw">match</span> <span class="self">Self</span><span class="ident">::latest</span>(<span class="ident">rx</span>) {
 					<span class="prelude-val">Ok</span>(<span class="ident">status</span>) <span class="op">=</span><span class="op">&gt;</span> { <span class="ident">net_status</span> <span class="op">=</span> <span class="ident">status</span>; }
 					<span class="prelude-val">Err</span>(()) <span class="op">=</span><span class="op">&gt;</span> { <span class="ident">net_status_rx</span> <span class="op">=</span> <span class="prelude-val">None</span>; }
 				}
 			}
 			<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">rx</span>) <span class="op">=</span> <span class="ident">net_state_rx</span>.<span class="ident">as_mut</span>() {
-				<span class="kw">match</span> <span class="self">Self</span>::<span class="ident">latest</span>(<span class="ident">rx</span>) {
+				<span class="kw">match</span> <span class="self">Self</span><span class="ident">::latest</span>(<span class="ident">rx</span>) {
 					<span class="prelude-val">Ok</span>(<span class="ident">state</span>) <span class="op">=</span><span class="op">&gt;</span> { <span class="ident">net_state</span> <span class="op">=</span> <span class="ident">state</span>; }
 					<span class="prelude-val">Err</span>(()) <span class="op">=</span><span class="op">&gt;</span> { <span class="ident">net_state_rx</span> <span class="op">=</span> <span class="prelude-val">None</span>; }
 				}
@@ -562,7 +562,7 @@
 					<span class="ident">value</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>)
 				}
 				<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
-					<span class="ident">log</span>::<span class="macro">error</span><span class="macro">!</span>(<span class="string">&quot;Receiver closed unexpectedly.&quot;</span>);
+					<span class="macro">log::error!</span>(<span class="string">&quot;Receiver closed unexpectedly.&quot;</span>);
 					<span class="kw">return</span> <span class="prelude-val">Err</span>(())
 				}
 			}
@@ -578,7 +578,7 @@
 		<span class="ident">net_status</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NetworkStatus</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 		<span class="ident">net_state</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NetworkState</span><span class="op">&gt;</span>,
 	) {
-		<span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Instant</span>::<span class="ident">now</span>();
+		<span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
 		<span class="kw">let</span> <span class="ident">elapsed</span> <span class="op">=</span> (<span class="ident">now</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">last_update</span>).<span class="ident">as_secs</span>();
 		<span class="self">self</span>.<span class="ident">last_update</span> <span class="op">=</span> <span class="ident">now</span>;
 
@@ -587,7 +587,7 @@
 		<span class="kw">let</span> <span class="ident">finalized_number</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">info</span>.<span class="ident">chain</span>.<span class="ident">finalized_number</span>.<span class="ident">saturated_into</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>();
 
 		<span class="comment">// Update/send metrics that are always available.</span>
-		<span class="macro">telemetry</span><span class="macro">!</span>(
+		<span class="macro">telemetry!</span>(
 			<span class="ident">SUBSTRATE_INFO</span>;
 			<span class="string">&quot;system.interval&quot;</span>;
 			<span class="string">&quot;height&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">best_number</span>,
@@ -610,7 +610,7 @@
 				.<span class="ident">with_label_values</span>(<span class="kw-2">&amp;</span>[<span class="string">&quot;best&quot;</span>])
 				.<span class="ident">set</span>(<span class="ident">best_number</span>);
 
-			<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">leaves</span>) <span class="op">=</span> <span class="ident">u64</span>::<span class="ident">try_from</span>(<span class="ident">info</span>.<span class="ident">chain</span>.<span class="ident">number_leaves</span>) {
+			<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">leaves</span>) <span class="op">=</span> <span class="ident">u64::try_from</span>(<span class="ident">info</span>.<span class="ident">chain</span>.<span class="ident">number_leaves</span>) {
 				<span class="ident">metrics</span>.<span class="ident">number_leaves</span>.<span class="ident">set</span>(<span class="ident">leaves</span>);
 			}
 
@@ -649,7 +649,7 @@
 					(<span class="ident">diff_bytes_inbound</span>, <span class="ident">diff_bytes_outbound</span>)
 				};
 
-			<span class="macro">telemetry</span><span class="macro">!</span>(
+			<span class="macro">telemetry!</span>(
 				<span class="ident">SUBSTRATE_INFO</span>;
 				<span class="string">&quot;system.interval&quot;</span>;
 				<span class="string">&quot;peers&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">num_peers</span>,
@@ -658,9 +658,9 @@
 			);
 
 			<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">metrics</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">metrics</span>.<span class="ident">as_ref</span>() {
-				<span class="kw">let</span> <span class="ident">best_seen_block</span> <span class="op">=</span> <span class="ident">net_status</span>
+				<span class="kw">let</span> <span class="ident">best_seen_block</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">net_status</span>
 					.<span class="ident">best_seen_block</span>
-					.<span class="ident">map</span>(<span class="op">|</span><span class="ident">num</span>: <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">|</span> <span class="ident">num</span>.<span class="ident">unique_saturated_into</span>() <span class="kw">as</span> <span class="ident">u64</span>);
+					.<span class="ident">map</span>(<span class="op">|</span><span class="ident">num</span>: <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">|</span> <span class="ident">UniqueSaturatedInto</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span><span class="ident">::unique_saturated_into</span>(<span class="ident">num</span>));
 
 				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">best_seen_block</span>) <span class="op">=</span> <span class="ident">best_seen_block</span> {
 					<span class="ident">metrics</span>.<span class="ident">block_height</span>.<span class="ident">with_label_values</span>(<span class="kw-2">&amp;</span>[<span class="string">&quot;sync_target&quot;</span>]).<span class="ident">set</span>(<span class="ident">best_seen_block</span>);
@@ -670,7 +670,7 @@
 
 		<span class="comment">// Send network state information, if any.</span>
 		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">net_state</span>) <span class="op">=</span> <span class="ident">net_state</span> {
-			<span class="macro">telemetry</span><span class="macro">!</span>(
+			<span class="macro">telemetry!</span>(
 				<span class="ident">SUBSTRATE_INFO</span>;
 				<span class="string">&quot;system.network_state&quot;</span>;
 				<span class="string">&quot;state&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">net_state</span>,
@@ -679,4 +679,5 @@
 	}
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "sc_service";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sc_service" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

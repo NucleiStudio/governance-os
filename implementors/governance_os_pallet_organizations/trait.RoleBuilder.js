@@ -1,3 +1,3 @@
 (function() {var implementors = {};
-implementors["governance_os_primitives"] = [{"text":"impl RoleBuilder for Role","synthetic":false,"types":[]}];
+implementors["governance_os_primitives"] = [{"text":"impl <a class=\"trait\" href=\"governance_os_pallet_organizations/trait.RoleBuilder.html\" title=\"trait governance_os_pallet_organizations::RoleBuilder\">RoleBuilder</a> for <a class=\"enum\" href=\"governance_os_primitives/enum.Role.html\" title=\"enum governance_os_primitives::Role\">Role</a>","synthetic":false,"types":["governance_os_primitives::Role"]}];
 if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

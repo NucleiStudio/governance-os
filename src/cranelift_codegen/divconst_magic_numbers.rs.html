@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/cranelift-codegen-0.66.0/src/divconst_magic_numbers.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>divconst_magic_numbers.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/cranelift-codegen-0.69.0/src/divconst_magic_numbers.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>divconst_magic_numbers.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../cranelift_codegen/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../cranelift_codegen/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1126,12 +1126,12 @@
 <span class="comment">// The actual &quot;magic number&quot; generators follow.</span>
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">magic_u32</span>(<span class="ident">d</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MU32</span> {
-    <span class="macro">debug_assert_ne</span><span class="macro">!</span>(<span class="ident">d</span>, <span class="number">0</span>);
-    <span class="macro">debug_assert_ne</span><span class="macro">!</span>(<span class="ident">d</span>, <span class="number">1</span>); <span class="comment">// d==1 generates out of range shifts.</span>
+    <span class="macro">debug_assert_ne!</span>(<span class="ident">d</span>, <span class="number">0</span>);
+    <span class="macro">debug_assert_ne!</span>(<span class="ident">d</span>, <span class="number">1</span>); <span class="comment">// d==1 generates out of range shifts.</span>
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">do_add</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="bool-val">false</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">31</span>;
-    <span class="kw">let</span> <span class="ident">nc</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0xFFFFFFFFu32</span> <span class="op">-</span> <span class="ident">u32</span>::<span class="ident">wrapping_neg</span>(<span class="ident">d</span>) <span class="op">%</span> <span class="ident">d</span>;
+    <span class="kw">let</span> <span class="ident">nc</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0xFFFFFFFFu32</span> <span class="op">-</span> <span class="ident">u32::wrapping_neg</span>(<span class="ident">d</span>) <span class="op">%</span> <span class="ident">d</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">q1</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x80000000u32</span> <span class="op">/</span> <span class="ident">nc</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r1</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x80000000u32</span> <span class="op">-</span> <span class="ident">q1</span> <span class="op">*</span> <span class="ident">nc</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">q2</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x7FFFFFFFu32</span> <span class="op">/</span> <span class="ident">d</span>;
@@ -1139,10 +1139,10 @@
     <span class="kw">loop</span> {
         <span class="ident">p</span> <span class="op">=</span> <span class="ident">p</span> <span class="op">+</span> <span class="number">1</span>;
         <span class="kw">if</span> <span class="ident">r1</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">nc</span> <span class="op">-</span> <span class="ident">r1</span> {
-            <span class="ident">q1</span> <span class="op">=</span> <span class="ident">u32</span>::<span class="ident">wrapping_add</span>(<span class="ident">u32</span>::<span class="ident">wrapping_mul</span>(<span class="number">2</span>, <span class="ident">q1</span>), <span class="number">1</span>);
-            <span class="ident">r1</span> <span class="op">=</span> <span class="ident">u32</span>::<span class="ident">wrapping_sub</span>(<span class="ident">u32</span>::<span class="ident">wrapping_mul</span>(<span class="number">2</span>, <span class="ident">r1</span>), <span class="ident">nc</span>);
+            <span class="ident">q1</span> <span class="op">=</span> <span class="ident">u32::wrapping_add</span>(<span class="ident">u32::wrapping_mul</span>(<span class="number">2</span>, <span class="ident">q1</span>), <span class="number">1</span>);
+            <span class="ident">r1</span> <span class="op">=</span> <span class="ident">u32::wrapping_sub</span>(<span class="ident">u32::wrapping_mul</span>(<span class="number">2</span>, <span class="ident">r1</span>), <span class="ident">nc</span>);
         } <span class="kw">else</span> {
-            <span class="ident">q1</span> <span class="op">=</span> <span class="ident">u32</span>::<span class="ident">wrapping_mul</span>(<span class="number">2</span>, <span class="ident">q1</span>);
+            <span class="ident">q1</span> <span class="op">=</span> <span class="ident">u32::wrapping_mul</span>(<span class="number">2</span>, <span class="ident">q1</span>);
             <span class="ident">r1</span> <span class="op">=</span> <span class="number">2</span> <span class="op">*</span> <span class="ident">r1</span>;
         }
         <span class="kw">if</span> <span class="ident">r2</span> <span class="op">+</span> <span class="number">1</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">d</span> <span class="op">-</span> <span class="ident">r2</span> {
@@ -1150,12 +1150,12 @@
                 <span class="ident">do_add</span> <span class="op">=</span> <span class="bool-val">true</span>;
             }
             <span class="ident">q2</span> <span class="op">=</span> <span class="number">2</span> <span class="op">*</span> <span class="ident">q2</span> <span class="op">+</span> <span class="number">1</span>;
-            <span class="ident">r2</span> <span class="op">=</span> <span class="ident">u32</span>::<span class="ident">wrapping_sub</span>(<span class="ident">u32</span>::<span class="ident">wrapping_add</span>(<span class="ident">u32</span>::<span class="ident">wrapping_mul</span>(<span class="number">2</span>, <span class="ident">r2</span>), <span class="number">1</span>), <span class="ident">d</span>);
+            <span class="ident">r2</span> <span class="op">=</span> <span class="ident">u32::wrapping_sub</span>(<span class="ident">u32::wrapping_add</span>(<span class="ident">u32::wrapping_mul</span>(<span class="number">2</span>, <span class="ident">r2</span>), <span class="number">1</span>), <span class="ident">d</span>);
         } <span class="kw">else</span> {
             <span class="kw">if</span> <span class="ident">q2</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0x80000000u32</span> {
                 <span class="ident">do_add</span> <span class="op">=</span> <span class="bool-val">true</span>;
             }
-            <span class="ident">q2</span> <span class="op">=</span> <span class="ident">u32</span>::<span class="ident">wrapping_mul</span>(<span class="number">2</span>, <span class="ident">q2</span>);
+            <span class="ident">q2</span> <span class="op">=</span> <span class="ident">u32::wrapping_mul</span>(<span class="number">2</span>, <span class="ident">q2</span>);
             <span class="ident">r2</span> <span class="op">=</span> <span class="number">2</span> <span class="op">*</span> <span class="ident">r2</span> <span class="op">+</span> <span class="number">1</span>;
         }
         <span class="kw">let</span> <span class="ident">delta</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="ident">d</span> <span class="op">-</span> <span class="number">1</span> <span class="op">-</span> <span class="ident">r2</span>;
@@ -1172,12 +1172,12 @@
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">magic_u64</span>(<span class="ident">d</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MU64</span> {
-    <span class="macro">debug_assert_ne</span><span class="macro">!</span>(<span class="ident">d</span>, <span class="number">0</span>);
-    <span class="macro">debug_assert_ne</span><span class="macro">!</span>(<span class="ident">d</span>, <span class="number">1</span>); <span class="comment">// d==1 generates out of range shifts.</span>
+    <span class="macro">debug_assert_ne!</span>(<span class="ident">d</span>, <span class="number">0</span>);
+    <span class="macro">debug_assert_ne!</span>(<span class="ident">d</span>, <span class="number">1</span>); <span class="comment">// d==1 generates out of range shifts.</span>
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">do_add</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="bool-val">false</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">63</span>;
-    <span class="kw">let</span> <span class="ident">nc</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">0xFFFFFFFFFFFFFFFFu64</span> <span class="op">-</span> <span class="ident">u64</span>::<span class="ident">wrapping_neg</span>(<span class="ident">d</span>) <span class="op">%</span> <span class="ident">d</span>;
+    <span class="kw">let</span> <span class="ident">nc</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">0xFFFFFFFFFFFFFFFFu64</span> <span class="op">-</span> <span class="ident">u64::wrapping_neg</span>(<span class="ident">d</span>) <span class="op">%</span> <span class="ident">d</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">q1</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">0x8000000000000000u64</span> <span class="op">/</span> <span class="ident">nc</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r1</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">0x8000000000000000u64</span> <span class="op">-</span> <span class="ident">q1</span> <span class="op">*</span> <span class="ident">nc</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">q2</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">0x7FFFFFFFFFFFFFFFu64</span> <span class="op">/</span> <span class="ident">d</span>;
@@ -1185,10 +1185,10 @@
     <span class="kw">loop</span> {
         <span class="ident">p</span> <span class="op">=</span> <span class="ident">p</span> <span class="op">+</span> <span class="number">1</span>;
         <span class="kw">if</span> <span class="ident">r1</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">nc</span> <span class="op">-</span> <span class="ident">r1</span> {
-            <span class="ident">q1</span> <span class="op">=</span> <span class="ident">u64</span>::<span class="ident">wrapping_add</span>(<span class="ident">u64</span>::<span class="ident">wrapping_mul</span>(<span class="number">2</span>, <span class="ident">q1</span>), <span class="number">1</span>);
-            <span class="ident">r1</span> <span class="op">=</span> <span class="ident">u64</span>::<span class="ident">wrapping_sub</span>(<span class="ident">u64</span>::<span class="ident">wrapping_mul</span>(<span class="number">2</span>, <span class="ident">r1</span>), <span class="ident">nc</span>);
+            <span class="ident">q1</span> <span class="op">=</span> <span class="ident">u64::wrapping_add</span>(<span class="ident">u64::wrapping_mul</span>(<span class="number">2</span>, <span class="ident">q1</span>), <span class="number">1</span>);
+            <span class="ident">r1</span> <span class="op">=</span> <span class="ident">u64::wrapping_sub</span>(<span class="ident">u64::wrapping_mul</span>(<span class="number">2</span>, <span class="ident">r1</span>), <span class="ident">nc</span>);
         } <span class="kw">else</span> {
-            <span class="ident">q1</span> <span class="op">=</span> <span class="ident">u64</span>::<span class="ident">wrapping_mul</span>(<span class="number">2</span>, <span class="ident">q1</span>);
+            <span class="ident">q1</span> <span class="op">=</span> <span class="ident">u64::wrapping_mul</span>(<span class="number">2</span>, <span class="ident">q1</span>);
             <span class="ident">r1</span> <span class="op">=</span> <span class="number">2</span> <span class="op">*</span> <span class="ident">r1</span>;
         }
         <span class="kw">if</span> <span class="ident">r2</span> <span class="op">+</span> <span class="number">1</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">d</span> <span class="op">-</span> <span class="ident">r2</span> {
@@ -1196,12 +1196,12 @@
                 <span class="ident">do_add</span> <span class="op">=</span> <span class="bool-val">true</span>;
             }
             <span class="ident">q2</span> <span class="op">=</span> <span class="number">2</span> <span class="op">*</span> <span class="ident">q2</span> <span class="op">+</span> <span class="number">1</span>;
-            <span class="ident">r2</span> <span class="op">=</span> <span class="ident">u64</span>::<span class="ident">wrapping_sub</span>(<span class="ident">u64</span>::<span class="ident">wrapping_add</span>(<span class="ident">u64</span>::<span class="ident">wrapping_mul</span>(<span class="number">2</span>, <span class="ident">r2</span>), <span class="number">1</span>), <span class="ident">d</span>);
+            <span class="ident">r2</span> <span class="op">=</span> <span class="ident">u64::wrapping_sub</span>(<span class="ident">u64::wrapping_add</span>(<span class="ident">u64::wrapping_mul</span>(<span class="number">2</span>, <span class="ident">r2</span>), <span class="number">1</span>), <span class="ident">d</span>);
         } <span class="kw">else</span> {
             <span class="kw">if</span> <span class="ident">q2</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0x8000000000000000u64</span> {
                 <span class="ident">do_add</span> <span class="op">=</span> <span class="bool-val">true</span>;
             }
-            <span class="ident">q2</span> <span class="op">=</span> <span class="ident">u64</span>::<span class="ident">wrapping_mul</span>(<span class="number">2</span>, <span class="ident">q2</span>);
+            <span class="ident">q2</span> <span class="op">=</span> <span class="ident">u64::wrapping_mul</span>(<span class="number">2</span>, <span class="ident">q2</span>);
             <span class="ident">r2</span> <span class="op">=</span> <span class="number">2</span> <span class="op">*</span> <span class="ident">r2</span> <span class="op">+</span> <span class="number">1</span>;
         }
         <span class="kw">let</span> <span class="ident">delta</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">d</span> <span class="op">-</span> <span class="number">1</span> <span class="op">-</span> <span class="ident">r2</span>;
@@ -1218,14 +1218,14 @@
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">magic_s32</span>(<span class="ident">d</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MS32</span> {
-    <span class="macro">debug_assert_ne</span><span class="macro">!</span>(<span class="ident">d</span>, <span class="op">-</span><span class="number">1</span>);
-    <span class="macro">debug_assert_ne</span><span class="macro">!</span>(<span class="ident">d</span>, <span class="number">0</span>);
-    <span class="macro">debug_assert_ne</span><span class="macro">!</span>(<span class="ident">d</span>, <span class="number">1</span>);
+    <span class="macro">debug_assert_ne!</span>(<span class="ident">d</span>, <span class="op">-</span><span class="number">1</span>);
+    <span class="macro">debug_assert_ne!</span>(<span class="ident">d</span>, <span class="number">0</span>);
+    <span class="macro">debug_assert_ne!</span>(<span class="ident">d</span>, <span class="number">1</span>);
     <span class="kw">let</span> <span class="ident">two31</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x80000000u32</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">31</span>;
-    <span class="kw">let</span> <span class="ident">ad</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="ident">i32</span>::<span class="ident">wrapping_abs</span>(<span class="ident">d</span>) <span class="kw">as</span> <span class="ident">u32</span>;
+    <span class="kw">let</span> <span class="ident">ad</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="ident">i32::wrapping_abs</span>(<span class="ident">d</span>) <span class="kw">as</span> <span class="ident">u32</span>;
     <span class="kw">let</span> <span class="ident">t</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="ident">two31</span> <span class="op">+</span> ((<span class="ident">d</span> <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">31</span>);
-    <span class="kw">let</span> <span class="ident">anc</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="ident">u32</span>::<span class="ident">wrapping_sub</span>(<span class="ident">t</span> <span class="op">-</span> <span class="number">1</span>, <span class="ident">t</span> <span class="op">%</span> <span class="ident">ad</span>);
+    <span class="kw">let</span> <span class="ident">anc</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="ident">u32::wrapping_sub</span>(<span class="ident">t</span> <span class="op">-</span> <span class="number">1</span>, <span class="ident">t</span> <span class="op">%</span> <span class="ident">ad</span>);
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">q1</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="ident">two31</span> <span class="op">/</span> <span class="ident">anc</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r1</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="ident">two31</span> <span class="op">-</span> <span class="ident">q1</span> <span class="op">*</span> <span class="ident">anc</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">q2</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="ident">two31</span> <span class="op">/</span> <span class="ident">ad</span>;
@@ -1252,7 +1252,7 @@
 
     <span class="ident">MS32</span> {
         <span class="ident">mul_by</span>: (<span class="kw">if</span> <span class="ident">d</span> <span class="op">&lt;</span> <span class="number">0</span> {
-            <span class="ident">u32</span>::<span class="ident">wrapping_neg</span>(<span class="ident">q2</span> <span class="op">+</span> <span class="number">1</span>)
+            <span class="ident">u32::wrapping_neg</span>(<span class="ident">q2</span> <span class="op">+</span> <span class="number">1</span>)
         } <span class="kw">else</span> {
             <span class="ident">q2</span> <span class="op">+</span> <span class="number">1</span>
         }) <span class="kw">as</span> <span class="ident">i32</span>,
@@ -1261,14 +1261,14 @@
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">magic_s64</span>(<span class="ident">d</span>: <span class="ident">i64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MS64</span> {
-    <span class="macro">debug_assert_ne</span><span class="macro">!</span>(<span class="ident">d</span>, <span class="op">-</span><span class="number">1</span>);
-    <span class="macro">debug_assert_ne</span><span class="macro">!</span>(<span class="ident">d</span>, <span class="number">0</span>);
-    <span class="macro">debug_assert_ne</span><span class="macro">!</span>(<span class="ident">d</span>, <span class="number">1</span>);
+    <span class="macro">debug_assert_ne!</span>(<span class="ident">d</span>, <span class="op">-</span><span class="number">1</span>);
+    <span class="macro">debug_assert_ne!</span>(<span class="ident">d</span>, <span class="number">0</span>);
+    <span class="macro">debug_assert_ne!</span>(<span class="ident">d</span>, <span class="number">1</span>);
     <span class="kw">let</span> <span class="ident">two63</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">0x8000000000000000u64</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">63</span>;
-    <span class="kw">let</span> <span class="ident">ad</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">i64</span>::<span class="ident">wrapping_abs</span>(<span class="ident">d</span>) <span class="kw">as</span> <span class="ident">u64</span>;
+    <span class="kw">let</span> <span class="ident">ad</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">i64::wrapping_abs</span>(<span class="ident">d</span>) <span class="kw">as</span> <span class="ident">u64</span>;
     <span class="kw">let</span> <span class="ident">t</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">two63</span> <span class="op">+</span> ((<span class="ident">d</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">63</span>);
-    <span class="kw">let</span> <span class="ident">anc</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">u64</span>::<span class="ident">wrapping_sub</span>(<span class="ident">t</span> <span class="op">-</span> <span class="number">1</span>, <span class="ident">t</span> <span class="op">%</span> <span class="ident">ad</span>);
+    <span class="kw">let</span> <span class="ident">anc</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">u64::wrapping_sub</span>(<span class="ident">t</span> <span class="op">-</span> <span class="number">1</span>, <span class="ident">t</span> <span class="op">%</span> <span class="ident">ad</span>);
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">q1</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">two63</span> <span class="op">/</span> <span class="ident">anc</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r1</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">two63</span> <span class="op">-</span> <span class="ident">q1</span> <span class="op">*</span> <span class="ident">anc</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">q2</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">two63</span> <span class="op">/</span> <span class="ident">ad</span>;
@@ -1295,7 +1295,7 @@
 
     <span class="ident">MS64</span> {
         <span class="ident">mul_by</span>: (<span class="kw">if</span> <span class="ident">d</span> <span class="op">&lt;</span> <span class="number">0</span> {
-            <span class="ident">u64</span>::<span class="ident">wrapping_neg</span>(<span class="ident">q2</span> <span class="op">+</span> <span class="number">1</span>)
+            <span class="ident">u64::wrapping_neg</span>(<span class="ident">q2</span> <span class="op">+</span> <span class="number">1</span>)
         } <span class="kw">else</span> {
             <span class="ident">q2</span> <span class="op">+</span> <span class="number">1</span>
         }) <span class="kw">as</span> <span class="ident">i64</span>,
@@ -1334,34 +1334,34 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_magic_u32</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_u32</span>(<span class="number">2u32</span>), <span class="ident">make_mu32</span>(<span class="number">0x80000000u32</span>, <span class="bool-val">false</span>, <span class="number">0</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_u32</span>(<span class="number">3u32</span>), <span class="ident">make_mu32</span>(<span class="number">0xaaaaaaabu32</span>, <span class="bool-val">false</span>, <span class="number">1</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_u32</span>(<span class="number">4u32</span>), <span class="ident">make_mu32</span>(<span class="number">0x40000000u32</span>, <span class="bool-val">false</span>, <span class="number">0</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_u32</span>(<span class="number">5u32</span>), <span class="ident">make_mu32</span>(<span class="number">0xcccccccdu32</span>, <span class="bool-val">false</span>, <span class="number">2</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_u32</span>(<span class="number">6u32</span>), <span class="ident">make_mu32</span>(<span class="number">0xaaaaaaabu32</span>, <span class="bool-val">false</span>, <span class="number">2</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_u32</span>(<span class="number">7u32</span>), <span class="ident">make_mu32</span>(<span class="number">0x24924925u32</span>, <span class="bool-val">true</span>, <span class="number">3</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_u32</span>(<span class="number">9u32</span>), <span class="ident">make_mu32</span>(<span class="number">0x38e38e39u32</span>, <span class="bool-val">false</span>, <span class="number">1</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_u32</span>(<span class="number">10u32</span>), <span class="ident">make_mu32</span>(<span class="number">0xcccccccdu32</span>, <span class="bool-val">false</span>, <span class="number">3</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_u32</span>(<span class="number">11u32</span>), <span class="ident">make_mu32</span>(<span class="number">0xba2e8ba3u32</span>, <span class="bool-val">false</span>, <span class="number">3</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_u32</span>(<span class="number">12u32</span>), <span class="ident">make_mu32</span>(<span class="number">0xaaaaaaabu32</span>, <span class="bool-val">false</span>, <span class="number">3</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_u32</span>(<span class="number">25u32</span>), <span class="ident">make_mu32</span>(<span class="number">0x51eb851fu32</span>, <span class="bool-val">false</span>, <span class="number">3</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_u32</span>(<span class="number">125u32</span>), <span class="ident">make_mu32</span>(<span class="number">0x10624dd3u32</span>, <span class="bool-val">false</span>, <span class="number">3</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_u32</span>(<span class="number">625u32</span>), <span class="ident">make_mu32</span>(<span class="number">0xd1b71759u32</span>, <span class="bool-val">false</span>, <span class="number">9</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_u32</span>(<span class="number">1337u32</span>), <span class="ident">make_mu32</span>(<span class="number">0x88233b2bu32</span>, <span class="bool-val">true</span>, <span class="number">11</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_u32</span>(<span class="number">65535u32</span>), <span class="ident">make_mu32</span>(<span class="number">0x80008001u32</span>, <span class="bool-val">false</span>, <span class="number">15</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_u32</span>(<span class="number">65536u32</span>), <span class="ident">make_mu32</span>(<span class="number">0x00010000u32</span>, <span class="bool-val">false</span>, <span class="number">0</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_u32</span>(<span class="number">65537u32</span>), <span class="ident">make_mu32</span>(<span class="number">0xffff0001u32</span>, <span class="bool-val">false</span>, <span class="number">16</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_u32</span>(<span class="number">31415927u32</span>), <span class="ident">make_mu32</span>(<span class="number">0x445b4553u32</span>, <span class="bool-val">false</span>, <span class="number">23</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_u32</span>(<span class="number">2u32</span>), <span class="ident">make_mu32</span>(<span class="number">0x80000000u32</span>, <span class="bool-val">false</span>, <span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_u32</span>(<span class="number">3u32</span>), <span class="ident">make_mu32</span>(<span class="number">0xaaaaaaabu32</span>, <span class="bool-val">false</span>, <span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_u32</span>(<span class="number">4u32</span>), <span class="ident">make_mu32</span>(<span class="number">0x40000000u32</span>, <span class="bool-val">false</span>, <span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_u32</span>(<span class="number">5u32</span>), <span class="ident">make_mu32</span>(<span class="number">0xcccccccdu32</span>, <span class="bool-val">false</span>, <span class="number">2</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_u32</span>(<span class="number">6u32</span>), <span class="ident">make_mu32</span>(<span class="number">0xaaaaaaabu32</span>, <span class="bool-val">false</span>, <span class="number">2</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_u32</span>(<span class="number">7u32</span>), <span class="ident">make_mu32</span>(<span class="number">0x24924925u32</span>, <span class="bool-val">true</span>, <span class="number">3</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_u32</span>(<span class="number">9u32</span>), <span class="ident">make_mu32</span>(<span class="number">0x38e38e39u32</span>, <span class="bool-val">false</span>, <span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_u32</span>(<span class="number">10u32</span>), <span class="ident">make_mu32</span>(<span class="number">0xcccccccdu32</span>, <span class="bool-val">false</span>, <span class="number">3</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_u32</span>(<span class="number">11u32</span>), <span class="ident">make_mu32</span>(<span class="number">0xba2e8ba3u32</span>, <span class="bool-val">false</span>, <span class="number">3</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_u32</span>(<span class="number">12u32</span>), <span class="ident">make_mu32</span>(<span class="number">0xaaaaaaabu32</span>, <span class="bool-val">false</span>, <span class="number">3</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_u32</span>(<span class="number">25u32</span>), <span class="ident">make_mu32</span>(<span class="number">0x51eb851fu32</span>, <span class="bool-val">false</span>, <span class="number">3</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_u32</span>(<span class="number">125u32</span>), <span class="ident">make_mu32</span>(<span class="number">0x10624dd3u32</span>, <span class="bool-val">false</span>, <span class="number">3</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_u32</span>(<span class="number">625u32</span>), <span class="ident">make_mu32</span>(<span class="number">0xd1b71759u32</span>, <span class="bool-val">false</span>, <span class="number">9</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_u32</span>(<span class="number">1337u32</span>), <span class="ident">make_mu32</span>(<span class="number">0x88233b2bu32</span>, <span class="bool-val">true</span>, <span class="number">11</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_u32</span>(<span class="number">65535u32</span>), <span class="ident">make_mu32</span>(<span class="number">0x80008001u32</span>, <span class="bool-val">false</span>, <span class="number">15</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_u32</span>(<span class="number">65536u32</span>), <span class="ident">make_mu32</span>(<span class="number">0x00010000u32</span>, <span class="bool-val">false</span>, <span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_u32</span>(<span class="number">65537u32</span>), <span class="ident">make_mu32</span>(<span class="number">0xffff0001u32</span>, <span class="bool-val">false</span>, <span class="number">16</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_u32</span>(<span class="number">31415927u32</span>), <span class="ident">make_mu32</span>(<span class="number">0x445b4553u32</span>, <span class="bool-val">false</span>, <span class="number">23</span>));
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_u32</span>(<span class="number">0xdeadbeefu32</span>),
             <span class="ident">make_mu32</span>(<span class="number">0x93275ab3u32</span>, <span class="bool-val">false</span>, <span class="number">31</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_u32</span>(<span class="number">0xfffffffdu32</span>),
             <span class="ident">make_mu32</span>(<span class="number">0x40000001u32</span>, <span class="bool-val">false</span>, <span class="number">30</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_u32</span>(<span class="number">0xfffffffeu32</span>), <span class="ident">make_mu32</span>(<span class="number">0x00000003u32</span>, <span class="bool-val">true</span>, <span class="number">32</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_u32</span>(<span class="number">0xfffffffeu32</span>), <span class="ident">make_mu32</span>(<span class="number">0x00000003u32</span>, <span class="bool-val">true</span>, <span class="number">32</span>));
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_u32</span>(<span class="number">0xffffffffu32</span>),
             <span class="ident">make_mu32</span>(<span class="number">0x80000001u32</span>, <span class="bool-val">false</span>, <span class="number">31</span>)
         );
@@ -1369,67 +1369,67 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_magic_u64</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_u64</span>(<span class="number">2u64</span>), <span class="ident">make_mu64</span>(<span class="number">0x8000000000000000u64</span>, <span class="bool-val">false</span>, <span class="number">0</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_u64</span>(<span class="number">3u64</span>), <span class="ident">make_mu64</span>(<span class="number">0xaaaaaaaaaaaaaaabu64</span>, <span class="bool-val">false</span>, <span class="number">1</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_u64</span>(<span class="number">4u64</span>), <span class="ident">make_mu64</span>(<span class="number">0x4000000000000000u64</span>, <span class="bool-val">false</span>, <span class="number">0</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_u64</span>(<span class="number">5u64</span>), <span class="ident">make_mu64</span>(<span class="number">0xcccccccccccccccdu64</span>, <span class="bool-val">false</span>, <span class="number">2</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_u64</span>(<span class="number">6u64</span>), <span class="ident">make_mu64</span>(<span class="number">0xaaaaaaaaaaaaaaabu64</span>, <span class="bool-val">false</span>, <span class="number">2</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_u64</span>(<span class="number">7u64</span>), <span class="ident">make_mu64</span>(<span class="number">0x2492492492492493u64</span>, <span class="bool-val">true</span>, <span class="number">3</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_u64</span>(<span class="number">9u64</span>), <span class="ident">make_mu64</span>(<span class="number">0xe38e38e38e38e38fu64</span>, <span class="bool-val">false</span>, <span class="number">3</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_u64</span>(<span class="number">10u64</span>), <span class="ident">make_mu64</span>(<span class="number">0xcccccccccccccccdu64</span>, <span class="bool-val">false</span>, <span class="number">3</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_u64</span>(<span class="number">11u64</span>), <span class="ident">make_mu64</span>(<span class="number">0x2e8ba2e8ba2e8ba3u64</span>, <span class="bool-val">false</span>, <span class="number">1</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_u64</span>(<span class="number">12u64</span>), <span class="ident">make_mu64</span>(<span class="number">0xaaaaaaaaaaaaaaabu64</span>, <span class="bool-val">false</span>, <span class="number">3</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_u64</span>(<span class="number">25u64</span>), <span class="ident">make_mu64</span>(<span class="number">0x47ae147ae147ae15u64</span>, <span class="bool-val">true</span>, <span class="number">5</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_u64</span>(<span class="number">125u64</span>), <span class="ident">make_mu64</span>(<span class="number">0x0624dd2f1a9fbe77u64</span>, <span class="bool-val">true</span>, <span class="number">7</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_u64</span>(<span class="number">2u64</span>), <span class="ident">make_mu64</span>(<span class="number">0x8000000000000000u64</span>, <span class="bool-val">false</span>, <span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_u64</span>(<span class="number">3u64</span>), <span class="ident">make_mu64</span>(<span class="number">0xaaaaaaaaaaaaaaabu64</span>, <span class="bool-val">false</span>, <span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_u64</span>(<span class="number">4u64</span>), <span class="ident">make_mu64</span>(<span class="number">0x4000000000000000u64</span>, <span class="bool-val">false</span>, <span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_u64</span>(<span class="number">5u64</span>), <span class="ident">make_mu64</span>(<span class="number">0xcccccccccccccccdu64</span>, <span class="bool-val">false</span>, <span class="number">2</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_u64</span>(<span class="number">6u64</span>), <span class="ident">make_mu64</span>(<span class="number">0xaaaaaaaaaaaaaaabu64</span>, <span class="bool-val">false</span>, <span class="number">2</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_u64</span>(<span class="number">7u64</span>), <span class="ident">make_mu64</span>(<span class="number">0x2492492492492493u64</span>, <span class="bool-val">true</span>, <span class="number">3</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_u64</span>(<span class="number">9u64</span>), <span class="ident">make_mu64</span>(<span class="number">0xe38e38e38e38e38fu64</span>, <span class="bool-val">false</span>, <span class="number">3</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_u64</span>(<span class="number">10u64</span>), <span class="ident">make_mu64</span>(<span class="number">0xcccccccccccccccdu64</span>, <span class="bool-val">false</span>, <span class="number">3</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_u64</span>(<span class="number">11u64</span>), <span class="ident">make_mu64</span>(<span class="number">0x2e8ba2e8ba2e8ba3u64</span>, <span class="bool-val">false</span>, <span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_u64</span>(<span class="number">12u64</span>), <span class="ident">make_mu64</span>(<span class="number">0xaaaaaaaaaaaaaaabu64</span>, <span class="bool-val">false</span>, <span class="number">3</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_u64</span>(<span class="number">25u64</span>), <span class="ident">make_mu64</span>(<span class="number">0x47ae147ae147ae15u64</span>, <span class="bool-val">true</span>, <span class="number">5</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_u64</span>(<span class="number">125u64</span>), <span class="ident">make_mu64</span>(<span class="number">0x0624dd2f1a9fbe77u64</span>, <span class="bool-val">true</span>, <span class="number">7</span>));
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_u64</span>(<span class="number">625u64</span>),
             <span class="ident">make_mu64</span>(<span class="number">0x346dc5d63886594bu64</span>, <span class="bool-val">false</span>, <span class="number">7</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_u64</span>(<span class="number">1337u64</span>),
             <span class="ident">make_mu64</span>(<span class="number">0xc4119d952866a139u64</span>, <span class="bool-val">false</span>, <span class="number">10</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_u64</span>(<span class="number">31415927u64</span>),
             <span class="ident">make_mu64</span>(<span class="number">0x116d154b9c3d2f85u64</span>, <span class="bool-val">true</span>, <span class="number">25</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_u64</span>(<span class="number">0x00000000deadbeefu64</span>),
             <span class="ident">make_mu64</span>(<span class="number">0x93275ab2dfc9094bu64</span>, <span class="bool-val">false</span>, <span class="number">31</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_u64</span>(<span class="number">0x00000000fffffffdu64</span>),
             <span class="ident">make_mu64</span>(<span class="number">0x8000000180000005u64</span>, <span class="bool-val">false</span>, <span class="number">31</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_u64</span>(<span class="number">0x00000000fffffffeu64</span>),
             <span class="ident">make_mu64</span>(<span class="number">0x0000000200000005u64</span>, <span class="bool-val">true</span>, <span class="number">32</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_u64</span>(<span class="number">0x00000000ffffffffu64</span>),
             <span class="ident">make_mu64</span>(<span class="number">0x8000000080000001u64</span>, <span class="bool-val">false</span>, <span class="number">31</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_u64</span>(<span class="number">0x0000000100000000u64</span>),
             <span class="ident">make_mu64</span>(<span class="number">0x0000000100000000u64</span>, <span class="bool-val">false</span>, <span class="number">0</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_u64</span>(<span class="number">0x0000000100000001u64</span>),
             <span class="ident">make_mu64</span>(<span class="number">0xffffffff00000001u64</span>, <span class="bool-val">false</span>, <span class="number">32</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_u64</span>(<span class="number">0x0ddc0ffeebadf00du64</span>),
             <span class="ident">make_mu64</span>(<span class="number">0x2788e9d394b77da1u64</span>, <span class="bool-val">true</span>, <span class="number">60</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_u64</span>(<span class="number">0xfffffffffffffffdu64</span>),
             <span class="ident">make_mu64</span>(<span class="number">0x4000000000000001u64</span>, <span class="bool-val">false</span>, <span class="number">62</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_u64</span>(<span class="number">0xfffffffffffffffeu64</span>),
             <span class="ident">make_mu64</span>(<span class="number">0x0000000000000003u64</span>, <span class="bool-val">true</span>, <span class="number">64</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_u64</span>(<span class="number">0xffffffffffffffffu64</span>),
             <span class="ident">make_mu64</span>(<span class="number">0x8000000000000001u64</span>, <span class="bool-val">false</span>, <span class="number">63</span>)
         );
@@ -1437,44 +1437,44 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_magic_s32</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_s32</span>(<span class="op">-</span><span class="number">0x80000000i32</span>),
             <span class="ident">make_ms32</span>(<span class="number">0x7fffffffu32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">30</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_s32</span>(<span class="op">-</span><span class="number">0x7FFFFFFFi32</span>),
             <span class="ident">make_ms32</span>(<span class="number">0xbfffffffu32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">29</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_s32</span>(<span class="op">-</span><span class="number">0x7FFFFFFEi32</span>),
             <span class="ident">make_ms32</span>(<span class="number">0x7ffffffdu32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">30</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_s32</span>(<span class="op">-</span><span class="number">31415927i32</span>), <span class="ident">make_ms32</span>(<span class="number">0xbba4baadu32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">23</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_s32</span>(<span class="op">-</span><span class="number">1337i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x9df73135u32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">9</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_s32</span>(<span class="op">-</span><span class="number">256i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x7fffffffu32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">7</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_s32</span>(<span class="op">-</span><span class="number">5i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x99999999u32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">1</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_s32</span>(<span class="op">-</span><span class="number">3i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x55555555u32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">1</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_s32</span>(<span class="op">-</span><span class="number">2i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x7fffffffu32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">0</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_s32</span>(<span class="number">2i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x80000001u32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">0</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_s32</span>(<span class="number">3i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x55555556u32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">0</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_s32</span>(<span class="number">4i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x80000001u32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">1</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_s32</span>(<span class="number">5i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x66666667u32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">1</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_s32</span>(<span class="number">6i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x2aaaaaabu32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">0</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_s32</span>(<span class="number">7i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x92492493u32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">2</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_s32</span>(<span class="number">9i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x38e38e39u32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">1</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_s32</span>(<span class="number">10i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x66666667u32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">2</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_s32</span>(<span class="number">11i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x2e8ba2e9u32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">1</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_s32</span>(<span class="number">12i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x2aaaaaabu32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">1</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_s32</span>(<span class="number">25i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x51eb851fu32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">3</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_s32</span>(<span class="number">125i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x10624dd3u32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">3</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_s32</span>(<span class="number">625i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x68db8badu32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">8</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_s32</span>(<span class="number">1337i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x6208cecbu32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">9</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_s32</span>(<span class="number">31415927i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x445b4553u32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">23</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_s32</span>(<span class="op">-</span><span class="number">31415927i32</span>), <span class="ident">make_ms32</span>(<span class="number">0xbba4baadu32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">23</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_s32</span>(<span class="op">-</span><span class="number">1337i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x9df73135u32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">9</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_s32</span>(<span class="op">-</span><span class="number">256i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x7fffffffu32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">7</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_s32</span>(<span class="op">-</span><span class="number">5i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x99999999u32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_s32</span>(<span class="op">-</span><span class="number">3i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x55555555u32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_s32</span>(<span class="op">-</span><span class="number">2i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x7fffffffu32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_s32</span>(<span class="number">2i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x80000001u32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_s32</span>(<span class="number">3i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x55555556u32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_s32</span>(<span class="number">4i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x80000001u32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_s32</span>(<span class="number">5i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x66666667u32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_s32</span>(<span class="number">6i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x2aaaaaabu32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_s32</span>(<span class="number">7i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x92492493u32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">2</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_s32</span>(<span class="number">9i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x38e38e39u32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_s32</span>(<span class="number">10i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x66666667u32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">2</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_s32</span>(<span class="number">11i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x2e8ba2e9u32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_s32</span>(<span class="number">12i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x2aaaaaabu32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_s32</span>(<span class="number">25i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x51eb851fu32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">3</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_s32</span>(<span class="number">125i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x10624dd3u32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">3</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_s32</span>(<span class="number">625i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x68db8badu32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">8</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_s32</span>(<span class="number">1337i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x6208cecbu32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">9</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_s32</span>(<span class="number">31415927i32</span>), <span class="ident">make_ms32</span>(<span class="number">0x445b4553u32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">23</span>));
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_s32</span>(<span class="number">0x7ffffffei32</span>),
             <span class="ident">make_ms32</span>(<span class="number">0x80000003u32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">30</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_s32</span>(<span class="number">0x7fffffffi32</span>),
             <span class="ident">make_ms32</span>(<span class="number">0x40000001u32</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="number">29</span>)
         );
@@ -1482,125 +1482,125 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_magic_s64</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_s64</span>(<span class="op">-</span><span class="number">0x8000000000000000i64</span>),
             <span class="ident">make_ms64</span>(<span class="number">0x7fffffffffffffffu64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">62</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_s64</span>(<span class="op">-</span><span class="number">0x7FFFFFFFFFFFFFFFi64</span>),
             <span class="ident">make_ms64</span>(<span class="number">0xbfffffffffffffffu64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">61</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_s64</span>(<span class="op">-</span><span class="number">0x7FFFFFFFFFFFFFFEi64</span>),
             <span class="ident">make_ms64</span>(<span class="number">0x7ffffffffffffffdu64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">62</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_s64</span>(<span class="op">-</span><span class="number">0x0ddC0ffeeBadF00di64</span>),
             <span class="ident">make_ms64</span>(<span class="number">0x6c3b8b1635a4412fu64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">59</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_s64</span>(<span class="op">-</span><span class="number">0x100000001i64</span>),
             <span class="ident">make_ms64</span>(<span class="number">0x800000007fffffffu64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">31</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_s64</span>(<span class="op">-</span><span class="number">0x100000000i64</span>),
             <span class="ident">make_ms64</span>(<span class="number">0x7fffffffffffffffu64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">31</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_s64</span>(<span class="op">-</span><span class="number">0xFFFFFFFFi64</span>),
             <span class="ident">make_ms64</span>(<span class="number">0x7fffffff7fffffffu64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">31</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_s64</span>(<span class="op">-</span><span class="number">0xFFFFFFFEi64</span>),
             <span class="ident">make_ms64</span>(<span class="number">0x7ffffffefffffffdu64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">31</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_s64</span>(<span class="op">-</span><span class="number">0xFFFFFFFDi64</span>),
             <span class="ident">make_ms64</span>(<span class="number">0x7ffffffe7ffffffbu64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">31</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_s64</span>(<span class="op">-</span><span class="number">0xDeadBeefi64</span>),
             <span class="ident">make_ms64</span>(<span class="number">0x6cd8a54d2036f6b5u64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">31</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_s64</span>(<span class="op">-</span><span class="number">31415927i64</span>),
             <span class="ident">make_ms64</span>(<span class="number">0x7749755a31e1683du64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">24</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_s64</span>(<span class="op">-</span><span class="number">1337i64</span>),
             <span class="ident">make_ms64</span>(<span class="number">0x9df731356bccaf63u64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">9</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_s64</span>(<span class="op">-</span><span class="number">256i64</span>),
             <span class="ident">make_ms64</span>(<span class="number">0x7fffffffffffffffu64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">7</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_s64</span>(<span class="op">-</span><span class="number">5i64</span>), <span class="ident">make_ms64</span>(<span class="number">0x9999999999999999u64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">1</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_s64</span>(<span class="op">-</span><span class="number">3i64</span>), <span class="ident">make_ms64</span>(<span class="number">0x5555555555555555u64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">1</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_s64</span>(<span class="op">-</span><span class="number">2i64</span>), <span class="ident">make_ms64</span>(<span class="number">0x7fffffffffffffffu64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">0</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_s64</span>(<span class="number">2i64</span>), <span class="ident">make_ms64</span>(<span class="number">0x8000000000000001u64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">0</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_s64</span>(<span class="number">3i64</span>), <span class="ident">make_ms64</span>(<span class="number">0x5555555555555556u64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">0</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_s64</span>(<span class="number">4i64</span>), <span class="ident">make_ms64</span>(<span class="number">0x8000000000000001u64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">1</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_s64</span>(<span class="number">5i64</span>), <span class="ident">make_ms64</span>(<span class="number">0x6666666666666667u64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">1</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_s64</span>(<span class="number">6i64</span>), <span class="ident">make_ms64</span>(<span class="number">0x2aaaaaaaaaaaaaabu64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">0</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_s64</span>(<span class="number">7i64</span>), <span class="ident">make_ms64</span>(<span class="number">0x4924924924924925u64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">1</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_s64</span>(<span class="number">9i64</span>), <span class="ident">make_ms64</span>(<span class="number">0x1c71c71c71c71c72u64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">0</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_s64</span>(<span class="number">10i64</span>), <span class="ident">make_ms64</span>(<span class="number">0x6666666666666667u64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">2</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_s64</span>(<span class="number">11i64</span>), <span class="ident">make_ms64</span>(<span class="number">0x2e8ba2e8ba2e8ba3u64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">1</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_s64</span>(<span class="number">12i64</span>), <span class="ident">make_ms64</span>(<span class="number">0x2aaaaaaaaaaaaaabu64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">1</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">magic_s64</span>(<span class="number">25i64</span>), <span class="ident">make_ms64</span>(<span class="number">0xa3d70a3d70a3d70bu64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">4</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_s64</span>(<span class="op">-</span><span class="number">5i64</span>), <span class="ident">make_ms64</span>(<span class="number">0x9999999999999999u64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_s64</span>(<span class="op">-</span><span class="number">3i64</span>), <span class="ident">make_ms64</span>(<span class="number">0x5555555555555555u64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_s64</span>(<span class="op">-</span><span class="number">2i64</span>), <span class="ident">make_ms64</span>(<span class="number">0x7fffffffffffffffu64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_s64</span>(<span class="number">2i64</span>), <span class="ident">make_ms64</span>(<span class="number">0x8000000000000001u64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_s64</span>(<span class="number">3i64</span>), <span class="ident">make_ms64</span>(<span class="number">0x5555555555555556u64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_s64</span>(<span class="number">4i64</span>), <span class="ident">make_ms64</span>(<span class="number">0x8000000000000001u64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_s64</span>(<span class="number">5i64</span>), <span class="ident">make_ms64</span>(<span class="number">0x6666666666666667u64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_s64</span>(<span class="number">6i64</span>), <span class="ident">make_ms64</span>(<span class="number">0x2aaaaaaaaaaaaaabu64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_s64</span>(<span class="number">7i64</span>), <span class="ident">make_ms64</span>(<span class="number">0x4924924924924925u64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_s64</span>(<span class="number">9i64</span>), <span class="ident">make_ms64</span>(<span class="number">0x1c71c71c71c71c72u64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_s64</span>(<span class="number">10i64</span>), <span class="ident">make_ms64</span>(<span class="number">0x6666666666666667u64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">2</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_s64</span>(<span class="number">11i64</span>), <span class="ident">make_ms64</span>(<span class="number">0x2e8ba2e8ba2e8ba3u64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_s64</span>(<span class="number">12i64</span>), <span class="ident">make_ms64</span>(<span class="number">0x2aaaaaaaaaaaaaabu64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">magic_s64</span>(<span class="number">25i64</span>), <span class="ident">make_ms64</span>(<span class="number">0xa3d70a3d70a3d70bu64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">4</span>));
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_s64</span>(<span class="number">125i64</span>),
             <span class="ident">make_ms64</span>(<span class="number">0x20c49ba5e353f7cfu64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">4</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_s64</span>(<span class="number">625i64</span>),
             <span class="ident">make_ms64</span>(<span class="number">0x346dc5d63886594bu64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">7</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_s64</span>(<span class="number">1337i64</span>),
             <span class="ident">make_ms64</span>(<span class="number">0x6208ceca9433509du64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">9</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_s64</span>(<span class="number">31415927i64</span>),
             <span class="ident">make_ms64</span>(<span class="number">0x88b68aa5ce1e97c3u64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">24</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_s64</span>(<span class="number">0x00000000deadbeefi64</span>),
             <span class="ident">make_ms64</span>(<span class="number">0x93275ab2dfc9094bu64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">31</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_s64</span>(<span class="number">0x00000000fffffffdi64</span>),
             <span class="ident">make_ms64</span>(<span class="number">0x8000000180000005u64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">31</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_s64</span>(<span class="number">0x00000000fffffffei64</span>),
             <span class="ident">make_ms64</span>(<span class="number">0x8000000100000003u64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">31</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_s64</span>(<span class="number">0x00000000ffffffffi64</span>),
             <span class="ident">make_ms64</span>(<span class="number">0x8000000080000001u64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">31</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_s64</span>(<span class="number">0x0000000100000000i64</span>),
             <span class="ident">make_ms64</span>(<span class="number">0x8000000000000001u64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">31</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_s64</span>(<span class="number">0x0000000100000001i64</span>),
             <span class="ident">make_ms64</span>(<span class="number">0x7fffffff80000001u64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">31</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_s64</span>(<span class="number">0x0ddc0ffeebadf00di64</span>),
             <span class="ident">make_ms64</span>(<span class="number">0x93c474e9ca5bbed1u64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">59</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_s64</span>(<span class="number">0x7ffffffffffffffdi64</span>),
             <span class="ident">make_ms64</span>(<span class="number">0x2000000000000001u64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">60</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_s64</span>(<span class="number">0x7ffffffffffffffei64</span>),
             <span class="ident">make_ms64</span>(<span class="number">0x8000000000000003u64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">62</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">magic_s64</span>(<span class="number">0x7fffffffffffffffi64</span>),
             <span class="ident">make_ms64</span>(<span class="number">0x4000000000000001u64</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">61</span>)
         );
@@ -1622,7 +1622,7 @@
             <span class="ident">total</span> <span class="op">=</span> <span class="ident">total</span> <span class="op">+</span> (<span class="ident">m</span>.<span class="ident">shift_by</span> <span class="kw">as</span> <span class="ident">u64</span>);
             <span class="ident">total</span> <span class="op">=</span> <span class="ident">total</span> <span class="op">+</span> (<span class="kw">if</span> <span class="ident">m</span>.<span class="ident">do_add</span> { <span class="number">123</span> } <span class="kw">else</span> { <span class="number">456</span> });
         }
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">total</span>, <span class="number">2481999609</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">total</span>, <span class="number">2481999609</span>);
 
         <span class="ident">total</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="comment">// Testing MIDPOINT magic_u32</span>
@@ -1632,7 +1632,7 @@
             <span class="ident">total</span> <span class="op">=</span> <span class="ident">total</span> <span class="op">+</span> (<span class="ident">m</span>.<span class="ident">shift_by</span> <span class="kw">as</span> <span class="ident">u64</span>);
             <span class="ident">total</span> <span class="op">=</span> <span class="ident">total</span> <span class="op">+</span> (<span class="kw">if</span> <span class="ident">m</span>.<span class="ident">do_add</span> { <span class="number">123</span> } <span class="kw">else</span> { <span class="number">456</span> });
         }
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">total</span>, <span class="number">2399809723</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">total</span>, <span class="number">2399809723</span>);
 
         <span class="ident">total</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="comment">// Testing DOWN magic_u32</span>
@@ -1642,7 +1642,7 @@
             <span class="ident">total</span> <span class="op">=</span> <span class="ident">total</span> <span class="op">+</span> (<span class="ident">m</span>.<span class="ident">shift_by</span> <span class="kw">as</span> <span class="ident">u64</span>);
             <span class="ident">total</span> <span class="op">=</span> <span class="ident">total</span> <span class="op">+</span> (<span class="kw">if</span> <span class="ident">m</span>.<span class="ident">do_add</span> { <span class="number">123</span> } <span class="kw">else</span> { <span class="number">456</span> });
         }
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">total</span>, <span class="number">271138267</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">total</span>, <span class="number">271138267</span>);
 
         <span class="comment">// Testing UP magic_u64</span>
         <span class="ident">total</span> <span class="op">=</span> <span class="number">0</span>;
@@ -1652,7 +1652,7 @@
             <span class="ident">total</span> <span class="op">=</span> <span class="ident">total</span> <span class="op">+</span> (<span class="ident">m</span>.<span class="ident">shift_by</span> <span class="kw">as</span> <span class="ident">u64</span>);
             <span class="ident">total</span> <span class="op">=</span> <span class="ident">total</span> <span class="op">+</span> (<span class="kw">if</span> <span class="ident">m</span>.<span class="ident">do_add</span> { <span class="number">123</span> } <span class="kw">else</span> { <span class="number">456</span> });
         }
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">total</span>, <span class="number">7430004086976261161</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">total</span>, <span class="number">7430004086976261161</span>);
 
         <span class="ident">total</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="comment">// Testing MIDPOINT magic_u64</span>
@@ -1662,7 +1662,7 @@
             <span class="ident">total</span> <span class="op">=</span> <span class="ident">total</span> <span class="op">+</span> (<span class="ident">m</span>.<span class="ident">shift_by</span> <span class="kw">as</span> <span class="ident">u64</span>);
             <span class="ident">total</span> <span class="op">=</span> <span class="ident">total</span> <span class="op">+</span> (<span class="kw">if</span> <span class="ident">m</span>.<span class="ident">do_add</span> { <span class="number">123</span> } <span class="kw">else</span> { <span class="number">456</span> });
         }
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">total</span>, <span class="number">10312117246769520603</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">total</span>, <span class="number">10312117246769520603</span>);
 
         <span class="comment">// Testing DOWN magic_u64</span>
         <span class="ident">total</span> <span class="op">=</span> <span class="number">0</span>;
@@ -1672,7 +1672,7 @@
             <span class="ident">total</span> <span class="op">=</span> <span class="ident">total</span> <span class="op">+</span> (<span class="ident">m</span>.<span class="ident">shift_by</span> <span class="kw">as</span> <span class="ident">u64</span>);
             <span class="ident">total</span> <span class="op">=</span> <span class="ident">total</span> <span class="op">+</span> (<span class="kw">if</span> <span class="ident">m</span>.<span class="ident">do_add</span> { <span class="number">123</span> } <span class="kw">else</span> { <span class="number">456</span> });
         }
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">total</span>, <span class="number">1126603594357269734</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">total</span>, <span class="number">1126603594357269734</span>);
 
         <span class="comment">// Testing UP magic_s32</span>
         <span class="ident">total</span> <span class="op">=</span> <span class="number">0</span>;
@@ -1681,7 +1681,7 @@
             <span class="ident">total</span> <span class="op">=</span> <span class="ident">total</span> <span class="op">^</span> (<span class="ident">m</span>.<span class="ident">mul_by</span> <span class="kw">as</span> <span class="ident">u64</span>);
             <span class="ident">total</span> <span class="op">=</span> <span class="ident">total</span> <span class="op">+</span> (<span class="ident">m</span>.<span class="ident">shift_by</span> <span class="kw">as</span> <span class="ident">u64</span>);
         }
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">total</span>, <span class="number">18446744069953376812</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">total</span>, <span class="number">18446744069953376812</span>);
 
         <span class="ident">total</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="comment">// Testing MIDPOINT magic_s32</span>
@@ -1693,7 +1693,7 @@
                 <span class="ident">total</span> <span class="op">=</span> <span class="ident">total</span> <span class="op">+</span> (<span class="ident">m</span>.<span class="ident">shift_by</span> <span class="kw">as</span> <span class="ident">u64</span>);
             }
         }
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">total</span>, <span class="number">351839350</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">total</span>, <span class="number">351839350</span>);
 
         <span class="comment">// Testing DOWN magic_s32</span>
         <span class="ident">total</span> <span class="op">=</span> <span class="number">0</span>;
@@ -1702,7 +1702,7 @@
             <span class="ident">total</span> <span class="op">=</span> <span class="ident">total</span> <span class="op">^</span> (<span class="ident">m</span>.<span class="ident">mul_by</span> <span class="kw">as</span> <span class="ident">u64</span>);
             <span class="ident">total</span> <span class="op">=</span> <span class="ident">total</span> <span class="op">+</span> (<span class="ident">m</span>.<span class="ident">shift_by</span> <span class="kw">as</span> <span class="ident">u64</span>);
         }
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">total</span>, <span class="number">18446744072916880714</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">total</span>, <span class="number">18446744072916880714</span>);
 
         <span class="comment">// Testing UP magic_s64</span>
         <span class="ident">total</span> <span class="op">=</span> <span class="number">0</span>;
@@ -1711,7 +1711,7 @@
             <span class="ident">total</span> <span class="op">=</span> <span class="ident">total</span> <span class="op">^</span> (<span class="ident">m</span>.<span class="ident">mul_by</span> <span class="kw">as</span> <span class="ident">u64</span>);
             <span class="ident">total</span> <span class="op">=</span> <span class="ident">total</span> <span class="op">+</span> (<span class="ident">m</span>.<span class="ident">shift_by</span> <span class="kw">as</span> <span class="ident">u64</span>);
         }
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">total</span>, <span class="number">17929885647724831014</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">total</span>, <span class="number">17929885647724831014</span>);
 
         <span class="ident">total</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="comment">// Testing MIDPOINT magic_s64</span>
@@ -1723,7 +1723,7 @@
                 <span class="ident">total</span> <span class="op">=</span> <span class="ident">total</span> <span class="op">+</span> (<span class="ident">m</span>.<span class="ident">shift_by</span> <span class="kw">as</span> <span class="ident">u64</span>);
             }
         }
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">total</span>, <span class="number">18106042338125661964</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">total</span>, <span class="number">18106042338125661964</span>);
 
         <span class="comment">// Testing DOWN magic_s64</span>
         <span class="ident">total</span> <span class="op">=</span> <span class="number">0</span>;
@@ -1732,7 +1732,7 @@
             <span class="ident">total</span> <span class="op">=</span> <span class="ident">total</span> <span class="op">^</span> (<span class="ident">m</span>.<span class="ident">mul_by</span> <span class="kw">as</span> <span class="ident">u64</span>);
             <span class="ident">total</span> <span class="op">=</span> <span class="ident">total</span> <span class="op">+</span> (<span class="ident">m</span>.<span class="ident">shift_by</span> <span class="kw">as</span> <span class="ident">u64</span>);
         }
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">total</span>, <span class="number">563301797155560970</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">total</span>, <span class="number">563301797155560970</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -1845,7 +1845,7 @@
                 <span class="kw">if</span> <span class="ident">x</span> <span class="op">&lt;</span> <span class="ident">MAX_U32</span> <span class="op">-</span> <span class="number">110</span> {
                     <span class="kw">return</span> <span class="ident">x</span> <span class="op">+</span> <span class="number">23</span>;
                 }
-                <span class="ident">u32</span>::<span class="ident">wrapping_add</span>(<span class="ident">x</span>, <span class="number">1</span>)
+                <span class="ident">u32::wrapping_add</span>(<span class="ident">x</span>, <span class="number">1</span>)
             }
 
             <span class="kw">let</span> <span class="ident">magic</span>: <span class="ident">MU32</span> <span class="op">=</span> <span class="ident">magic_u32</span>(<span class="ident">d</span>);
@@ -1855,17 +1855,17 @@
                 <span class="comment">// Compute and check `q = n / d` using `magic`.</span>
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">q</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="ident">mulhw_u32</span>(<span class="ident">n</span>, <span class="ident">magic</span>.<span class="ident">mul_by</span>);
                 <span class="kw">if</span> <span class="ident">magic</span>.<span class="ident">do_add</span> {
-                    <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">magic</span>.<span class="ident">shift_by</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="ident">magic</span>.<span class="ident">shift_by</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">32</span>);
+                    <span class="macro">assert!</span>(<span class="ident">magic</span>.<span class="ident">shift_by</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="ident">magic</span>.<span class="ident">shift_by</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">32</span>);
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">t</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="ident">n</span> <span class="op">-</span> <span class="ident">q</span>;
                     <span class="ident">t</span> <span class="op">&gt;</span><span class="op">&gt;</span><span class="op">=</span> <span class="number">1</span>;
                     <span class="ident">t</span> <span class="op">=</span> <span class="ident">t</span> <span class="op">+</span> <span class="ident">q</span>;
                     <span class="ident">q</span> <span class="op">=</span> <span class="ident">t</span> <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="ident">magic</span>.<span class="ident">shift_by</span> <span class="op">-</span> <span class="number">1</span>);
                 } <span class="kw">else</span> {
-                    <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">magic</span>.<span class="ident">shift_by</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">magic</span>.<span class="ident">shift_by</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">31</span>);
+                    <span class="macro">assert!</span>(<span class="ident">magic</span>.<span class="ident">shift_by</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">magic</span>.<span class="ident">shift_by</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">31</span>);
                     <span class="ident">q</span> <span class="op">&gt;</span><span class="op">&gt;</span><span class="op">=</span> <span class="ident">magic</span>.<span class="ident">shift_by</span>;
                 }
 
-                <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">q</span>, <span class="ident">div_u32</span>(<span class="ident">n</span>, <span class="ident">d</span>));
+                <span class="macro">assert_eq!</span>(<span class="ident">q</span>, <span class="ident">div_u32</span>(<span class="ident">n</span>, <span class="ident">d</span>));
 
                 <span class="ident">n</span> <span class="op">=</span> <span class="ident">advance_n_u32</span>(<span class="ident">n</span>);
                 <span class="kw">if</span> <span class="ident">n</span> <span class="op">=</span><span class="op">=</span> <span class="ident">MIN_U32</span> {
@@ -1922,13 +1922,13 @@
                 } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">d</span> <span class="op">&lt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">magic</span>.<span class="ident">mul_by</span> <span class="op">&gt;</span> <span class="number">0</span> {
                     <span class="ident">q</span> <span class="op">=</span> <span class="ident">q</span> <span class="op">-</span> <span class="ident">n</span>;
                 }
-                <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">magic</span>.<span class="ident">shift_by</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">magic</span>.<span class="ident">shift_by</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">31</span>);
+                <span class="macro">assert!</span>(<span class="ident">magic</span>.<span class="ident">shift_by</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">magic</span>.<span class="ident">shift_by</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">31</span>);
                 <span class="ident">q</span> <span class="op">=</span> <span class="ident">q</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">magic</span>.<span class="ident">shift_by</span>;
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">t</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="ident">q</span> <span class="kw">as</span> <span class="ident">u32</span>;
                 <span class="ident">t</span> <span class="op">=</span> <span class="ident">t</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">31</span>;
                 <span class="ident">q</span> <span class="op">=</span> <span class="ident">q</span> <span class="op">+</span> (<span class="ident">t</span> <span class="kw">as</span> <span class="ident">i32</span>);
 
-                <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">q</span>, <span class="ident">div_s32</span>(<span class="ident">n</span>, <span class="ident">d</span>));
+                <span class="macro">assert_eq!</span>(<span class="ident">q</span>, <span class="ident">div_s32</span>(<span class="ident">n</span>, <span class="ident">d</span>));
 
                 <span class="ident">n</span> <span class="op">=</span> <span class="ident">advance_n_s32</span>(<span class="ident">n</span>);
                 <span class="kw">if</span> <span class="ident">n</span> <span class="op">=</span><span class="op">=</span> <span class="ident">MIN_S32</span> {
@@ -1960,7 +1960,7 @@
                 <span class="kw">if</span> <span class="ident">x</span> <span class="op">&lt;</span> <span class="ident">MAX_U64</span> <span class="op">-</span> <span class="number">110</span> {
                     <span class="kw">return</span> <span class="ident">x</span> <span class="op">+</span> <span class="number">23</span>;
                 }
-                <span class="ident">u64</span>::<span class="ident">wrapping_add</span>(<span class="ident">x</span>, <span class="number">1</span>)
+                <span class="ident">u64::wrapping_add</span>(<span class="ident">x</span>, <span class="number">1</span>)
             }
 
             <span class="kw">let</span> <span class="ident">magic</span>: <span class="ident">MU64</span> <span class="op">=</span> <span class="ident">magic_u64</span>(<span class="ident">d</span>);
@@ -1970,17 +1970,17 @@
                 <span class="comment">// Compute and check `q = n / d` using `magic`.</span>
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">q</span> <span class="op">=</span> <span class="ident">mulhw_u64</span>(<span class="ident">n</span>, <span class="ident">magic</span>.<span class="ident">mul_by</span>);
                 <span class="kw">if</span> <span class="ident">magic</span>.<span class="ident">do_add</span> {
-                    <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">magic</span>.<span class="ident">shift_by</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="ident">magic</span>.<span class="ident">shift_by</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">64</span>);
+                    <span class="macro">assert!</span>(<span class="ident">magic</span>.<span class="ident">shift_by</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="ident">magic</span>.<span class="ident">shift_by</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">64</span>);
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">t</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">n</span> <span class="op">-</span> <span class="ident">q</span>;
                     <span class="ident">t</span> <span class="op">&gt;</span><span class="op">&gt;</span><span class="op">=</span> <span class="number">1</span>;
                     <span class="ident">t</span> <span class="op">=</span> <span class="ident">t</span> <span class="op">+</span> <span class="ident">q</span>;
                     <span class="ident">q</span> <span class="op">=</span> <span class="ident">t</span> <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="ident">magic</span>.<span class="ident">shift_by</span> <span class="op">-</span> <span class="number">1</span>);
                 } <span class="kw">else</span> {
-                    <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">magic</span>.<span class="ident">shift_by</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">magic</span>.<span class="ident">shift_by</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">63</span>);
+                    <span class="macro">assert!</span>(<span class="ident">magic</span>.<span class="ident">shift_by</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">magic</span>.<span class="ident">shift_by</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">63</span>);
                     <span class="ident">q</span> <span class="op">&gt;</span><span class="op">&gt;</span><span class="op">=</span> <span class="ident">magic</span>.<span class="ident">shift_by</span>;
                 }
 
-                <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">q</span>, <span class="ident">div_u64</span>(<span class="ident">n</span>, <span class="ident">d</span>));
+                <span class="macro">assert_eq!</span>(<span class="ident">q</span>, <span class="ident">div_u64</span>(<span class="ident">n</span>, <span class="ident">d</span>));
 
                 <span class="ident">n</span> <span class="op">=</span> <span class="ident">advance_n_u64</span>(<span class="ident">n</span>);
                 <span class="kw">if</span> <span class="ident">n</span> <span class="op">=</span><span class="op">=</span> <span class="ident">MIN_U64</span> {
@@ -2037,13 +2037,13 @@
                 } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">d</span> <span class="op">&lt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">magic</span>.<span class="ident">mul_by</span> <span class="op">&gt;</span> <span class="number">0</span> {
                     <span class="ident">q</span> <span class="op">=</span> <span class="ident">q</span> <span class="op">-</span> <span class="ident">n</span>;
                 }
-                <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">magic</span>.<span class="ident">shift_by</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">magic</span>.<span class="ident">shift_by</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">63</span>);
+                <span class="macro">assert!</span>(<span class="ident">magic</span>.<span class="ident">shift_by</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">magic</span>.<span class="ident">shift_by</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">63</span>);
                 <span class="ident">q</span> <span class="op">=</span> <span class="ident">q</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">magic</span>.<span class="ident">shift_by</span>;
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">t</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">q</span> <span class="kw">as</span> <span class="ident">u64</span>;
                 <span class="ident">t</span> <span class="op">=</span> <span class="ident">t</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">63</span>;
                 <span class="ident">q</span> <span class="op">=</span> <span class="ident">q</span> <span class="op">+</span> (<span class="ident">t</span> <span class="kw">as</span> <span class="ident">i64</span>);
 
-                <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">q</span>, <span class="ident">div_s64</span>(<span class="ident">n</span>, <span class="ident">d</span>));
+                <span class="macro">assert_eq!</span>(<span class="ident">q</span>, <span class="ident">div_s64</span>(<span class="ident">n</span>, <span class="ident">d</span>));
 
                 <span class="ident">n</span> <span class="op">=</span> <span class="ident">advance_n_s64</span>(<span class="ident">n</span>);
                 <span class="kw">if</span> <span class="ident">n</span> <span class="op">=</span><span class="op">=</span> <span class="ident">MIN_S64</span> {
@@ -2165,8 +2165,9 @@
                 <span class="ident">d</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
             }
         }
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">n_tests_done</span>, <span class="number">50_148_000</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">n_tests_done</span>, <span class="number">50_148_000</span>);
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "cranelift_codegen";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="cranelift_codegen" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

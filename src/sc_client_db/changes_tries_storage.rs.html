@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sc-client-db-0.8.0/src/changes_tries_storage.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>changes_tries_storage.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sc-client-db-0.9.0/src/changes_tries_storage.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>changes_tries_storage.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../sc_client_db/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../sc_client_db/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1019,45 +1019,49 @@
 <span id="1016">1016</span>
 <span id="1017">1017</span>
 <span id="1018">1018</span>
+<span id="1019">1019</span>
+<span id="1020">1020</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="comment">// Copyright 2019 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Substrate.</span>
 
-<span class="comment">// Substrate is free software: you can redistribute it and/or modify</span>
+<span class="comment">// Copyright (C) 2019-2021 Parity Technologies (UK) Ltd.</span>
+<span class="comment">// SPDX-License-Identifier: GPL-3.0-or-later WITH Classpath-exception-2.0</span>
+
+<span class="comment">// This program is free software: you can redistribute it and/or modify</span>
 <span class="comment">// it under the terms of the GNU General Public License as published by</span>
 <span class="comment">// the Free Software Foundation, either version 3 of the License, or</span>
 <span class="comment">// (at your option) any later version.</span>
 
-<span class="comment">// Substrate is distributed in the hope that it will be useful,</span>
+<span class="comment">// This program is distributed in the hope that it will be useful,</span>
 <span class="comment">// but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
-<span class="comment">// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="comment">// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the</span>
 <span class="comment">// GNU General Public License for more details.</span>
 
 <span class="comment">// You should have received a copy of the GNU General Public License</span>
-<span class="comment">// along with Substrate.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="comment">// along with this program. If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
 
 <span class="doccomment">//! DB-backed changes tries storage.</span>
 
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::{<span class="ident">HashMap</span>, <span class="ident">HashSet</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Arc</span>;
-<span class="kw">use</span> <span class="ident">hash_db</span>::<span class="ident">Prefix</span>;
+<span class="kw">use</span> <span class="ident">std::collections</span>::{<span class="ident">HashMap</span>, <span class="ident">HashSet</span>};
+<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<span class="kw">use</span> <span class="ident">hash_db::Prefix</span>;
 <span class="kw">use</span> <span class="ident">codec</span>::{<span class="ident">Decode</span>, <span class="ident">Encode</span>};
-<span class="kw">use</span> <span class="ident">parking_lot</span>::<span class="ident">RwLock</span>;
+<span class="kw">use</span> <span class="ident">parking_lot::RwLock</span>;
 <span class="kw">use</span> <span class="ident">sp_blockchain</span>::{<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">ClientError</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">ClientResult</span>};
-<span class="kw">use</span> <span class="ident">sp_trie</span>::<span class="ident">MemoryDB</span>;
-<span class="kw">use</span> <span class="ident">sc_client_api</span>::<span class="ident">backend</span>::<span class="ident">PrunableStateChangesTrieStorage</span>;
+<span class="kw">use</span> <span class="ident">sp_trie::MemoryDB</span>;
+<span class="kw">use</span> <span class="ident">sc_client_api::backend::PrunableStateChangesTrieStorage</span>;
 <span class="kw">use</span> <span class="ident">sp_blockchain</span>::{<span class="ident">well_known_cache_keys</span>, <span class="ident">Cache</span> <span class="kw">as</span> <span class="ident">BlockchainCache</span>, <span class="ident">HeaderMetadataCache</span>};
 <span class="kw">use</span> <span class="ident">sp_core</span>::{<span class="ident">ChangesTrieConfiguration</span>, <span class="ident">ChangesTrieConfigurationRange</span>, <span class="ident">convert_hash</span>};
-<span class="kw">use</span> <span class="ident">sp_core</span>::<span class="ident">storage</span>::<span class="ident">PrefixedStorageKey</span>;
-<span class="kw">use</span> <span class="ident">sp_database</span>::<span class="ident">Transaction</span>;
-<span class="kw">use</span> <span class="ident">sp_runtime</span>::<span class="ident">traits</span>::{
+<span class="kw">use</span> <span class="ident">sp_core::storage::PrefixedStorageKey</span>;
+<span class="kw">use</span> <span class="ident">sp_database::Transaction</span>;
+<span class="kw">use</span> <span class="ident">sp_runtime::traits</span>::{
 	<span class="ident">Block</span> <span class="kw">as</span> <span class="ident">BlockT</span>, <span class="ident">Header</span> <span class="kw">as</span> <span class="ident">HeaderT</span>, <span class="ident">HashFor</span>, <span class="ident">NumberFor</span>, <span class="ident">One</span>, <span class="ident">Zero</span>, <span class="ident">CheckedSub</span>,
 };
-<span class="kw">use</span> <span class="ident">sp_runtime</span>::<span class="ident">generic</span>::{<span class="ident">BlockId</span>, <span class="ident">DigestItem</span>, <span class="ident">ChangesTrieSignal</span>};
+<span class="kw">use</span> <span class="ident">sp_runtime::generic</span>::{<span class="ident">BlockId</span>, <span class="ident">DigestItem</span>, <span class="ident">ChangesTrieSignal</span>};
 <span class="kw">use</span> <span class="ident">sp_state_machine</span>::{<span class="ident">ChangesTrieBuildCache</span>, <span class="ident">ChangesTrieCacheAction</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Database</span>, <span class="ident">DbHash</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">utils</span>::{<span class="self">self</span>, <span class="ident">Meta</span>, <span class="ident">meta_keys</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">cache</span>::{
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::utils</span>::{<span class="self">self</span>, <span class="ident">Meta</span>, <span class="ident">meta_keys</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::cache</span>::{
 	<span class="ident">DbCacheSync</span>, <span class="ident">DbCache</span>, <span class="ident">DbCacheTransactionOps</span>,
 	<span class="ident">ComplexBlockId</span>, <span class="ident">EntryType</span> <span class="kw">as</span> <span class="ident">CacheEntryType</span>,
 };
@@ -1065,8 +1069,8 @@
 <span class="doccomment">/// Extract new changes trie configuration (if available) from the header.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extract_new_configuration</span><span class="op">&lt;</span><span class="ident">Header</span>: <span class="ident">HeaderT</span><span class="op">&gt;</span>(<span class="ident">header</span>: <span class="kw-2">&amp;</span><span class="ident">Header</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChangesTrieConfiguration</span><span class="op">&gt;</span><span class="op">&gt;</span> {
 	<span class="ident">header</span>.<span class="ident">digest</span>()
-		.<span class="ident">log</span>(<span class="ident">DigestItem</span>::<span class="ident">as_changes_trie_signal</span>)
-		.<span class="ident">and_then</span>(<span class="ident">ChangesTrieSignal</span>::<span class="ident">as_new_configuration</span>)
+		.<span class="ident">log</span>(<span class="ident">DigestItem::as_changes_trie_signal</span>)
+		.<span class="ident">and_then</span>(<span class="ident">ChangesTrieSignal::as_new_configuration</span>)
 }
 
 <span class="doccomment">/// Opaque configuration cache transaction. During its lifetime, no-one should modify cache. This is currently</span>
@@ -1100,12 +1104,12 @@
 <span class="doccomment">/// Stores all tries in separate DB column.</span>
 <span class="doccomment">/// Lock order: meta, tries_meta, cache, build_cache.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DbChangesTrieStorage</span><span class="op">&lt;</span><span class="ident">Block</span>: <span class="ident">BlockT</span><span class="op">&gt;</span> {
-	<span class="ident">db</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Database</span><span class="op">&lt;</span><span class="ident">DbHash</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+	<span class="ident">db</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Database</span><span class="op">&lt;</span><span class="ident">DbHash</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 	<span class="ident">meta_column</span>: <span class="ident">u32</span>,
 	<span class="ident">changes_tries_column</span>: <span class="ident">u32</span>,
 	<span class="ident">key_lookup_column</span>: <span class="ident">u32</span>,
 	<span class="ident">header_column</span>: <span class="ident">u32</span>,
-	<span class="ident">meta</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">Meta</span><span class="op">&lt;</span><span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>, <span class="ident">Block</span>::<span class="ident">Hash</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+	<span class="ident">meta</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">Meta</span><span class="op">&lt;</span><span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>, <span class="ident">Block::Hash</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 	<span class="ident">tries_meta</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">ChangesTriesMeta</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 	<span class="ident">min_blocks_to_keep</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
 	<span class="doccomment">/// The cache stores all ever existing changes tries configurations.</span>
@@ -1113,7 +1117,7 @@
 	<span class="doccomment">/// Build cache is a map of block =&gt; set of storage keys changed at this block.</span>
 	<span class="doccomment">/// They&#39;re used to build digest blocks - instead of reading+parsing tries from db</span>
 	<span class="doccomment">/// we just use keys sets from the cache.</span>
-	<span class="ident">build_cache</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">ChangesTrieBuildCache</span><span class="op">&lt;</span><span class="ident">Block</span>::<span class="ident">Hash</span>, <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+	<span class="ident">build_cache</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">ChangesTrieBuildCache</span><span class="op">&lt;</span><span class="ident">Block::Hash</span>, <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="doccomment">/// Persistent struct that contains all the changes tries metadata.</span>
@@ -1135,14 +1139,14 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Block</span>: <span class="ident">BlockT</span><span class="op">&gt;</span> <span class="ident">DbChangesTrieStorage</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span> {
 	<span class="doccomment">/// Create new changes trie storage.</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-		<span class="ident">db</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Database</span><span class="op">&lt;</span><span class="ident">DbHash</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+		<span class="ident">db</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Database</span><span class="op">&lt;</span><span class="ident">DbHash</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 		<span class="ident">header_metadata_cache</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">HeaderMetadataCache</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 		<span class="ident">meta_column</span>: <span class="ident">u32</span>,
 		<span class="ident">changes_tries_column</span>: <span class="ident">u32</span>,
 		<span class="ident">key_lookup_column</span>: <span class="ident">u32</span>,
 		<span class="ident">header_column</span>: <span class="ident">u32</span>,
 		<span class="ident">cache_column</span>: <span class="ident">u32</span>,
-		<span class="ident">meta</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">Meta</span><span class="op">&lt;</span><span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>, <span class="ident">Block</span>::<span class="ident">Hash</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+		<span class="ident">meta</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">Meta</span><span class="op">&lt;</span><span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>, <span class="ident">Block::Hash</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 		<span class="ident">min_blocks_to_keep</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ClientResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
 		<span class="kw">let</span> (<span class="ident">finalized_hash</span>, <span class="ident">finalized_number</span>, <span class="ident">genesis_hash</span>) <span class="op">=</span> {
@@ -1158,17 +1162,17 @@
 			<span class="ident">header_column</span>,
 			<span class="ident">meta</span>,
 			<span class="ident">min_blocks_to_keep</span>,
-			<span class="ident">cache</span>: <span class="ident">DbCacheSync</span>(<span class="ident">RwLock</span>::<span class="ident">new</span>(<span class="ident">DbCache</span>::<span class="ident">new</span>(
+			<span class="ident">cache</span>: <span class="ident">DbCacheSync</span>(<span class="ident">RwLock::new</span>(<span class="ident">DbCache::new</span>(
 				<span class="ident">db</span>.<span class="ident">clone</span>(),
 				<span class="ident">header_metadata_cache</span>,
 				<span class="ident">key_lookup_column</span>,
 				<span class="ident">header_column</span>,
 				<span class="ident">cache_column</span>,
 				<span class="ident">genesis_hash</span>,
-				<span class="ident">ComplexBlockId</span>::<span class="ident">new</span>(<span class="ident">finalized_hash</span>, <span class="ident">finalized_number</span>),
+				<span class="ident">ComplexBlockId::new</span>(<span class="ident">finalized_hash</span>, <span class="ident">finalized_number</span>),
 			))),
-			<span class="ident">build_cache</span>: <span class="ident">RwLock</span>::<span class="ident">new</span>(<span class="ident">ChangesTrieBuildCache</span>::<span class="ident">new</span>()),
-			<span class="ident">tries_meta</span>: <span class="ident">RwLock</span>::<span class="ident">new</span>(<span class="ident">tries_meta</span>),
+			<span class="ident">build_cache</span>: <span class="ident">RwLock::new</span>(<span class="ident">ChangesTrieBuildCache::new</span>()),
+			<span class="ident">tries_meta</span>: <span class="ident">RwLock::new</span>(<span class="ident">tries_meta</span>),
 		})
 	}
 
@@ -1179,7 +1183,7 @@
 		<span class="kw-2">mut</span> <span class="ident">changes_trie</span>: <span class="ident">MemoryDB</span><span class="op">&lt;</span><span class="ident">HashFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 		<span class="ident">parent_block</span>: <span class="ident">ComplexBlockId</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>,
 		<span class="ident">block</span>: <span class="ident">ComplexBlockId</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>,
-		<span class="ident">new_header</span>: <span class="kw-2">&amp;</span><span class="ident">Block</span>::<span class="ident">Header</span>,
+		<span class="ident">new_header</span>: <span class="kw-2">&amp;</span><span class="ident">Block::Header</span>,
 		<span class="ident">finalized</span>: <span class="ident">bool</span>,
 		<span class="ident">new_configuration</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChangesTrieConfiguration</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 		<span class="ident">cache_tx</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DbChangesTrieStorageTransaction</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="op">&gt;</span>,
@@ -1192,7 +1196,7 @@
 		<span class="comment">// if configuration has not been changed AND block is not finalized =&gt; nothing to do here</span>
 		<span class="kw">let</span> <span class="ident">new_configuration</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">new_configuration</span> {
 			<span class="prelude-val">Some</span>(<span class="ident">new_configuration</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">new_configuration</span>,
-			<span class="prelude-val">None</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">finalized</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">DbCacheTransactionOps</span>::<span class="ident">empty</span>().<span class="ident">into</span>()),
+			<span class="prelude-val">None</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">finalized</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">DbCacheTransactionOps::empty</span>().<span class="ident">into</span>()),
 			<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="self">self</span>.<span class="ident">finalize</span>(
 				<span class="ident">tx</span>,
 				<span class="ident">parent_block</span>.<span class="ident">hash</span>,
@@ -1204,16 +1208,16 @@
 		};
 
 		<span class="comment">// update configuration cache</span>
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache_at</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="ident">new</span>();
-		<span class="ident">cache_at</span>.<span class="ident">insert</span>(<span class="ident">well_known_cache_keys</span>::<span class="ident">CHANGES_TRIE_CONFIG</span>, <span class="ident">new_configuration</span>.<span class="ident">encode</span>());
-		<span class="prelude-val">Ok</span>(<span class="ident">DbChangesTrieStorageTransaction</span>::<span class="ident">from</span>(<span class="kw">match</span> <span class="ident">cache_tx</span> {
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache_at</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
+		<span class="ident">cache_at</span>.<span class="ident">insert</span>(<span class="ident">well_known_cache_keys::CHANGES_TRIE_CONFIG</span>, <span class="ident">new_configuration</span>.<span class="ident">encode</span>());
+		<span class="prelude-val">Ok</span>(<span class="ident">DbChangesTrieStorageTransaction::from</span>(<span class="kw">match</span> <span class="ident">cache_tx</span> {
 			<span class="prelude-val">Some</span>(<span class="ident">cache_tx</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">cache</span>.<span class="number">0</span>.<span class="ident">write</span>()
 				.<span class="ident">transaction_with_ops</span>(<span class="ident">tx</span>, <span class="ident">cache_tx</span>.<span class="ident">cache_ops</span>)
 				.<span class="ident">on_block_insert</span>(
 					<span class="ident">parent_block</span>,
 					<span class="ident">block</span>,
 					<span class="ident">cache_at</span>,
-					<span class="kw">if</span> <span class="ident">finalized</span> { <span class="ident">CacheEntryType</span>::<span class="ident">Final</span> } <span class="kw">else</span> { <span class="ident">CacheEntryType</span>::<span class="ident">NonFinal</span> },
+					<span class="kw">if</span> <span class="ident">finalized</span> { <span class="ident">CacheEntryType::Final</span> } <span class="kw">else</span> { <span class="ident">CacheEntryType::NonFinal</span> },
 				)<span class="question-mark">?</span>
 				.<span class="ident">into_ops</span>(),
 			<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">cache</span>.<span class="number">0</span>.<span class="ident">write</span>()
@@ -1222,7 +1226,7 @@
 					<span class="ident">parent_block</span>,
 					<span class="ident">block</span>,
 					<span class="ident">cache_at</span>,
-					<span class="kw">if</span> <span class="ident">finalized</span> { <span class="ident">CacheEntryType</span>::<span class="ident">Final</span> } <span class="kw">else</span> { <span class="ident">CacheEntryType</span>::<span class="ident">NonFinal</span> },
+					<span class="kw">if</span> <span class="ident">finalized</span> { <span class="ident">CacheEntryType::Final</span> } <span class="kw">else</span> { <span class="ident">CacheEntryType::NonFinal</span> },
 				)<span class="question-mark">?</span>
 				.<span class="ident">into_ops</span>(),
 		}).<span class="ident">with_new_config</span>(<span class="prelude-val">Some</span>(<span class="ident">new_configuration</span>)))
@@ -1232,10 +1236,10 @@
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finalize</span>(
 		<span class="kw-2">&amp;</span><span class="self">self</span>,
 		<span class="ident">tx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Transaction</span><span class="op">&lt;</span><span class="ident">DbHash</span><span class="op">&gt;</span>,
-		<span class="ident">parent_block_hash</span>: <span class="ident">Block</span>::<span class="ident">Hash</span>,
-		<span class="ident">block_hash</span>: <span class="ident">Block</span>::<span class="ident">Hash</span>,
+		<span class="ident">parent_block_hash</span>: <span class="ident">Block::Hash</span>,
+		<span class="ident">block_hash</span>: <span class="ident">Block::Hash</span>,
 		<span class="ident">block_num</span>: <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>,
-		<span class="ident">new_header</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Block</span>::<span class="ident">Header</span><span class="op">&gt;</span>,
+		<span class="ident">new_header</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Block::Header</span><span class="op">&gt;</span>,
 		<span class="ident">cache_tx</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DbChangesTrieStorageTransaction</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ClientResult</span><span class="op">&lt;</span><span class="ident">DbChangesTrieStorageTransaction</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="op">&gt;</span> {
 		<span class="comment">// prune obsolete changes tries</span>
@@ -1252,11 +1256,11 @@
 		}
 
 		<span class="comment">// and finalize configuration cache entries</span>
-		<span class="kw">let</span> <span class="ident">block</span> <span class="op">=</span> <span class="ident">ComplexBlockId</span>::<span class="ident">new</span>(<span class="ident">block_hash</span>, <span class="ident">block_num</span>);
-		<span class="kw">let</span> <span class="ident">parent_block_num</span> <span class="op">=</span> <span class="ident">block_num</span>.<span class="ident">checked_sub</span>(<span class="kw-2">&amp;</span><span class="ident">One</span>::<span class="ident">one</span>()).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Zero</span>::<span class="ident">zero</span>());
-		<span class="kw">let</span> <span class="ident">parent_block</span> <span class="op">=</span> <span class="ident">ComplexBlockId</span>::<span class="ident">new</span>(<span class="ident">parent_block_hash</span>, <span class="ident">parent_block_num</span>);
+		<span class="kw">let</span> <span class="ident">block</span> <span class="op">=</span> <span class="ident">ComplexBlockId::new</span>(<span class="ident">block_hash</span>, <span class="ident">block_num</span>);
+		<span class="kw">let</span> <span class="ident">parent_block_num</span> <span class="op">=</span> <span class="ident">block_num</span>.<span class="ident">checked_sub</span>(<span class="kw-2">&amp;</span><span class="ident">One::one</span>()).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Zero::zero</span>());
+		<span class="kw">let</span> <span class="ident">parent_block</span> <span class="op">=</span> <span class="ident">ComplexBlockId::new</span>(<span class="ident">parent_block_hash</span>, <span class="ident">parent_block_num</span>);
 		<span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">cache_tx</span> {
-			<span class="prelude-val">Some</span>(<span class="ident">cache_tx</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">DbChangesTrieStorageTransaction</span>::<span class="ident">from</span>(
+			<span class="prelude-val">Some</span>(<span class="ident">cache_tx</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">DbChangesTrieStorageTransaction::from</span>(
 				<span class="self">self</span>.<span class="ident">cache</span>.<span class="number">0</span>.<span class="ident">write</span>()
 					.<span class="ident">transaction_with_ops</span>(<span class="ident">tx</span>, <span class="ident">cache_tx</span>.<span class="ident">cache_ops</span>)
 					.<span class="ident">on_block_finalize</span>(
@@ -1265,7 +1269,7 @@
 					)<span class="question-mark">?</span>
 					.<span class="ident">into_ops</span>()
 			).<span class="ident">with_new_config</span>(<span class="ident">cache_tx</span>.<span class="ident">new_config</span>),
-			<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">DbChangesTrieStorageTransaction</span>::<span class="ident">from</span>(
+			<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">DbChangesTrieStorageTransaction::from</span>(
 				<span class="self">self</span>.<span class="ident">cache</span>.<span class="number">0</span>.<span class="ident">write</span>()
 					.<span class="ident">transaction</span>(<span class="ident">tx</span>)
 					.<span class="ident">on_block_finalize</span>(
@@ -1299,7 +1303,7 @@
 	}
 
 	<span class="doccomment">/// Commit changes into changes trie build cache.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">commit_build_cache</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_update</span>: <span class="ident">ChangesTrieCacheAction</span><span class="op">&lt;</span><span class="ident">Block</span>::<span class="ident">Hash</span>, <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">commit_build_cache</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_update</span>: <span class="ident">ChangesTrieCacheAction</span><span class="op">&lt;</span><span class="ident">Block::Hash</span>, <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
 		<span class="self">self</span>.<span class="ident">build_cache</span>.<span class="ident">write</span>().<span class="ident">perform</span>(<span class="ident">cache_update</span>);
 	}
 
@@ -1307,9 +1311,9 @@
 	<span class="kw">fn</span> <span class="ident">prune</span>(
 		<span class="kw-2">&amp;</span><span class="self">self</span>,
 		<span class="ident">tx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Transaction</span><span class="op">&lt;</span><span class="ident">DbHash</span><span class="op">&gt;</span>,
-		<span class="ident">block_hash</span>: <span class="ident">Block</span>::<span class="ident">Hash</span>,
+		<span class="ident">block_hash</span>: <span class="ident">Block::Hash</span>,
 		<span class="ident">block_num</span>: <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>,
-		<span class="ident">new_header</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Block</span>::<span class="ident">Header</span><span class="op">&gt;</span>,
+		<span class="ident">new_header</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Block::Header</span><span class="op">&gt;</span>,
 		<span class="ident">cache_tx</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">DbChangesTrieStorageTransaction</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ClientResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
 		<span class="comment">// never prune on archive nodes</span>
@@ -1331,28 +1335,28 @@
 				}
 
 				<span class="ident">tries_meta</span>.<span class="ident">oldest_pruned_digest_range_end</span> <span class="op">=</span> <span class="ident">end</span>;
-				<span class="ident">sp_state_machine</span>::<span class="ident">prune_changes_tries</span>(
+				<span class="ident">sp_state_machine::prune_changes_tries</span>(
 					<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>,
 					<span class="ident">begin</span>,
 					<span class="ident">end</span>,
-					<span class="kw-2">&amp;</span><span class="ident">sp_state_machine</span>::<span class="ident">ChangesTrieAnchorBlockId</span> {
+					<span class="kw-2">&amp;</span><span class="ident">sp_state_machine::ChangesTrieAnchorBlockId</span> {
 						<span class="ident">hash</span>: <span class="ident">convert_hash</span>(<span class="kw-2">&amp;</span><span class="ident">block_hash</span>),
 						<span class="ident">number</span>: <span class="ident">block_num</span>,
 					},
 					<span class="op">|</span><span class="ident">node</span><span class="op">|</span> <span class="ident">tx</span>.<span class="ident">remove</span>(<span class="self">self</span>.<span class="ident">changes_tries_column</span>, <span class="ident">node</span>.<span class="ident">as_ref</span>()),
 				);
 
-				<span class="ident">next_digest_range_start</span> <span class="op">=</span> <span class="ident">end</span> <span class="op">+</span> <span class="ident">One</span>::<span class="ident">one</span>();
+				<span class="ident">next_digest_range_start</span> <span class="op">=</span> <span class="ident">end</span> <span class="op">+</span> <span class="ident">One::one</span>();
 			}
 
 			<span class="comment">// proceed to the next configuration range</span>
 			<span class="kw">let</span> <span class="ident">next_digest_range_start_hash</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">block_num</span> <span class="op">=</span><span class="op">=</span> <span class="ident">next_digest_range_start</span> {
 				<span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">block_hash</span>,
-				<span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">utils</span>::<span class="ident">require_header</span>::<span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>(
+				<span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">utils::require_header</span>::<span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>(
 					<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">db</span>,
 					<span class="self">self</span>.<span class="ident">key_lookup_column</span>,
 					<span class="self">self</span>.<span class="ident">header_column</span>,
-					<span class="ident">BlockId</span>::<span class="ident">Number</span>(<span class="ident">next_digest_range_start</span>),
+					<span class="ident">BlockId::Number</span>(<span class="ident">next_digest_range_start</span>),
 				)<span class="question-mark">?</span>.<span class="ident">hash</span>(),
 			};
 
@@ -1372,11 +1376,11 @@
 					}
 				},
 				<span class="kw">_</span> <span class="kw">if</span> <span class="ident">config_for_new_block</span> <span class="op">=</span><span class="op">&gt;</span> {
-					<span class="self">self</span>.<span class="ident">configuration_at</span>(<span class="kw-2">&amp;</span><span class="ident">BlockId</span>::<span class="ident">Hash</span>(<span class="kw-2">*</span><span class="ident">new_header</span>.<span class="ident">expect</span>(
+					<span class="self">self</span>.<span class="ident">configuration_at</span>(<span class="kw-2">&amp;</span><span class="ident">BlockId::Hash</span>(<span class="kw-2">*</span><span class="ident">new_header</span>.<span class="ident">expect</span>(
 						<span class="string">&quot;config_for_new_block is only true when new_header is passed; qed&quot;</span>
 					).<span class="ident">parent_hash</span>()))<span class="question-mark">?</span>
 				},
-				<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">configuration_at</span>(<span class="kw-2">&amp;</span><span class="ident">BlockId</span>::<span class="ident">Hash</span>(<span class="ident">next_digest_range_start_hash</span>))<span class="question-mark">?</span>,
+				<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">configuration_at</span>(<span class="kw-2">&amp;</span><span class="ident">BlockId::Hash</span>(<span class="ident">next_digest_range_start_hash</span>))<span class="question-mark">?</span>,
 			};
 			<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">config</span>) <span class="op">=</span> <span class="ident">next_config</span>.<span class="ident">config</span> {
 				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">oldest_digest_range</span> <span class="op">=</span> <span class="ident">config</span>
@@ -1403,18 +1407,18 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Block</span>: <span class="ident">BlockT</span><span class="op">&gt;</span> <span class="ident">PrunableStateChangesTrieStorage</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DbChangesTrieStorage</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">storage</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">dyn</span> <span class="ident">sp_state_machine</span>::<span class="ident">ChangesTrieStorage</span><span class="op">&lt;</span><span class="ident">HashFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>, <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">storage</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">sp_state_machine::ChangesTrieStorage</span><span class="op">&lt;</span><span class="ident">HashFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>, <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="op">&gt;</span> {
 		<span class="self">self</span>
 	}
 
 	<span class="kw">fn</span> <span class="ident">configuration_at</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">at</span>: <span class="kw-2">&amp;</span><span class="ident">BlockId</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ClientResult</span><span class="op">&lt;</span>
-		<span class="ident">ChangesTrieConfigurationRange</span><span class="op">&lt;</span><span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>, <span class="ident">Block</span>::<span class="ident">Hash</span><span class="op">&gt;</span>
+		<span class="ident">ChangesTrieConfigurationRange</span><span class="op">&lt;</span><span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>, <span class="ident">Block::Hash</span><span class="op">&gt;</span>
 	<span class="op">&gt;</span> {
 		<span class="self">self</span>.<span class="ident">cache</span>
-			.<span class="ident">get_at</span>(<span class="kw-2">&amp;</span><span class="ident">well_known_cache_keys</span>::<span class="ident">CHANGES_TRIE_CONFIG</span>, <span class="ident">at</span>)<span class="question-mark">?</span>
-			.<span class="ident">and_then</span>(<span class="op">|</span>(<span class="ident">zero</span>, <span class="ident">end</span>, <span class="ident">encoded</span>)<span class="op">|</span> <span class="ident">Decode</span>::<span class="ident">decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">&amp;</span><span class="ident">encoded</span>[..]).<span class="ident">ok</span>()
+			.<span class="ident">get_at</span>(<span class="kw-2">&amp;</span><span class="ident">well_known_cache_keys::CHANGES_TRIE_CONFIG</span>, <span class="ident">at</span>)<span class="question-mark">?</span>
+			.<span class="ident">and_then</span>(<span class="op">|</span>(<span class="ident">zero</span>, <span class="ident">end</span>, <span class="ident">encoded</span>)<span class="op">|</span> <span class="ident">Decode::decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">&amp;</span><span class="ident">encoded</span>[..]).<span class="ident">ok</span>()
 				.<span class="ident">map</span>(<span class="op">|</span><span class="ident">config</span><span class="op">|</span> <span class="ident">ChangesTrieConfigurationRange</span> { <span class="ident">zero</span>, <span class="ident">end</span>, <span class="ident">config</span> }))
-			.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">ClientError</span>::<span class="ident">ErrorReadingChangesTriesConfig</span>)
+			.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">ClientError::ErrorReadingChangesTriesConfig</span>)
 	}
 
 	<span class="kw">fn</span> <span class="ident">oldest_pruned_digest_range_end</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span> {
@@ -1422,66 +1426,66 @@
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Block</span>: <span class="ident">BlockT</span><span class="op">&gt;</span> <span class="ident">sp_state_machine</span>::<span class="ident">ChangesTrieRootsStorage</span><span class="op">&lt;</span><span class="ident">HashFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>, <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Block</span>: <span class="ident">BlockT</span><span class="op">&gt;</span> <span class="ident">sp_state_machine::ChangesTrieRootsStorage</span><span class="op">&lt;</span><span class="ident">HashFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>, <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="op">&gt;</span>
 	<span class="kw">for</span> <span class="ident">DbChangesTrieStorage</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>
 {
 	<span class="kw">fn</span> <span class="ident">build_anchor</span>(
 		<span class="kw-2">&amp;</span><span class="self">self</span>,
-		<span class="ident">hash</span>: <span class="ident">Block</span>::<span class="ident">Hash</span>,
-	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">sp_state_machine</span>::<span class="ident">ChangesTrieAnchorBlockId</span><span class="op">&lt;</span><span class="ident">Block</span>::<span class="ident">Hash</span>, <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span> {
-		<span class="ident">utils</span>::<span class="ident">read_header</span>::<span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">db</span>, <span class="self">self</span>.<span class="ident">key_lookup_column</span>, <span class="self">self</span>.<span class="ident">header_column</span>, <span class="ident">BlockId</span>::<span class="ident">Hash</span>(<span class="ident">hash</span>))
+		<span class="ident">hash</span>: <span class="ident">Block::Hash</span>,
+	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">sp_state_machine::ChangesTrieAnchorBlockId</span><span class="op">&lt;</span><span class="ident">Block::Hash</span>, <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+		<span class="ident">utils::read_header</span>::<span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">db</span>, <span class="self">self</span>.<span class="ident">key_lookup_column</span>, <span class="self">self</span>.<span class="ident">header_column</span>, <span class="ident">BlockId::Hash</span>(<span class="ident">hash</span>))
 			.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">to_string</span>())
 			.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">maybe_header</span><span class="op">|</span> <span class="ident">maybe_header</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">header</span><span class="op">|</span>
-				<span class="ident">sp_state_machine</span>::<span class="ident">ChangesTrieAnchorBlockId</span> {
+				<span class="ident">sp_state_machine::ChangesTrieAnchorBlockId</span> {
 					<span class="ident">hash</span>,
 					<span class="ident">number</span>: <span class="kw-2">*</span><span class="ident">header</span>.<span class="ident">number</span>(),
 				}
-			).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Unknown header: {}&quot;</span>, <span class="ident">hash</span>)))
+			).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;Unknown header: {}&quot;</span>, <span class="ident">hash</span>)))
 	}
 
 	<span class="kw">fn</span> <span class="ident">root</span>(
 		<span class="kw-2">&amp;</span><span class="self">self</span>,
-		<span class="ident">anchor</span>: <span class="kw-2">&amp;</span><span class="ident">sp_state_machine</span>::<span class="ident">ChangesTrieAnchorBlockId</span><span class="op">&lt;</span><span class="ident">Block</span>::<span class="ident">Hash</span>, <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+		<span class="ident">anchor</span>: <span class="kw-2">&amp;</span><span class="ident">sp_state_machine::ChangesTrieAnchorBlockId</span><span class="op">&lt;</span><span class="ident">Block::Hash</span>, <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 		<span class="ident">block</span>: <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>,
-	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Block</span>::<span class="ident">Hash</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Block::Hash</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span> {
 		<span class="comment">// check API requirement: we can&#39;t get NEXT block(s) based on anchor</span>
 		<span class="kw">if</span> <span class="ident">block</span> <span class="op">&gt;</span> <span class="ident">anchor</span>.<span class="ident">number</span> {
-			<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Can&#39;t get changes trie root at {} using anchor at {}&quot;</span>, <span class="ident">block</span>, <span class="ident">anchor</span>.<span class="ident">number</span>));
+			<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;Can&#39;t get changes trie root at {} using anchor at {}&quot;</span>, <span class="ident">block</span>, <span class="ident">anchor</span>.<span class="ident">number</span>));
 		}
 
 		<span class="comment">// we need to get hash of the block to resolve changes trie root</span>
 		<span class="kw">let</span> <span class="ident">block_id</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">block</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">meta</span>.<span class="ident">read</span>().<span class="ident">finalized_number</span> {
 			<span class="comment">// if block is finalized, we could just read canonical hash</span>
-			<span class="ident">BlockId</span>::<span class="ident">Number</span>(<span class="ident">block</span>)
+			<span class="ident">BlockId::Number</span>(<span class="ident">block</span>)
 		} <span class="kw">else</span> {
 			<span class="comment">// the block is not finalized</span>
 			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">current_num</span> <span class="op">=</span> <span class="ident">anchor</span>.<span class="ident">number</span>;
-			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">current_hash</span>: <span class="ident">Block</span>::<span class="ident">Hash</span> <span class="op">=</span> <span class="ident">convert_hash</span>(<span class="kw-2">&amp;</span><span class="ident">anchor</span>.<span class="ident">hash</span>);
-			<span class="kw">let</span> <span class="ident">maybe_anchor_header</span>: <span class="ident">Block</span>::<span class="ident">Header</span> <span class="op">=</span> <span class="ident">utils</span>::<span class="ident">require_header</span>::<span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>(
-				<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">db</span>, <span class="self">self</span>.<span class="ident">key_lookup_column</span>, <span class="self">self</span>.<span class="ident">header_column</span>, <span class="ident">BlockId</span>::<span class="ident">Number</span>(<span class="ident">current_num</span>)
+			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">current_hash</span>: <span class="ident">Block::Hash</span> <span class="op">=</span> <span class="ident">convert_hash</span>(<span class="kw-2">&amp;</span><span class="ident">anchor</span>.<span class="ident">hash</span>);
+			<span class="kw">let</span> <span class="ident">maybe_anchor_header</span>: <span class="ident">Block::Header</span> <span class="op">=</span> <span class="ident">utils::require_header</span>::<span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>(
+				<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">db</span>, <span class="self">self</span>.<span class="ident">key_lookup_column</span>, <span class="self">self</span>.<span class="ident">header_column</span>, <span class="ident">BlockId::Number</span>(<span class="ident">current_num</span>)
 			).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">to_string</span>())<span class="question-mark">?</span>;
 			<span class="kw">if</span> <span class="ident">maybe_anchor_header</span>.<span class="ident">hash</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">current_hash</span> {
 				<span class="comment">// if anchor is canonicalized, then the block is also canonicalized</span>
-				<span class="ident">BlockId</span>::<span class="ident">Number</span>(<span class="ident">block</span>)
+				<span class="ident">BlockId::Number</span>(<span class="ident">block</span>)
 			} <span class="kw">else</span> {
 				<span class="comment">// else (block is not finalized + anchor is not canonicalized):</span>
 				<span class="comment">// =&gt; we should find the required block hash by traversing</span>
 				<span class="comment">// back from the anchor to the block with given number</span>
 				<span class="kw">while</span> <span class="ident">current_num</span> <span class="op">!</span><span class="op">=</span> <span class="ident">block</span> {
-					<span class="kw">let</span> <span class="ident">current_header</span>: <span class="ident">Block</span>::<span class="ident">Header</span> <span class="op">=</span> <span class="ident">utils</span>::<span class="ident">require_header</span>::<span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>(
-						<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">db</span>, <span class="self">self</span>.<span class="ident">key_lookup_column</span>, <span class="self">self</span>.<span class="ident">header_column</span>, <span class="ident">BlockId</span>::<span class="ident">Hash</span>(<span class="ident">current_hash</span>)
+					<span class="kw">let</span> <span class="ident">current_header</span>: <span class="ident">Block::Header</span> <span class="op">=</span> <span class="ident">utils::require_header</span>::<span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>(
+						<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">db</span>, <span class="self">self</span>.<span class="ident">key_lookup_column</span>, <span class="self">self</span>.<span class="ident">header_column</span>, <span class="ident">BlockId::Hash</span>(<span class="ident">current_hash</span>)
 					).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">to_string</span>())<span class="question-mark">?</span>;
 
 					<span class="ident">current_hash</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">current_header</span>.<span class="ident">parent_hash</span>();
-					<span class="ident">current_num</span> <span class="op">=</span> <span class="ident">current_num</span> <span class="op">-</span> <span class="ident">One</span>::<span class="ident">one</span>();
+					<span class="ident">current_num</span> <span class="op">=</span> <span class="ident">current_num</span> <span class="op">-</span> <span class="ident">One::one</span>();
 				}
 
-				<span class="ident">BlockId</span>::<span class="ident">Hash</span>(<span class="ident">current_hash</span>)
+				<span class="ident">BlockId::Hash</span>(<span class="ident">current_hash</span>)
 			}
 		};
 
 		<span class="prelude-val">Ok</span>(
-			<span class="ident">utils</span>::<span class="ident">require_header</span>::<span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>(
+			<span class="ident">utils::require_header</span>::<span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>(
 				<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">db</span>,
 				<span class="self">self</span>.<span class="ident">key_lookup_column</span>,
 				<span class="self">self</span>.<span class="ident">header_column</span>,
@@ -1489,47 +1493,47 @@
 			)
 			.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">to_string</span>())<span class="question-mark">?</span>
 			.<span class="ident">digest</span>()
-			.<span class="ident">log</span>(<span class="ident">DigestItem</span>::<span class="ident">as_changes_trie_root</span>)
+			.<span class="ident">log</span>(<span class="ident">DigestItem::as_changes_trie_root</span>)
 			.<span class="ident">cloned</span>()
 		)
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span> <span class="ident">sp_state_machine</span>::<span class="ident">ChangesTrieStorage</span><span class="op">&lt;</span><span class="ident">HashFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>, <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span> <span class="ident">sp_state_machine::ChangesTrieStorage</span><span class="op">&lt;</span><span class="ident">HashFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>, <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="op">&gt;</span>
 	<span class="kw">for</span> <span class="ident">DbChangesTrieStorage</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">Block</span>: <span class="ident">BlockT</span>,
 {
-	<span class="kw">fn</span> <span class="ident">as_roots_storage</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">dyn</span> <span class="ident">sp_state_machine</span>::<span class="ident">ChangesTrieRootsStorage</span><span class="op">&lt;</span><span class="ident">HashFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>, <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">as_roots_storage</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">sp_state_machine::ChangesTrieRootsStorage</span><span class="op">&lt;</span><span class="ident">HashFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>, <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="op">&gt;</span> {
 		<span class="self">self</span>
 	}
 
 	<span class="kw">fn</span> <span class="ident">with_cached_changed_keys</span>(
 		<span class="kw-2">&amp;</span><span class="self">self</span>,
-		<span class="ident">root</span>: <span class="kw-2">&amp;</span><span class="ident">Block</span>::<span class="ident">Hash</span>,
-		<span class="ident">functor</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dyn</span> <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrefixedStorageKey</span><span class="op">&gt;</span>, <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>),
+		<span class="ident">root</span>: <span class="kw-2">&amp;</span><span class="ident">Block::Hash</span>,
+		<span class="ident">functor</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrefixedStorageKey</span><span class="op">&gt;</span>, <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>),
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
 		<span class="self">self</span>.<span class="ident">build_cache</span>.<span class="ident">read</span>().<span class="ident">with_changed_keys</span>(<span class="ident">root</span>, <span class="ident">functor</span>)
 	}
 
-	<span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Block</span>::<span class="ident">Hash</span>, <span class="ident">_prefix</span>: <span class="ident">Prefix</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Block::Hash</span>, <span class="ident">_prefix</span>: <span class="ident">Prefix</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span> {
 		<span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">db</span>.<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">changes_tries_column</span>, <span class="ident">key</span>.<span class="ident">as_ref</span>()))
 	}
 }
 
 <span class="doccomment">/// Read changes tries metadata from database.</span>
 <span class="kw">fn</span> <span class="ident">read_tries_meta</span><span class="op">&lt;</span><span class="ident">Block</span>: <span class="ident">BlockT</span><span class="op">&gt;</span>(
-	<span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">dyn</span> <span class="ident">Database</span><span class="op">&lt;</span><span class="ident">DbHash</span><span class="op">&gt;</span>,
+	<span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Database</span><span class="op">&lt;</span><span class="ident">DbHash</span><span class="op">&gt;</span>,
 	<span class="ident">meta_column</span>: <span class="ident">u32</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ClientResult</span><span class="op">&lt;</span><span class="ident">ChangesTriesMeta</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-	<span class="kw">match</span> <span class="ident">db</span>.<span class="ident">get</span>(<span class="ident">meta_column</span>, <span class="ident">meta_keys</span>::<span class="ident">CHANGES_TRIES_META</span>) {
-		<span class="prelude-val">Some</span>(<span class="ident">h</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">Decode</span>::<span class="ident">decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">&amp;</span><span class="ident">h</span>[..]) {
+	<span class="kw">match</span> <span class="ident">db</span>.<span class="ident">get</span>(<span class="ident">meta_column</span>, <span class="ident">meta_keys::CHANGES_TRIES_META</span>) {
+		<span class="prelude-val">Some</span>(<span class="ident">h</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">Decode::decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">&amp;</span><span class="ident">h</span>[..]) {
 			<span class="prelude-val">Ok</span>(<span class="ident">h</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">h</span>),
-			<span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">ClientError</span>::<span class="ident">Backend</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Error decoding changes tries metadata: {}&quot;</span>, <span class="ident">err</span>))),
+			<span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">ClientError::Backend</span>(<span class="macro">format!</span>(<span class="string">&quot;Error decoding changes tries metadata: {}&quot;</span>, <span class="ident">err</span>))),
 		},
 		<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">ChangesTriesMeta</span> {
 			<span class="ident">oldest_digest_range</span>: <span class="prelude-val">None</span>,
-			<span class="ident">oldest_pruned_digest_range_end</span>: <span class="ident">Zero</span>::<span class="ident">zero</span>(),
+			<span class="ident">oldest_pruned_digest_range_end</span>: <span class="ident">Zero::zero</span>(),
 		}),
 	}
 }
@@ -1540,26 +1544,26 @@
 	<span class="ident">meta_column</span>: <span class="ident">u32</span>,
 	<span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="ident">ChangesTriesMeta</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>,
 ) {
-	<span class="ident">tx</span>.<span class="ident">set_from_vec</span>(<span class="ident">meta_column</span>, <span class="ident">meta_keys</span>::<span class="ident">CHANGES_TRIES_META</span>, <span class="ident">meta</span>.<span class="ident">encode</span>());
+	<span class="ident">tx</span>.<span class="ident">set_from_vec</span>(<span class="ident">meta_column</span>, <span class="ident">meta_keys::CHANGES_TRIES_META</span>, <span class="ident">meta</span>.<span class="ident">encode</span>());
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
-	<span class="kw">use</span> <span class="ident">hash_db</span>::<span class="ident">EMPTY_PREFIX</span>;
-	<span class="kw">use</span> <span class="ident">sc_client_api</span>::<span class="ident">backend</span>::{
+	<span class="kw">use</span> <span class="ident">hash_db::EMPTY_PREFIX</span>;
+	<span class="kw">use</span> <span class="ident">sc_client_api::backend</span>::{
 		<span class="ident">Backend</span> <span class="kw">as</span> <span class="ident">ClientBackend</span>, <span class="ident">NewBlockState</span>, <span class="ident">BlockImportOperation</span>, <span class="ident">PrunableStateChangesTrieStorage</span>,
 	};
-	<span class="kw">use</span> <span class="ident">sp_blockchain</span>::<span class="ident">HeaderBackend</span> <span class="kw">as</span> <span class="ident">BlockchainHeaderBackend</span>;
-	<span class="kw">use</span> <span class="ident">sp_core</span>::<span class="ident">H256</span>;
-	<span class="kw">use</span> <span class="ident">sp_runtime</span>::<span class="ident">testing</span>::{<span class="ident">Digest</span>, <span class="ident">Header</span>};
-	<span class="kw">use</span> <span class="ident">sp_runtime</span>::<span class="ident">traits</span>::{<span class="ident">Hash</span>, <span class="ident">BlakeTwo256</span>};
+	<span class="kw">use</span> <span class="ident">sp_blockchain::HeaderBackend</span> <span class="kw">as</span> <span class="ident">BlockchainHeaderBackend</span>;
+	<span class="kw">use</span> <span class="ident">sp_core::H256</span>;
+	<span class="kw">use</span> <span class="ident">sp_runtime::testing</span>::{<span class="ident">Digest</span>, <span class="ident">Header</span>};
+	<span class="kw">use</span> <span class="ident">sp_runtime::traits</span>::{<span class="ident">Hash</span>, <span class="ident">BlakeTwo256</span>};
 	<span class="kw">use</span> <span class="ident">sp_state_machine</span>::{<span class="ident">ChangesTrieRootsStorage</span>, <span class="ident">ChangesTrieStorage</span>};
-	<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">Backend</span>;
-	<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">tests</span>::{<span class="ident">Block</span>, <span class="ident">insert_header</span>, <span class="ident">prepare_changes</span>};
+	<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::Backend</span>;
+	<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::tests</span>::{<span class="ident">Block</span>, <span class="ident">insert_header</span>, <span class="ident">prepare_changes</span>};
 	<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
 	<span class="kw">fn</span> <span class="ident">changes</span>(<span class="ident">number</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
-		<span class="prelude-val">Some</span>(<span class="macro">vec</span><span class="macro">!</span>[(<span class="ident">number</span>.<span class="ident">to_le_bytes</span>().<span class="ident">to_vec</span>(), <span class="ident">number</span>.<span class="ident">to_le_bytes</span>().<span class="ident">to_vec</span>())])
+		<span class="prelude-val">Some</span>(<span class="macro">vec!</span>[(<span class="ident">number</span>.<span class="ident">to_le_bytes</span>().<span class="ident">to_vec</span>(), <span class="ident">number</span>.<span class="ident">to_le_bytes</span>().<span class="ident">to_vec</span>())])
 	}
 
 	<span class="kw">fn</span> <span class="ident">insert_header_with_configuration_change</span>(
@@ -1569,33 +1573,33 @@
 		<span class="ident">changes</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>)<span class="op">&gt;</span><span class="op">&gt;</span>,
 		<span class="ident">new_configuration</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChangesTrieConfiguration</span><span class="op">&gt;</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">H256</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">digest</span> <span class="op">=</span> <span class="ident">Digest</span>::<span class="ident">default</span>();
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes_trie_update</span> <span class="op">=</span> <span class="ident">Default</span>::<span class="ident">default</span>();
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">digest</span> <span class="op">=</span> <span class="ident">Digest::default</span>();
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes_trie_update</span> <span class="op">=</span> <span class="ident">Default::default</span>();
 		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">changes</span>) <span class="op">=</span> <span class="ident">changes</span> {
 			<span class="kw">let</span> (<span class="ident">root</span>, <span class="ident">update</span>) <span class="op">=</span> <span class="ident">prepare_changes</span>(<span class="ident">changes</span>);
-			<span class="ident">digest</span>.<span class="ident">push</span>(<span class="ident">DigestItem</span>::<span class="ident">ChangesTrieRoot</span>(<span class="ident">root</span>));
+			<span class="ident">digest</span>.<span class="ident">push</span>(<span class="ident">DigestItem::ChangesTrieRoot</span>(<span class="ident">root</span>));
 			<span class="ident">changes_trie_update</span> <span class="op">=</span> <span class="ident">update</span>;
 		}
-		<span class="ident">digest</span>.<span class="ident">push</span>(<span class="ident">DigestItem</span>::<span class="ident">ChangesTrieSignal</span>(<span class="ident">ChangesTrieSignal</span>::<span class="ident">NewConfiguration</span>(<span class="ident">new_configuration</span>)));
+		<span class="ident">digest</span>.<span class="ident">push</span>(<span class="ident">DigestItem::ChangesTrieSignal</span>(<span class="ident">ChangesTrieSignal::NewConfiguration</span>(<span class="ident">new_configuration</span>)));
 
 		<span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="ident">Header</span> {
 			<span class="ident">number</span>,
 			<span class="ident">parent_hash</span>,
-			<span class="ident">state_root</span>: <span class="ident">BlakeTwo256</span>::<span class="ident">trie_root</span>(<span class="ident">Vec</span>::<span class="ident">new</span>()),
+			<span class="ident">state_root</span>: <span class="ident">BlakeTwo256::trie_root</span>(<span class="ident">Vec::new</span>()),
 			<span class="ident">digest</span>,
-			<span class="ident">extrinsics_root</span>: <span class="ident">Default</span>::<span class="ident">default</span>(),
+			<span class="ident">extrinsics_root</span>: <span class="ident">Default::default</span>(),
 		};
 		<span class="kw">let</span> <span class="ident">header_hash</span> <span class="op">=</span> <span class="ident">header</span>.<span class="ident">hash</span>();
 
 		<span class="kw">let</span> <span class="ident">block_id</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">number</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
-			<span class="ident">BlockId</span>::<span class="ident">Hash</span>(<span class="ident">Default</span>::<span class="ident">default</span>())
+			<span class="ident">BlockId::Hash</span>(<span class="ident">Default::default</span>())
 		} <span class="kw">else</span> {
-			<span class="ident">BlockId</span>::<span class="ident">Number</span>(<span class="ident">number</span> <span class="op">-</span> <span class="number">1</span>)
+			<span class="ident">BlockId::Number</span>(<span class="ident">number</span> <span class="op">-</span> <span class="number">1</span>)
 		};
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">op</span> <span class="op">=</span> <span class="ident">backend</span>.<span class="ident">begin_operation</span>().<span class="ident">unwrap</span>();
 		<span class="ident">backend</span>.<span class="ident">begin_state_operation</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">op</span>, <span class="ident">block_id</span>).<span class="ident">unwrap</span>();
-		<span class="ident">op</span>.<span class="ident">set_block_data</span>(<span class="ident">header</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="ident">NewBlockState</span>::<span class="ident">Best</span>).<span class="ident">unwrap</span>();
-		<span class="ident">op</span>.<span class="ident">update_changes_trie</span>((<span class="ident">changes_trie_update</span>, <span class="ident">ChangesTrieCacheAction</span>::<span class="ident">Clear</span>)).<span class="ident">unwrap</span>();
+		<span class="ident">op</span>.<span class="ident">set_block_data</span>(<span class="ident">header</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="ident">NewBlockState::Best</span>).<span class="ident">unwrap</span>();
+		<span class="ident">op</span>.<span class="ident">update_changes_trie</span>((<span class="ident">changes_trie_update</span>, <span class="ident">ChangesTrieCacheAction::Clear</span>)).<span class="ident">unwrap</span>();
 		<span class="ident">backend</span>.<span class="ident">commit_operation</span>(<span class="ident">op</span>).<span class="ident">unwrap</span>();
 
 		<span class="ident">header_hash</span>
@@ -1603,33 +1607,33 @@
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">changes_trie_storage_works</span>() {
-		<span class="kw">let</span> <span class="ident">backend</span> <span class="op">=</span> <span class="ident">Backend</span>::<span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>::<span class="ident">new_test</span>(<span class="number">1000</span>, <span class="number">100</span>);
+		<span class="kw">let</span> <span class="ident">backend</span> <span class="op">=</span> <span class="ident">Backend</span>::<span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="ident">::new_test</span>(<span class="number">1000</span>, <span class="number">100</span>);
 		<span class="ident">backend</span>.<span class="ident">changes_tries_storage</span>.<span class="ident">meta</span>.<span class="ident">write</span>().<span class="ident">finalized_number</span> <span class="op">=</span> <span class="number">1000</span>;
 
 		<span class="kw">let</span> <span class="ident">check_changes</span> <span class="op">=</span> <span class="op">|</span><span class="ident">backend</span>: <span class="kw-2">&amp;</span><span class="ident">Backend</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>, <span class="ident">block</span>: <span class="ident">u64</span>, <span class="ident">changes</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>)<span class="op">&gt;</span><span class="op">|</span> {
 			<span class="kw">let</span> (<span class="ident">changes_root</span>, <span class="kw-2">mut</span> <span class="ident">changes_trie_update</span>) <span class="op">=</span> <span class="ident">prepare_changes</span>(<span class="ident">changes</span>);
-			<span class="kw">let</span> <span class="ident">anchor</span> <span class="op">=</span> <span class="ident">sp_state_machine</span>::<span class="ident">ChangesTrieAnchorBlockId</span> {
-				<span class="ident">hash</span>: <span class="ident">backend</span>.<span class="ident">blockchain</span>().<span class="ident">header</span>(<span class="ident">BlockId</span>::<span class="ident">Number</span>(<span class="ident">block</span>)).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>().<span class="ident">hash</span>(),
+			<span class="kw">let</span> <span class="ident">anchor</span> <span class="op">=</span> <span class="ident">sp_state_machine::ChangesTrieAnchorBlockId</span> {
+				<span class="ident">hash</span>: <span class="ident">backend</span>.<span class="ident">blockchain</span>().<span class="ident">header</span>(<span class="ident">BlockId::Number</span>(<span class="ident">block</span>)).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>().<span class="ident">hash</span>(),
 				<span class="ident">number</span>: <span class="ident">block</span>
 			};
-			<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">backend</span>.<span class="ident">changes_tries_storage</span>.<span class="ident">root</span>(<span class="kw-2">&amp;</span><span class="ident">anchor</span>, <span class="ident">block</span>), <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">changes_root</span>)));
+			<span class="macro">assert_eq!</span>(<span class="ident">backend</span>.<span class="ident">changes_tries_storage</span>.<span class="ident">root</span>(<span class="kw-2">&amp;</span><span class="ident">anchor</span>, <span class="ident">block</span>), <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">changes_root</span>)));
 
 			<span class="kw">let</span> <span class="ident">storage</span> <span class="op">=</span> <span class="ident">backend</span>.<span class="ident">changes_tries_storage</span>.<span class="ident">storage</span>();
 			<span class="kw">for</span> (<span class="ident">key</span>, (<span class="ident">val</span>, <span class="kw">_</span>)) <span class="kw">in</span> <span class="ident">changes_trie_update</span>.<span class="ident">drain</span>() {
-				<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">storage</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>, <span class="ident">EMPTY_PREFIX</span>), <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">val</span>)));
+				<span class="macro">assert_eq!</span>(<span class="ident">storage</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>, <span class="ident">EMPTY_PREFIX</span>), <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">val</span>)));
 			}
 		};
 
-		<span class="kw">let</span> <span class="ident">changes0</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[(<span class="string">b&quot;key_at_0&quot;</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;val_at_0&quot;</span>.<span class="ident">to_vec</span>())];
-		<span class="kw">let</span> <span class="ident">changes1</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[
+		<span class="kw">let</span> <span class="ident">changes0</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="string">b&quot;key_at_0&quot;</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;val_at_0&quot;</span>.<span class="ident">to_vec</span>())];
+		<span class="kw">let</span> <span class="ident">changes1</span> <span class="op">=</span> <span class="macro">vec!</span>[
 			(<span class="string">b&quot;key_at_1&quot;</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;val_at_1&quot;</span>.<span class="ident">to_vec</span>()),
 			(<span class="string">b&quot;another_key_at_1&quot;</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;another_val_at_1&quot;</span>.<span class="ident">to_vec</span>()),
 		];
-		<span class="kw">let</span> <span class="ident">changes2</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[(<span class="string">b&quot;key_at_2&quot;</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;val_at_2&quot;</span>.<span class="ident">to_vec</span>())];
+		<span class="kw">let</span> <span class="ident">changes2</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="string">b&quot;key_at_2&quot;</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;val_at_2&quot;</span>.<span class="ident">to_vec</span>())];
 
-		<span class="kw">let</span> <span class="ident">block0</span> <span class="op">=</span> <span class="ident">insert_header</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">0</span>, <span class="ident">Default</span>::<span class="ident">default</span>(), <span class="prelude-val">Some</span>(<span class="ident">changes0</span>.<span class="ident">clone</span>()), <span class="ident">Default</span>::<span class="ident">default</span>());
-		<span class="kw">let</span> <span class="ident">block1</span> <span class="op">=</span> <span class="ident">insert_header</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">1</span>, <span class="ident">block0</span>, <span class="prelude-val">Some</span>(<span class="ident">changes1</span>.<span class="ident">clone</span>()), <span class="ident">Default</span>::<span class="ident">default</span>());
-		<span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">insert_header</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">2</span>, <span class="ident">block1</span>, <span class="prelude-val">Some</span>(<span class="ident">changes2</span>.<span class="ident">clone</span>()), <span class="ident">Default</span>::<span class="ident">default</span>());
+		<span class="kw">let</span> <span class="ident">block0</span> <span class="op">=</span> <span class="ident">insert_header</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">0</span>, <span class="ident">Default::default</span>(), <span class="prelude-val">Some</span>(<span class="ident">changes0</span>.<span class="ident">clone</span>()), <span class="ident">Default::default</span>());
+		<span class="kw">let</span> <span class="ident">block1</span> <span class="op">=</span> <span class="ident">insert_header</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">1</span>, <span class="ident">block0</span>, <span class="prelude-val">Some</span>(<span class="ident">changes1</span>.<span class="ident">clone</span>()), <span class="ident">Default::default</span>());
+		<span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">insert_header</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">2</span>, <span class="ident">block1</span>, <span class="prelude-val">Some</span>(<span class="ident">changes2</span>.<span class="ident">clone</span>()), <span class="ident">Default::default</span>());
 
 		<span class="comment">// check that the storage contains tries for all blocks</span>
 		<span class="ident">check_changes</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">0</span>, <span class="ident">changes0</span>);
@@ -1639,70 +1643,70 @@
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">changes_trie_storage_works_with_forks</span>() {
-		<span class="kw">let</span> <span class="ident">backend</span> <span class="op">=</span> <span class="ident">Backend</span>::<span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>::<span class="ident">new_test</span>(<span class="number">1000</span>, <span class="number">100</span>);
+		<span class="kw">let</span> <span class="ident">backend</span> <span class="op">=</span> <span class="ident">Backend</span>::<span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="ident">::new_test</span>(<span class="number">1000</span>, <span class="number">100</span>);
 
-		<span class="kw">let</span> <span class="ident">changes0</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[(<span class="string">b&quot;k0&quot;</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;v0&quot;</span>.<span class="ident">to_vec</span>())];
-		<span class="kw">let</span> <span class="ident">changes1</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[(<span class="string">b&quot;k1&quot;</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;v1&quot;</span>.<span class="ident">to_vec</span>())];
-		<span class="kw">let</span> <span class="ident">changes2</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[(<span class="string">b&quot;k2&quot;</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;v2&quot;</span>.<span class="ident">to_vec</span>())];
-		<span class="kw">let</span> <span class="ident">block0</span> <span class="op">=</span> <span class="ident">insert_header</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">0</span>, <span class="ident">Default</span>::<span class="ident">default</span>(), <span class="prelude-val">Some</span>(<span class="ident">changes0</span>.<span class="ident">clone</span>()), <span class="ident">Default</span>::<span class="ident">default</span>());
-		<span class="kw">let</span> <span class="ident">block1</span> <span class="op">=</span> <span class="ident">insert_header</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">1</span>, <span class="ident">block0</span>, <span class="prelude-val">Some</span>(<span class="ident">changes1</span>.<span class="ident">clone</span>()), <span class="ident">Default</span>::<span class="ident">default</span>());
-		<span class="kw">let</span> <span class="ident">block2</span> <span class="op">=</span> <span class="ident">insert_header</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">2</span>, <span class="ident">block1</span>, <span class="prelude-val">Some</span>(<span class="ident">changes2</span>.<span class="ident">clone</span>()), <span class="ident">Default</span>::<span class="ident">default</span>());
+		<span class="kw">let</span> <span class="ident">changes0</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="string">b&quot;k0&quot;</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;v0&quot;</span>.<span class="ident">to_vec</span>())];
+		<span class="kw">let</span> <span class="ident">changes1</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="string">b&quot;k1&quot;</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;v1&quot;</span>.<span class="ident">to_vec</span>())];
+		<span class="kw">let</span> <span class="ident">changes2</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="string">b&quot;k2&quot;</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;v2&quot;</span>.<span class="ident">to_vec</span>())];
+		<span class="kw">let</span> <span class="ident">block0</span> <span class="op">=</span> <span class="ident">insert_header</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">0</span>, <span class="ident">Default::default</span>(), <span class="prelude-val">Some</span>(<span class="ident">changes0</span>.<span class="ident">clone</span>()), <span class="ident">Default::default</span>());
+		<span class="kw">let</span> <span class="ident">block1</span> <span class="op">=</span> <span class="ident">insert_header</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">1</span>, <span class="ident">block0</span>, <span class="prelude-val">Some</span>(<span class="ident">changes1</span>.<span class="ident">clone</span>()), <span class="ident">Default::default</span>());
+		<span class="kw">let</span> <span class="ident">block2</span> <span class="op">=</span> <span class="ident">insert_header</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">2</span>, <span class="ident">block1</span>, <span class="prelude-val">Some</span>(<span class="ident">changes2</span>.<span class="ident">clone</span>()), <span class="ident">Default::default</span>());
 
-		<span class="kw">let</span> <span class="ident">changes2_1_0</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[(<span class="string">b&quot;k3&quot;</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;v3&quot;</span>.<span class="ident">to_vec</span>())];
-		<span class="kw">let</span> <span class="ident">changes2_1_1</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[(<span class="string">b&quot;k4&quot;</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;v4&quot;</span>.<span class="ident">to_vec</span>())];
-		<span class="kw">let</span> <span class="ident">block2_1_0</span> <span class="op">=</span> <span class="ident">insert_header</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">3</span>, <span class="ident">block2</span>, <span class="prelude-val">Some</span>(<span class="ident">changes2_1_0</span>.<span class="ident">clone</span>()), <span class="ident">Default</span>::<span class="ident">default</span>());
-		<span class="kw">let</span> <span class="ident">block2_1_1</span> <span class="op">=</span> <span class="ident">insert_header</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">4</span>, <span class="ident">block2_1_0</span>, <span class="prelude-val">Some</span>(<span class="ident">changes2_1_1</span>.<span class="ident">clone</span>()), <span class="ident">Default</span>::<span class="ident">default</span>());
+		<span class="kw">let</span> <span class="ident">changes2_1_0</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="string">b&quot;k3&quot;</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;v3&quot;</span>.<span class="ident">to_vec</span>())];
+		<span class="kw">let</span> <span class="ident">changes2_1_1</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="string">b&quot;k4&quot;</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;v4&quot;</span>.<span class="ident">to_vec</span>())];
+		<span class="kw">let</span> <span class="ident">block2_1_0</span> <span class="op">=</span> <span class="ident">insert_header</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">3</span>, <span class="ident">block2</span>, <span class="prelude-val">Some</span>(<span class="ident">changes2_1_0</span>.<span class="ident">clone</span>()), <span class="ident">Default::default</span>());
+		<span class="kw">let</span> <span class="ident">block2_1_1</span> <span class="op">=</span> <span class="ident">insert_header</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">4</span>, <span class="ident">block2_1_0</span>, <span class="prelude-val">Some</span>(<span class="ident">changes2_1_1</span>.<span class="ident">clone</span>()), <span class="ident">Default::default</span>());
 
-		<span class="kw">let</span> <span class="ident">changes2_2_0</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[(<span class="string">b&quot;k5&quot;</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;v5&quot;</span>.<span class="ident">to_vec</span>())];
-		<span class="kw">let</span> <span class="ident">changes2_2_1</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[(<span class="string">b&quot;k6&quot;</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;v6&quot;</span>.<span class="ident">to_vec</span>())];
-		<span class="kw">let</span> <span class="ident">block2_2_0</span> <span class="op">=</span> <span class="ident">insert_header</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">3</span>, <span class="ident">block2</span>, <span class="prelude-val">Some</span>(<span class="ident">changes2_2_0</span>.<span class="ident">clone</span>()), <span class="ident">Default</span>::<span class="ident">default</span>());
-		<span class="kw">let</span> <span class="ident">block2_2_1</span> <span class="op">=</span> <span class="ident">insert_header</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">4</span>, <span class="ident">block2_2_0</span>, <span class="prelude-val">Some</span>(<span class="ident">changes2_2_1</span>.<span class="ident">clone</span>()), <span class="ident">Default</span>::<span class="ident">default</span>());
+		<span class="kw">let</span> <span class="ident">changes2_2_0</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="string">b&quot;k5&quot;</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;v5&quot;</span>.<span class="ident">to_vec</span>())];
+		<span class="kw">let</span> <span class="ident">changes2_2_1</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="string">b&quot;k6&quot;</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;v6&quot;</span>.<span class="ident">to_vec</span>())];
+		<span class="kw">let</span> <span class="ident">block2_2_0</span> <span class="op">=</span> <span class="ident">insert_header</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">3</span>, <span class="ident">block2</span>, <span class="prelude-val">Some</span>(<span class="ident">changes2_2_0</span>.<span class="ident">clone</span>()), <span class="ident">Default::default</span>());
+		<span class="kw">let</span> <span class="ident">block2_2_1</span> <span class="op">=</span> <span class="ident">insert_header</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">4</span>, <span class="ident">block2_2_0</span>, <span class="prelude-val">Some</span>(<span class="ident">changes2_2_1</span>.<span class="ident">clone</span>()), <span class="ident">Default::default</span>());
 
 		<span class="comment">// finalize block1</span>
 		<span class="ident">backend</span>.<span class="ident">changes_tries_storage</span>.<span class="ident">meta</span>.<span class="ident">write</span>().<span class="ident">finalized_number</span> <span class="op">=</span> <span class="number">1</span>;
 
 		<span class="comment">// branch1: when asking for finalized block hash</span>
 		<span class="kw">let</span> (<span class="ident">changes1_root</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">prepare_changes</span>(<span class="ident">changes1</span>);
-		<span class="kw">let</span> <span class="ident">anchor</span> <span class="op">=</span> <span class="ident">sp_state_machine</span>::<span class="ident">ChangesTrieAnchorBlockId</span> { <span class="ident">hash</span>: <span class="ident">block2_1_1</span>, <span class="ident">number</span>: <span class="number">4</span> };
-		<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">backend</span>.<span class="ident">changes_tries_storage</span>.<span class="ident">root</span>(<span class="kw-2">&amp;</span><span class="ident">anchor</span>, <span class="number">1</span>), <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">changes1_root</span>)));
+		<span class="kw">let</span> <span class="ident">anchor</span> <span class="op">=</span> <span class="ident">sp_state_machine::ChangesTrieAnchorBlockId</span> { <span class="ident">hash</span>: <span class="ident">block2_1_1</span>, <span class="ident">number</span>: <span class="number">4</span> };
+		<span class="macro">assert_eq!</span>(<span class="ident">backend</span>.<span class="ident">changes_tries_storage</span>.<span class="ident">root</span>(<span class="kw-2">&amp;</span><span class="ident">anchor</span>, <span class="number">1</span>), <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">changes1_root</span>)));
 
 		<span class="comment">// branch2: when asking for finalized block hash</span>
-		<span class="kw">let</span> <span class="ident">anchor</span> <span class="op">=</span> <span class="ident">sp_state_machine</span>::<span class="ident">ChangesTrieAnchorBlockId</span> { <span class="ident">hash</span>: <span class="ident">block2_2_1</span>, <span class="ident">number</span>: <span class="number">4</span> };
-		<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">backend</span>.<span class="ident">changes_tries_storage</span>.<span class="ident">root</span>(<span class="kw-2">&amp;</span><span class="ident">anchor</span>, <span class="number">1</span>), <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">changes1_root</span>)));
+		<span class="kw">let</span> <span class="ident">anchor</span> <span class="op">=</span> <span class="ident">sp_state_machine::ChangesTrieAnchorBlockId</span> { <span class="ident">hash</span>: <span class="ident">block2_2_1</span>, <span class="ident">number</span>: <span class="number">4</span> };
+		<span class="macro">assert_eq!</span>(<span class="ident">backend</span>.<span class="ident">changes_tries_storage</span>.<span class="ident">root</span>(<span class="kw-2">&amp;</span><span class="ident">anchor</span>, <span class="number">1</span>), <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">changes1_root</span>)));
 
 		<span class="comment">// branch1: when asking for non-finalized block hash (search by traversal)</span>
 		<span class="kw">let</span> (<span class="ident">changes2_1_0_root</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">prepare_changes</span>(<span class="ident">changes2_1_0</span>);
-		<span class="kw">let</span> <span class="ident">anchor</span> <span class="op">=</span> <span class="ident">sp_state_machine</span>::<span class="ident">ChangesTrieAnchorBlockId</span> { <span class="ident">hash</span>: <span class="ident">block2_1_1</span>, <span class="ident">number</span>: <span class="number">4</span> };
-		<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">backend</span>.<span class="ident">changes_tries_storage</span>.<span class="ident">root</span>(<span class="kw-2">&amp;</span><span class="ident">anchor</span>, <span class="number">3</span>), <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">changes2_1_0_root</span>)));
+		<span class="kw">let</span> <span class="ident">anchor</span> <span class="op">=</span> <span class="ident">sp_state_machine::ChangesTrieAnchorBlockId</span> { <span class="ident">hash</span>: <span class="ident">block2_1_1</span>, <span class="ident">number</span>: <span class="number">4</span> };
+		<span class="macro">assert_eq!</span>(<span class="ident">backend</span>.<span class="ident">changes_tries_storage</span>.<span class="ident">root</span>(<span class="kw-2">&amp;</span><span class="ident">anchor</span>, <span class="number">3</span>), <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">changes2_1_0_root</span>)));
 
 		<span class="comment">// branch2: when asking for non-finalized block hash (search using canonicalized hint)</span>
 		<span class="kw">let</span> (<span class="ident">changes2_2_0_root</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">prepare_changes</span>(<span class="ident">changes2_2_0</span>);
-		<span class="kw">let</span> <span class="ident">anchor</span> <span class="op">=</span> <span class="ident">sp_state_machine</span>::<span class="ident">ChangesTrieAnchorBlockId</span> { <span class="ident">hash</span>: <span class="ident">block2_2_1</span>, <span class="ident">number</span>: <span class="number">4</span> };
-		<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">backend</span>.<span class="ident">changes_tries_storage</span>.<span class="ident">root</span>(<span class="kw-2">&amp;</span><span class="ident">anchor</span>, <span class="number">3</span>), <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">changes2_2_0_root</span>)));
+		<span class="kw">let</span> <span class="ident">anchor</span> <span class="op">=</span> <span class="ident">sp_state_machine::ChangesTrieAnchorBlockId</span> { <span class="ident">hash</span>: <span class="ident">block2_2_1</span>, <span class="ident">number</span>: <span class="number">4</span> };
+		<span class="macro">assert_eq!</span>(<span class="ident">backend</span>.<span class="ident">changes_tries_storage</span>.<span class="ident">root</span>(<span class="kw-2">&amp;</span><span class="ident">anchor</span>, <span class="number">3</span>), <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">changes2_2_0_root</span>)));
 
 		<span class="comment">// finalize first block of branch2 (block2_2_0)</span>
 		<span class="ident">backend</span>.<span class="ident">changes_tries_storage</span>.<span class="ident">meta</span>.<span class="ident">write</span>().<span class="ident">finalized_number</span> <span class="op">=</span> <span class="number">3</span>;
 
 		<span class="comment">// branch2: when asking for finalized block of this branch</span>
-		<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">backend</span>.<span class="ident">changes_tries_storage</span>.<span class="ident">root</span>(<span class="kw-2">&amp;</span><span class="ident">anchor</span>, <span class="number">3</span>), <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">changes2_2_0_root</span>)));
+		<span class="macro">assert_eq!</span>(<span class="ident">backend</span>.<span class="ident">changes_tries_storage</span>.<span class="ident">root</span>(<span class="kw-2">&amp;</span><span class="ident">anchor</span>, <span class="number">3</span>), <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">changes2_2_0_root</span>)));
 
 		<span class="comment">// branch1: when asking for finalized block of other branch</span>
 		<span class="comment">// =&gt; result is incorrect (returned for the block of branch1), but this is expected,</span>
 		<span class="comment">// because the other fork is abandoned (forked before finalized header)</span>
-		<span class="kw">let</span> <span class="ident">anchor</span> <span class="op">=</span> <span class="ident">sp_state_machine</span>::<span class="ident">ChangesTrieAnchorBlockId</span> { <span class="ident">hash</span>: <span class="ident">block2_1_1</span>, <span class="ident">number</span>: <span class="number">4</span> };
-		<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">backend</span>.<span class="ident">changes_tries_storage</span>.<span class="ident">root</span>(<span class="kw-2">&amp;</span><span class="ident">anchor</span>, <span class="number">3</span>), <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">changes2_2_0_root</span>)));
+		<span class="kw">let</span> <span class="ident">anchor</span> <span class="op">=</span> <span class="ident">sp_state_machine::ChangesTrieAnchorBlockId</span> { <span class="ident">hash</span>: <span class="ident">block2_1_1</span>, <span class="ident">number</span>: <span class="number">4</span> };
+		<span class="macro">assert_eq!</span>(<span class="ident">backend</span>.<span class="ident">changes_tries_storage</span>.<span class="ident">root</span>(<span class="kw-2">&amp;</span><span class="ident">anchor</span>, <span class="number">3</span>), <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">changes2_2_0_root</span>)));
 	}
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">changes_tries_are_pruned_on_finalization</span>() {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">backend</span> <span class="op">=</span> <span class="ident">Backend</span>::<span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>::<span class="ident">new_test</span>(<span class="number">1000</span>, <span class="number">100</span>);
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">backend</span> <span class="op">=</span> <span class="ident">Backend</span>::<span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="ident">::new_test</span>(<span class="number">1000</span>, <span class="number">100</span>);
 		<span class="ident">backend</span>.<span class="ident">changes_tries_storage</span>.<span class="ident">min_blocks_to_keep</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="number">8</span>);
 
 		<span class="kw">let</span> <span class="ident">parent_hash</span> <span class="op">=</span> <span class="op">|</span><span class="ident">number</span><span class="op">|</span> {
 			<span class="kw">if</span> <span class="ident">number</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
-				<span class="ident">Default</span>::<span class="ident">default</span>()
+				<span class="ident">Default::default</span>()
 			} <span class="kw">else</span> {
-				<span class="ident">backend</span>.<span class="ident">blockchain</span>().<span class="ident">header</span>(<span class="ident">BlockId</span>::<span class="ident">Number</span>(<span class="ident">number</span> <span class="op">-</span> <span class="number">1</span>)).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>().<span class="ident">hash</span>()
+				<span class="ident">backend</span>.<span class="ident">blockchain</span>().<span class="ident">header</span>(<span class="ident">BlockId::Number</span>(<span class="ident">number</span> <span class="op">-</span> <span class="number">1</span>)).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>().<span class="ident">hash</span>()
 			}
 		};
 
@@ -1712,17 +1716,17 @@
 				<span class="ident">number</span>,
 				<span class="ident">parent_hash</span>(<span class="ident">number</span>),
 				<span class="kw">if</span> <span class="ident">with_changes</span> { <span class="ident">changes</span>(<span class="ident">number</span>) } <span class="kw">else</span> { <span class="prelude-val">None</span> },
-				<span class="ident">Default</span>::<span class="ident">default</span>(),
+				<span class="ident">Default::default</span>(),
 			);
 		};
 
 		<span class="kw">let</span> <span class="ident">is_pruned</span> <span class="op">=</span> <span class="op">|</span><span class="ident">number</span><span class="op">|</span> {
 			<span class="kw">let</span> <span class="ident">trie_root</span> <span class="op">=</span> <span class="ident">backend</span>
 				.<span class="ident">blockchain</span>()
-				.<span class="ident">header</span>(<span class="ident">BlockId</span>::<span class="ident">Number</span>(<span class="ident">number</span>))
+				.<span class="ident">header</span>(<span class="ident">BlockId::Number</span>(<span class="ident">number</span>))
 				.<span class="ident">unwrap</span>().<span class="ident">unwrap</span>()
 				.<span class="ident">digest</span>()
-				.<span class="ident">log</span>(<span class="ident">DigestItem</span>::<span class="ident">as_changes_trie_root</span>)
+				.<span class="ident">log</span>(<span class="ident">DigestItem::as_changes_trie_root</span>)
 				.<span class="ident">cloned</span>();
 			<span class="kw">match</span> <span class="ident">trie_root</span> {
 				<span class="prelude-val">Some</span>(<span class="ident">trie_root</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">backend</span>.<span class="ident">changes_tries_storage</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">trie_root</span>, <span class="ident">EMPTY_PREFIX</span>).<span class="ident">unwrap</span>().<span class="ident">is_none</span>(),
@@ -1731,8 +1735,8 @@
 		};
 
 		<span class="kw">let</span> <span class="ident">finalize_block</span> <span class="op">=</span> <span class="op">|</span><span class="ident">number</span><span class="op">|</span> {
-			<span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="ident">backend</span>.<span class="ident">blockchain</span>().<span class="ident">header</span>(<span class="ident">BlockId</span>::<span class="ident">Number</span>(<span class="ident">number</span>)).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
-			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tx</span> <span class="op">=</span> <span class="ident">Transaction</span>::<span class="ident">new</span>();
+			<span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="ident">backend</span>.<span class="ident">blockchain</span>().<span class="ident">header</span>(<span class="ident">BlockId::Number</span>(<span class="ident">number</span>)).<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
+			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tx</span> <span class="op">=</span> <span class="ident">Transaction::new</span>();
 			<span class="kw">let</span> <span class="ident">cache_ops</span> <span class="op">=</span> <span class="ident">backend</span>.<span class="ident">changes_tries_storage</span>.<span class="ident">finalize</span>(
 				<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">tx</span>,
 				<span class="kw-2">*</span><span class="ident">header</span>.<span class="ident">parent_hash</span>(),
@@ -1751,10 +1755,10 @@
 		<span class="comment">// [18; 21] - None</span>
 		<span class="comment">// [22; 32] - Some(8^1): D1 is built at #29; SD is built at #32</span>
 		<span class="comment">// [33; ... - Some(1)</span>
-		<span class="kw">let</span> <span class="ident">config_at_6</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ChangesTrieConfiguration</span>::<span class="ident">new</span>(<span class="number">2</span>, <span class="number">2</span>));
+		<span class="kw">let</span> <span class="ident">config_at_6</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ChangesTrieConfiguration::new</span>(<span class="number">2</span>, <span class="number">2</span>));
 		<span class="kw">let</span> <span class="ident">config_at_17</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-		<span class="kw">let</span> <span class="ident">config_at_21</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ChangesTrieConfiguration</span>::<span class="ident">new</span>(<span class="number">8</span>, <span class="number">1</span>));
-		<span class="kw">let</span> <span class="ident">config_at_32</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ChangesTrieConfiguration</span>::<span class="ident">new</span>(<span class="number">1</span>, <span class="number">0</span>));
+		<span class="kw">let</span> <span class="ident">config_at_21</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ChangesTrieConfiguration::new</span>(<span class="number">8</span>, <span class="number">1</span>));
+		<span class="kw">let</span> <span class="ident">config_at_32</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ChangesTrieConfiguration::new</span>(<span class="number">1</span>, <span class="number">0</span>));
 
 		(<span class="number">0</span>..<span class="number">6</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="ident">insert_regular_header</span>(<span class="bool-val">false</span>, <span class="ident">number</span>));
 		<span class="ident">insert_header_with_configuration_change</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">6</span>, <span class="ident">parent_hash</span>(<span class="number">6</span>), <span class="prelude-val">None</span>, <span class="ident">config_at_6</span>);
@@ -1767,85 +1771,85 @@
 		(<span class="number">33</span>..<span class="number">50</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="ident">insert_regular_header</span>(<span class="bool-val">true</span>, <span class="ident">number</span>));
 
 		<span class="comment">// when only genesis is finalized, nothing is pruned</span>
-		(<span class="number">0</span>..<span class="op">=</span><span class="number">6</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
-		(<span class="number">7</span>..<span class="op">=</span><span class="number">17</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
-		(<span class="number">18</span>..<span class="op">=</span><span class="number">21</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
-		(<span class="number">22</span>..<span class="number">50</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">0</span>..<span class="op">=</span><span class="number">6</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">7</span>..<span class="op">=</span><span class="number">17</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">18</span>..<span class="op">=</span><span class="number">21</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">22</span>..<span class="number">50</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
 
 		<span class="comment">// when blocks [1; 18] are finalized, nothing is pruned</span>
 		(<span class="number">1</span>..<span class="op">=</span><span class="number">18</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="ident">finalize_block</span>(<span class="ident">number</span>));
-		(<span class="number">0</span>..<span class="op">=</span><span class="number">6</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
-		(<span class="number">7</span>..<span class="op">=</span><span class="number">17</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
-		(<span class="number">18</span>..<span class="op">=</span><span class="number">21</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
-		(<span class="number">22</span>..<span class="number">50</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">0</span>..<span class="op">=</span><span class="number">6</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">7</span>..<span class="op">=</span><span class="number">17</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">18</span>..<span class="op">=</span><span class="number">21</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">22</span>..<span class="number">50</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
 
 		<span class="comment">// when block 19 is finalized, changes tries for blocks [7; 10] are pruned</span>
 		<span class="ident">finalize_block</span>(<span class="number">19</span>);
-		(<span class="number">0</span>..<span class="op">=</span><span class="number">10</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
-		(<span class="number">11</span>..<span class="op">=</span><span class="number">17</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
-		(<span class="number">18</span>..<span class="op">=</span><span class="number">21</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
-		(<span class="number">22</span>..<span class="number">50</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">0</span>..<span class="op">=</span><span class="number">10</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">11</span>..<span class="op">=</span><span class="number">17</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">18</span>..<span class="op">=</span><span class="number">21</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">22</span>..<span class="number">50</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
 
 		<span class="comment">// when blocks [20; 22] are finalized, nothing is pruned</span>
 		(<span class="number">20</span>..<span class="op">=</span><span class="number">22</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="ident">finalize_block</span>(<span class="ident">number</span>));
-		(<span class="number">0</span>..<span class="op">=</span><span class="number">10</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
-		(<span class="number">11</span>..<span class="op">=</span><span class="number">17</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
-		(<span class="number">18</span>..<span class="op">=</span><span class="number">21</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
-		(<span class="number">22</span>..<span class="number">50</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">0</span>..<span class="op">=</span><span class="number">10</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">11</span>..<span class="op">=</span><span class="number">17</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">18</span>..<span class="op">=</span><span class="number">21</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">22</span>..<span class="number">50</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
 
 		<span class="comment">// when block 23 is finalized, changes tries for blocks [11; 14] are pruned</span>
 		<span class="ident">finalize_block</span>(<span class="number">23</span>);
-		(<span class="number">0</span>..<span class="op">=</span><span class="number">14</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
-		(<span class="number">15</span>..<span class="op">=</span><span class="number">17</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
-		(<span class="number">18</span>..<span class="op">=</span><span class="number">21</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
-		(<span class="number">22</span>..<span class="number">50</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">0</span>..<span class="op">=</span><span class="number">14</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">15</span>..<span class="op">=</span><span class="number">17</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">18</span>..<span class="op">=</span><span class="number">21</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">22</span>..<span class="number">50</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
 
 		<span class="comment">// when blocks [24; 25] are finalized, nothing is pruned</span>
 		(<span class="number">24</span>..<span class="op">=</span><span class="number">25</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="ident">finalize_block</span>(<span class="ident">number</span>));
-		(<span class="number">0</span>..<span class="op">=</span><span class="number">14</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
-		(<span class="number">15</span>..<span class="op">=</span><span class="number">17</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
-		(<span class="number">18</span>..<span class="op">=</span><span class="number">21</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
-		(<span class="number">22</span>..<span class="number">50</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">0</span>..<span class="op">=</span><span class="number">14</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">15</span>..<span class="op">=</span><span class="number">17</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">18</span>..<span class="op">=</span><span class="number">21</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">22</span>..<span class="number">50</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
 
 		<span class="comment">// when block 26 is finalized, changes tries for blocks [15; 17] are pruned</span>
 		<span class="ident">finalize_block</span>(<span class="number">26</span>);
-		(<span class="number">0</span>..<span class="op">=</span><span class="number">21</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
-		(<span class="number">22</span>..<span class="number">50</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">0</span>..<span class="op">=</span><span class="number">21</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">22</span>..<span class="number">50</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
 
 		<span class="comment">// when blocks [27; 37] are finalized, nothing is pruned</span>
 		(<span class="number">27</span>..<span class="op">=</span><span class="number">37</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="ident">finalize_block</span>(<span class="ident">number</span>));
-		(<span class="number">0</span>..<span class="op">=</span><span class="number">21</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
-		(<span class="number">22</span>..<span class="number">50</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">0</span>..<span class="op">=</span><span class="number">21</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">22</span>..<span class="number">50</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
 
 		<span class="comment">// when block 38 is finalized, changes tries for blocks [22; 29] are pruned</span>
 		<span class="ident">finalize_block</span>(<span class="number">38</span>);
-		(<span class="number">0</span>..<span class="op">=</span><span class="number">29</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
-		(<span class="number">30</span>..<span class="number">50</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">0</span>..<span class="op">=</span><span class="number">29</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">30</span>..<span class="number">50</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
 
 		<span class="comment">// when blocks [39; 40] are finalized, nothing is pruned</span>
 		(<span class="number">39</span>..<span class="op">=</span><span class="number">40</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="ident">finalize_block</span>(<span class="ident">number</span>));
-		(<span class="number">0</span>..<span class="op">=</span><span class="number">29</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
-		(<span class="number">30</span>..<span class="number">50</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">0</span>..<span class="op">=</span><span class="number">29</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">30</span>..<span class="number">50</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
 
 		<span class="comment">// when block 41 is finalized, changes tries for blocks [30; 32] are pruned</span>
 		<span class="ident">finalize_block</span>(<span class="number">41</span>);
-		(<span class="number">0</span>..<span class="op">=</span><span class="number">32</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
-		(<span class="number">33</span>..<span class="number">50</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">0</span>..<span class="op">=</span><span class="number">32</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">33</span>..<span class="number">50</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
 
 		<span class="comment">// when block 42 is finalized, changes trie for block 33 is pruned</span>
 		<span class="ident">finalize_block</span>(<span class="number">42</span>);
-		(<span class="number">0</span>..<span class="op">=</span><span class="number">33</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
-		(<span class="number">34</span>..<span class="number">50</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">0</span>..<span class="op">=</span><span class="number">33</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">34</span>..<span class="number">50</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
 
 		<span class="comment">// when block 43 is finalized, changes trie for block 34 is pruned</span>
 		<span class="ident">finalize_block</span>(<span class="number">43</span>);
-		(<span class="number">0</span>..<span class="op">=</span><span class="number">34</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
-		(<span class="number">35</span>..<span class="number">50</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">0</span>..<span class="op">=</span><span class="number">34</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="ident">is_pruned</span>(<span class="ident">number</span>)));
+		(<span class="number">35</span>..<span class="number">50</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">number</span><span class="op">|</span> <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">is_pruned</span>(<span class="ident">number</span>)));
 	}
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">changes_tries_configuration_is_updated_on_block_insert</span>() {
-		<span class="kw">let</span> <span class="ident">backend</span> <span class="op">=</span> <span class="ident">Backend</span>::<span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>::<span class="ident">new_test</span>(<span class="number">1000</span>, <span class="number">100</span>);
+		<span class="kw">let</span> <span class="ident">backend</span> <span class="op">=</span> <span class="ident">Backend</span>::<span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="ident">::new_test</span>(<span class="number">1000</span>, <span class="number">100</span>);
 
 		<span class="comment">// configurations at blocks</span>
 		<span class="kw">let</span> <span class="ident">config_at_1</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ChangesTrieConfiguration</span> {
@@ -1863,61 +1867,61 @@
 		});
 
 		<span class="comment">// insert some blocks</span>
-		<span class="kw">let</span> <span class="ident">block0</span> <span class="op">=</span> <span class="ident">insert_header</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">0</span>, <span class="ident">Default</span>::<span class="ident">default</span>(), <span class="prelude-val">None</span>, <span class="ident">Default</span>::<span class="ident">default</span>());
+		<span class="kw">let</span> <span class="ident">block0</span> <span class="op">=</span> <span class="ident">insert_header</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">0</span>, <span class="ident">Default::default</span>(), <span class="prelude-val">None</span>, <span class="ident">Default::default</span>());
 		<span class="kw">let</span> <span class="ident">block1</span> <span class="op">=</span> <span class="ident">insert_header_with_configuration_change</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">1</span>, <span class="ident">block0</span>, <span class="prelude-val">None</span>, <span class="ident">config_at_1</span>.<span class="ident">clone</span>());
-		<span class="kw">let</span> <span class="ident">block2</span> <span class="op">=</span> <span class="ident">insert_header</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">2</span>, <span class="ident">block1</span>, <span class="prelude-val">None</span>, <span class="ident">Default</span>::<span class="ident">default</span>());
+		<span class="kw">let</span> <span class="ident">block2</span> <span class="op">=</span> <span class="ident">insert_header</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">2</span>, <span class="ident">block1</span>, <span class="prelude-val">None</span>, <span class="ident">Default::default</span>());
 		<span class="kw">let</span> <span class="ident">block3</span> <span class="op">=</span> <span class="ident">insert_header_with_configuration_change</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">3</span>, <span class="ident">block2</span>, <span class="prelude-val">None</span>, <span class="ident">config_at_3</span>.<span class="ident">clone</span>());
-		<span class="kw">let</span> <span class="ident">block4</span> <span class="op">=</span> <span class="ident">insert_header</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">4</span>, <span class="ident">block3</span>, <span class="prelude-val">None</span>, <span class="ident">Default</span>::<span class="ident">default</span>());
+		<span class="kw">let</span> <span class="ident">block4</span> <span class="op">=</span> <span class="ident">insert_header</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">4</span>, <span class="ident">block3</span>, <span class="prelude-val">None</span>, <span class="ident">Default::default</span>());
 		<span class="kw">let</span> <span class="ident">block5</span> <span class="op">=</span> <span class="ident">insert_header_with_configuration_change</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">5</span>, <span class="ident">block4</span>, <span class="prelude-val">None</span>, <span class="ident">config_at_5</span>.<span class="ident">clone</span>());
-		<span class="kw">let</span> <span class="ident">block6</span> <span class="op">=</span> <span class="ident">insert_header</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">6</span>, <span class="ident">block5</span>, <span class="prelude-val">None</span>, <span class="ident">Default</span>::<span class="ident">default</span>());
+		<span class="kw">let</span> <span class="ident">block6</span> <span class="op">=</span> <span class="ident">insert_header</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">6</span>, <span class="ident">block5</span>, <span class="prelude-val">None</span>, <span class="ident">Default::default</span>());
 		<span class="kw">let</span> <span class="ident">block7</span> <span class="op">=</span> <span class="ident">insert_header_with_configuration_change</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">7</span>, <span class="ident">block6</span>, <span class="prelude-val">None</span>, <span class="ident">config_at_7</span>.<span class="ident">clone</span>());
 
 		<span class="comment">// test configuration cache</span>
 		<span class="kw">let</span> <span class="ident">storage</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">backend</span>.<span class="ident">changes_tries_storage</span>;
-		<span class="macro">assert_eq</span><span class="macro">!</span>(
-			<span class="ident">storage</span>.<span class="ident">configuration_at</span>(<span class="kw-2">&amp;</span><span class="ident">BlockId</span>::<span class="ident">Hash</span>(<span class="ident">block1</span>)).<span class="ident">unwrap</span>().<span class="ident">config</span>,
+		<span class="macro">assert_eq!</span>(
+			<span class="ident">storage</span>.<span class="ident">configuration_at</span>(<span class="kw-2">&amp;</span><span class="ident">BlockId::Hash</span>(<span class="ident">block1</span>)).<span class="ident">unwrap</span>().<span class="ident">config</span>,
 			<span class="ident">config_at_1</span>.<span class="ident">clone</span>(),
 		);
-		<span class="macro">assert_eq</span><span class="macro">!</span>(
-			<span class="ident">storage</span>.<span class="ident">configuration_at</span>(<span class="kw-2">&amp;</span><span class="ident">BlockId</span>::<span class="ident">Hash</span>(<span class="ident">block2</span>)).<span class="ident">unwrap</span>().<span class="ident">config</span>,
+		<span class="macro">assert_eq!</span>(
+			<span class="ident">storage</span>.<span class="ident">configuration_at</span>(<span class="kw-2">&amp;</span><span class="ident">BlockId::Hash</span>(<span class="ident">block2</span>)).<span class="ident">unwrap</span>().<span class="ident">config</span>,
 			<span class="ident">config_at_1</span>.<span class="ident">clone</span>(),
 		);
-		<span class="macro">assert_eq</span><span class="macro">!</span>(
-			<span class="ident">storage</span>.<span class="ident">configuration_at</span>(<span class="kw-2">&amp;</span><span class="ident">BlockId</span>::<span class="ident">Hash</span>(<span class="ident">block3</span>)).<span class="ident">unwrap</span>().<span class="ident">config</span>,
+		<span class="macro">assert_eq!</span>(
+			<span class="ident">storage</span>.<span class="ident">configuration_at</span>(<span class="kw-2">&amp;</span><span class="ident">BlockId::Hash</span>(<span class="ident">block3</span>)).<span class="ident">unwrap</span>().<span class="ident">config</span>,
 			<span class="ident">config_at_3</span>.<span class="ident">clone</span>(),
 		);
-		<span class="macro">assert_eq</span><span class="macro">!</span>(
-			<span class="ident">storage</span>.<span class="ident">configuration_at</span>(<span class="kw-2">&amp;</span><span class="ident">BlockId</span>::<span class="ident">Hash</span>(<span class="ident">block4</span>)).<span class="ident">unwrap</span>().<span class="ident">config</span>,
+		<span class="macro">assert_eq!</span>(
+			<span class="ident">storage</span>.<span class="ident">configuration_at</span>(<span class="kw-2">&amp;</span><span class="ident">BlockId::Hash</span>(<span class="ident">block4</span>)).<span class="ident">unwrap</span>().<span class="ident">config</span>,
 			<span class="ident">config_at_3</span>.<span class="ident">clone</span>(),
 		);
-		<span class="macro">assert_eq</span><span class="macro">!</span>(
-			<span class="ident">storage</span>.<span class="ident">configuration_at</span>(<span class="kw-2">&amp;</span><span class="ident">BlockId</span>::<span class="ident">Hash</span>(<span class="ident">block5</span>)).<span class="ident">unwrap</span>().<span class="ident">config</span>,
+		<span class="macro">assert_eq!</span>(
+			<span class="ident">storage</span>.<span class="ident">configuration_at</span>(<span class="kw-2">&amp;</span><span class="ident">BlockId::Hash</span>(<span class="ident">block5</span>)).<span class="ident">unwrap</span>().<span class="ident">config</span>,
 			<span class="ident">config_at_5</span>.<span class="ident">clone</span>(),
 		);
-		<span class="macro">assert_eq</span><span class="macro">!</span>(
-			<span class="ident">storage</span>.<span class="ident">configuration_at</span>(<span class="kw-2">&amp;</span><span class="ident">BlockId</span>::<span class="ident">Hash</span>(<span class="ident">block6</span>)).<span class="ident">unwrap</span>().<span class="ident">config</span>,
+		<span class="macro">assert_eq!</span>(
+			<span class="ident">storage</span>.<span class="ident">configuration_at</span>(<span class="kw-2">&amp;</span><span class="ident">BlockId::Hash</span>(<span class="ident">block6</span>)).<span class="ident">unwrap</span>().<span class="ident">config</span>,
 			<span class="ident">config_at_5</span>.<span class="ident">clone</span>(),
 		);
-		<span class="macro">assert_eq</span><span class="macro">!</span>(
-			<span class="ident">storage</span>.<span class="ident">configuration_at</span>(<span class="kw-2">&amp;</span><span class="ident">BlockId</span>::<span class="ident">Hash</span>(<span class="ident">block7</span>)).<span class="ident">unwrap</span>().<span class="ident">config</span>,
+		<span class="macro">assert_eq!</span>(
+			<span class="ident">storage</span>.<span class="ident">configuration_at</span>(<span class="kw-2">&amp;</span><span class="ident">BlockId::Hash</span>(<span class="ident">block7</span>)).<span class="ident">unwrap</span>().<span class="ident">config</span>,
 			<span class="ident">config_at_7</span>.<span class="ident">clone</span>(),
 		);
 	}
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">test_finalize_several_configuration_change_blocks_in_single_operation</span>() {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">backend</span> <span class="op">=</span> <span class="ident">Backend</span>::<span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>::<span class="ident">new_test</span>(<span class="number">10</span>, <span class="number">10</span>);
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">backend</span> <span class="op">=</span> <span class="ident">Backend</span>::<span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="ident">::new_test</span>(<span class="number">10</span>, <span class="number">10</span>);
 		<span class="ident">backend</span>.<span class="ident">changes_tries_storage</span>.<span class="ident">min_blocks_to_keep</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="number">8</span>);
 
-		<span class="kw">let</span> <span class="ident">configs</span> <span class="op">=</span> (<span class="number">0</span>..<span class="op">=</span><span class="number">7</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">ChangesTrieConfiguration</span>::<span class="ident">new</span>(<span class="number">2</span>, <span class="ident">i</span>))).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+		<span class="kw">let</span> <span class="ident">configs</span> <span class="op">=</span> (<span class="number">0</span>..<span class="op">=</span><span class="number">7</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">ChangesTrieConfiguration::new</span>(<span class="number">2</span>, <span class="ident">i</span>))).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
 		<span class="comment">// insert unfinalized headers</span>
-		<span class="kw">let</span> <span class="ident">block0</span> <span class="op">=</span> <span class="ident">insert_header_with_configuration_change</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">0</span>, <span class="ident">Default</span>::<span class="ident">default</span>(), <span class="prelude-val">None</span>, <span class="ident">configs</span>[<span class="number">0</span>].<span class="ident">clone</span>());
+		<span class="kw">let</span> <span class="ident">block0</span> <span class="op">=</span> <span class="ident">insert_header_with_configuration_change</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">0</span>, <span class="ident">Default::default</span>(), <span class="prelude-val">None</span>, <span class="ident">configs</span>[<span class="number">0</span>].<span class="ident">clone</span>());
 		<span class="kw">let</span> <span class="ident">block1</span> <span class="op">=</span> <span class="ident">insert_header_with_configuration_change</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">1</span>, <span class="ident">block0</span>, <span class="ident">changes</span>(<span class="number">1</span>), <span class="ident">configs</span>[<span class="number">1</span>].<span class="ident">clone</span>());
 		<span class="kw">let</span> <span class="ident">block2</span> <span class="op">=</span> <span class="ident">insert_header_with_configuration_change</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">2</span>, <span class="ident">block1</span>, <span class="ident">changes</span>(<span class="number">2</span>), <span class="ident">configs</span>[<span class="number">2</span>].<span class="ident">clone</span>());
 
-		<span class="kw">let</span> <span class="ident">side_config2_1</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ChangesTrieConfiguration</span>::<span class="ident">new</span>(<span class="number">3</span>, <span class="number">2</span>));
-		<span class="kw">let</span> <span class="ident">side_config2_2</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ChangesTrieConfiguration</span>::<span class="ident">new</span>(<span class="number">3</span>, <span class="number">3</span>));
+		<span class="kw">let</span> <span class="ident">side_config2_1</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ChangesTrieConfiguration::new</span>(<span class="number">3</span>, <span class="number">2</span>));
+		<span class="kw">let</span> <span class="ident">side_config2_2</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ChangesTrieConfiguration::new</span>(<span class="number">3</span>, <span class="number">3</span>));
 		<span class="kw">let</span> <span class="ident">block2_1</span> <span class="op">=</span> <span class="ident">insert_header_with_configuration_change</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">2</span>, <span class="ident">block1</span>, <span class="ident">changes</span>(<span class="number">8</span>), <span class="ident">side_config2_1</span>.<span class="ident">clone</span>());
 		<span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">insert_header_with_configuration_change</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">3</span>, <span class="ident">block2_1</span>, <span class="ident">changes</span>(<span class="number">9</span>), <span class="ident">side_config2_2</span>.<span class="ident">clone</span>());
 
@@ -1925,20 +1929,20 @@
 		<span class="kw">let</span> <span class="ident">header3</span> <span class="op">=</span> <span class="ident">Header</span> {
 			<span class="ident">number</span>: <span class="number">3</span>,
 			<span class="ident">parent_hash</span>: <span class="ident">block2</span>,
-			<span class="ident">state_root</span>: <span class="ident">Default</span>::<span class="ident">default</span>(),
+			<span class="ident">state_root</span>: <span class="ident">Default::default</span>(),
 			<span class="ident">digest</span>: <span class="ident">Digest</span> {
-				<span class="ident">logs</span>: <span class="macro">vec</span><span class="macro">!</span>[
-					<span class="ident">DigestItem</span>::<span class="ident">ChangesTrieSignal</span>(<span class="ident">ChangesTrieSignal</span>::<span class="ident">NewConfiguration</span>(<span class="ident">configs</span>[<span class="number">3</span>].<span class="ident">clone</span>())),
+				<span class="ident">logs</span>: <span class="macro">vec!</span>[
+					<span class="ident">DigestItem::ChangesTrieSignal</span>(<span class="ident">ChangesTrieSignal::NewConfiguration</span>(<span class="ident">configs</span>[<span class="number">3</span>].<span class="ident">clone</span>())),
 				],
 			},
-			<span class="ident">extrinsics_root</span>: <span class="ident">Default</span>::<span class="ident">default</span>(),
+			<span class="ident">extrinsics_root</span>: <span class="ident">Default::default</span>(),
 		};
 		<span class="kw">let</span> <span class="ident">block3</span> <span class="op">=</span> <span class="ident">header3</span>.<span class="ident">hash</span>();
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">op</span> <span class="op">=</span> <span class="ident">backend</span>.<span class="ident">begin_operation</span>().<span class="ident">unwrap</span>();
-		<span class="ident">backend</span>.<span class="ident">begin_state_operation</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">op</span>, <span class="ident">BlockId</span>::<span class="ident">Hash</span>(<span class="ident">block2</span>)).<span class="ident">unwrap</span>();
-		<span class="ident">op</span>.<span class="ident">mark_finalized</span>(<span class="ident">BlockId</span>::<span class="ident">Hash</span>(<span class="ident">block1</span>), <span class="prelude-val">None</span>).<span class="ident">unwrap</span>();
-		<span class="ident">op</span>.<span class="ident">mark_finalized</span>(<span class="ident">BlockId</span>::<span class="ident">Hash</span>(<span class="ident">block2</span>), <span class="prelude-val">None</span>).<span class="ident">unwrap</span>();
-		<span class="ident">op</span>.<span class="ident">set_block_data</span>(<span class="ident">header3</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="ident">NewBlockState</span>::<span class="ident">Final</span>).<span class="ident">unwrap</span>();
+		<span class="ident">backend</span>.<span class="ident">begin_state_operation</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">op</span>, <span class="ident">BlockId::Hash</span>(<span class="ident">block2</span>)).<span class="ident">unwrap</span>();
+		<span class="ident">op</span>.<span class="ident">mark_finalized</span>(<span class="ident">BlockId::Hash</span>(<span class="ident">block1</span>), <span class="prelude-val">None</span>).<span class="ident">unwrap</span>();
+		<span class="ident">op</span>.<span class="ident">mark_finalized</span>(<span class="ident">BlockId::Hash</span>(<span class="ident">block2</span>), <span class="prelude-val">None</span>).<span class="ident">unwrap</span>();
+		<span class="ident">op</span>.<span class="ident">set_block_data</span>(<span class="ident">header3</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="ident">NewBlockState::Final</span>).<span class="ident">unwrap</span>();
 		<span class="ident">backend</span>.<span class="ident">commit_operation</span>(<span class="ident">op</span>).<span class="ident">unwrap</span>();
 
 		<span class="comment">// insert more unfinalized headers</span>
@@ -1950,85 +1954,85 @@
 		<span class="kw">let</span> <span class="ident">header7</span> <span class="op">=</span> <span class="ident">Header</span> {
 			<span class="ident">number</span>: <span class="number">7</span>,
 			<span class="ident">parent_hash</span>: <span class="ident">block6</span>,
-			<span class="ident">state_root</span>: <span class="ident">Default</span>::<span class="ident">default</span>(),
+			<span class="ident">state_root</span>: <span class="ident">Default::default</span>(),
 			<span class="ident">digest</span>: <span class="ident">Digest</span> {
-				<span class="ident">logs</span>: <span class="macro">vec</span><span class="macro">!</span>[
-					<span class="ident">DigestItem</span>::<span class="ident">ChangesTrieSignal</span>(<span class="ident">ChangesTrieSignal</span>::<span class="ident">NewConfiguration</span>(<span class="ident">configs</span>[<span class="number">7</span>].<span class="ident">clone</span>())),
+				<span class="ident">logs</span>: <span class="macro">vec!</span>[
+					<span class="ident">DigestItem::ChangesTrieSignal</span>(<span class="ident">ChangesTrieSignal::NewConfiguration</span>(<span class="ident">configs</span>[<span class="number">7</span>].<span class="ident">clone</span>())),
 				],
 			},
-			<span class="ident">extrinsics_root</span>: <span class="ident">Default</span>::<span class="ident">default</span>(),
+			<span class="ident">extrinsics_root</span>: <span class="ident">Default::default</span>(),
 		};
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">op</span> <span class="op">=</span> <span class="ident">backend</span>.<span class="ident">begin_operation</span>().<span class="ident">unwrap</span>();
-		<span class="ident">backend</span>.<span class="ident">begin_state_operation</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">op</span>, <span class="ident">BlockId</span>::<span class="ident">Hash</span>(<span class="ident">block6</span>)).<span class="ident">unwrap</span>();
-		<span class="ident">op</span>.<span class="ident">mark_finalized</span>(<span class="ident">BlockId</span>::<span class="ident">Hash</span>(<span class="ident">block4</span>), <span class="prelude-val">None</span>).<span class="ident">unwrap</span>();
-		<span class="ident">op</span>.<span class="ident">mark_finalized</span>(<span class="ident">BlockId</span>::<span class="ident">Hash</span>(<span class="ident">block5</span>), <span class="prelude-val">None</span>).<span class="ident">unwrap</span>();
-		<span class="ident">op</span>.<span class="ident">mark_finalized</span>(<span class="ident">BlockId</span>::<span class="ident">Hash</span>(<span class="ident">block6</span>), <span class="prelude-val">None</span>).<span class="ident">unwrap</span>();
-		<span class="ident">op</span>.<span class="ident">set_block_data</span>(<span class="ident">header7</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="ident">NewBlockState</span>::<span class="ident">Final</span>).<span class="ident">unwrap</span>();
+		<span class="ident">backend</span>.<span class="ident">begin_state_operation</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">op</span>, <span class="ident">BlockId::Hash</span>(<span class="ident">block6</span>)).<span class="ident">unwrap</span>();
+		<span class="ident">op</span>.<span class="ident">mark_finalized</span>(<span class="ident">BlockId::Hash</span>(<span class="ident">block4</span>), <span class="prelude-val">None</span>).<span class="ident">unwrap</span>();
+		<span class="ident">op</span>.<span class="ident">mark_finalized</span>(<span class="ident">BlockId::Hash</span>(<span class="ident">block5</span>), <span class="prelude-val">None</span>).<span class="ident">unwrap</span>();
+		<span class="ident">op</span>.<span class="ident">mark_finalized</span>(<span class="ident">BlockId::Hash</span>(<span class="ident">block6</span>), <span class="prelude-val">None</span>).<span class="ident">unwrap</span>();
+		<span class="ident">op</span>.<span class="ident">set_block_data</span>(<span class="ident">header7</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="ident">NewBlockState::Final</span>).<span class="ident">unwrap</span>();
 		<span class="ident">backend</span>.<span class="ident">commit_operation</span>(<span class="ident">op</span>).<span class="ident">unwrap</span>();
 	}
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">changes_tries_configuration_is_reverted</span>() {
-		<span class="kw">let</span> <span class="ident">backend</span> <span class="op">=</span> <span class="ident">Backend</span>::<span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>::<span class="ident">new_test</span>(<span class="number">10</span>, <span class="number">10</span>);
+		<span class="kw">let</span> <span class="ident">backend</span> <span class="op">=</span> <span class="ident">Backend</span>::<span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="ident">::new_test</span>(<span class="number">10</span>, <span class="number">10</span>);
 
-		<span class="kw">let</span> <span class="ident">config0</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ChangesTrieConfiguration</span>::<span class="ident">new</span>(<span class="number">2</span>, <span class="number">5</span>));
-		<span class="kw">let</span> <span class="ident">block0</span> <span class="op">=</span> <span class="ident">insert_header_with_configuration_change</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">0</span>, <span class="ident">Default</span>::<span class="ident">default</span>(), <span class="prelude-val">None</span>, <span class="ident">config0</span>);
-		<span class="kw">let</span> <span class="ident">config1</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ChangesTrieConfiguration</span>::<span class="ident">new</span>(<span class="number">2</span>, <span class="number">6</span>));
+		<span class="kw">let</span> <span class="ident">config0</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ChangesTrieConfiguration::new</span>(<span class="number">2</span>, <span class="number">5</span>));
+		<span class="kw">let</span> <span class="ident">block0</span> <span class="op">=</span> <span class="ident">insert_header_with_configuration_change</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">0</span>, <span class="ident">Default::default</span>(), <span class="prelude-val">None</span>, <span class="ident">config0</span>);
+		<span class="kw">let</span> <span class="ident">config1</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ChangesTrieConfiguration::new</span>(<span class="number">2</span>, <span class="number">6</span>));
 		<span class="kw">let</span> <span class="ident">block1</span> <span class="op">=</span> <span class="ident">insert_header_with_configuration_change</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">1</span>, <span class="ident">block0</span>, <span class="ident">changes</span>(<span class="number">0</span>), <span class="ident">config1</span>);
-		<span class="ident">backend</span>.<span class="ident">finalize_block</span>(<span class="ident">BlockId</span>::<span class="ident">Number</span>(<span class="number">1</span>), <span class="prelude-val">Some</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="number">42</span>])).<span class="ident">unwrap</span>();
-		<span class="kw">let</span> <span class="ident">config2</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ChangesTrieConfiguration</span>::<span class="ident">new</span>(<span class="number">2</span>, <span class="number">7</span>));
+		<span class="ident">backend</span>.<span class="ident">finalize_block</span>(<span class="ident">BlockId::Number</span>(<span class="number">1</span>), <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="number">42</span>])).<span class="ident">unwrap</span>();
+		<span class="kw">let</span> <span class="ident">config2</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ChangesTrieConfiguration::new</span>(<span class="number">2</span>, <span class="number">7</span>));
 		<span class="kw">let</span> <span class="ident">block2</span> <span class="op">=</span> <span class="ident">insert_header_with_configuration_change</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">2</span>, <span class="ident">block1</span>, <span class="ident">changes</span>(<span class="number">1</span>), <span class="ident">config2</span>);
-		<span class="kw">let</span> <span class="ident">config2_1</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ChangesTrieConfiguration</span>::<span class="ident">new</span>(<span class="number">2</span>, <span class="number">8</span>));
+		<span class="kw">let</span> <span class="ident">config2_1</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ChangesTrieConfiguration::new</span>(<span class="number">2</span>, <span class="number">8</span>));
 		<span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">insert_header_with_configuration_change</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">3</span>, <span class="ident">block2</span>, <span class="ident">changes</span>(<span class="number">10</span>), <span class="ident">config2_1</span>);
-		<span class="kw">let</span> <span class="ident">config2_2</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ChangesTrieConfiguration</span>::<span class="ident">new</span>(<span class="number">2</span>, <span class="number">9</span>));
+		<span class="kw">let</span> <span class="ident">config2_2</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ChangesTrieConfiguration::new</span>(<span class="number">2</span>, <span class="number">9</span>));
 		<span class="kw">let</span> <span class="ident">block2_2</span> <span class="op">=</span> <span class="ident">insert_header_with_configuration_change</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">3</span>, <span class="ident">block2</span>, <span class="ident">changes</span>(<span class="number">20</span>), <span class="ident">config2_2</span>);
-		<span class="kw">let</span> <span class="ident">config2_3</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ChangesTrieConfiguration</span>::<span class="ident">new</span>(<span class="number">2</span>, <span class="number">10</span>));
+		<span class="kw">let</span> <span class="ident">config2_3</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ChangesTrieConfiguration::new</span>(<span class="number">2</span>, <span class="number">10</span>));
 		<span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">insert_header_with_configuration_change</span>(<span class="kw-2">&amp;</span><span class="ident">backend</span>, <span class="number">4</span>, <span class="ident">block2_2</span>, <span class="ident">changes</span>(<span class="number">30</span>), <span class="ident">config2_3</span>);
 
 		<span class="comment">// before truncate there are 2 unfinalized forks - block2_1+block2_3</span>
-		<span class="macro">assert_eq</span><span class="macro">!</span>(
+		<span class="macro">assert_eq!</span>(
 			<span class="ident">backend</span>.<span class="ident">changes_tries_storage</span>.<span class="ident">cache</span>.<span class="number">0</span>.<span class="ident">write</span>()
-				.<span class="ident">get_cache</span>(<span class="ident">well_known_cache_keys</span>::<span class="ident">CHANGES_TRIE_CONFIG</span>)
+				.<span class="ident">get_cache</span>(<span class="ident">well_known_cache_keys::CHANGES_TRIE_CONFIG</span>)
 				.<span class="ident">unwrap</span>()
 				.<span class="ident">unfinalized</span>()
 				.<span class="ident">iter</span>()
 				.<span class="ident">map</span>(<span class="op">|</span><span class="ident">fork</span><span class="op">|</span> <span class="ident">fork</span>.<span class="ident">head</span>().<span class="ident">valid_from</span>.<span class="ident">number</span>)
 				.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
-			<span class="macro">vec</span><span class="macro">!</span>[<span class="number">3</span>, <span class="number">4</span>],
+			<span class="macro">vec!</span>[<span class="number">3</span>, <span class="number">4</span>],
 		);
 
 		<span class="comment">// after truncating block2_3 - there are 2 unfinalized forks - block2_1+block2_2</span>
 		<span class="ident">backend</span>.<span class="ident">revert</span>(<span class="number">1</span>, <span class="bool-val">false</span>).<span class="ident">unwrap</span>();
-		<span class="macro">assert_eq</span><span class="macro">!</span>(
+		<span class="macro">assert_eq!</span>(
 			<span class="ident">backend</span>.<span class="ident">changes_tries_storage</span>.<span class="ident">cache</span>.<span class="number">0</span>.<span class="ident">write</span>()
-				.<span class="ident">get_cache</span>(<span class="ident">well_known_cache_keys</span>::<span class="ident">CHANGES_TRIE_CONFIG</span>)
+				.<span class="ident">get_cache</span>(<span class="ident">well_known_cache_keys::CHANGES_TRIE_CONFIG</span>)
 				.<span class="ident">unwrap</span>()
 				.<span class="ident">unfinalized</span>()
 				.<span class="ident">iter</span>()
 				.<span class="ident">map</span>(<span class="op">|</span><span class="ident">fork</span><span class="op">|</span> <span class="ident">fork</span>.<span class="ident">head</span>().<span class="ident">valid_from</span>.<span class="ident">number</span>)
 				.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
-			<span class="macro">vec</span><span class="macro">!</span>[<span class="number">3</span>, <span class="number">3</span>],
+			<span class="macro">vec!</span>[<span class="number">3</span>, <span class="number">3</span>],
 		);
 
 		<span class="comment">// after truncating block2_1 &amp;&amp; block2_2 - there are still two unfinalized forks (cache impl specifics),</span>
 		<span class="comment">// the 1st one points to the block #3 because it isn&#39;t truncated</span>
 		<span class="ident">backend</span>.<span class="ident">revert</span>(<span class="number">1</span>, <span class="bool-val">false</span>).<span class="ident">unwrap</span>();
-		<span class="macro">assert_eq</span><span class="macro">!</span>(
+		<span class="macro">assert_eq!</span>(
 			<span class="ident">backend</span>.<span class="ident">changes_tries_storage</span>.<span class="ident">cache</span>.<span class="number">0</span>.<span class="ident">write</span>()
-				.<span class="ident">get_cache</span>(<span class="ident">well_known_cache_keys</span>::<span class="ident">CHANGES_TRIE_CONFIG</span>)
+				.<span class="ident">get_cache</span>(<span class="ident">well_known_cache_keys::CHANGES_TRIE_CONFIG</span>)
 				.<span class="ident">unwrap</span>()
 				.<span class="ident">unfinalized</span>()
 				.<span class="ident">iter</span>()
 				.<span class="ident">map</span>(<span class="op">|</span><span class="ident">fork</span><span class="op">|</span> <span class="ident">fork</span>.<span class="ident">head</span>().<span class="ident">valid_from</span>.<span class="ident">number</span>)
 				.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
-			<span class="macro">vec</span><span class="macro">!</span>[<span class="number">3</span>, <span class="number">2</span>],
+			<span class="macro">vec!</span>[<span class="number">3</span>, <span class="number">2</span>],
 		);
 
 		<span class="comment">// after truncating block2 - there are no unfinalized forks</span>
 		<span class="ident">backend</span>.<span class="ident">revert</span>(<span class="number">1</span>, <span class="bool-val">false</span>).<span class="ident">unwrap</span>();
-		<span class="macro">assert</span><span class="macro">!</span>(
+		<span class="macro">assert!</span>(
 			<span class="ident">backend</span>.<span class="ident">changes_tries_storage</span>.<span class="ident">cache</span>.<span class="number">0</span>.<span class="ident">write</span>()
-				.<span class="ident">get_cache</span>(<span class="ident">well_known_cache_keys</span>::<span class="ident">CHANGES_TRIE_CONFIG</span>)
+				.<span class="ident">get_cache</span>(<span class="ident">well_known_cache_keys::CHANGES_TRIE_CONFIG</span>)
 				.<span class="ident">unwrap</span>()
 				.<span class="ident">unfinalized</span>()
 				.<span class="ident">iter</span>()
@@ -2039,4 +2043,5 @@
 	}
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "sc_client_db";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sc_client_db" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

@@ -1,4 +1,3 @@
 (function() {var implementors = {};
-implementors["frame_support"] = [];
-implementors["governance_os_runtime"] = [{"text":"impl PalletInfo for PalletInfo","synthetic":false,"types":[]}];
+implementors["governance_os_runtime"] = [{"text":"impl <a class=\"trait\" href=\"frame_support/traits/trait.PalletInfo.html\" title=\"trait frame_support::traits::PalletInfo\">PalletInfo</a> for <a class=\"struct\" href=\"governance_os_runtime/struct.PalletInfo.html\" title=\"struct governance_os_runtime::PalletInfo\">PalletInfo</a>","synthetic":false,"types":["governance_os_runtime::PalletInfo"]}];
 if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

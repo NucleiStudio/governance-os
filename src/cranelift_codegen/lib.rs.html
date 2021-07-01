@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/cranelift-codegen-0.66.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/cranelift-codegen-0.69.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../cranelift_codegen/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../cranelift_codegen/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -123,6 +123,9 @@
 <span id="120">120</span>
 <span id="121">121</span>
 <span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Cranelift code generation library.</span>
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">missing_docs</span>, <span class="ident">trivial_numeric_casts</span>, <span class="ident">unused_extern_crates</span>)]</span>
@@ -131,36 +134,35 @@
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;clippy&quot;</span>, <span class="ident">plugin</span>(<span class="ident">clippy</span>(<span class="ident">conf_file</span> <span class="op">=</span> <span class="string">&quot;../../clippy.toml&quot;</span>)))]</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span><span class="op">=</span><span class="string">&quot;cargo-clippy&quot;</span>, <span class="ident">allow</span>(
 <span class="comment">// Produces only a false positive:</span>
-                <span class="ident">clippy</span>::<span class="ident">while_let_loop</span>,
+                <span class="ident">clippy::while_let_loop</span>,
 <span class="comment">// Produces many false positives, but did produce some valid lints, now fixed:</span>
-                <span class="ident">clippy</span>::<span class="ident">needless_lifetimes</span>,
+                <span class="ident">clippy::needless_lifetimes</span>,
 <span class="comment">// Generated code makes some style transgressions, but readability doesn&#39;t suffer much:</span>
-                <span class="ident">clippy</span>::<span class="ident">many_single_char_names</span>,
-                <span class="ident">clippy</span>::<span class="ident">identity_op</span>,
-                <span class="ident">clippy</span>::<span class="ident">needless_borrow</span>,
-                <span class="ident">clippy</span>::<span class="ident">cast_lossless</span>,
-                <span class="ident">clippy</span>::<span class="ident">unreadable_literal</span>,
-                <span class="ident">clippy</span>::<span class="ident">assign_op_pattern</span>,
-                <span class="ident">clippy</span>::<span class="ident">empty_line_after_outer_attr</span>,
+                <span class="ident">clippy::many_single_char_names</span>,
+                <span class="ident">clippy::identity_op</span>,
+                <span class="ident">clippy::needless_borrow</span>,
+                <span class="ident">clippy::cast_lossless</span>,
+                <span class="ident">clippy::unreadable_literal</span>,
+                <span class="ident">clippy::assign_op_pattern</span>,
+                <span class="ident">clippy::empty_line_after_outer_attr</span>,
 <span class="comment">// Hard to avoid in generated code:</span>
-                <span class="ident">clippy</span>::<span class="ident">cognitive_complexity</span>,
-                <span class="ident">clippy</span>::<span class="ident">too_many_arguments</span>,
+                <span class="ident">clippy::cognitive_complexity</span>,
+                <span class="ident">clippy::too_many_arguments</span>,
 <span class="comment">// Code generator doesn&#39;t have a way to collapse identical arms:</span>
-                <span class="ident">clippy</span>::<span class="ident">match_same_arms</span>,
+                <span class="ident">clippy::match_same_arms</span>,
 <span class="comment">// These are relatively minor style issues, but would be easy to fix:</span>
-                <span class="ident">clippy</span>::<span class="ident">new_without_default</span>,
-                <span class="ident">clippy</span>::<span class="ident">should_implement_trait</span>,
-                <span class="ident">clippy</span>::<span class="ident">len_without_is_empty</span>))]</span>
+                <span class="ident">clippy::new_without_default</span>,
+                <span class="ident">clippy::should_implement_trait</span>,
+                <span class="ident">clippy::len_without_is_empty</span>))]</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(
     <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cargo-clippy&quot;</span>,
     <span class="ident">warn</span>(
-        <span class="ident">clippy</span>::<span class="ident">float_arithmetic</span>,
-        <span class="ident">clippy</span>::<span class="ident">mut_mut</span>,
-        <span class="ident">clippy</span>::<span class="ident">nonminimal_bool</span>,
-        <span class="ident">clippy</span>::<span class="ident">option_map_unwrap_or</span>,
-        <span class="ident">clippy</span>::<span class="ident">option_map_unwrap_or_else</span>,
-        <span class="ident">clippy</span>::<span class="ident">unicode_not_nfc</span>,
-        <span class="ident">clippy</span>::<span class="ident">use_self</span>
+        <span class="ident">clippy::float_arithmetic</span>,
+        <span class="ident">clippy::mut_mut</span>,
+        <span class="ident">clippy::nonminimal_bool</span>,
+        <span class="ident">clippy::map_unwrap_or</span>,
+        <span class="ident">clippy::unicode_not_nfc</span>,
+        <span class="ident">clippy::use_self</span>
     )
 )]</span>
 <span class="attribute">#![<span class="ident">no_std</span>]</span>
@@ -183,13 +185,13 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
 <span class="kw">use</span> <span class="ident">hashbrown</span>::{<span class="ident">hash_map</span>, <span class="ident">HashMap</span>, <span class="ident">HashSet</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::{<span class="ident">hash_map</span>, <span class="ident">HashMap</span>, <span class="ident">HashSet</span>};
+<span class="kw">use</span> <span class="ident">std::collections</span>::{<span class="ident">hash_map</span>, <span class="ident">HashMap</span>, <span class="ident">HashSet</span>};
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">context</span>::<span class="ident">Context</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">legalizer</span>::<span class="ident">legalize_function</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">value_label</span>::{<span class="ident">ValueLabelsRanges</span>, <span class="ident">ValueLocRange</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">verifier</span>::<span class="ident">verify_function</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">write</span>::<span class="ident">write_function</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::context::Context</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::legalizer::legalize_function</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::value_label</span>::{<span class="ident">ValueLabelsRanges</span>, <span class="ident">ValueLocRange</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::verifier::verify_function</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::write::write_function</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">cranelift_bforest</span> <span class="kw">as</span> <span class="ident">bforest</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">cranelift_entity</span> <span class="kw">as</span> <span class="ident">entity</span>;
@@ -197,6 +199,7 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">binemit</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">cfg_printer</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">cursor</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">data_value</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">dbg</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">dominator_tree</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">flowgraph</span>;
@@ -210,7 +213,7 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">verifier</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">write</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">entity</span>::<span class="ident">packed_option</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::entity::packed_option</span>;
 
 <span class="kw">mod</span> <span class="ident">abi</span>;
 <span class="kw">mod</span> <span class="ident">bitset</span>;
@@ -242,9 +245,13 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;enable-peepmatic&quot;</span>)]</span>
 <span class="kw">mod</span> <span class="ident">peepmatic</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">result</span>::{<span class="ident">CodegenError</span>, <span class="ident">CodegenResult</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;souper-harvest&quot;</span>)]</span>
+<span class="kw">mod</span> <span class="ident">souper_harvest</span>;
+
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::result</span>::{<span class="ident">CodegenError</span>, <span class="ident">CodegenResult</span>};
 
 <span class="doccomment">/// Version number of this crate.</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">VERSION</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="macro">env</span><span class="macro">!</span>(<span class="string">&quot;CARGO_PKG_VERSION&quot;</span>);
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">VERSION</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="macro">env!</span>(<span class="string">&quot;CARGO_PKG_VERSION&quot;</span>);
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "cranelift_codegen";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="cranelift_codegen" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

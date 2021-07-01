@@ -1,3 +1,3 @@
 (function() {var implementors = {};
-implementors["governance_os_node"] = [{"text":"impl SubstrateCli for Cli","synthetic":false,"types":[]}];
+implementors["governance_os_node"] = [{"text":"impl <a class=\"trait\" href=\"sc_cli/trait.SubstrateCli.html\" title=\"trait sc_cli::SubstrateCli\">SubstrateCli</a> for <a class=\"struct\" href=\"governance_os_node/cli/struct.Cli.html\" title=\"struct governance_os_node::cli::Cli\">Cli</a>","synthetic":false,"types":["governance_os_node::cli::Cli"]}];
 if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

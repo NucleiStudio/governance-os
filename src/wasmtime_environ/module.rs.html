@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/wasmtime-environ-0.19.0/src/module.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>module.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/wasmtime-environ-0.22.0/src/module.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>module.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../wasmtime_environ/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../wasmtime_environ/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -399,26 +399,72 @@
 <span id="396">396</span>
 <span id="397">397</span>
 <span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Data structures for representing decoded wasm modules.</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">tunables</span>::<span class="ident">Tunables</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">WASM_MAX_PAGES</span>;
-<span class="kw">use</span> <span class="ident">cranelift_codegen</span>::<span class="ident">ir</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::tunables::Tunables</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::WASM_MAX_PAGES</span>;
+<span class="kw">use</span> <span class="ident">cranelift_codegen::ir</span>;
 <span class="kw">use</span> <span class="ident">cranelift_entity</span>::{<span class="ident">EntityRef</span>, <span class="ident">PrimaryMap</span>};
-<span class="kw">use</span> <span class="ident">cranelift_wasm</span>::{
-    <span class="ident">DataIndex</span>, <span class="ident">DefinedFuncIndex</span>, <span class="ident">DefinedGlobalIndex</span>, <span class="ident">DefinedMemoryIndex</span>, <span class="ident">DefinedTableIndex</span>,
-    <span class="ident">ElemIndex</span>, <span class="ident">FuncIndex</span>, <span class="ident">Global</span>, <span class="ident">GlobalIndex</span>, <span class="ident">Memory</span>, <span class="ident">MemoryIndex</span>, <span class="ident">SignatureIndex</span>, <span class="ident">Table</span>,
-    <span class="ident">TableIndex</span>, <span class="ident">WasmFuncType</span>,
-};
-<span class="kw">use</span> <span class="ident">indexmap</span>::<span class="ident">IndexMap</span>;
-<span class="kw">use</span> <span class="ident">more_asserts</span>::<span class="ident">assert_ge</span>;
+<span class="kw">use</span> <span class="ident">cranelift_wasm</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">indexmap::IndexMap</span>;
+<span class="kw">use</span> <span class="ident">more_asserts::assert_ge</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashMap</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::{
-    <span class="ident">atomic</span>::{<span class="ident">AtomicUsize</span>, <span class="ident">Ordering</span>::<span class="ident">SeqCst</span>},
-    <span class="ident">Arc</span>,
-};
+<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
 <span class="doccomment">/// A WebAssembly table initializer.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Hash</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
@@ -431,19 +477,6 @@
     <span class="kw">pub</span> <span class="ident">offset</span>: <span class="ident">usize</span>,
     <span class="doccomment">/// The values to write into the table elements.</span>
     <span class="kw">pub</span> <span class="ident">elements</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">FuncIndex</span>]<span class="op">&gt;</span>,
-}
-
-<span class="doccomment">/// An index of an entity.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">EntityIndex</span> {
-    <span class="doccomment">/// Function index.</span>
-    <span class="ident">Function</span>(<span class="ident">FuncIndex</span>),
-    <span class="doccomment">/// Table index.</span>
-    <span class="ident">Table</span>(<span class="ident">TableIndex</span>),
-    <span class="doccomment">/// Memory index.</span>
-    <span class="ident">Memory</span>(<span class="ident">MemoryIndex</span>),
-    <span class="doccomment">/// Global index.</span>
-    <span class="ident">Global</span>(<span class="ident">GlobalIndex</span>),
 }
 
 <span class="doccomment">/// Implemenation styles for WebAssembly linear memory.</span>
@@ -467,9 +500,9 @@
         <span class="comment">// If the module doesn&#39;t declare an explicit maximum treat it as 4GiB.</span>
         <span class="kw">let</span> <span class="ident">maximum</span> <span class="op">=</span> <span class="ident">memory</span>.<span class="ident">maximum</span>.<span class="ident">unwrap_or</span>(<span class="ident">WASM_MAX_PAGES</span>);
         <span class="kw">if</span> <span class="ident">maximum</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">tunables</span>.<span class="ident">static_memory_bound</span> {
-            <span class="macro">assert_ge</span><span class="macro">!</span>(<span class="ident">tunables</span>.<span class="ident">static_memory_bound</span>, <span class="ident">memory</span>.<span class="ident">minimum</span>);
+            <span class="macro">assert_ge!</span>(<span class="ident">tunables</span>.<span class="ident">static_memory_bound</span>, <span class="ident">memory</span>.<span class="ident">minimum</span>);
             <span class="kw">return</span> (
-                <span class="self">Self</span>::<span class="ident">Static</span> {
+                <span class="self">Self</span><span class="ident">::Static</span> {
                     <span class="ident">bound</span>: <span class="ident">tunables</span>.<span class="ident">static_memory_bound</span>,
                 },
                 <span class="ident">tunables</span>.<span class="ident">static_memory_offset_guard_size</span>,
@@ -477,7 +510,7 @@
         }
 
         <span class="comment">// Otherwise, make it dynamic.</span>
-        (<span class="self">Self</span>::<span class="ident">Dynamic</span>, <span class="ident">tunables</span>.<span class="ident">dynamic_memory_offset_guard_size</span>)
+        (<span class="self">Self</span><span class="ident">::Dynamic</span>, <span class="ident">tunables</span>.<span class="ident">dynamic_memory_offset_guard_size</span>)
     }
 }
 
@@ -496,7 +529,7 @@
 <span class="kw">impl</span> <span class="ident">MemoryPlan</span> {
     <span class="doccomment">/// Draw up a plan for implementing a `Memory`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">for_memory</span>(<span class="ident">memory</span>: <span class="ident">Memory</span>, <span class="ident">tunables</span>: <span class="kw-2">&amp;</span><span class="ident">Tunables</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="kw">let</span> (<span class="ident">style</span>, <span class="ident">offset_guard_size</span>) <span class="op">=</span> <span class="ident">MemoryStyle</span>::<span class="ident">for_memory</span>(<span class="ident">memory</span>, <span class="ident">tunables</span>);
+        <span class="kw">let</span> (<span class="ident">style</span>, <span class="ident">offset_guard_size</span>) <span class="op">=</span> <span class="ident">MemoryStyle::for_memory</span>(<span class="ident">memory</span>, <span class="ident">tunables</span>);
         <span class="self">Self</span> {
             <span class="ident">memory</span>,
             <span class="ident">style</span>,
@@ -515,7 +548,7 @@
 <span class="kw">impl</span> <span class="ident">TableStyle</span> {
     <span class="doccomment">/// Decide on an implementation style for the given `Table`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">for_table</span>(<span class="ident">_table</span>: <span class="ident">Table</span>, <span class="ident">_tunables</span>: <span class="kw-2">&amp;</span><span class="ident">Tunables</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span>::<span class="ident">CallerChecksSignature</span>
+        <span class="self">Self</span><span class="ident">::CallerChecksSignature</span>
     }
 }
 
@@ -524,7 +557,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TablePlan</span> {
     <span class="doccomment">/// The WebAssembly table description.</span>
-    <span class="kw">pub</span> <span class="ident">table</span>: <span class="ident">cranelift_wasm</span>::<span class="ident">Table</span>,
+    <span class="kw">pub</span> <span class="ident">table</span>: <span class="ident">cranelift_wasm::Table</span>,
     <span class="doccomment">/// Our chosen implementation style.</span>
     <span class="kw">pub</span> <span class="ident">style</span>: <span class="ident">TableStyle</span>,
 }
@@ -532,30 +565,49 @@
 <span class="kw">impl</span> <span class="ident">TablePlan</span> {
     <span class="doccomment">/// Draw up a plan for implementing a `Table`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">for_table</span>(<span class="ident">table</span>: <span class="ident">Table</span>, <span class="ident">tunables</span>: <span class="kw-2">&amp;</span><span class="ident">Tunables</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">style</span> <span class="op">=</span> <span class="ident">TableStyle</span>::<span class="ident">for_table</span>(<span class="ident">table</span>, <span class="ident">tunables</span>);
+        <span class="kw">let</span> <span class="ident">style</span> <span class="op">=</span> <span class="ident">TableStyle::for_table</span>(<span class="ident">table</span>, <span class="ident">tunables</span>);
         <span class="self">Self</span> { <span class="ident">table</span>, <span class="ident">style</span> }
+    }
+}
+
+<span class="doccomment">/// Different types that can appear in a module.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Note that each of these variants are intended to index further into a</span>
+<span class="doccomment">/// separate table.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ModuleType</span> {
+    <span class="ident">Function</span>(<span class="ident">SignatureIndex</span>),
+    <span class="ident">Module</span>(<span class="ident">ModuleTypeIndex</span>),
+    <span class="ident">Instance</span>(<span class="ident">InstanceTypeIndex</span>),
+}
+
+<span class="kw">impl</span> <span class="ident">ModuleType</span> {
+    <span class="doccomment">/// Asserts this is a `ModuleType::Function`, returning the underlying</span>
+    <span class="doccomment">/// `SignatureIndex`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unwrap_function</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SignatureIndex</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">ModuleType::Function</span>(<span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">f</span>,
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;not a function type&quot;</span>),
+        }
     }
 }
 
 <span class="doccomment">/// A translated WebAssembly module, excluding the function bodies and</span>
 <span class="doccomment">/// memory initializers.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Module</span> {
-    <span class="doccomment">/// A unique identifier (within this process) for this module.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing</span>, <span class="ident">default</span> <span class="op">=</span> <span class="string">&quot;Module::next_id&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// The parent index of this module, used for the module linking proposal.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This index is into the list of modules returned from compilation of a</span>
+    <span class="doccomment">/// single wasm file with nested modules.</span>
+    <span class="kw">pub</span> <span class="ident">parent</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
 
     <span class="doccomment">/// The name of this wasm module, often found in the wasm file.</span>
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 
-    <span class="doccomment">/// Local information about a module which is the bare minimum necessary to</span>
-    <span class="doccomment">/// translate a function body. This is derived as `Hash` whereas this module</span>
-    <span class="doccomment">/// isn&#39;t, since it contains too much information needed to translate a</span>
-    <span class="doccomment">/// function.</span>
-    <span class="kw">pub</span> <span class="ident">local</span>: <span class="ident">ModuleLocal</span>,
-
     <span class="doccomment">/// All import records, in the order they are declared in the module.</span>
-    <span class="kw">pub</span> <span class="ident">imports</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">String</span>, <span class="ident">EntityIndex</span>)<span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">initializers</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Initializer</span><span class="op">&gt;</span>,
 
     <span class="doccomment">/// Exported entities.</span>
     <span class="kw">pub</span> <span class="ident">exports</span>: <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">EntityIndex</span><span class="op">&gt;</span>,
@@ -575,29 +627,20 @@
 
     <span class="doccomment">/// WebAssembly table initializers.</span>
     <span class="kw">pub</span> <span class="ident">func_names</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">FuncIndex</span>, <span class="ident">String</span><span class="op">&gt;</span>,
-}
 
-<span class="doccomment">/// Local information known about a wasm module, the bare minimum necessary to</span>
-<span class="doccomment">/// translate function bodies.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is stored within a `Module` and it implements `Hash`, unlike `Module`,</span>
-<span class="doccomment">/// and is used as part of the cache key when we load compiled modules from the</span>
-<span class="doccomment">/// global cache.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Hash</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ModuleLocal</span> {
-    <span class="doccomment">/// Unprocessed signatures exactly as provided by `declare_signature()`.</span>
-    <span class="kw">pub</span> <span class="ident">signatures</span>: <span class="ident">PrimaryMap</span><span class="op">&lt;</span><span class="ident">SignatureIndex</span>, (<span class="ident">WasmFuncType</span>, <span class="ident">ir</span>::<span class="ident">Signature</span>)<span class="op">&gt;</span>,
+    <span class="doccomment">/// Types declared in the wasm module.</span>
+    <span class="kw">pub</span> <span class="ident">types</span>: <span class="ident">PrimaryMap</span><span class="op">&lt;</span><span class="ident">TypeIndex</span>, <span class="ident">ModuleType</span><span class="op">&gt;</span>,
 
-    <span class="doccomment">/// Number of imported functions in the module.</span>
+    <span class="doccomment">/// Number of imported or aliased functions in the module.</span>
     <span class="kw">pub</span> <span class="ident">num_imported_funcs</span>: <span class="ident">usize</span>,
 
-    <span class="doccomment">/// Number of imported tables in the module.</span>
+    <span class="doccomment">/// Number of imported or aliased tables in the module.</span>
     <span class="kw">pub</span> <span class="ident">num_imported_tables</span>: <span class="ident">usize</span>,
 
-    <span class="doccomment">/// Number of imported memories in the module.</span>
+    <span class="doccomment">/// Number of imported or aliased memories in the module.</span>
     <span class="kw">pub</span> <span class="ident">num_imported_memories</span>: <span class="ident">usize</span>,
 
-    <span class="doccomment">/// Number of imported globals in the module.</span>
+    <span class="doccomment">/// Number of imported or aliased globals in the module.</span>
     <span class="kw">pub</span> <span class="ident">num_imported_globals</span>: <span class="ident">usize</span>,
 
     <span class="doccomment">/// Types of functions, imported and local.</span>
@@ -611,33 +654,59 @@
 
     <span class="doccomment">/// WebAssembly global variables.</span>
     <span class="kw">pub</span> <span class="ident">globals</span>: <span class="ident">PrimaryMap</span><span class="op">&lt;</span><span class="ident">GlobalIndex</span>, <span class="ident">Global</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// The type of each wasm instance this module defines.</span>
+    <span class="kw">pub</span> <span class="ident">instances</span>: <span class="ident">PrimaryMap</span><span class="op">&lt;</span><span class="ident">InstanceIndex</span>, <span class="ident">InstanceTypeIndex</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// The type of each nested wasm module this module contains.</span>
+    <span class="kw">pub</span> <span class="ident">modules</span>: <span class="ident">PrimaryMap</span><span class="op">&lt;</span><span class="ident">ModuleIndex</span>, <span class="ident">ModuleTypeIndex</span><span class="op">&gt;</span>,
+}
+
+<span class="doccomment">/// Initialization routines for creating an instance, encompassing imports,</span>
+<span class="doccomment">/// modules, instances, aliases, etc.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Initializer</span> {
+    <span class="doccomment">/// An imported item is required to be provided.</span>
+    <span class="ident">Import</span> {
+        <span class="doccomment">/// Module name of this import</span>
+        <span class="ident">module</span>: <span class="ident">String</span>,
+        <span class="doccomment">/// Optional field name of this import</span>
+        <span class="ident">field</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+        <span class="doccomment">/// Where this import will be placed, which also has type information</span>
+        <span class="doccomment">/// about the import.</span>
+        <span class="ident">index</span>: <span class="ident">EntityIndex</span>,
+    },
+
+    <span class="doccomment">/// A module from the parent&#39;s declared modules is inserted into our own</span>
+    <span class="doccomment">/// index space.</span>
+    <span class="ident">AliasParentModule</span>(<span class="ident">ModuleIndex</span>),
+
+    <span class="doccomment">/// A module from the parent&#39;s declared modules is inserted into our own</span>
+    <span class="doccomment">/// index space.</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
+    <span class="ident">AliasInstanceExport</span> {
+        <span class="ident">instance</span>: <span class="ident">InstanceIndex</span>,
+        <span class="ident">export</span>: <span class="ident">usize</span>,
+    },
+
+    <span class="doccomment">/// A module is being instantiated with previously configured intializers</span>
+    <span class="doccomment">/// as arguments.</span>
+    <span class="ident">Instantiate</span> {
+        <span class="doccomment">/// The module that this instance is instantiating.</span>
+        <span class="ident">module</span>: <span class="ident">ModuleIndex</span>,
+        <span class="doccomment">/// The arguments provided to instantiation.</span>
+        <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EntityIndex</span><span class="op">&gt;</span>,
+    },
+
+    <span class="doccomment">/// A module is defined into the module index space, and which module is</span>
+    <span class="doccomment">/// being defined is specified by the index payload.</span>
+    <span class="ident">DefineModule</span>(<span class="ident">usize</span>),
 }
 
 <span class="kw">impl</span> <span class="ident">Module</span> {
     <span class="doccomment">/// Allocates the module data structures.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">id</span>: <span class="self">Self</span>::<span class="ident">next_id</span>(),
-            <span class="ident">name</span>: <span class="prelude-val">None</span>,
-            <span class="ident">imports</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
-            <span class="ident">exports</span>: <span class="ident">IndexMap</span>::<span class="ident">new</span>(),
-            <span class="ident">start_func</span>: <span class="prelude-val">None</span>,
-            <span class="ident">table_elements</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
-            <span class="ident">passive_elements</span>: <span class="ident">HashMap</span>::<span class="ident">new</span>(),
-            <span class="ident">passive_data</span>: <span class="ident">HashMap</span>::<span class="ident">new</span>(),
-            <span class="ident">func_names</span>: <span class="ident">HashMap</span>::<span class="ident">new</span>(),
-            <span class="ident">local</span>: <span class="ident">ModuleLocal</span> {
-                <span class="ident">num_imported_funcs</span>: <span class="number">0</span>,
-                <span class="ident">num_imported_tables</span>: <span class="number">0</span>,
-                <span class="ident">num_imported_memories</span>: <span class="number">0</span>,
-                <span class="ident">num_imported_globals</span>: <span class="number">0</span>,
-                <span class="ident">signatures</span>: <span class="ident">PrimaryMap</span>::<span class="ident">new</span>(),
-                <span class="ident">functions</span>: <span class="ident">PrimaryMap</span>::<span class="ident">new</span>(),
-                <span class="ident">table_plans</span>: <span class="ident">PrimaryMap</span>::<span class="ident">new</span>(),
-                <span class="ident">memory_plans</span>: <span class="ident">PrimaryMap</span>::<span class="ident">new</span>(),
-                <span class="ident">globals</span>: <span class="ident">PrimaryMap</span>::<span class="ident">new</span>(),
-            },
-        }
+        <span class="ident">Module::default</span>()
     }
 
     <span class="doccomment">/// Get the given passive element, if it exists.</span>
@@ -645,16 +714,9 @@
         <span class="self">self</span>.<span class="ident">passive_elements</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">index</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">es</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">es</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">next_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
-        <span class="kw">static</span> <span class="ident">NEXT_ID</span>: <span class="ident">AtomicUsize</span> <span class="op">=</span> <span class="ident">AtomicUsize</span>::<span class="ident">new</span>(<span class="number">0</span>);
-        <span class="ident">NEXT_ID</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">SeqCst</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">ModuleLocal</span> {
     <span class="doccomment">/// Convert a `DefinedFuncIndex` into a `FuncIndex`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">func_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">defined_func</span>: <span class="ident">DefinedFuncIndex</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FuncIndex</span> {
-        <span class="ident">FuncIndex</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">num_imported_funcs</span> <span class="op">+</span> <span class="ident">defined_func</span>.<span class="ident">index</span>())
+        <span class="ident">FuncIndex::new</span>(<span class="self">self</span>.<span class="ident">num_imported_funcs</span> <span class="op">+</span> <span class="ident">defined_func</span>.<span class="ident">index</span>())
     }
 
     <span class="doccomment">/// Convert a `FuncIndex` into a `DefinedFuncIndex`. Returns None if the</span>
@@ -663,7 +725,7 @@
         <span class="kw">if</span> <span class="ident">func</span>.<span class="ident">index</span>() <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">num_imported_funcs</span> {
             <span class="prelude-val">None</span>
         } <span class="kw">else</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">DefinedFuncIndex</span>::<span class="ident">new</span>(
+            <span class="prelude-val">Some</span>(<span class="ident">DefinedFuncIndex::new</span>(
                 <span class="ident">func</span>.<span class="ident">index</span>() <span class="op">-</span> <span class="self">self</span>.<span class="ident">num_imported_funcs</span>,
             ))
         }
@@ -676,7 +738,7 @@
 
     <span class="doccomment">/// Convert a `DefinedTableIndex` into a `TableIndex`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">table_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">defined_table</span>: <span class="ident">DefinedTableIndex</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TableIndex</span> {
-        <span class="ident">TableIndex</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">num_imported_tables</span> <span class="op">+</span> <span class="ident">defined_table</span>.<span class="ident">index</span>())
+        <span class="ident">TableIndex::new</span>(<span class="self">self</span>.<span class="ident">num_imported_tables</span> <span class="op">+</span> <span class="ident">defined_table</span>.<span class="ident">index</span>())
     }
 
     <span class="doccomment">/// Convert a `TableIndex` into a `DefinedTableIndex`. Returns None if the</span>
@@ -685,7 +747,7 @@
         <span class="kw">if</span> <span class="ident">table</span>.<span class="ident">index</span>() <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">num_imported_tables</span> {
             <span class="prelude-val">None</span>
         } <span class="kw">else</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">DefinedTableIndex</span>::<span class="ident">new</span>(
+            <span class="prelude-val">Some</span>(<span class="ident">DefinedTableIndex::new</span>(
                 <span class="ident">table</span>.<span class="ident">index</span>() <span class="op">-</span> <span class="self">self</span>.<span class="ident">num_imported_tables</span>,
             ))
         }
@@ -698,7 +760,7 @@
 
     <span class="doccomment">/// Convert a `DefinedMemoryIndex` into a `MemoryIndex`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">memory_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">defined_memory</span>: <span class="ident">DefinedMemoryIndex</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MemoryIndex</span> {
-        <span class="ident">MemoryIndex</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">num_imported_memories</span> <span class="op">+</span> <span class="ident">defined_memory</span>.<span class="ident">index</span>())
+        <span class="ident">MemoryIndex::new</span>(<span class="self">self</span>.<span class="ident">num_imported_memories</span> <span class="op">+</span> <span class="ident">defined_memory</span>.<span class="ident">index</span>())
     }
 
     <span class="doccomment">/// Convert a `MemoryIndex` into a `DefinedMemoryIndex`. Returns None if the</span>
@@ -707,7 +769,7 @@
         <span class="kw">if</span> <span class="ident">memory</span>.<span class="ident">index</span>() <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">num_imported_memories</span> {
             <span class="prelude-val">None</span>
         } <span class="kw">else</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">DefinedMemoryIndex</span>::<span class="ident">new</span>(
+            <span class="prelude-val">Some</span>(<span class="ident">DefinedMemoryIndex::new</span>(
                 <span class="ident">memory</span>.<span class="ident">index</span>() <span class="op">-</span> <span class="self">self</span>.<span class="ident">num_imported_memories</span>,
             ))
         }
@@ -720,7 +782,7 @@
 
     <span class="doccomment">/// Convert a `DefinedGlobalIndex` into a `GlobalIndex`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">global_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">defined_global</span>: <span class="ident">DefinedGlobalIndex</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GlobalIndex</span> {
-        <span class="ident">GlobalIndex</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">num_imported_globals</span> <span class="op">+</span> <span class="ident">defined_global</span>.<span class="ident">index</span>())
+        <span class="ident">GlobalIndex::new</span>(<span class="self">self</span>.<span class="ident">num_imported_globals</span> <span class="op">+</span> <span class="ident">defined_global</span>.<span class="ident">index</span>())
     }
 
     <span class="doccomment">/// Convert a `GlobalIndex` into a `DefinedGlobalIndex`. Returns None if the</span>
@@ -729,7 +791,7 @@
         <span class="kw">if</span> <span class="ident">global</span>.<span class="ident">index</span>() <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">num_imported_globals</span> {
             <span class="prelude-val">None</span>
         } <span class="kw">else</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">DefinedGlobalIndex</span>::<span class="ident">new</span>(
+            <span class="prelude-val">Some</span>(<span class="ident">DefinedGlobalIndex::new</span>(
                 <span class="ident">global</span>.<span class="ident">index</span>() <span class="op">-</span> <span class="self">self</span>.<span class="ident">num_imported_globals</span>,
             ))
         }
@@ -740,28 +802,72 @@
         <span class="ident">index</span>.<span class="ident">index</span>() <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">num_imported_globals</span>
     }
 
-    <span class="doccomment">/// Convenience method for looking up the native signature of a compiled</span>
-    <span class="doccomment">/// Wasm function.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">native_func_signature</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func_index</span>: <span class="ident">FuncIndex</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">ir</span>::<span class="ident">Signature</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">signatures</span>[<span class="self">self</span>.<span class="ident">functions</span>[<span class="ident">func_index</span>]].<span class="number">1</span>
+    <span class="doccomment">/// Returns an iterator of all the imports in this module, along with their</span>
+    <span class="doccomment">/// module name, field name, and type that&#39;s being imported.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">imports</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">EntityType</span>)<span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">initializers</span>.<span class="ident">iter</span>().<span class="ident">filter_map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">i</span> {
+            <span class="ident">Initializer::Import</span> {
+                <span class="ident">module</span>,
+                <span class="ident">field</span>,
+                <span class="ident">index</span>,
+            } <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>((<span class="ident">module</span>.<span class="ident">as_str</span>(), <span class="ident">field</span>.<span class="ident">as_deref</span>(), <span class="self">self</span>.<span class="ident">type_of</span>(<span class="kw-2">*</span><span class="ident">index</span>))),
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        })
     }
 
-    <span class="doccomment">/// Convenience method for looking up the original Wasm signature of a</span>
-    <span class="doccomment">/// function.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wasm_func_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func_index</span>: <span class="ident">FuncIndex</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">WasmFuncType</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">signatures</span>[<span class="self">self</span>.<span class="ident">functions</span>[<span class="ident">func_index</span>]].<span class="number">0</span>
+    <span class="doccomment">/// Returns the type of an item based on its index</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_of</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">EntityIndex</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">EntityType</span> {
+        <span class="kw">match</span> <span class="ident">index</span> {
+            <span class="ident">EntityIndex::Global</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EntityType::Global</span>(<span class="self">self</span>.<span class="ident">globals</span>[<span class="ident">i</span>]),
+            <span class="ident">EntityIndex::Table</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EntityType::Table</span>(<span class="self">self</span>.<span class="ident">table_plans</span>[<span class="ident">i</span>].<span class="ident">table</span>),
+            <span class="ident">EntityIndex::Memory</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EntityType::Memory</span>(<span class="self">self</span>.<span class="ident">memory_plans</span>[<span class="ident">i</span>].<span class="ident">memory</span>),
+            <span class="ident">EntityIndex::Function</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EntityType::Function</span>(<span class="self">self</span>.<span class="ident">functions</span>[<span class="ident">i</span>]),
+            <span class="ident">EntityIndex::Instance</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EntityType::Instance</span>(<span class="self">self</span>.<span class="ident">instances</span>[<span class="ident">i</span>]),
+            <span class="ident">EntityIndex::Module</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EntityType::Module</span>(<span class="self">self</span>.<span class="ident">modules</span>[<span class="ident">i</span>]),
+        }
     }
+}
+
+<span class="doccomment">/// All types which are recorded for the entirety of a translation.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Note that this is shared amongst all modules coming out of a translation</span>
+<span class="doccomment">/// in the case of nested modules and the module linking proposal.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TypeTables</span> {
+    <span class="kw">pub</span> <span class="ident">wasm_signatures</span>: <span class="ident">PrimaryMap</span><span class="op">&lt;</span><span class="ident">SignatureIndex</span>, <span class="ident">WasmFuncType</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">native_signatures</span>: <span class="ident">PrimaryMap</span><span class="op">&lt;</span><span class="ident">SignatureIndex</span>, <span class="ident">ir::Signature</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">module_signatures</span>: <span class="ident">PrimaryMap</span><span class="op">&lt;</span><span class="ident">ModuleTypeIndex</span>, <span class="ident">ModuleSignature</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">instance_signatures</span>: <span class="ident">PrimaryMap</span><span class="op">&lt;</span><span class="ident">InstanceTypeIndex</span>, <span class="ident">InstanceSignature</span><span class="op">&gt;</span>,
+}
+
+<span class="doccomment">/// The type signature of known modules.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ModuleSignature</span> {
+    <span class="doccomment">/// All imports in this module, listed in order with their module/name and</span>
+    <span class="doccomment">/// what type they&#39;re importing.</span>
+    <span class="kw">pub</span> <span class="ident">imports</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">EntityType</span>)<span class="op">&gt;</span>,
+    <span class="doccomment">/// Exports are what an instance type conveys, so we go through an</span>
+    <span class="doccomment">/// indirection over there.</span>
+    <span class="kw">pub</span> <span class="ident">exports</span>: <span class="ident">InstanceTypeIndex</span>,
+}
+
+<span class="doccomment">/// The type signature of known instances.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InstanceSignature</span> {
+    <span class="doccomment">/// The name of what&#39;s being exported as well as its type signature.</span>
+    <span class="kw">pub</span> <span class="ident">exports</span>: <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">EntityType</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">mod</span> <span class="ident">passive_data_serde</span> {
     <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Arc</span>, <span class="ident">DataIndex</span>, <span class="ident">HashMap</span>};
-    <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">de</span>::<span class="ident">MapAccess</span>, <span class="ident">de</span>::<span class="ident">Visitor</span>, <span class="ident">ser</span>::<span class="ident">SerializeMap</span>, <span class="ident">Deserializer</span>, <span class="ident">Serializer</span>};
-    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
+    <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">de::MapAccess</span>, <span class="ident">de::Visitor</span>, <span class="ident">ser::SerializeMap</span>, <span class="ident">Deserializer</span>, <span class="ident">Serializer</span>};
+    <span class="kw">use</span> <span class="ident">std::fmt</span>;
 
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(
         <span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">DataIndex</span>, <span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">ser</span>: <span class="ident">S</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S</span>::<span class="prelude-val">Ok</span>, <span class="ident">S</span>::<span class="ident">Error</span><span class="op">&gt;</span>
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">Serializer</span>,
     {
@@ -776,14 +882,14 @@
     <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PassiveDataVisitor</span> {
         <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">DataIndex</span>, <span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>;
 
-        <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+        <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
             <span class="ident">formatter</span>.<span class="ident">write_str</span>(<span class="string">&quot;a passive_data map&quot;</span>)
         }
-        <span class="kw">fn</span> <span class="ident">visit_map</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">access</span>: <span class="ident">M</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Value</span>, <span class="ident">M</span>::<span class="ident">Error</span><span class="op">&gt;</span>
+        <span class="kw">fn</span> <span class="ident">visit_map</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">access</span>: <span class="ident">M</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Value</span>, <span class="ident">M::Error</span><span class="op">&gt;</span>
         <span class="kw">where</span>
             <span class="ident">M</span>: <span class="ident">MapAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
         {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="ident">with_capacity</span>(<span class="ident">access</span>.<span class="ident">size_hint</span>().<span class="ident">unwrap_or</span>(<span class="number">0</span>));
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">HashMap::with_capacity</span>(<span class="ident">access</span>.<span class="ident">size_hint</span>().<span class="ident">unwrap_or</span>(<span class="number">0</span>));
             <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">key</span>, <span class="ident">value</span>)) <span class="op">=</span> <span class="ident">access</span>.<span class="ident">next_entry</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span> {
                 <span class="ident">map</span>.<span class="ident">insert</span>(<span class="ident">key</span>, <span class="ident">value</span>.<span class="ident">into</span>());
             }
@@ -791,7 +897,7 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">de</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">DataIndex</span>, <span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">D</span>::<span class="ident">Error</span><span class="op">&gt;</span>
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">de</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">DataIndex</span>, <span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {
@@ -799,4 +905,5 @@
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "wasmtime_environ";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="wasmtime_environ" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

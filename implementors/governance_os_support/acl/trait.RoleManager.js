@@ -1,3 +1,3 @@
 (function() {var implementors = {};
-implementors["governance_os_pallet_bylaws"] = [{"text":"impl&lt;T:&nbsp;Trait&gt; RoleManager for Module&lt;T&gt;","synthetic":false,"types":[]}];
+implementors["governance_os_pallet_bylaws"] = [{"text":"impl&lt;T:&nbsp;<a class=\"trait\" href=\"governance_os_pallet_bylaws/pallet/trait.Config.html\" title=\"trait governance_os_pallet_bylaws::pallet::Config\">Config</a>&gt; <a class=\"trait\" href=\"governance_os_support/acl/trait.RoleManager.html\" title=\"trait governance_os_support::acl::RoleManager\">RoleManager</a> for <a class=\"struct\" href=\"governance_os_pallet_bylaws/pallet/struct.Pallet.html\" title=\"struct governance_os_pallet_bylaws::pallet::Pallet\">Pallet</a>&lt;T&gt;","synthetic":false,"types":["governance_os_pallet_bylaws::pallet::Pallet"]}];
 if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/cranelift-codegen-0.66.0/src/ir/types.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>types.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/cranelift-codegen-0.69.0/src/ir/types.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>types.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../cranelift_codegen/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../cranelift_codegen/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -533,12 +533,13 @@
 <span id="530">530</span>
 <span id="531">531</span>
 <span id="532">532</span>
+<span id="533">533</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Common types for the Cranelift code generator.</span>
 
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">default</span>::<span class="ident">Default</span>;
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Debug</span>, <span class="ident">Display</span>, <span class="ident">Formatter</span>};
-<span class="kw">use</span> <span class="ident">cranelift_codegen_shared</span>::<span class="ident">constants</span>;
+<span class="kw">use</span> <span class="ident">core::default::Default</span>;
+<span class="kw">use</span> <span class="ident">core::fmt</span>::{<span class="self">self</span>, <span class="ident">Debug</span>, <span class="ident">Display</span>, <span class="ident">Formatter</span>};
+<span class="kw">use</span> <span class="ident">cranelift_codegen_shared::constants</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;enable-serde&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">target_lexicon</span>::{<span class="ident">PointerWidth</span>, <span class="ident">Triple</span>};
@@ -568,17 +569,17 @@
 <span class="comment">// Include code generated by `cranelift-codegen/meta/gen_types.rs`. This file contains constant</span>
 <span class="comment">// definitions for all the scalar types as well as common vector types for 64, 128, 256, and</span>
 <span class="comment">// 512-bit SIMD vectors.</span>
-<span class="macro">include</span><span class="macro">!</span>(<span class="macro">concat</span><span class="macro">!</span>(<span class="macro">env</span><span class="macro">!</span>(<span class="string">&quot;OUT_DIR&quot;</span>), <span class="string">&quot;/types.rs&quot;</span>));
+<span class="macro">include!</span>(<span class="macro">concat!</span>(<span class="macro">env!</span>(<span class="string">&quot;OUT_DIR&quot;</span>), <span class="string">&quot;/types.rs&quot;</span>));
 
 <span class="kw">impl</span> <span class="ident">Type</span> {
     <span class="doccomment">/// Get the lane type of this SIMD vector type.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// A lane type is the same as a SIMD vector type with one lane, so it returns itself.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lane_type</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span> <span class="op">&lt;</span> <span class="ident">constants</span>::<span class="ident">VECTOR_BASE</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span> <span class="op">&lt;</span> <span class="ident">constants::VECTOR_BASE</span> {
             <span class="self">self</span>
         } <span class="kw">else</span> {
-            <span class="self">Self</span>(<span class="ident">constants</span>::<span class="ident">LANE_BASE</span> <span class="op">|</span> (<span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="number">0x0f</span>))
+            <span class="self">Self</span>(<span class="ident">constants::LANE_BASE</span> <span class="op">|</span> (<span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="number">0x0f</span>))
         }
     }
 
@@ -629,7 +630,7 @@
 
     <span class="doccomment">/// Get a type with the same number of lanes as `self`, but using `lane` as the lane type.</span>
     <span class="kw">fn</span> <span class="ident">replace_lanes</span>(<span class="self">self</span>, <span class="ident">lane</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">lane</span>.<span class="ident">is_lane</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_special</span>());
+        <span class="macro">debug_assert!</span>(<span class="ident">lane</span>.<span class="ident">is_lane</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_special</span>());
         <span class="self">Self</span>((<span class="ident">lane</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="number">0x0f</span>) <span class="op">|</span> (<span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="number">0xf0</span>))
     }
 
@@ -645,7 +646,7 @@
             <span class="ident">B16</span> <span class="op">|</span> <span class="ident">I16</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">B16</span>,
             <span class="ident">B32</span> <span class="op">|</span> <span class="ident">I32</span> <span class="op">|</span> <span class="ident">F32</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">B32</span>,
             <span class="ident">B64</span> <span class="op">|</span> <span class="ident">I64</span> <span class="op">|</span> <span class="ident">F64</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">B64</span>,
-            <span class="ident">R32</span> <span class="op">|</span> <span class="ident">R64</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Reference types should not convert to bool&quot;</span>),
+            <span class="ident">R32</span> <span class="op">|</span> <span class="ident">R64</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Reference types should not convert to bool&quot;</span>),
             <span class="ident">B128</span> <span class="op">|</span> <span class="ident">I128</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">B128</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">B1</span>,
         })
@@ -704,21 +705,21 @@
 
     <span class="doccomment">/// Is this a special type?</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_special</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span> <span class="op">&lt;</span> <span class="ident">constants</span>::<span class="ident">LANE_BASE</span>
+        <span class="self">self</span>.<span class="number">0</span> <span class="op">&lt;</span> <span class="ident">constants::LANE_BASE</span>
     }
 
     <span class="doccomment">/// Is this a lane type?</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is a scalar type that can also appear as the lane type of a SIMD vector.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_lane</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="ident">constants</span>::<span class="ident">LANE_BASE</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="number">0</span> <span class="op">&lt;</span> <span class="ident">constants</span>::<span class="ident">VECTOR_BASE</span>
+        <span class="ident">constants::LANE_BASE</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="number">0</span> <span class="op">&lt;</span> <span class="ident">constants::VECTOR_BASE</span>
     }
 
     <span class="doccomment">/// Is this a SIMD vector type?</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// A vector type has 2 or more lanes.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_vector</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">constants</span>::<span class="ident">VECTOR_BASE</span>
+        <span class="self">self</span>.<span class="number">0</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">constants::VECTOR_BASE</span>
     }
 
     <span class="doccomment">/// Is this a scalar boolean type?</span>
@@ -768,7 +769,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// A scalar type is the same as a SIMD vector type with one lane, so it returns 0.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">log2_lane_count</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">saturating_sub</span>(<span class="ident">constants</span>::<span class="ident">LANE_BASE</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">4</span>
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">saturating_sub</span>(<span class="ident">constants::LANE_BASE</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">4</span>
     }
 
     <span class="doccomment">/// Get the number of lanes in this SIMD vector type.</span>
@@ -780,12 +781,12 @@
 
     <span class="doccomment">/// Get the total number of bits used to represent this type.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bits</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u16</span> {
-        <span class="ident">u16</span>::<span class="ident">from</span>(<span class="self">self</span>.<span class="ident">lane_bits</span>()) <span class="op">*</span> <span class="self">self</span>.<span class="ident">lane_count</span>()
+        <span class="ident">u16::from</span>(<span class="self">self</span>.<span class="ident">lane_bits</span>()) <span class="op">*</span> <span class="self">self</span>.<span class="ident">lane_count</span>()
     }
 
     <span class="doccomment">/// Get the number of bytes used to store this type in memory.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bytes</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
-        (<span class="ident">u32</span>::<span class="ident">from</span>(<span class="self">self</span>.<span class="ident">bits</span>()) <span class="op">+</span> <span class="number">7</span>) <span class="op">/</span> <span class="number">8</span>
+        (<span class="ident">u32::from</span>(<span class="self">self</span>.<span class="ident">bits</span>()) <span class="op">+</span> <span class="number">7</span>) <span class="op">/</span> <span class="number">8</span>
     }
 
     <span class="doccomment">/// Get a SIMD vector type with `n` times more lanes than this one.</span>
@@ -799,7 +800,7 @@
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
         <span class="kw">let</span> <span class="ident">log2_lanes</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="ident">n</span>.<span class="ident">trailing_zeros</span>();
-        <span class="kw">let</span> <span class="ident">new_type</span> <span class="op">=</span> <span class="ident">u32</span>::<span class="ident">from</span>(<span class="self">self</span>.<span class="number">0</span>) <span class="op">+</span> (<span class="ident">log2_lanes</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>);
+        <span class="kw">let</span> <span class="ident">new_type</span> <span class="op">=</span> <span class="ident">u32::from</span>(<span class="self">self</span>.<span class="number">0</span>) <span class="op">+</span> (<span class="ident">log2_lanes</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>);
         <span class="kw">if</span> <span class="ident">new_type</span> <span class="op">&lt;</span> <span class="number">0x100</span> {
             <span class="prelude-val">Some</span>(<span class="self">Self</span>(<span class="ident">new_type</span> <span class="kw">as</span> <span class="ident">u8</span>))
         } <span class="kw">else</span> {
@@ -841,7 +842,7 @@
 
     <span class="doccomment">/// Index of this type, for use with hash tables etc.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
-        <span class="ident">usize</span>::<span class="ident">from</span>(<span class="self">self</span>.<span class="number">0</span>)
+        <span class="ident">usize::from</span>(<span class="self">self</span>.<span class="number">0</span>)
     }
 
     <span class="doccomment">/// True iff:</span>
@@ -855,55 +856,56 @@
     <span class="doccomment">/// Return the pointer type for the given target triple.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">triple_pointer_type</span>(<span class="ident">triple</span>: <span class="kw-2">&amp;</span><span class="ident">Triple</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">triple</span>.<span class="ident">pointer_width</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">PointerWidth</span>::<span class="ident">U16</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">I16</span>,
-            <span class="prelude-val">Ok</span>(<span class="ident">PointerWidth</span>::<span class="ident">U32</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">I32</span>,
-            <span class="prelude-val">Ok</span>(<span class="ident">PointerWidth</span>::<span class="ident">U64</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">I64</span>,
-            <span class="prelude-val">Err</span>(()) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;unable to determine architecture pointer width&quot;</span>),
+            <span class="prelude-val">Ok</span>(<span class="ident">PointerWidth::U16</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">I16</span>,
+            <span class="prelude-val">Ok</span>(<span class="ident">PointerWidth::U32</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">I32</span>,
+            <span class="prelude-val">Ok</span>(<span class="ident">PointerWidth::U64</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">I64</span>,
+            <span class="prelude-val">Err</span>(()) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;unable to determine architecture pointer width&quot;</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Type</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_bool</span>() {
-            <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;b{}&quot;</span>, <span class="self">self</span>.<span class="ident">lane_bits</span>())
+            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;b{}&quot;</span>, <span class="self">self</span>.<span class="ident">lane_bits</span>())
         } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_int</span>() {
-            <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;i{}&quot;</span>, <span class="self">self</span>.<span class="ident">lane_bits</span>())
+            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;i{}&quot;</span>, <span class="self">self</span>.<span class="ident">lane_bits</span>())
         } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_float</span>() {
-            <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;f{}&quot;</span>, <span class="self">self</span>.<span class="ident">lane_bits</span>())
+            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;f{}&quot;</span>, <span class="self">self</span>.<span class="ident">lane_bits</span>())
         } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_vector</span>() {
-            <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;{}x{}&quot;</span>, <span class="self">self</span>.<span class="ident">lane_type</span>(), <span class="self">self</span>.<span class="ident">lane_count</span>())
+            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}x{}&quot;</span>, <span class="self">self</span>.<span class="ident">lane_type</span>(), <span class="self">self</span>.<span class="ident">lane_count</span>())
         } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_ref</span>() {
-            <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;r{}&quot;</span>, <span class="self">self</span>.<span class="ident">lane_bits</span>())
+            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;r{}&quot;</span>, <span class="self">self</span>.<span class="ident">lane_bits</span>())
         } <span class="kw">else</span> {
             <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
                 <span class="ident">IFLAGS</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;iflags&quot;</span>,
                 <span class="ident">FFLAGS</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;fflags&quot;</span>,
-                <span class="ident">INVALID</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;INVALID encountered&quot;</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Unknown Type(0x{:x})&quot;</span>, <span class="self">self</span>.<span class="number">0</span>),
+                <span class="ident">SARG_T</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;sarg_t&quot;</span>,
+                <span class="ident">INVALID</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;INVALID encountered&quot;</span>),
+                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unknown Type(0x{:x})&quot;</span>, <span class="self">self</span>.<span class="number">0</span>),
             })
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Type</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_bool</span>() {
-            <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;types::B{}&quot;</span>, <span class="self">self</span>.<span class="ident">lane_bits</span>())
+            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;types::B{}&quot;</span>, <span class="self">self</span>.<span class="ident">lane_bits</span>())
         } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_int</span>() {
-            <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;types::I{}&quot;</span>, <span class="self">self</span>.<span class="ident">lane_bits</span>())
+            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;types::I{}&quot;</span>, <span class="self">self</span>.<span class="ident">lane_bits</span>())
         } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_float</span>() {
-            <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;types::F{}&quot;</span>, <span class="self">self</span>.<span class="ident">lane_bits</span>())
+            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;types::F{}&quot;</span>, <span class="self">self</span>.<span class="ident">lane_bits</span>())
         } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_vector</span>() {
-            <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;{:?}X{}&quot;</span>, <span class="self">self</span>.<span class="ident">lane_type</span>(), <span class="self">self</span>.<span class="ident">lane_count</span>())
+            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{:?}X{}&quot;</span>, <span class="self">self</span>.<span class="ident">lane_type</span>(), <span class="self">self</span>.<span class="ident">lane_count</span>())
         } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_ref</span>() {
-            <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;types::R{}&quot;</span>, <span class="self">self</span>.<span class="ident">lane_bits</span>())
+            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;types::R{}&quot;</span>, <span class="self">self</span>.<span class="ident">lane_bits</span>())
         } <span class="kw">else</span> {
             <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-                <span class="ident">INVALID</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;types::INVALID&quot;</span>),
-                <span class="ident">IFLAGS</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;types::IFLAGS&quot;</span>),
-                <span class="ident">FFLAGS</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;types::FFLAGS&quot;</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;Type(0x{:x})&quot;</span>, <span class="self">self</span>.<span class="number">0</span>),
+                <span class="ident">INVALID</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;types::INVALID&quot;</span>),
+                <span class="ident">IFLAGS</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;types::IFLAGS&quot;</span>),
+                <span class="ident">FFLAGS</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;types::FFLAGS&quot;</span>),
+                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Type(0x{:x})&quot;</span>, <span class="self">self</span>.<span class="number">0</span>),
             }
         }
     }
@@ -918,153 +920,154 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">alloc</span>::<span class="ident">string</span>::<span class="ident">ToString</span>;
+    <span class="kw">use</span> <span class="ident">alloc::string::ToString</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">basic_scalars</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">INVALID</span>, <span class="ident">INVALID</span>.<span class="ident">lane_type</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="number">0</span>, <span class="ident">INVALID</span>.<span class="ident">bits</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">IFLAGS</span>, <span class="ident">IFLAGS</span>.<span class="ident">lane_type</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="number">0</span>, <span class="ident">IFLAGS</span>.<span class="ident">bits</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">FFLAGS</span>, <span class="ident">FFLAGS</span>.<span class="ident">lane_type</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="number">0</span>, <span class="ident">FFLAGS</span>.<span class="ident">bits</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">B1</span>, <span class="ident">B1</span>.<span class="ident">lane_type</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">B8</span>, <span class="ident">B8</span>.<span class="ident">lane_type</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">B16</span>, <span class="ident">B16</span>.<span class="ident">lane_type</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">B32</span>, <span class="ident">B32</span>.<span class="ident">lane_type</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">B64</span>, <span class="ident">B64</span>.<span class="ident">lane_type</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">B128</span>, <span class="ident">B128</span>.<span class="ident">lane_type</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">I8</span>, <span class="ident">I8</span>.<span class="ident">lane_type</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">I16</span>, <span class="ident">I16</span>.<span class="ident">lane_type</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">I32</span>, <span class="ident">I32</span>.<span class="ident">lane_type</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">I64</span>, <span class="ident">I64</span>.<span class="ident">lane_type</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">I128</span>, <span class="ident">I128</span>.<span class="ident">lane_type</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">F32</span>, <span class="ident">F32</span>.<span class="ident">lane_type</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">F64</span>, <span class="ident">F64</span>.<span class="ident">lane_type</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">B1</span>, <span class="ident">B1</span>.<span class="ident">by</span>(<span class="number">8</span>).<span class="ident">unwrap</span>().<span class="ident">lane_type</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">I32</span>, <span class="ident">I32X4</span>.<span class="ident">lane_type</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">F64</span>, <span class="ident">F64X2</span>.<span class="ident">lane_type</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">R32</span>, <span class="ident">R32</span>.<span class="ident">lane_type</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">R64</span>, <span class="ident">R64</span>.<span class="ident">lane_type</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">INVALID</span>, <span class="ident">INVALID</span>.<span class="ident">lane_type</span>());
+        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="ident">INVALID</span>.<span class="ident">bits</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">IFLAGS</span>, <span class="ident">IFLAGS</span>.<span class="ident">lane_type</span>());
+        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="ident">IFLAGS</span>.<span class="ident">bits</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">FFLAGS</span>, <span class="ident">FFLAGS</span>.<span class="ident">lane_type</span>());
+        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="ident">FFLAGS</span>.<span class="ident">bits</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">B1</span>, <span class="ident">B1</span>.<span class="ident">lane_type</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">B8</span>, <span class="ident">B8</span>.<span class="ident">lane_type</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">B16</span>, <span class="ident">B16</span>.<span class="ident">lane_type</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">B32</span>, <span class="ident">B32</span>.<span class="ident">lane_type</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">B64</span>, <span class="ident">B64</span>.<span class="ident">lane_type</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">B128</span>, <span class="ident">B128</span>.<span class="ident">lane_type</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">I8</span>, <span class="ident">I8</span>.<span class="ident">lane_type</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">I16</span>, <span class="ident">I16</span>.<span class="ident">lane_type</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">I32</span>, <span class="ident">I32</span>.<span class="ident">lane_type</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">I64</span>, <span class="ident">I64</span>.<span class="ident">lane_type</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">I128</span>, <span class="ident">I128</span>.<span class="ident">lane_type</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">F32</span>, <span class="ident">F32</span>.<span class="ident">lane_type</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">F64</span>, <span class="ident">F64</span>.<span class="ident">lane_type</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">B1</span>, <span class="ident">B1</span>.<span class="ident">by</span>(<span class="number">8</span>).<span class="ident">unwrap</span>().<span class="ident">lane_type</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">I32</span>, <span class="ident">I32X4</span>.<span class="ident">lane_type</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">F64</span>, <span class="ident">F64X2</span>.<span class="ident">lane_type</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">R32</span>, <span class="ident">R32</span>.<span class="ident">lane_type</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">R64</span>, <span class="ident">R64</span>.<span class="ident">lane_type</span>());
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">INVALID</span>.<span class="ident">lane_bits</span>(), <span class="number">0</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">IFLAGS</span>.<span class="ident">lane_bits</span>(), <span class="number">0</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">FFLAGS</span>.<span class="ident">lane_bits</span>(), <span class="number">0</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">B1</span>.<span class="ident">lane_bits</span>(), <span class="number">1</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">B8</span>.<span class="ident">lane_bits</span>(), <span class="number">8</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">B16</span>.<span class="ident">lane_bits</span>(), <span class="number">16</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">B32</span>.<span class="ident">lane_bits</span>(), <span class="number">32</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">B64</span>.<span class="ident">lane_bits</span>(), <span class="number">64</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">B128</span>.<span class="ident">lane_bits</span>(), <span class="number">128</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">I8</span>.<span class="ident">lane_bits</span>(), <span class="number">8</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">I16</span>.<span class="ident">lane_bits</span>(), <span class="number">16</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">I32</span>.<span class="ident">lane_bits</span>(), <span class="number">32</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">I64</span>.<span class="ident">lane_bits</span>(), <span class="number">64</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">I128</span>.<span class="ident">lane_bits</span>(), <span class="number">128</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">F32</span>.<span class="ident">lane_bits</span>(), <span class="number">32</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">F64</span>.<span class="ident">lane_bits</span>(), <span class="number">64</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">R32</span>.<span class="ident">lane_bits</span>(), <span class="number">32</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">R64</span>.<span class="ident">lane_bits</span>(), <span class="number">64</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">INVALID</span>.<span class="ident">lane_bits</span>(), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">IFLAGS</span>.<span class="ident">lane_bits</span>(), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">FFLAGS</span>.<span class="ident">lane_bits</span>(), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">B1</span>.<span class="ident">lane_bits</span>(), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">B8</span>.<span class="ident">lane_bits</span>(), <span class="number">8</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">B16</span>.<span class="ident">lane_bits</span>(), <span class="number">16</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">B32</span>.<span class="ident">lane_bits</span>(), <span class="number">32</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">B64</span>.<span class="ident">lane_bits</span>(), <span class="number">64</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">B128</span>.<span class="ident">lane_bits</span>(), <span class="number">128</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">I8</span>.<span class="ident">lane_bits</span>(), <span class="number">8</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">I16</span>.<span class="ident">lane_bits</span>(), <span class="number">16</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">I32</span>.<span class="ident">lane_bits</span>(), <span class="number">32</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">I64</span>.<span class="ident">lane_bits</span>(), <span class="number">64</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">I128</span>.<span class="ident">lane_bits</span>(), <span class="number">128</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">F32</span>.<span class="ident">lane_bits</span>(), <span class="number">32</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">F64</span>.<span class="ident">lane_bits</span>(), <span class="number">64</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">R32</span>.<span class="ident">lane_bits</span>(), <span class="number">32</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">R64</span>.<span class="ident">lane_bits</span>(), <span class="number">64</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">typevar_functions</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">INVALID</span>.<span class="ident">half_width</span>(), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">INVALID</span>.<span class="ident">half_width</span>(), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">FFLAGS</span>.<span class="ident">half_width</span>(), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">B1</span>.<span class="ident">half_width</span>(), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">B8</span>.<span class="ident">half_width</span>(), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">B16</span>.<span class="ident">half_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">B8</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">B32</span>.<span class="ident">half_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">B16</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">B64</span>.<span class="ident">half_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">B32</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">B128</span>.<span class="ident">half_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">B64</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">I8</span>.<span class="ident">half_width</span>(), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">I16</span>.<span class="ident">half_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">I8</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">I32</span>.<span class="ident">half_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">I16</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">I32X4</span>.<span class="ident">half_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">I16X4</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">I64</span>.<span class="ident">half_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">I32</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">I128</span>.<span class="ident">half_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">I64</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">F32</span>.<span class="ident">half_width</span>(), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">F64</span>.<span class="ident">half_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">F32</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">INVALID</span>.<span class="ident">half_width</span>(), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">INVALID</span>.<span class="ident">half_width</span>(), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">FFLAGS</span>.<span class="ident">half_width</span>(), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">B1</span>.<span class="ident">half_width</span>(), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">B8</span>.<span class="ident">half_width</span>(), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">B16</span>.<span class="ident">half_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">B8</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">B32</span>.<span class="ident">half_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">B16</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">B64</span>.<span class="ident">half_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">B32</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">B128</span>.<span class="ident">half_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">B64</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">I8</span>.<span class="ident">half_width</span>(), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">I16</span>.<span class="ident">half_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">I8</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">I32</span>.<span class="ident">half_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">I16</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">I32X4</span>.<span class="ident">half_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">I16X4</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">I64</span>.<span class="ident">half_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">I32</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">I128</span>.<span class="ident">half_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">I64</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">F32</span>.<span class="ident">half_width</span>(), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">F64</span>.<span class="ident">half_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">F32</span>));
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">INVALID</span>.<span class="ident">double_width</span>(), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">IFLAGS</span>.<span class="ident">double_width</span>(), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">FFLAGS</span>.<span class="ident">double_width</span>(), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">B1</span>.<span class="ident">double_width</span>(), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">B8</span>.<span class="ident">double_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">B16</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">B16</span>.<span class="ident">double_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">B32</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">B32</span>.<span class="ident">double_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">B64</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">B64</span>.<span class="ident">double_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">B128</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">B128</span>.<span class="ident">double_width</span>(), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">I8</span>.<span class="ident">double_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">I16</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">I16</span>.<span class="ident">double_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">I32</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">I32</span>.<span class="ident">double_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">I64</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">I32X4</span>.<span class="ident">double_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">I64X4</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">I64</span>.<span class="ident">double_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">I128</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">I128</span>.<span class="ident">double_width</span>(), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">F32</span>.<span class="ident">double_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">F64</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">F64</span>.<span class="ident">double_width</span>(), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">INVALID</span>.<span class="ident">double_width</span>(), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">IFLAGS</span>.<span class="ident">double_width</span>(), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">FFLAGS</span>.<span class="ident">double_width</span>(), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">B1</span>.<span class="ident">double_width</span>(), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">B8</span>.<span class="ident">double_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">B16</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">B16</span>.<span class="ident">double_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">B32</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">B32</span>.<span class="ident">double_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">B64</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">B64</span>.<span class="ident">double_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">B128</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">B128</span>.<span class="ident">double_width</span>(), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">I8</span>.<span class="ident">double_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">I16</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">I16</span>.<span class="ident">double_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">I32</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">I32</span>.<span class="ident">double_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">I64</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">I32X4</span>.<span class="ident">double_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">I64X4</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">I64</span>.<span class="ident">double_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">I128</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">I128</span>.<span class="ident">double_width</span>(), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">F32</span>.<span class="ident">double_width</span>(), <span class="prelude-val">Some</span>(<span class="ident">F64</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">F64</span>.<span class="ident">double_width</span>(), <span class="prelude-val">None</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">vectors</span>() {
         <span class="kw">let</span> <span class="ident">big</span> <span class="op">=</span> <span class="ident">F64</span>.<span class="ident">by</span>(<span class="number">256</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">big</span>.<span class="ident">lane_bits</span>(), <span class="number">64</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">big</span>.<span class="ident">lane_count</span>(), <span class="number">256</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">big</span>.<span class="ident">bits</span>(), <span class="number">64</span> <span class="op">*</span> <span class="number">256</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">big</span>.<span class="ident">lane_bits</span>(), <span class="number">64</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">big</span>.<span class="ident">lane_count</span>(), <span class="number">256</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">big</span>.<span class="ident">bits</span>(), <span class="number">64</span> <span class="op">*</span> <span class="number">256</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">big</span>.<span class="ident">half_vector</span>().<span class="ident">unwrap</span>().<span class="ident">to_string</span>(), <span class="string">&quot;f64x128&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">B1</span>.<span class="ident">by</span>(<span class="number">2</span>).<span class="ident">unwrap</span>().<span class="ident">half_vector</span>().<span class="ident">unwrap</span>().<span class="ident">to_string</span>(), <span class="string">&quot;b1&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">I32</span>.<span class="ident">half_vector</span>(), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">INVALID</span>.<span class="ident">half_vector</span>(), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">big</span>.<span class="ident">half_vector</span>().<span class="ident">unwrap</span>().<span class="ident">to_string</span>(), <span class="string">&quot;f64x128&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">B1</span>.<span class="ident">by</span>(<span class="number">2</span>).<span class="ident">unwrap</span>().<span class="ident">half_vector</span>().<span class="ident">unwrap</span>().<span class="ident">to_string</span>(), <span class="string">&quot;b1&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">I32</span>.<span class="ident">half_vector</span>(), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">INVALID</span>.<span class="ident">half_vector</span>(), <span class="prelude-val">None</span>);
 
         <span class="comment">// Check that the generated constants match the computed vector types.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">I32</span>.<span class="ident">by</span>(<span class="number">4</span>), <span class="prelude-val">Some</span>(<span class="ident">I32X4</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">F64</span>.<span class="ident">by</span>(<span class="number">8</span>), <span class="prelude-val">Some</span>(<span class="ident">F64X8</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">I32</span>.<span class="ident">by</span>(<span class="number">4</span>), <span class="prelude-val">Some</span>(<span class="ident">I32X4</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">F64</span>.<span class="ident">by</span>(<span class="number">8</span>), <span class="prelude-val">Some</span>(<span class="ident">F64X8</span>));
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">format_scalars</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">IFLAGS</span>.<span class="ident">to_string</span>(), <span class="string">&quot;iflags&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">FFLAGS</span>.<span class="ident">to_string</span>(), <span class="string">&quot;fflags&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">B1</span>.<span class="ident">to_string</span>(), <span class="string">&quot;b1&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">B8</span>.<span class="ident">to_string</span>(), <span class="string">&quot;b8&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">B16</span>.<span class="ident">to_string</span>(), <span class="string">&quot;b16&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">B32</span>.<span class="ident">to_string</span>(), <span class="string">&quot;b32&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">B64</span>.<span class="ident">to_string</span>(), <span class="string">&quot;b64&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">B128</span>.<span class="ident">to_string</span>(), <span class="string">&quot;b128&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">I8</span>.<span class="ident">to_string</span>(), <span class="string">&quot;i8&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">I16</span>.<span class="ident">to_string</span>(), <span class="string">&quot;i16&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">I32</span>.<span class="ident">to_string</span>(), <span class="string">&quot;i32&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">I64</span>.<span class="ident">to_string</span>(), <span class="string">&quot;i64&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">I128</span>.<span class="ident">to_string</span>(), <span class="string">&quot;i128&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">F32</span>.<span class="ident">to_string</span>(), <span class="string">&quot;f32&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">F64</span>.<span class="ident">to_string</span>(), <span class="string">&quot;f64&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">R32</span>.<span class="ident">to_string</span>(), <span class="string">&quot;r32&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">R64</span>.<span class="ident">to_string</span>(), <span class="string">&quot;r64&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">IFLAGS</span>.<span class="ident">to_string</span>(), <span class="string">&quot;iflags&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">FFLAGS</span>.<span class="ident">to_string</span>(), <span class="string">&quot;fflags&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">B1</span>.<span class="ident">to_string</span>(), <span class="string">&quot;b1&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">B8</span>.<span class="ident">to_string</span>(), <span class="string">&quot;b8&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">B16</span>.<span class="ident">to_string</span>(), <span class="string">&quot;b16&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">B32</span>.<span class="ident">to_string</span>(), <span class="string">&quot;b32&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">B64</span>.<span class="ident">to_string</span>(), <span class="string">&quot;b64&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">B128</span>.<span class="ident">to_string</span>(), <span class="string">&quot;b128&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">I8</span>.<span class="ident">to_string</span>(), <span class="string">&quot;i8&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">I16</span>.<span class="ident">to_string</span>(), <span class="string">&quot;i16&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">I32</span>.<span class="ident">to_string</span>(), <span class="string">&quot;i32&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">I64</span>.<span class="ident">to_string</span>(), <span class="string">&quot;i64&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">I128</span>.<span class="ident">to_string</span>(), <span class="string">&quot;i128&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">F32</span>.<span class="ident">to_string</span>(), <span class="string">&quot;f32&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">F64</span>.<span class="ident">to_string</span>(), <span class="string">&quot;f64&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">R32</span>.<span class="ident">to_string</span>(), <span class="string">&quot;r32&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">R64</span>.<span class="ident">to_string</span>(), <span class="string">&quot;r64&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">format_vectors</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">B1</span>.<span class="ident">by</span>(<span class="number">8</span>).<span class="ident">unwrap</span>().<span class="ident">to_string</span>(), <span class="string">&quot;b1x8&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">B8</span>.<span class="ident">by</span>(<span class="number">1</span>).<span class="ident">unwrap</span>().<span class="ident">to_string</span>(), <span class="string">&quot;b8&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">B16</span>.<span class="ident">by</span>(<span class="number">256</span>).<span class="ident">unwrap</span>().<span class="ident">to_string</span>(), <span class="string">&quot;b16x256&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">B32</span>.<span class="ident">by</span>(<span class="number">4</span>).<span class="ident">unwrap</span>().<span class="ident">by</span>(<span class="number">2</span>).<span class="ident">unwrap</span>().<span class="ident">to_string</span>(), <span class="string">&quot;b32x8&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">B64</span>.<span class="ident">by</span>(<span class="number">8</span>).<span class="ident">unwrap</span>().<span class="ident">to_string</span>(), <span class="string">&quot;b64x8&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">I8</span>.<span class="ident">by</span>(<span class="number">64</span>).<span class="ident">unwrap</span>().<span class="ident">to_string</span>(), <span class="string">&quot;i8x64&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">F64</span>.<span class="ident">by</span>(<span class="number">2</span>).<span class="ident">unwrap</span>().<span class="ident">to_string</span>(), <span class="string">&quot;f64x2&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">I8</span>.<span class="ident">by</span>(<span class="number">3</span>), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">I8</span>.<span class="ident">by</span>(<span class="number">512</span>), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">INVALID</span>.<span class="ident">by</span>(<span class="number">4</span>), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">B1</span>.<span class="ident">by</span>(<span class="number">8</span>).<span class="ident">unwrap</span>().<span class="ident">to_string</span>(), <span class="string">&quot;b1x8&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">B8</span>.<span class="ident">by</span>(<span class="number">1</span>).<span class="ident">unwrap</span>().<span class="ident">to_string</span>(), <span class="string">&quot;b8&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">B16</span>.<span class="ident">by</span>(<span class="number">256</span>).<span class="ident">unwrap</span>().<span class="ident">to_string</span>(), <span class="string">&quot;b16x256&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">B32</span>.<span class="ident">by</span>(<span class="number">4</span>).<span class="ident">unwrap</span>().<span class="ident">by</span>(<span class="number">2</span>).<span class="ident">unwrap</span>().<span class="ident">to_string</span>(), <span class="string">&quot;b32x8&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">B64</span>.<span class="ident">by</span>(<span class="number">8</span>).<span class="ident">unwrap</span>().<span class="ident">to_string</span>(), <span class="string">&quot;b64x8&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">I8</span>.<span class="ident">by</span>(<span class="number">64</span>).<span class="ident">unwrap</span>().<span class="ident">to_string</span>(), <span class="string">&quot;i8x64&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">F64</span>.<span class="ident">by</span>(<span class="number">2</span>).<span class="ident">unwrap</span>().<span class="ident">to_string</span>(), <span class="string">&quot;f64x2&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">I8</span>.<span class="ident">by</span>(<span class="number">3</span>), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">I8</span>.<span class="ident">by</span>(<span class="number">512</span>), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">INVALID</span>.<span class="ident">by</span>(<span class="number">4</span>), <span class="prelude-val">None</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">as_bool</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">I32X4</span>.<span class="ident">as_bool</span>(), <span class="ident">B32X4</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">I32</span>.<span class="ident">as_bool</span>(), <span class="ident">B1</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">I32X4</span>.<span class="ident">as_bool_pedantic</span>(), <span class="ident">B32X4</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">I32</span>.<span class="ident">as_bool_pedantic</span>(), <span class="ident">B32</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">I32X4</span>.<span class="ident">as_bool</span>(), <span class="ident">B32X4</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">I32</span>.<span class="ident">as_bool</span>(), <span class="ident">B1</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">I32X4</span>.<span class="ident">as_bool_pedantic</span>(), <span class="ident">B32X4</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">I32</span>.<span class="ident">as_bool_pedantic</span>(), <span class="ident">B32</span>);
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "cranelift_codegen";</script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="cranelift_codegen" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
+    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script></body></html>

@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/libp2p-kad-0.23.0/src/query/peers/closest/disjoint.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>disjoint.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled ><script src="../../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/libp2p-kad-0.28.1/src/query/peers/closest/disjoint.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>disjoint.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../../../storage.js"></script><script src="../../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../../../libp2p_kad/index.html'><div class='logo-container rust-logo'><img src='../../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../../../../settings.html"><img src="../../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../../libp2p_kad/index.html'><div class='logo-container rust-logo'><img src='../../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../../../../settings.html"><img src="../../../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -972,6 +972,7 @@
 <span id="969">969</span>
 <span id="970">970</span>
 <span id="971">971</span>
+<span id="972">972</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">//</span>
@@ -994,14 +995,14 @@
 <span class="comment">// DEALINGS IN THE SOFTWARE.</span>
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">kbucket</span>::{<span class="ident">Key</span>, <span class="ident">KeyBytes</span>};
-<span class="kw">use</span> <span class="ident">libp2p_core</span>::<span class="ident">PeerId</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::kbucket</span>::{<span class="ident">Key</span>, <span class="ident">KeyBytes</span>};
+<span class="kw">use</span> <span class="ident">libp2p_core::PeerId</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">collections</span>::<span class="ident">HashMap</span>,
+    <span class="ident">collections::HashMap</span>,
     <span class="ident">iter</span>::{<span class="ident">Cycle</span>, <span class="ident">Map</span>, <span class="ident">Peekable</span>},
     <span class="ident">ops</span>::{<span class="ident">Index</span>, <span class="ident">IndexMut</span>, <span class="ident">Range</span>},
 };
-<span class="kw">use</span> <span class="ident">wasm_timer</span>::<span class="ident">Instant</span>;
+<span class="kw">use</span> <span class="ident">wasm_timer::Instant</span>;
 
 <span class="doccomment">/// Wraps around a set of [`ClosestPeersIter`], enforcing a disjoint discovery</span>
 <span class="doccomment">/// path per configured parallelism according to the S/Kademlia paper.</span>
@@ -1030,8 +1031,8 @@
     <span class="kw">where</span>
         <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Key</span><span class="op">&lt;</span><span class="ident">PeerId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
-        <span class="self">Self</span>::<span class="ident">with_config</span>(
-            <span class="ident">ClosestPeersIterConfig</span>::<span class="ident">default</span>(),
+        <span class="self">Self</span><span class="ident">::with_config</span>(
+            <span class="ident">ClosestPeersIterConfig::default</span>(),
             <span class="ident">target</span>,
             <span class="ident">known_closest_peers</span>,
         )
@@ -1054,7 +1055,7 @@
             <span class="comment">// mapping ensures that a successful response from a peer is only</span>
             <span class="comment">// ever passed to a single [`ClosestPeersIter`]. See</span>
             <span class="comment">// [`ClosestDisjointPeersIter::on_success`] for details.</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">ClosestPeersIter</span>::<span class="ident">with_config</span>(<span class="ident">config</span>.<span class="ident">clone</span>(), <span class="ident">target</span>.<span class="ident">clone</span>(), <span class="ident">peers</span>.<span class="ident">clone</span>()))
+            .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">ClosestPeersIter::with_config</span>(<span class="ident">config</span>.<span class="ident">clone</span>(), <span class="ident">target</span>.<span class="ident">clone</span>(), <span class="ident">peers</span>.<span class="ident">clone</span>()))
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
         <span class="kw">let</span> <span class="ident">iters_len</span> <span class="op">=</span> <span class="ident">iters</span>.<span class="ident">len</span>();
@@ -1064,7 +1065,7 @@
             <span class="ident">target</span>: <span class="ident">target</span>.<span class="ident">into</span>(),
             <span class="ident">iters</span>,
             <span class="ident">iter_order</span>: (<span class="number">0</span>..<span class="ident">iters_len</span>).<span class="ident">map</span>(<span class="ident">IteratorIndex</span> <span class="kw">as</span> <span class="kw">fn</span>(<span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IteratorIndex</span>).<span class="ident">cycle</span>(),
-            <span class="ident">contacted_peers</span>: <span class="ident">HashMap</span>::<span class="ident">new</span>(),
+            <span class="ident">contacted_peers</span>: <span class="ident">HashMap::new</span>(),
         }
     }
 
@@ -1085,7 +1086,7 @@
             <span class="ident">updated</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">iters</span>[<span class="kw-2">*</span><span class="ident">initiated_by</span>].<span class="ident">on_failure</span>(<span class="ident">peer</span>);
 
             <span class="kw">if</span> <span class="ident">updated</span> {
-                <span class="kw-2">*</span><span class="ident">response</span> <span class="op">=</span> <span class="ident">ResponseState</span>::<span class="ident">Failed</span>;
+                <span class="kw-2">*</span><span class="ident">response</span> <span class="op">=</span> <span class="ident">ResponseState::Failed</span>;
             }
 
             <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">iter</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">iters</span>.<span class="ident">iter_mut</span>().<span class="ident">enumerate</span>() {
@@ -1133,7 +1134,7 @@
                 <span class="comment">// this peer. There is no need to keep the `closer_peers`</span>
                 <span class="comment">// around, given that they are only passed to the first</span>
                 <span class="comment">// iterator.</span>
-                <span class="kw-2">*</span><span class="ident">response</span> <span class="op">=</span> <span class="ident">ResponseState</span>::<span class="ident">Succeeded</span>;
+                <span class="kw-2">*</span><span class="ident">response</span> <span class="op">=</span> <span class="ident">ResponseState::Succeeded</span>;
             }
 
             <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">iter</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">iters</span>.<span class="ident">iter_mut</span>().<span class="ident">enumerate</span>() {
@@ -1144,7 +1145,7 @@
                     <span class="comment">//</span>
                     <span class="comment">// This iterator never triggered an actual request to the</span>
                     <span class="comment">// given peer - thus ignore the returned boolean.</span>
-                    <span class="ident">iter</span>.<span class="ident">on_success</span>(<span class="ident">peer</span>, <span class="ident">std</span>::<span class="ident">iter</span>::<span class="ident">empty</span>());
+                    <span class="ident">iter</span>.<span class="ident">on_success</span>(<span class="ident">peer</span>, <span class="ident">std::iter::empty</span>());
                 }
             }
         }
@@ -1166,31 +1167,31 @@
 
             <span class="kw">loop</span> {
                 <span class="kw">match</span> <span class="ident">iter</span>.<span class="ident">next</span>(<span class="ident">now</span>) {
-                    <span class="ident">PeersIterState</span>::<span class="ident">Waiting</span>(<span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">PeersIterState::Waiting</span>(<span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> {
                         <span class="kw">match</span> <span class="ident">state</span> {
-                            <span class="prelude-val">Some</span>(<span class="ident">PeersIterState</span>::<span class="ident">Waiting</span>(<span class="prelude-val">Some</span>(<span class="kw">_</span>))) <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="prelude-val">Some</span>(<span class="ident">PeersIterState::Waiting</span>(<span class="prelude-val">Some</span>(<span class="kw">_</span>))) <span class="op">=</span><span class="op">&gt;</span> {
                                 <span class="comment">// [`ClosestDisjointPeersIter::next`] returns immediately once a</span>
                                 <span class="comment">// [`ClosestPeersIter`] yielded a peer. Thus this state is</span>
                                 <span class="comment">// unreachable.</span>
-                                <span class="macro">unreachable</span><span class="macro">!</span>();
+                                <span class="macro">unreachable!</span>();
                             },
-                            <span class="prelude-val">Some</span>(<span class="ident">PeersIterState</span>::<span class="ident">Waiting</span>(<span class="prelude-val">None</span>)) <span class="op">=</span><span class="op">&gt;</span> {}
-                            <span class="prelude-val">Some</span>(<span class="ident">PeersIterState</span>::<span class="ident">WaitingAtCapacity</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="prelude-val">Some</span>(<span class="ident">PeersIterState::Waiting</span>(<span class="prelude-val">None</span>)) <span class="op">=</span><span class="op">&gt;</span> {}
+                            <span class="prelude-val">Some</span>(<span class="ident">PeersIterState::WaitingAtCapacity</span>) <span class="op">=</span><span class="op">&gt;</span> {
                                 <span class="comment">// At least one ClosestPeersIter is no longer at capacity, thus the</span>
                                 <span class="comment">// composite ClosestDisjointPeersIter is no longer at capacity.</span>
-                                <span class="ident">state</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">PeersIterState</span>::<span class="ident">Waiting</span>(<span class="prelude-val">None</span>))
+                                <span class="ident">state</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">PeersIterState::Waiting</span>(<span class="prelude-val">None</span>))
                             }
-                            <span class="prelude-val">Some</span>(<span class="ident">PeersIterState</span>::<span class="ident">Finished</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="prelude-val">Some</span>(<span class="ident">PeersIterState::Finished</span>) <span class="op">=</span><span class="op">&gt;</span> {
                                 <span class="comment">// `state` is never set to `Finished`.</span>
-                                <span class="macro">unreachable</span><span class="macro">!</span>();
+                                <span class="macro">unreachable!</span>();
                             }
-                            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">state</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">PeersIterState</span>::<span class="ident">Waiting</span>(<span class="prelude-val">None</span>)),
+                            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">state</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">PeersIterState::Waiting</span>(<span class="prelude-val">None</span>)),
 
                         };
 
                         <span class="kw">break</span>;
                     }
-                    <span class="ident">PeersIterState</span>::<span class="ident">Waiting</span>(<span class="prelude-val">Some</span>(<span class="ident">peer</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">PeersIterState::Waiting</span>(<span class="prelude-val">Some</span>(<span class="ident">peer</span>)) <span class="op">=</span><span class="op">&gt;</span> {
                         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">contacted_peers</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">peer</span>) {
                             <span class="prelude-val">Some</span>(<span class="ident">PeerState</span>{ <span class="ident">response</span>, .. }) <span class="op">=</span><span class="op">&gt;</span> {
                                 <span class="comment">// Another iterator already contacted this peer.</span>
@@ -1200,15 +1201,15 @@
                                     <span class="comment">// The iterator will be notified later whether the given node</span>
                                     <span class="comment">// was successfully contacted or not. See</span>
                                     <span class="comment">// [`ClosestDisjointPeersIter::on_success`] for details.</span>
-                                    <span class="ident">ResponseState</span>::<span class="ident">Waiting</span> <span class="op">=</span><span class="op">&gt;</span> {},
-                                    <span class="ident">ResponseState</span>::<span class="ident">Succeeded</span> <span class="op">=</span><span class="op">&gt;</span> {
+                                    <span class="ident">ResponseState::Waiting</span> <span class="op">=</span><span class="op">&gt;</span> {},
+                                    <span class="ident">ResponseState::Succeeded</span> <span class="op">=</span><span class="op">&gt;</span> {
                                         <span class="comment">// Given that iterator was not the first to contact the peer</span>
                                         <span class="comment">// it will not be made aware of the closer peers discovered</span>
                                         <span class="comment">// to uphold the S/Kademlia disjoint paths guarantee. See</span>
                                         <span class="comment">// [`ClosestDisjointPeersIter::on_success`] for details.</span>
-                                        <span class="ident">iter</span>.<span class="ident">on_success</span>(<span class="kw-2">&amp;</span><span class="ident">peer</span>, <span class="ident">std</span>::<span class="ident">iter</span>::<span class="ident">empty</span>());
+                                        <span class="ident">iter</span>.<span class="ident">on_success</span>(<span class="kw-2">&amp;</span><span class="ident">peer</span>, <span class="ident">std::iter::empty</span>());
                                     },
-                                    <span class="ident">ResponseState</span>::<span class="ident">Failed</span> <span class="op">=</span><span class="op">&gt;</span> {
+                                    <span class="ident">ResponseState::Failed</span> <span class="op">=</span><span class="op">&gt;</span> {
                                         <span class="ident">iter</span>.<span class="ident">on_failure</span>(<span class="kw-2">&amp;</span><span class="ident">peer</span>);
                                     },
                                 }
@@ -1217,37 +1218,37 @@
                                 <span class="comment">// The iterator is the first to contact this peer.</span>
                                 <span class="self">self</span>.<span class="ident">contacted_peers</span>.<span class="ident">insert</span>(
                                     <span class="ident">peer</span>.<span class="ident">clone</span>().<span class="ident">into_owned</span>(),
-                                    <span class="ident">PeerState</span>::<span class="ident">new</span>(<span class="ident">i</span>),
+                                    <span class="ident">PeerState::new</span>(<span class="ident">i</span>),
                                 );
-                                <span class="kw">return</span> <span class="ident">PeersIterState</span>::<span class="ident">Waiting</span>(<span class="prelude-val">Some</span>(<span class="ident">Cow</span>::<span class="ident">Owned</span>(<span class="ident">peer</span>.<span class="ident">into_owned</span>())));
+                                <span class="kw">return</span> <span class="ident">PeersIterState::Waiting</span>(<span class="prelude-val">Some</span>(<span class="ident">Cow::Owned</span>(<span class="ident">peer</span>.<span class="ident">into_owned</span>())));
                             },
                         }
                     }
-                    <span class="ident">PeersIterState</span>::<span class="ident">WaitingAtCapacity</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">PeersIterState::WaitingAtCapacity</span> <span class="op">=</span><span class="op">&gt;</span> {
                         <span class="kw">match</span> <span class="ident">state</span> {
-                            <span class="prelude-val">Some</span>(<span class="ident">PeersIterState</span>::<span class="ident">Waiting</span>(<span class="prelude-val">Some</span>(<span class="kw">_</span>))) <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="prelude-val">Some</span>(<span class="ident">PeersIterState::Waiting</span>(<span class="prelude-val">Some</span>(<span class="kw">_</span>))) <span class="op">=</span><span class="op">&gt;</span> {
                                 <span class="comment">// [`ClosestDisjointPeersIter::next`] returns immediately once a</span>
                                 <span class="comment">// [`ClosestPeersIter`] yielded a peer. Thus this state is</span>
                                 <span class="comment">// unreachable.</span>
-                                <span class="macro">unreachable</span><span class="macro">!</span>();
+                                <span class="macro">unreachable!</span>();
                             },
-                            <span class="prelude-val">Some</span>(<span class="ident">PeersIterState</span>::<span class="ident">Waiting</span>(<span class="prelude-val">None</span>)) <span class="op">=</span><span class="op">&gt;</span> {}
-                            <span class="prelude-val">Some</span>(<span class="ident">PeersIterState</span>::<span class="ident">WaitingAtCapacity</span>) <span class="op">=</span><span class="op">&gt;</span> {}
-                            <span class="prelude-val">Some</span>(<span class="ident">PeersIterState</span>::<span class="ident">Finished</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="prelude-val">Some</span>(<span class="ident">PeersIterState::Waiting</span>(<span class="prelude-val">None</span>)) <span class="op">=</span><span class="op">&gt;</span> {}
+                            <span class="prelude-val">Some</span>(<span class="ident">PeersIterState::WaitingAtCapacity</span>) <span class="op">=</span><span class="op">&gt;</span> {}
+                            <span class="prelude-val">Some</span>(<span class="ident">PeersIterState::Finished</span>) <span class="op">=</span><span class="op">&gt;</span> {
                                 <span class="comment">// `state` is never set to `Finished`.</span>
-                                <span class="macro">unreachable</span><span class="macro">!</span>();
+                                <span class="macro">unreachable!</span>();
                             },
-                            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">state</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">PeersIterState</span>::<span class="ident">WaitingAtCapacity</span>),
+                            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">state</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">PeersIterState::WaitingAtCapacity</span>),
                         };
 
                         <span class="kw">break</span>;
                     }
-                    <span class="ident">PeersIterState</span>::<span class="ident">Finished</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
+                    <span class="ident">PeersIterState::Finished</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
                 }
             }
         }
 
-        <span class="ident">state</span>.<span class="ident">unwrap_or</span>(<span class="ident">PeersIterState</span>::<span class="ident">Finished</span>)
+        <span class="ident">state</span>.<span class="ident">unwrap_or</span>(<span class="ident">PeersIterState::Finished</span>)
     }
 
     <span class="doccomment">/// Finishes all paths containing one of the given peers.</span>
@@ -1288,9 +1289,9 @@
     <span class="doccomment">///       peers and thus overall returns more than `num_results` peers.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_result</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">PeerId</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">result_per_path</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">iters</span>.<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">iter</span><span class="op">|</span> <span class="ident">iter</span>.<span class="ident">into_result</span>().<span class="ident">map</span>(<span class="ident">Key</span>::<span class="ident">from</span>));
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">iter</span><span class="op">|</span> <span class="ident">iter</span>.<span class="ident">into_result</span>().<span class="ident">map</span>(<span class="ident">Key::from</span>));
 
-        <span class="ident">ResultIter</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">target</span>, <span class="ident">result_per_path</span>).<span class="ident">map</span>(<span class="ident">Key</span>::<span class="ident">into_preimage</span>)
+        <span class="ident">ResultIter::new</span>(<span class="self">self</span>.<span class="ident">target</span>, <span class="ident">result_per_path</span>).<span class="ident">map</span>(<span class="ident">Key::into_preimage</span>)
     }
 }
 
@@ -1301,13 +1302,13 @@
 <span class="kw">impl</span> <span class="ident">Index</span><span class="op">&lt;</span><span class="ident">IteratorIndex</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ClosestPeersIter</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">ClosestPeersIter</span>;
 
-    <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">IteratorIndex</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Output</span> {
+    <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">IteratorIndex</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="self">Self</span><span class="ident">::Output</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>[<span class="ident">index</span>.<span class="number">0</span>]
     }
 }
 
 <span class="kw">impl</span> <span class="ident">IndexMut</span><span class="op">&lt;</span><span class="ident">IteratorIndex</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ClosestPeersIter</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">index_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">IteratorIndex</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>::<span class="ident">Output</span> {
+    <span class="kw">fn</span> <span class="ident">index_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">IteratorIndex</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="ident">::Output</span> {
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>[<span class="ident">index</span>.<span class="number">0</span>]
     }
 }
@@ -1328,7 +1329,7 @@
     <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">initiated_by</span>: <span class="ident">IteratorIndex</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="ident">PeerState</span> {
             <span class="ident">initiated_by</span>,
-            <span class="ident">response</span>: <span class="ident">ResponseState</span>::<span class="ident">Waiting</span>,
+            <span class="ident">response</span>: <span class="ident">ResponseState::Waiting</span>,
         }
     }
 }
@@ -1356,21 +1357,21 @@
     <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">target</span>: <span class="ident">KeyBytes</span>, <span class="ident">iters</span>: <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">I</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="ident">ResultIter</span>{
             <span class="ident">target</span>,
-            <span class="ident">iters</span>: <span class="ident">iters</span>.<span class="ident">map</span>(<span class="ident">Iterator</span>::<span class="ident">peekable</span>).<span class="ident">collect</span>(),
+            <span class="ident">iters</span>: <span class="ident">iters</span>.<span class="ident">map</span>(<span class="ident">Iterator::peekable</span>).<span class="ident">collect</span>(),
         }
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Key</span><span class="op">&lt;</span><span class="ident">PeerId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">ResultIter</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">I</span>::<span class="ident">Item</span>;
+    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">I::Item</span>;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Item</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">target</span>;
 
         <span class="self">self</span>.<span class="ident">iters</span>.<span class="ident">iter_mut</span>()
             <span class="comment">// Find the iterator with the next closest peer.</span>
             .<span class="ident">fold</span>(
-                <span class="prelude-ty">Option</span>::<span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Peekable</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>::<span class="prelude-val">None</span>,
+                <span class="prelude-ty">Option</span>::<span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Peekable</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::None</span>,
                 <span class="op">|</span><span class="ident">iter_a</span>, <span class="ident">iter_b</span><span class="op">|</span> {
                     <span class="kw">let</span> <span class="ident">iter_a</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">iter_a</span> {
                         <span class="prelude-val">Some</span>(<span class="ident">iter_a</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">iter_a</span>,
@@ -1398,7 +1399,7 @@
                 },
             )
             <span class="comment">// Pop off the next closest peer from that iterator.</span>
-            .<span class="ident">and_then</span>(<span class="ident">Iterator</span>::<span class="ident">next</span>)
+            .<span class="ident">and_then</span>(<span class="ident">Iterator::next</span>)
     }
 }
 
@@ -1406,15 +1407,16 @@
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">K_VALUE</span>;
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::K_VALUE</span>;
+    <span class="kw">use</span> <span class="ident">libp2p_core::multihash</span>::{<span class="ident">Code</span>, <span class="ident">Multihash</span>};
     <span class="kw">use</span> <span class="ident">quickcheck</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">rand</span>::{<span class="ident">Rng</span>, <span class="ident">seq</span>::<span class="ident">SliceRandom</span>};
-    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashSet</span>;
-    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">iter</span>;
+    <span class="kw">use</span> <span class="ident">rand</span>::{<span class="ident">Rng</span>, <span class="ident">seq::SliceRandom</span>};
+    <span class="kw">use</span> <span class="ident">std::collections::HashSet</span>;
+    <span class="kw">use</span> <span class="ident">std::iter</span>;
 
-    <span class="kw">impl</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">ResultIter</span><span class="op">&lt;</span><span class="ident">std</span>::<span class="ident">vec</span>::<span class="ident">IntoIter</span><span class="op">&lt;</span><span class="ident">Key</span><span class="op">&lt;</span><span class="ident">PeerId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">impl</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">ResultIter</span><span class="op">&lt;</span><span class="ident">std::vec::IntoIter</span><span class="op">&lt;</span><span class="ident">Key</span><span class="op">&lt;</span><span class="ident">PeerId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-            <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="ident">Target</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>).<span class="number">0</span>;
+            <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="ident">Target::arbitrary</span>(<span class="ident">g</span>).<span class="number">0</span>;
             <span class="kw">let</span> <span class="ident">num_closest_iters</span> <span class="op">=</span> <span class="ident">g</span>.<span class="ident">gen_range</span>(<span class="number">0</span>, <span class="number">20</span> <span class="op">+</span> <span class="number">1</span>);
             <span class="kw">let</span> <span class="ident">peers</span> <span class="op">=</span> <span class="ident">random_peers</span>(
                 <span class="ident">g</span>.<span class="ident">gen_range</span>(<span class="number">0</span>, <span class="number">20</span> <span class="op">*</span> <span class="ident">num_closest_iters</span> <span class="op">+</span> <span class="number">1</span>),
@@ -1426,7 +1428,7 @@
                     <span class="kw">let</span> <span class="ident">num_peers</span> <span class="op">=</span> <span class="ident">g</span>.<span class="ident">gen_range</span>(<span class="number">0</span>, <span class="number">20</span> <span class="op">+</span> <span class="number">1</span>);
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">peers</span> <span class="op">=</span> <span class="ident">peers</span>.<span class="ident">choose_multiple</span>(<span class="ident">g</span>, <span class="ident">num_peers</span>)
                         .<span class="ident">cloned</span>()
-                        .<span class="ident">map</span>(<span class="ident">Key</span>::<span class="ident">from</span>)
+                        .<span class="ident">map</span>(<span class="ident">Key::from</span>)
                         .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
                     <span class="ident">peers</span>.<span class="ident">sort_unstable_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> {
@@ -1437,10 +1439,10 @@
                 })
                 .<span class="ident">collect</span>();
 
-            <span class="ident">ResultIter</span>::<span class="ident">new</span>(<span class="ident">target</span>, <span class="ident">iters</span>.<span class="ident">into_iter</span>())
+            <span class="ident">ResultIter::new</span>(<span class="ident">target</span>, <span class="ident">iters</span>.<span class="ident">into_iter</span>())
         }
 
-        <span class="kw">fn</span> <span class="ident">shrink</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">shrink</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">peers</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">iters</span>
                 .<span class="ident">clone</span>()
                 .<span class="ident">into_iter</span>()
@@ -1454,7 +1456,7 @@
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">iter</span><span class="op">|</span> <span class="ident">iter</span>.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>())
                 .<span class="ident">collect</span>();
 
-            <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">ResultIterShrinker</span> {
+            <span class="ident">Box::new</span>(<span class="ident">ResultIterShrinker</span> {
                 <span class="ident">target</span>: <span class="self">self</span>.<span class="ident">target</span>.<span class="ident">clone</span>(),
                 <span class="ident">peers</span>,
                 <span class="ident">iters</span>,
@@ -1469,11 +1471,11 @@
     }
 
     <span class="kw">impl</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">ResultIterShrinker</span> {
-        <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">ResultIter</span><span class="op">&lt;</span><span class="ident">std</span>::<span class="ident">vec</span>::<span class="ident">IntoIter</span><span class="op">&lt;</span><span class="ident">Key</span><span class="op">&lt;</span><span class="ident">PeerId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+        <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">ResultIter</span><span class="op">&lt;</span><span class="ident">std::vec::IntoIter</span><span class="op">&lt;</span><span class="ident">Key</span><span class="op">&lt;</span><span class="ident">PeerId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
         <span class="doccomment">/// Return an iterator of [`ResultIter`]s with each of them missing a</span>
         <span class="doccomment">/// different peer from the original set.</span>
-        <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Item</span><span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Item</span><span class="op">&gt;</span> {
             <span class="comment">// The peer that should not be included.</span>
             <span class="kw">let</span> <span class="ident">peer</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">peers</span>.<span class="ident">pop</span>()<span class="question-mark">?</span>;
 
@@ -1486,7 +1488,7 @@
                     <span class="prelude-val">Some</span>(<span class="ident">iter</span>.<span class="ident">into_iter</span>())
                 }).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
-            <span class="prelude-val">Some</span>(<span class="ident">ResultIter</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">target</span>.<span class="ident">clone</span>(), <span class="ident">iters</span>.<span class="ident">into_iter</span>()))
+            <span class="prelude-val">Some</span>(<span class="ident">ResultIter::new</span>(<span class="self">self</span>.<span class="ident">target</span>.<span class="ident">clone</span>(), <span class="ident">iters</span>.<span class="ident">into_iter</span>()))
         }
     }
 
@@ -1495,19 +1497,19 @@
 
     <span class="kw">impl</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">Target</span> {
         <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-            <span class="ident">Target</span>(<span class="ident">Key</span>::<span class="ident">from</span>(<span class="ident">random_peers</span>(<span class="number">1</span>, <span class="ident">g</span>).<span class="ident">pop</span>().<span class="ident">unwrap</span>()).<span class="ident">into</span>())
+            <span class="ident">Target</span>(<span class="ident">Key::from</span>(<span class="ident">random_peers</span>(<span class="number">1</span>, <span class="ident">g</span>).<span class="ident">pop</span>().<span class="ident">unwrap</span>()).<span class="ident">into</span>())
         }
     }
 
     <span class="kw">fn</span> <span class="ident">random_peers</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Rng</span><span class="op">&gt;</span>(<span class="ident">n</span>: <span class="ident">usize</span>, <span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PeerId</span><span class="op">&gt;</span> {
-        (<span class="number">0</span> .. <span class="ident">n</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">PeerId</span>::<span class="ident">from_multihash</span>(
-            <span class="ident">multihash</span>::<span class="ident">wrap</span>(<span class="ident">multihash</span>::<span class="ident">Code</span>::<span class="ident">Sha2_256</span>, <span class="kw-2">&amp;</span><span class="ident">g</span>.<span class="ident">gen</span>::<span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span>())
+        (<span class="number">0</span> .. <span class="ident">n</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">PeerId::from_multihash</span>(
+            <span class="ident">Multihash::wrap</span>(<span class="ident">Code::Sha2_256</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="ident">g</span>.<span class="ident">gen</span>::<span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span>()).<span class="ident">unwrap</span>()
         ).<span class="ident">unwrap</span>()).<span class="ident">collect</span>()
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">result_iter_returns_deduplicated_ordered_peer_id_stream</span>() {
-        <span class="kw">fn</span> <span class="ident">prop</span>(<span class="ident">result_iter</span>: <span class="ident">ResultIter</span><span class="op">&lt;</span><span class="ident">std</span>::<span class="ident">vec</span>::<span class="ident">IntoIter</span><span class="op">&lt;</span><span class="ident">Key</span><span class="op">&lt;</span><span class="ident">PeerId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
+        <span class="kw">fn</span> <span class="ident">prop</span>(<span class="ident">result_iter</span>: <span class="ident">ResultIter</span><span class="op">&lt;</span><span class="ident">std::vec::IntoIter</span><span class="op">&lt;</span><span class="ident">Key</span><span class="op">&lt;</span><span class="ident">PeerId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
             <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">deduplicated</span> <span class="op">=</span> <span class="ident">result_iter</span>.<span class="ident">clone</span>()
                     .<span class="ident">iters</span>
@@ -1515,7 +1517,7 @@
                     .<span class="ident">flatten</span>()
                     .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
                     .<span class="ident">into_iter</span>()
-                    .<span class="ident">map</span>(<span class="ident">Key</span>::<span class="ident">from</span>)
+                    .<span class="ident">map</span>(<span class="ident">Key::from</span>)
                     .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
                 <span class="ident">deduplicated</span>.<span class="ident">sort_unstable_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> {
@@ -1525,10 +1527,10 @@
                 <span class="ident">deduplicated</span>
             };
 
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">expected</span>, <span class="ident">result_iter</span>.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>());
+            <span class="macro">assert_eq!</span>(<span class="ident">expected</span>, <span class="ident">result_iter</span>.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>());
         }
 
-        <span class="ident">QuickCheck</span>::<span class="ident">new</span>().<span class="ident">quickcheck</span>(<span class="ident">prop</span> <span class="kw">as</span> <span class="kw">fn</span>(<span class="kw">_</span>))
+        <span class="ident">QuickCheck::new</span>().<span class="ident">quickcheck</span>(<span class="ident">prop</span> <span class="kw">as</span> <span class="kw">fn</span>(<span class="kw">_</span>))
     }
 
     <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
@@ -1536,7 +1538,7 @@
 
     <span class="kw">impl</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">Parallelism</span>{
         <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-            <span class="ident">Parallelism</span>(<span class="ident">NonZeroUsize</span>::<span class="ident">new</span>(<span class="ident">g</span>.<span class="ident">gen_range</span>(<span class="number">1</span>, <span class="number">10</span>)).<span class="ident">unwrap</span>())
+            <span class="ident">Parallelism</span>(<span class="ident">NonZeroUsize::new</span>(<span class="ident">g</span>.<span class="ident">gen_range</span>(<span class="number">1</span>, <span class="number">10</span>)).<span class="ident">unwrap</span>())
         }
     }
 
@@ -1545,16 +1547,16 @@
 
     <span class="kw">impl</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">NumResults</span>{
         <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-            <span class="ident">NumResults</span>(<span class="ident">NonZeroUsize</span>::<span class="ident">new</span>(<span class="ident">g</span>.<span class="ident">gen_range</span>(<span class="number">1</span>, <span class="ident">K_VALUE</span>.<span class="ident">get</span>())).<span class="ident">unwrap</span>())
+            <span class="ident">NumResults</span>(<span class="ident">NonZeroUsize::new</span>(<span class="ident">g</span>.<span class="ident">gen_range</span>(<span class="number">1</span>, <span class="ident">K_VALUE</span>.<span class="ident">get</span>())).<span class="ident">unwrap</span>())
         }
     }
 
     <span class="kw">impl</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">ClosestPeersIterConfig</span> {
         <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
             <span class="ident">ClosestPeersIterConfig</span> {
-                <span class="ident">parallelism</span>: <span class="ident">Parallelism</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>).<span class="number">0</span>,
-                <span class="ident">num_results</span>: <span class="ident">NumResults</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>).<span class="number">0</span>,
-                <span class="ident">peer_timeout</span>: <span class="ident">Duration</span>::<span class="ident">from_secs</span>(<span class="number">1</span>),
+                <span class="ident">parallelism</span>: <span class="ident">Parallelism::arbitrary</span>(<span class="ident">g</span>).<span class="number">0</span>,
+                <span class="ident">num_results</span>: <span class="ident">NumResults::arbitrary</span>(<span class="ident">g</span>).<span class="number">0</span>,
+                <span class="ident">peer_timeout</span>: <span class="ident">Duration::from_secs</span>(<span class="number">1</span>),
             }
         }
     }
@@ -1566,8 +1568,8 @@
         <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
             <span class="ident">PeerVec</span>(
                 (<span class="number">0</span>..<span class="ident">g</span>.<span class="ident">gen_range</span>(<span class="number">1</span>, <span class="number">60</span>))
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">PeerId</span>::<span class="ident">random</span>())
-                    .<span class="ident">map</span>(<span class="ident">Key</span>::<span class="ident">from</span>)
+                    .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">PeerId::random</span>())
+                    .<span class="ident">map</span>(<span class="ident">Key::from</span>)
                     .<span class="ident">collect</span>(),
             )
         }
@@ -1575,11 +1577,11 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">s_kademlia_disjoint_paths</span>() {
-        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Instant</span>::<span class="ident">now</span>();
-        <span class="kw">let</span> <span class="ident">target</span>: <span class="ident">KeyBytes</span> <span class="op">=</span> <span class="ident">Key</span>::<span class="ident">from</span>(<span class="ident">PeerId</span>::<span class="ident">random</span>()).<span class="ident">into</span>();
+        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
+        <span class="kw">let</span> <span class="ident">target</span>: <span class="ident">KeyBytes</span> <span class="op">=</span> <span class="ident">Key::from</span>(<span class="ident">PeerId::random</span>()).<span class="ident">into</span>();
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pool</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">12</span>].<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Key</span>::<span class="ident">from</span>(<span class="ident">PeerId</span>::<span class="ident">random</span>()))
+            .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Key::from</span>(<span class="ident">PeerId::random</span>()))
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
         <span class="ident">pool</span>.<span class="ident">sort_unstable_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> {
@@ -1589,12 +1591,12 @@
         <span class="kw">let</span> <span class="ident">known_closest_peers</span> <span class="op">=</span> <span class="ident">pool</span>.<span class="ident">split_off</span>(<span class="ident">pool</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">3</span>);
 
         <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">ClosestPeersIterConfig</span> {
-            <span class="ident">parallelism</span>: <span class="ident">NonZeroUsize</span>::<span class="ident">new</span>(<span class="number">3</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">num_results</span>: <span class="ident">NonZeroUsize</span>::<span class="ident">new</span>(<span class="number">3</span>).<span class="ident">unwrap</span>(),
-            ..<span class="ident">ClosestPeersIterConfig</span>::<span class="ident">default</span>()
+            <span class="ident">parallelism</span>: <span class="ident">NonZeroUsize::new</span>(<span class="number">3</span>).<span class="ident">unwrap</span>(),
+            <span class="ident">num_results</span>: <span class="ident">NonZeroUsize::new</span>(<span class="number">3</span>).<span class="ident">unwrap</span>(),
+            ..<span class="ident">ClosestPeersIterConfig::default</span>()
         };
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">peers_iter</span> <span class="op">=</span> <span class="ident">ClosestDisjointPeersIter</span>::<span class="ident">with_config</span>(
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">peers_iter</span> <span class="op">=</span> <span class="ident">ClosestDisjointPeersIter::with_config</span>(
             <span class="ident">config</span>.<span class="ident">clone</span>(),
             <span class="ident">target</span>,
             <span class="ident">known_closest_peers</span>.<span class="ident">clone</span>(),
@@ -1604,15 +1606,15 @@
         <span class="comment">// First round.</span>
 
         <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">3</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">PeersIterState</span>::<span class="ident">Waiting</span>(<span class="prelude-val">Some</span>(<span class="ident">Cow</span>::<span class="ident">Owned</span>(<span class="ident">peer</span>))) <span class="op">=</span> <span class="ident">peers_iter</span>.<span class="ident">next</span>(<span class="ident">now</span>) {
-                <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">known_closest_peers</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">Key</span>::<span class="ident">from</span>(<span class="ident">peer</span>)));
+            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">PeersIterState::Waiting</span>(<span class="prelude-val">Some</span>(<span class="ident">Cow::Owned</span>(<span class="ident">peer</span>))) <span class="op">=</span> <span class="ident">peers_iter</span>.<span class="ident">next</span>(<span class="ident">now</span>) {
+                <span class="macro">assert!</span>(<span class="ident">known_closest_peers</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">Key::from</span>(<span class="ident">peer</span>)));
             } <span class="kw">else</span> {
-                <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Expected iterator to return peer to query.&quot;</span>);
+                <span class="macro">panic!</span>(<span class="string">&quot;Expected iterator to return peer to query.&quot;</span>);
             }
         }
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
-            <span class="ident">PeersIterState</span>::<span class="ident">WaitingAtCapacity</span>,
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">PeersIterState::WaitingAtCapacity</span>,
             <span class="ident">peers_iter</span>.<span class="ident">next</span>(<span class="ident">now</span>),
         );
 
@@ -1643,35 +1645,35 @@
         <span class="comment">////////////////////////////////////////////////////////////////////////</span>
         <span class="comment">// Second round.</span>
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">next_to_query</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[];
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">next_to_query</span> <span class="op">=</span> <span class="macro">vec!</span>[];
         <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">3</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">PeersIterState</span>::<span class="ident">Waiting</span>(<span class="prelude-val">Some</span>(<span class="ident">Cow</span>::<span class="ident">Owned</span>(<span class="ident">peer</span>))) <span class="op">=</span> <span class="ident">peers_iter</span>.<span class="ident">next</span>(<span class="ident">now</span>) {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">PeersIterState::Waiting</span>(<span class="prelude-val">Some</span>(<span class="ident">Cow::Owned</span>(<span class="ident">peer</span>))) <span class="op">=</span> <span class="ident">peers_iter</span>.<span class="ident">next</span>(<span class="ident">now</span>) {
                 <span class="ident">next_to_query</span>.<span class="ident">push</span>(<span class="ident">peer</span>)
             } <span class="kw">else</span> {
-                <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Expected iterator to return peer to query.&quot;</span>);
+                <span class="macro">panic!</span>(<span class="string">&quot;Expected iterator to return peer to query.&quot;</span>);
             }
         };
 
         <span class="comment">// Expect a peer from each disjoint path.</span>
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">next_to_query</span>.<span class="ident">contains</span>(<span class="ident">malicious_response_1</span>[<span class="number">0</span>].<span class="ident">preimage</span>()));
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">next_to_query</span>.<span class="ident">contains</span>(<span class="ident">response_2</span>[<span class="number">0</span>].<span class="ident">preimage</span>()));
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">next_to_query</span>.<span class="ident">contains</span>(<span class="ident">response_3</span>[<span class="number">0</span>].<span class="ident">preimage</span>()));
+        <span class="macro">assert!</span>(<span class="ident">next_to_query</span>.<span class="ident">contains</span>(<span class="ident">malicious_response_1</span>[<span class="number">0</span>].<span class="ident">preimage</span>()));
+        <span class="macro">assert!</span>(<span class="ident">next_to_query</span>.<span class="ident">contains</span>(<span class="ident">response_2</span>[<span class="number">0</span>].<span class="ident">preimage</span>()));
+        <span class="macro">assert!</span>(<span class="ident">next_to_query</span>.<span class="ident">contains</span>(<span class="ident">response_3</span>[<span class="number">0</span>].<span class="ident">preimage</span>()));
 
         <span class="kw">for</span> <span class="ident">peer</span> <span class="kw">in</span> <span class="ident">next_to_query</span> {
-            <span class="ident">peers_iter</span>.<span class="ident">on_success</span>(<span class="kw-2">&amp;</span><span class="ident">peer</span>, <span class="macro">vec</span><span class="macro">!</span>[]);
+            <span class="ident">peers_iter</span>.<span class="ident">on_success</span>(<span class="kw-2">&amp;</span><span class="ident">peer</span>, <span class="macro">vec!</span>[]);
         }
 
         <span class="comment">// Mark all remaining peers as succeeded.</span>
         <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">6</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">PeersIterState</span>::<span class="ident">Waiting</span>(<span class="prelude-val">Some</span>(<span class="ident">Cow</span>::<span class="ident">Owned</span>(<span class="ident">peer</span>))) <span class="op">=</span> <span class="ident">peers_iter</span>.<span class="ident">next</span>(<span class="ident">now</span>) {
-                <span class="ident">peers_iter</span>.<span class="ident">on_success</span>(<span class="kw-2">&amp;</span><span class="ident">peer</span>, <span class="macro">vec</span><span class="macro">!</span>[]);
+            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">PeersIterState::Waiting</span>(<span class="prelude-val">Some</span>(<span class="ident">Cow::Owned</span>(<span class="ident">peer</span>))) <span class="op">=</span> <span class="ident">peers_iter</span>.<span class="ident">next</span>(<span class="ident">now</span>) {
+                <span class="ident">peers_iter</span>.<span class="ident">on_success</span>(<span class="kw-2">&amp;</span><span class="ident">peer</span>, <span class="macro">vec!</span>[]);
             } <span class="kw">else</span> {
-                <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Expected iterator to return peer to query.&quot;</span>);
+                <span class="macro">panic!</span>(<span class="string">&quot;Expected iterator to return peer to query.&quot;</span>);
             }
         }
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
-            <span class="ident">PeersIterState</span>::<span class="ident">Finished</span>,
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">PeersIterState::Finished</span>,
             <span class="ident">peers_iter</span>.<span class="ident">next</span>(<span class="ident">now</span>),
         );
 
@@ -1679,16 +1681,16 @@
 
         <span class="comment">// Expect final result to contain peer from each disjoint path, even</span>
         <span class="comment">// though not all are among the best ones.</span>
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">final_peers</span>.<span class="ident">contains</span>(<span class="ident">malicious_response_1</span>[<span class="number">0</span>].<span class="ident">preimage</span>()));
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">final_peers</span>.<span class="ident">contains</span>(<span class="ident">response_2</span>[<span class="number">0</span>].<span class="ident">preimage</span>()));
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">final_peers</span>.<span class="ident">contains</span>(<span class="ident">response_3</span>[<span class="number">0</span>].<span class="ident">preimage</span>()));
+        <span class="macro">assert!</span>(<span class="ident">final_peers</span>.<span class="ident">contains</span>(<span class="ident">malicious_response_1</span>[<span class="number">0</span>].<span class="ident">preimage</span>()));
+        <span class="macro">assert!</span>(<span class="ident">final_peers</span>.<span class="ident">contains</span>(<span class="ident">response_2</span>[<span class="number">0</span>].<span class="ident">preimage</span>()));
+        <span class="macro">assert!</span>(<span class="ident">final_peers</span>.<span class="ident">contains</span>(<span class="ident">response_3</span>[<span class="number">0</span>].<span class="ident">preimage</span>()));
     }
 
     <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
     <span class="kw">struct</span> <span class="ident">Graph</span>(<span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">PeerId</span>, <span class="ident">Peer</span><span class="op">&gt;</span>);
 
-    <span class="kw">impl</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Graph</span> {
-        <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+    <span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">Graph</span> {
+        <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
             <span class="ident">fmt</span>.<span class="ident">debug_list</span>().<span class="ident">entries</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">id</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">id</span>)).<span class="ident">finish</span>()
         }
     }
@@ -1697,7 +1699,7 @@
         <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">peer_ids</span> <span class="op">=</span> <span class="ident">random_peers</span>(<span class="ident">g</span>.<span class="ident">gen_range</span>(<span class="ident">K_VALUE</span>.<span class="ident">get</span>(), <span class="number">200</span>), <span class="ident">g</span>)
                 .<span class="ident">into_iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">peer_id</span><span class="op">|</span> (<span class="ident">peer_id</span>.<span class="ident">clone</span>(), <span class="ident">Key</span>::<span class="ident">from</span>(<span class="ident">peer_id</span>)))
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">peer_id</span><span class="op">|</span> (<span class="ident">peer_id</span>.<span class="ident">clone</span>(), <span class="ident">Key::from</span>(<span class="ident">peer_id</span>)))
                 .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
             <span class="comment">// Make each peer aware of its direct neighborhood.</span>
@@ -1707,7 +1709,7 @@
                         <span class="ident">key</span>.<span class="ident">distance</span>(<span class="ident">a</span>).<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>.<span class="ident">distance</span>(<span class="ident">b</span>))
                     });
 
-                    <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">peer_id</span>, <span class="ident">peer_ids</span>[<span class="number">0</span>].<span class="number">0</span>);
+                    <span class="macro">assert_eq!</span>(<span class="ident">peer_id</span>, <span class="ident">peer_ids</span>[<span class="number">0</span>].<span class="number">0</span>);
 
                     <span class="kw">let</span> <span class="ident">known_peers</span> <span class="op">=</span> <span class="ident">peer_ids</span>.<span class="ident">iter</span>()
                         <span class="comment">// Skip itself.</span>
@@ -1732,7 +1734,7 @@
                     .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
                 <span class="ident">peer</span>.<span class="ident">known_peers</span>.<span class="ident">append</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">random_peer_ids</span>);
-                <span class="ident">peer</span>.<span class="ident">known_peers</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">replace</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">peer</span>.<span class="ident">known_peers</span>, <span class="macro">vec</span><span class="macro">!</span>[])
+                <span class="ident">peer</span>.<span class="ident">known_peers</span> <span class="op">=</span> <span class="ident">std::mem::replace</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">peer</span>.<span class="ident">known_peers</span>, <span class="macro">vec!</span>[])
                     <span class="comment">// Deduplicate peer ids.</span>
                     .<span class="ident">into_iter</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="ident">into_iter</span>().<span class="ident">collect</span>();
             }
@@ -1744,7 +1746,7 @@
     <span class="kw">impl</span> <span class="ident">Graph</span> {
         <span class="kw">fn</span> <span class="ident">get_closest_peer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">target</span>: <span class="kw-2">&amp;</span><span class="ident">KeyBytes</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PeerId</span> {
             <span class="self">self</span>.<span class="number">0</span>.<span class="ident">iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">peer_id</span>, <span class="kw">_</span>)<span class="op">|</span> (<span class="ident">target</span>.<span class="ident">distance</span>(<span class="kw-2">&amp;</span><span class="ident">Key</span>::<span class="ident">new</span>(<span class="ident">peer_id</span>.<span class="ident">clone</span>())), <span class="ident">peer_id</span>))
+                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">peer_id</span>, <span class="kw">_</span>)<span class="op">|</span> (<span class="ident">target</span>.<span class="ident">distance</span>(<span class="kw-2">&amp;</span><span class="ident">Key::from</span>(<span class="kw-2">*</span><span class="ident">peer_id</span>)), <span class="ident">peer_id</span>))
                 .<span class="ident">fold</span>(<span class="prelude-val">None</span>, <span class="op">|</span><span class="ident">acc</span>, (<span class="ident">distance_b</span>, <span class="ident">peer_id_b</span>)<span class="op">|</span> {
                     <span class="kw">match</span> <span class="ident">acc</span> {
                         <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>((<span class="ident">distance_b</span>, <span class="ident">peer_id_b</span>)),
@@ -1784,22 +1786,22 @@
     <span class="kw">impl</span> <span class="ident">PeerIterator</span> {
         <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">now</span>: <span class="ident">Instant</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PeersIterState</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
             <span class="kw">match</span> <span class="self">self</span> {
-                <span class="ident">PeerIterator</span>::<span class="ident">Disjoint</span>(<span class="ident">iter</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">iter</span>.<span class="ident">next</span>(<span class="ident">now</span>),
-                <span class="ident">PeerIterator</span>::<span class="ident">Closest</span>(<span class="ident">iter</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">iter</span>.<span class="ident">next</span>(<span class="ident">now</span>),
+                <span class="ident">PeerIterator::Disjoint</span>(<span class="ident">iter</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">iter</span>.<span class="ident">next</span>(<span class="ident">now</span>),
+                <span class="ident">PeerIterator::Closest</span>(<span class="ident">iter</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">iter</span>.<span class="ident">next</span>(<span class="ident">now</span>),
             }
         }
 
         <span class="kw">fn</span> <span class="ident">on_success</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">peer</span>: <span class="kw-2">&amp;</span><span class="ident">PeerId</span>, <span class="ident">closer_peers</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PeerId</span><span class="op">&gt;</span>) {
             <span class="kw">match</span> <span class="self">self</span> {
-                <span class="ident">PeerIterator</span>::<span class="ident">Disjoint</span>(<span class="ident">iter</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">iter</span>.<span class="ident">on_success</span>(<span class="ident">peer</span>, <span class="ident">closer_peers</span>),
-                <span class="ident">PeerIterator</span>::<span class="ident">Closest</span>(<span class="ident">iter</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">iter</span>.<span class="ident">on_success</span>(<span class="ident">peer</span>, <span class="ident">closer_peers</span>),
+                <span class="ident">PeerIterator::Disjoint</span>(<span class="ident">iter</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">iter</span>.<span class="ident">on_success</span>(<span class="ident">peer</span>, <span class="ident">closer_peers</span>),
+                <span class="ident">PeerIterator::Closest</span>(<span class="ident">iter</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">iter</span>.<span class="ident">on_success</span>(<span class="ident">peer</span>, <span class="ident">closer_peers</span>),
             };
         }
 
         <span class="kw">fn</span> <span class="ident">into_result</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PeerId</span><span class="op">&gt;</span> {
             <span class="kw">match</span> <span class="self">self</span> {
-                <span class="ident">PeerIterator</span>::<span class="ident">Disjoint</span>(<span class="ident">iter</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">iter</span>.<span class="ident">into_result</span>().<span class="ident">collect</span>(),
-                <span class="ident">PeerIterator</span>::<span class="ident">Closest</span>(<span class="ident">iter</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">iter</span>.<span class="ident">into_result</span>().<span class="ident">collect</span>(),
+                <span class="ident">PeerIterator::Disjoint</span>(<span class="ident">iter</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">iter</span>.<span class="ident">into_result</span>().<span class="ident">collect</span>(),
+                <span class="ident">PeerIterator::Closest</span>(<span class="ident">iter</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">iter</span>.<span class="ident">into_result</span>().<span class="ident">collect</span>(),
             }
         }
     }
@@ -1814,7 +1816,7 @@
             <span class="ident">num_results</span>: <span class="ident">NumResults</span>,
         ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TestResult</span> {
             <span class="kw">if</span> <span class="ident">parallelism</span>.<span class="number">0</span> <span class="op">&gt;</span> <span class="ident">num_results</span>.<span class="number">0</span> {
-                <span class="kw">return</span> <span class="ident">TestResult</span>::<span class="ident">discard</span>();
+                <span class="kw">return</span> <span class="ident">TestResult::discard</span>();
             }
 
             <span class="kw">let</span> <span class="ident">target</span>: <span class="ident">KeyBytes</span> <span class="op">=</span> <span class="ident">target</span>.<span class="number">0</span>;
@@ -1822,7 +1824,7 @@
 
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">known_closest_peers</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="number">0</span>.<span class="ident">iter</span>()
                 .<span class="ident">take</span>(<span class="ident">K_VALUE</span>.<span class="ident">get</span>())
-                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">key</span>, <span class="ident">_peers</span>)<span class="op">|</span> <span class="ident">Key</span>::<span class="ident">new</span>(<span class="ident">key</span>.<span class="ident">clone</span>()))
+                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">key</span>, <span class="ident">_peers</span>)<span class="op">|</span> <span class="ident">Key::from</span>(<span class="kw-2">*</span><span class="ident">key</span>))
                 .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
             <span class="ident">known_closest_peers</span>.<span class="ident">sort_unstable_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> {
                 <span class="ident">target</span>.<span class="ident">distance</span>(<span class="ident">a</span>).<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">target</span>.<span class="ident">distance</span>(<span class="ident">b</span>))
@@ -1831,11 +1833,11 @@
             <span class="kw">let</span> <span class="ident">cfg</span> <span class="op">=</span> <span class="ident">ClosestPeersIterConfig</span>{
                 <span class="ident">parallelism</span>: <span class="ident">parallelism</span>.<span class="number">0</span>,
                 <span class="ident">num_results</span>: <span class="ident">num_results</span>.<span class="number">0</span>,
-                ..<span class="ident">ClosestPeersIterConfig</span>::<span class="ident">default</span>()
+                ..<span class="ident">ClosestPeersIterConfig::default</span>()
             };
 
             <span class="kw">let</span> <span class="ident">closest</span> <span class="op">=</span> <span class="ident">drive_to_finish</span>(
-                <span class="ident">PeerIterator</span>::<span class="ident">Closest</span>(<span class="ident">ClosestPeersIter</span>::<span class="ident">with_config</span>(
+                <span class="ident">PeerIterator::Closest</span>(<span class="ident">ClosestPeersIter::with_config</span>(
                     <span class="ident">cfg</span>.<span class="ident">clone</span>(),
                     <span class="ident">target</span>.<span class="ident">clone</span>(),
                     <span class="ident">known_closest_peers</span>.<span class="ident">clone</span>(),
@@ -1845,7 +1847,7 @@
             );
 
             <span class="kw">let</span> <span class="ident">disjoint</span> <span class="op">=</span> <span class="ident">drive_to_finish</span>(
-                <span class="ident">PeerIterator</span>::<span class="ident">Disjoint</span>(<span class="ident">ClosestDisjointPeersIter</span>::<span class="ident">with_config</span>(
+                <span class="ident">PeerIterator::Disjoint</span>(<span class="ident">ClosestDisjointPeersIter::with_config</span>(
                     <span class="ident">cfg</span>,
                     <span class="ident">target</span>.<span class="ident">clone</span>(),
                     <span class="ident">known_closest_peers</span>.<span class="ident">clone</span>(),
@@ -1854,21 +1856,21 @@
                 <span class="kw-2">&amp;</span><span class="ident">target</span>,
             );
 
-            <span class="macro">assert</span><span class="macro">!</span>(
+            <span class="macro">assert!</span>(
                 <span class="ident">closest</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">closest_peer</span>),
                 <span class="string">&quot;Expected `ClosestPeersIter` to find closest peer.&quot;</span>,
             );
-            <span class="macro">assert</span><span class="macro">!</span>(
+            <span class="macro">assert!</span>(
                 <span class="ident">disjoint</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">closest_peer</span>),
                 <span class="string">&quot;Expected `ClosestDisjointPeersIter` to find closest peer.&quot;</span>,
             );
 
-            <span class="macro">assert</span><span class="macro">!</span>(
+            <span class="macro">assert!</span>(
                 <span class="ident">closest</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">num_results</span>.<span class="number">0</span>.<span class="ident">get</span>(),
                 <span class="string">&quot;Expected `ClosestPeersIter` to find `num_results` closest \
                  peers.&quot;</span>
             );
-            <span class="macro">assert</span><span class="macro">!</span>(
+            <span class="macro">assert!</span>(
                 <span class="ident">disjoint</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">num_results</span>.<span class="number">0</span>.<span class="ident">get</span>(),
                 <span class="string">&quot;Expected `ClosestDisjointPeersIter` to find at least \
                  `num_results` closest peers.&quot;</span>
@@ -1877,14 +1879,14 @@
             <span class="kw">if</span> <span class="ident">closest</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">disjoint</span>.<span class="ident">len</span>() {
                 <span class="kw">let</span> <span class="ident">closest_only</span> <span class="op">=</span> <span class="ident">closest</span>.<span class="ident">difference</span>(<span class="kw-2">&amp;</span><span class="ident">disjoint</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
-                <span class="macro">panic</span><span class="macro">!</span>(
+                <span class="macro">panic!</span>(
                     <span class="string">&quot;Expected `ClosestDisjointPeersIter` to find all peers \
                      found by `ClosestPeersIter`, but it did not find {:?}.&quot;</span>,
                     <span class="ident">closest_only</span>,
                 );
             };
 
-            <span class="ident">TestResult</span>::<span class="ident">passed</span>()
+            <span class="ident">TestResult::passed</span>()
         }
 
         <span class="kw">fn</span> <span class="ident">drive_to_finish</span>(
@@ -1892,57 +1894,58 @@
             <span class="kw-2">mut</span> <span class="ident">graph</span>: <span class="ident">Graph</span>,
             <span class="ident">target</span>: <span class="kw-2">&amp;</span><span class="ident">KeyBytes</span>,
         ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">PeerId</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Instant</span>::<span class="ident">now</span>();
+            <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
             <span class="kw">loop</span> {
                 <span class="kw">match</span> <span class="ident">iter</span>.<span class="ident">next</span>(<span class="ident">now</span>) {
-                    <span class="ident">PeersIterState</span>::<span class="ident">Waiting</span>(<span class="prelude-val">Some</span>(<span class="ident">peer_id</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">PeersIterState::Waiting</span>(<span class="prelude-val">Some</span>(<span class="ident">peer_id</span>)) <span class="op">=</span><span class="op">&gt;</span> {
                         <span class="kw">let</span> <span class="ident">peer_id</span> <span class="op">=</span> <span class="ident">peer_id</span>.<span class="ident">clone</span>().<span class="ident">into_owned</span>();
                         <span class="kw">let</span> <span class="ident">closest_peers</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="number">0</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="ident">peer_id</span>)
                             .<span class="ident">unwrap</span>()
                             .<span class="ident">get_closest_peers</span>(<span class="kw-2">&amp;</span><span class="ident">target</span>);
                         <span class="ident">iter</span>.<span class="ident">on_success</span>(<span class="kw-2">&amp;</span><span class="ident">peer_id</span>, <span class="ident">closest_peers</span>);
                     } ,
-                    <span class="ident">PeersIterState</span>::<span class="ident">WaitingAtCapacity</span> <span class="op">|</span> <span class="ident">PeersIterState</span>::<span class="ident">Waiting</span>(<span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span>
-                        <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;There is never more than one request in flight.&quot;</span>),
-                    <span class="ident">PeersIterState</span>::<span class="ident">Finished</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
+                    <span class="ident">PeersIterState::WaitingAtCapacity</span> <span class="op">|</span> <span class="ident">PeersIterState::Waiting</span>(<span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span>
+                        <span class="macro">panic!</span>(<span class="string">&quot;There is never more than one request in flight.&quot;</span>),
+                    <span class="ident">PeersIterState::Finished</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
                 }
             }
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">into_result</span>().<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Key</span>::<span class="ident">new</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">into_result</span>().<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Key::from</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
             <span class="ident">result</span>.<span class="ident">sort_unstable_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> {
                 <span class="ident">target</span>.<span class="ident">distance</span>(<span class="ident">a</span>).<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">target</span>.<span class="ident">distance</span>(<span class="ident">b</span>))
             });
             <span class="ident">result</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">k</span><span class="op">|</span> <span class="ident">k</span>.<span class="ident">into_preimage</span>()).<span class="ident">collect</span>()
         }
 
-        <span class="ident">QuickCheck</span>::<span class="ident">new</span>().<span class="ident">tests</span>(<span class="number">10</span>).<span class="ident">quickcheck</span>(<span class="ident">prop</span> <span class="kw">as</span> <span class="kw">fn</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">_</span>)
+        <span class="ident">QuickCheck::new</span>().<span class="ident">tests</span>(<span class="number">10</span>).<span class="ident">quickcheck</span>(<span class="ident">prop</span> <span class="kw">as</span> <span class="kw">fn</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">_</span>)
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">failure_can_not_overwrite_previous_success</span>() {
-        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Instant</span>::<span class="ident">now</span>();
-        <span class="kw">let</span> <span class="ident">peer</span> <span class="op">=</span> <span class="ident">PeerId</span>::<span class="ident">random</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">ClosestDisjointPeersIter</span>::<span class="ident">new</span>(
-            <span class="ident">Key</span>::<span class="ident">from</span>(<span class="ident">PeerId</span>::<span class="ident">random</span>()).<span class="ident">into</span>(),
-            <span class="ident">iter</span>::<span class="ident">once</span>(<span class="ident">Key</span>::<span class="ident">from</span>(<span class="ident">peer</span>.<span class="ident">clone</span>())),
+        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
+        <span class="kw">let</span> <span class="ident">peer</span> <span class="op">=</span> <span class="ident">PeerId::random</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">ClosestDisjointPeersIter::new</span>(
+            <span class="ident">Key::from</span>(<span class="ident">PeerId::random</span>()).<span class="ident">into</span>(),
+            <span class="ident">iter::once</span>(<span class="ident">Key::from</span>(<span class="ident">peer</span>.<span class="ident">clone</span>())),
         );
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="macro">matches</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">next</span>(<span class="ident">now</span>), <span class="ident">PeersIterState</span>::<span class="ident">Waiting</span>(<span class="prelude-val">Some</span>(<span class="kw">_</span>))));
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="ident">iter</span>.<span class="ident">next</span>(<span class="ident">now</span>), <span class="ident">PeersIterState::Waiting</span>(<span class="prelude-val">Some</span>(<span class="kw">_</span>))));
 
         <span class="comment">// Expect peer to be marked as succeeded.</span>
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">on_success</span>(<span class="kw-2">&amp;</span><span class="ident">peer</span>, <span class="ident">iter</span>::<span class="ident">empty</span>()));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">contacted_peers</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">peer</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">PeerState</span> {
+        <span class="macro">assert!</span>(<span class="ident">iter</span>.<span class="ident">on_success</span>(<span class="kw-2">&amp;</span><span class="ident">peer</span>, <span class="ident">iter::empty</span>()));
+        <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">contacted_peers</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">peer</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">PeerState</span> {
             <span class="ident">initiated_by</span>: <span class="ident">IteratorIndex</span>(<span class="number">0</span>),
-            <span class="ident">response</span>: <span class="ident">ResponseState</span>::<span class="ident">Succeeded</span>,
+            <span class="ident">response</span>: <span class="ident">ResponseState::Succeeded</span>,
         }));
 
         <span class="comment">// Expect peer to stay marked as succeeded.</span>
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">iter</span>.<span class="ident">on_failure</span>(<span class="kw-2">&amp;</span><span class="ident">peer</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">contacted_peers</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">peer</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">PeerState</span> {
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">iter</span>.<span class="ident">on_failure</span>(<span class="kw-2">&amp;</span><span class="ident">peer</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">contacted_peers</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">peer</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">PeerState</span> {
             <span class="ident">initiated_by</span>: <span class="ident">IteratorIndex</span>(<span class="number">0</span>),
-            <span class="ident">response</span>: <span class="ident">ResponseState</span>::<span class="ident">Succeeded</span>,
+            <span class="ident">response</span>: <span class="ident">ResponseState::Succeeded</span>,
         }));
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../../../";window.currentCrate = "libp2p_kad";</script><script src="../../../../../main.js"></script><script src="../../../../../source-script.js"></script><script src="../../../../../source-files.js"></script><script defer src="../../../../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="libp2p_kad" data-search-index-js="../../../../../search-index.js" data-search-js="../../../../../search.js"></div>
+    <script src="../../../../../main.js"></script><script src="../../../../../source-script.js"></script><script src="../../../../../source-files.js"></script></body></html>

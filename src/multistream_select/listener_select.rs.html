@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/multistream-select-0.8.5/src/listener_select.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>listener_select.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/multistream-select-0.10.2/src/listener_select.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>listener_select.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../multistream_select/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../multistream_select/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -247,6 +247,43 @@
 <span id="244">244</span>
 <span id="245">245</span>
 <span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2017 Parity Technologies (UK) Ltd.</span>
 <span class="comment">//</span>
@@ -272,11 +309,11 @@
 <span class="doccomment">//! in a multistream-select protocol negotiation.</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Negotiated</span>, <span class="ident">NegotiationError</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">protocol</span>::{<span class="ident">Protocol</span>, <span class="ident">ProtocolError</span>, <span class="ident">MessageIO</span>, <span class="ident">Message</span>, <span class="ident">Version</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::protocol</span>::{<span class="ident">Protocol</span>, <span class="ident">ProtocolError</span>, <span class="ident">MessageIO</span>, <span class="ident">Message</span>, <span class="ident">HeaderLine</span>};
 
-<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">smallvec</span>::<span class="ident">SmallVec</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert</span>::<span class="ident">TryFrom</span> <span class="kw">as</span> <span class="kw">_</span>, <span class="ident">iter</span>::<span class="ident">FromIterator</span>, <span class="ident">mem</span>, <span class="ident">pin</span>::<span class="ident">Pin</span>, <span class="ident">task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>}};
+<span class="kw">use</span> <span class="ident">futures::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">smallvec::SmallVec</span>;
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert::TryFrom</span> <span class="kw">as</span> <span class="kw">_</span>, <span class="ident">iter::FromIterator</span>, <span class="ident">mem</span>, <span class="ident">pin::Pin</span>, <span class="ident">task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>}};
 
 <span class="doccomment">/// Returns a `Future` that negotiates a protocol on the given I/O stream</span>
 <span class="doccomment">/// for a peer acting as the _listener_ (or _responder_).</span>
@@ -288,32 +325,33 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">listener_select_proto</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">I</span><span class="op">&gt;</span>(
     <span class="ident">inner</span>: <span class="ident">R</span>,
     <span class="ident">protocols</span>: <span class="ident">I</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ListenerSelectFuture</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">I</span>::<span class="ident">Item</span><span class="op">&gt;</span>
+) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ListenerSelectFuture</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">I::Item</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">R</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span>,
     <span class="ident">I</span>: <span class="ident">IntoIterator</span>,
-    <span class="ident">I</span>::<span class="ident">Item</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>
+    <span class="ident">I::Item</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>
 {
     <span class="kw">let</span> <span class="ident">protocols</span> <span class="op">=</span> <span class="ident">protocols</span>.<span class="ident">into_iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span>
-        <span class="kw">match</span> <span class="ident">Protocol</span>::<span class="ident">try_from</span>(<span class="ident">n</span>.<span class="ident">as_ref</span>()) {
+        <span class="kw">match</span> <span class="ident">Protocol::try_from</span>(<span class="ident">n</span>.<span class="ident">as_ref</span>()) {
             <span class="prelude-val">Ok</span>(<span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>((<span class="ident">n</span>, <span class="ident">p</span>)),
             <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">log</span>::<span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;Listener: Ignoring invalid protocol: {} due to {}&quot;</span>,
-                      <span class="ident">String</span>::<span class="ident">from_utf8_lossy</span>(<span class="ident">n</span>.<span class="ident">as_ref</span>()), <span class="ident">e</span>);
+                <span class="macro">log::warn!</span>(<span class="string">&quot;Listener: Ignoring invalid protocol: {} due to {}&quot;</span>,
+                      <span class="ident">String::from_utf8_lossy</span>(<span class="ident">n</span>.<span class="ident">as_ref</span>()), <span class="ident">e</span>);
                 <span class="prelude-val">None</span>
             }
         });
     <span class="ident">ListenerSelectFuture</span> {
-        <span class="ident">protocols</span>: <span class="ident">SmallVec</span>::<span class="ident">from_iter</span>(<span class="ident">protocols</span>),
-        <span class="ident">state</span>: <span class="ident">State</span>::<span class="ident">RecvHeader</span> {
-            <span class="ident">io</span>: <span class="ident">MessageIO</span>::<span class="ident">new</span>(<span class="ident">inner</span>)
-        }
+        <span class="ident">protocols</span>: <span class="ident">SmallVec::from_iter</span>(<span class="ident">protocols</span>),
+        <span class="ident">state</span>: <span class="ident">State::RecvHeader</span> {
+            <span class="ident">io</span>: <span class="ident">MessageIO::new</span>(<span class="ident">inner</span>)
+        },
+        <span class="ident">last_sent_na</span>: <span class="bool-val">false</span>,
     }
 }
 
 <span class="doccomment">/// The `Future` returned by [`listener_select_proto`] that performs a</span>
 <span class="doccomment">/// multistream-select protocol negotiation on an underlying I/O stream.</span>
-<span class="attribute">#[<span class="ident">pin_project</span>::<span class="ident">pin_project</span>]</span>
+<span class="attribute">#[<span class="ident">pin_project::pin_project</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ListenerSelectFuture</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">N</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">R</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span>,
@@ -322,7 +360,14 @@
     <span class="comment">// TODO: It would be nice if eventually N = Protocol, which has a</span>
     <span class="comment">// few more implications on the API.</span>
     <span class="ident">protocols</span>: <span class="ident">SmallVec</span><span class="op">&lt;</span>[(<span class="ident">N</span>, <span class="ident">Protocol</span>); <span class="number">8</span>]<span class="op">&gt;</span>,
-    <span class="ident">state</span>: <span class="ident">State</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">N</span><span class="op">&gt;</span>
+    <span class="ident">state</span>: <span class="ident">State</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">N</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Whether the last message sent was a protocol rejection (i.e. `na\n`).</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If the listener reads garbage or EOF after such a rejection,</span>
+    <span class="doccomment">/// the dialer is likely using `V1Lazy` and negotiation must be</span>
+    <span class="doccomment">/// considered failed, but not with a protocol violation or I/O</span>
+    <span class="doccomment">/// error.</span>
+    <span class="ident">last_sent_na</span>: <span class="ident">bool</span>,
 }
 
 <span class="kw">enum</span> <span class="ident">State</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">N</span><span class="op">&gt;</span>
@@ -331,7 +376,7 @@
     <span class="ident">N</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>
 {
     <span class="ident">RecvHeader</span> { <span class="ident">io</span>: <span class="ident">MessageIO</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> },
-    <span class="ident">SendHeader</span> { <span class="ident">io</span>: <span class="ident">MessageIO</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>, <span class="ident">version</span>: <span class="ident">Version</span> },
+    <span class="ident">SendHeader</span> { <span class="ident">io</span>: <span class="ident">MessageIO</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> },
     <span class="ident">RecvMessage</span> { <span class="ident">io</span>: <span class="ident">MessageIO</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> },
     <span class="ident">SendMessage</span> {
         <span class="ident">io</span>: <span class="ident">MessageIO</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
@@ -354,54 +399,54 @@
 {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">N</span>, <span class="ident">Negotiated</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>), <span class="ident">NegotiationError</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Output</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
 
         <span class="kw">loop</span> {
-            <span class="kw">match</span> <span class="ident">mem</span>::<span class="ident">replace</span>(<span class="ident">this</span>.<span class="ident">state</span>, <span class="ident">State</span>::<span class="ident">Done</span>) {
-                <span class="ident">State</span>::<span class="ident">RecvHeader</span> { <span class="kw-2">mut</span> <span class="ident">io</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw">match</span> <span class="ident">mem::replace</span>(<span class="ident">this</span>.<span class="ident">state</span>, <span class="ident">State::Done</span>) {
+                <span class="ident">State::RecvHeader</span> { <span class="kw-2">mut</span> <span class="ident">io</span> } <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="kw">match</span> <span class="ident">io</span>.<span class="ident">poll_next_unpin</span>(<span class="ident">cx</span>) {
-                        <span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">Message</span>::<span class="ident">Header</span>(<span class="ident">version</span>)))) <span class="op">=</span><span class="op">&gt;</span> {
-                            <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">SendHeader</span> { <span class="ident">io</span>, <span class="ident">version</span> }
+                        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">Message::Header</span>(<span class="ident">h</span>)))) <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="kw">match</span> <span class="ident">h</span> {
+                                <span class="ident">HeaderLine::V1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::SendHeader</span> { <span class="ident">io</span> }
+                            }
                         }
-                        <span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="kw">_</span>))) <span class="op">=</span><span class="op">&gt;</span> {
-                            <span class="kw">return</span> <span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">ProtocolError</span>::<span class="ident">InvalidMessage</span>.<span class="ident">into</span>()))
+                        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="kw">_</span>))) <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">ProtocolError::InvalidMessage</span>.<span class="ident">into</span>()))
                         },
-                        <span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>))) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">From</span>::<span class="ident">from</span>(<span class="ident">err</span>))),
+                        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>))) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">From::from</span>(<span class="ident">err</span>))),
                         <span class="comment">// Treat EOF error as [`NegotiationError::Failed`], not as</span>
                         <span class="comment">// [`NegotiationError::ProtocolError`], allowing dropping or closing an I/O</span>
                         <span class="comment">// stream as a permissible way to &quot;gracefully&quot; fail a negotiation.</span>
-                        <span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">NegotiationError</span>::<span class="ident">Failed</span>)),
-                        <span class="ident">Poll</span>::<span class="ident">Pending</span> <span class="op">=</span><span class="op">&gt;</span> {
-                            <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">RecvHeader</span> { <span class="ident">io</span> };
-                            <span class="kw">return</span> <span class="ident">Poll</span>::<span class="ident">Pending</span>
+                        <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">NegotiationError::Failed</span>)),
+                        <span class="ident">Poll::Pending</span> <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::RecvHeader</span> { <span class="ident">io</span> };
+                            <span class="kw">return</span> <span class="ident">Poll::Pending</span>
                         }
                     }
                 }
 
-                <span class="ident">State</span>::<span class="ident">SendHeader</span> { <span class="kw-2">mut</span> <span class="ident">io</span>, <span class="ident">version</span> } <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="kw">match</span> <span class="ident">Pin</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">io</span>).<span class="ident">poll_ready</span>(<span class="ident">cx</span>) {
-                        <span class="ident">Poll</span>::<span class="ident">Pending</span> <span class="op">=</span><span class="op">&gt;</span> {
-                            <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">SendHeader</span> { <span class="ident">io</span>, <span class="ident">version</span> };
-                            <span class="kw">return</span> <span class="ident">Poll</span>::<span class="ident">Pending</span>
+                <span class="ident">State::SendHeader</span> { <span class="kw-2">mut</span> <span class="ident">io</span> } <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="kw">match</span> <span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">io</span>).<span class="ident">poll_ready</span>(<span class="ident">cx</span>) {
+                        <span class="ident">Poll::Pending</span> <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::SendHeader</span> { <span class="ident">io</span> };
+                            <span class="kw">return</span> <span class="ident">Poll::Pending</span>
                         },
-                        <span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="prelude-val">Ok</span>(())) <span class="op">=</span><span class="op">&gt;</span> {},
-                        <span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">From</span>::<span class="ident">from</span>(<span class="ident">err</span>))),
+                        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(())) <span class="op">=</span><span class="op">&gt;</span> {},
+                        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">From::from</span>(<span class="ident">err</span>))),
                     }
 
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="ident">Pin</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">io</span>).<span class="ident">start_send</span>(<span class="ident">Message</span>::<span class="ident">Header</span>(<span class="ident">version</span>)) {
-                        <span class="kw">return</span> <span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">From</span>::<span class="ident">from</span>(<span class="ident">err</span>)));
+                    <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">Message::Header</span>(<span class="ident">HeaderLine::V1</span>);
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">io</span>).<span class="ident">start_send</span>(<span class="ident">msg</span>) {
+                        <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">From::from</span>(<span class="ident">err</span>)));
                     }
 
-                    <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">state</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">version</span> {
-                        <span class="ident">Version</span>::<span class="ident">V1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">State</span>::<span class="ident">Flush</span> { <span class="ident">io</span>, <span class="ident">protocol</span>: <span class="prelude-val">None</span> },
-                        <span class="ident">Version</span>::<span class="ident">V1Lazy</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">State</span>::<span class="ident">RecvMessage</span> { <span class="ident">io</span> },
-                    }
+                    <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::Flush</span> { <span class="ident">io</span>, <span class="ident">protocol</span>: <span class="prelude-val">None</span> };
                 }
 
-                <span class="ident">State</span>::<span class="ident">RecvMessage</span> { <span class="kw-2">mut</span> <span class="ident">io</span> } <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">Pin</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">io</span>).<span class="ident">poll_next</span>(<span class="ident">cx</span>) {
-                        <span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">msg</span>))) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">msg</span>,
+                <span class="ident">State::RecvMessage</span> { <span class="kw-2">mut</span> <span class="ident">io</span> } <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">io</span>).<span class="ident">poll_next</span>(<span class="ident">cx</span>) {
+                        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">msg</span>))) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">msg</span>,
                         <span class="comment">// Treat EOF error as [`NegotiationError::Failed`], not as</span>
                         <span class="comment">// [`NegotiationError::ProtocolError`], allowing dropping or closing an I/O</span>
                         <span class="comment">// stream as a permissible way to &quot;gracefully&quot; fail a negotiation.</span>
@@ -411,21 +456,44 @@
                         <span class="comment">// protocols to propose. Then the dialer will stop the negotiation and drop</span>
                         <span class="comment">// the corresponding stream. As a listener this EOF should be interpreted as</span>
                         <span class="comment">// a failed negotiation.</span>
-                        <span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">NegotiationError</span>::<span class="ident">Failed</span>)),
-                        <span class="ident">Poll</span>::<span class="ident">Pending</span> <span class="op">=</span><span class="op">&gt;</span> {
-                            <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">RecvMessage</span> { <span class="ident">io</span> };
-                            <span class="kw">return</span> <span class="ident">Poll</span>::<span class="ident">Pending</span>;
+                        <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">NegotiationError::Failed</span>)),
+                        <span class="ident">Poll::Pending</span> <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::RecvMessage</span> { <span class="ident">io</span> };
+                            <span class="kw">return</span> <span class="ident">Poll::Pending</span>;
                         }
-                        <span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>))) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">From</span>::<span class="ident">from</span>(<span class="ident">err</span>))),
+                        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>))) <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">last_sent_na</span> {
+                                <span class="comment">// When we read garbage or EOF after having already rejected a</span>
+                                <span class="comment">// protocol, the dialer is most likely using `V1Lazy` and has</span>
+                                <span class="comment">// optimistically settled on this protocol, so this is really a</span>
+                                <span class="comment">// failed negotiation, not a protocol violation. In this case</span>
+                                <span class="comment">// the dialer also raises `NegotiationError::Failed` when finally</span>
+                                <span class="comment">// reading the `N/A` response.</span>
+                                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ProtocolError::InvalidMessage</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">err</span> {
+                                    <span class="macro">log::trace!</span>(<span class="string">&quot;Listener: Negotiation failed with invalid \
+                                        message after protocol rejection.&quot;</span>);
+                                    <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">NegotiationError::Failed</span>))
+                                }
+                                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ProtocolError::IoError</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">err</span> {
+                                    <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">kind</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">std::io::ErrorKind::UnexpectedEof</span> {
+                                        <span class="macro">log::trace!</span>(<span class="string">&quot;Listener: Negotiation failed with EOF \
+                                            after protocol rejection.&quot;</span>);
+                                        <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">NegotiationError::Failed</span>))
+                                    }
+                                }
+                            }
+
+                            <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">From::from</span>(<span class="ident">err</span>)))
+                        }
                     };
 
                     <span class="kw">match</span> <span class="ident">msg</span> {
-                        <span class="ident">Message</span>::<span class="ident">ListProtocols</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">Message::ListProtocols</span> <span class="op">=</span><span class="op">&gt;</span> {
                             <span class="kw">let</span> <span class="ident">supported</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">protocols</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>,<span class="ident">p</span>)<span class="op">|</span> <span class="ident">p</span>).<span class="ident">cloned</span>().<span class="ident">collect</span>();
-                            <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">Message</span>::<span class="ident">Protocols</span>(<span class="ident">supported</span>);
-                            <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">SendMessage</span> { <span class="ident">io</span>, <span class="ident">message</span>, <span class="ident">protocol</span>: <span class="prelude-val">None</span> }
+                            <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">Message::Protocols</span>(<span class="ident">supported</span>);
+                            <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::SendMessage</span> { <span class="ident">io</span>, <span class="ident">message</span>, <span class="ident">protocol</span>: <span class="prelude-val">None</span> }
                         }
-                        <span class="ident">Message</span>::<span class="ident">Protocol</span>(<span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">Message::Protocol</span>(<span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> {
                             <span class="kw">let</span> <span class="ident">protocol</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">protocols</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span>(<span class="ident">name</span>, <span class="ident">proto</span>)<span class="op">|</span> {
                                 <span class="kw">if</span> <span class="kw-2">&amp;</span><span class="ident">p</span> <span class="op">=</span><span class="op">=</span> <span class="ident">proto</span> {
                                     <span class="prelude-val">Some</span>(<span class="ident">name</span>.<span class="ident">clone</span>())
@@ -435,64 +503,71 @@
                             });
 
                             <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">protocol</span>.<span class="ident">is_some</span>() {
-                                <span class="ident">log</span>::<span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Listener: confirming protocol: {}&quot;</span>, <span class="ident">p</span>);
-                                <span class="ident">Message</span>::<span class="ident">Protocol</span>(<span class="ident">p</span>.<span class="ident">clone</span>())
+                                <span class="macro">log::debug!</span>(<span class="string">&quot;Listener: confirming protocol: {}&quot;</span>, <span class="ident">p</span>);
+                                <span class="ident">Message::Protocol</span>(<span class="ident">p</span>.<span class="ident">clone</span>())
                             } <span class="kw">else</span> {
-                                <span class="ident">log</span>::<span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Listener: rejecting protocol: {}&quot;</span>,
-                                    <span class="ident">String</span>::<span class="ident">from_utf8_lossy</span>(<span class="ident">p</span>.<span class="ident">as_ref</span>()));
-                                <span class="ident">Message</span>::<span class="ident">NotAvailable</span>
+                                <span class="macro">log::debug!</span>(<span class="string">&quot;Listener: rejecting protocol: {}&quot;</span>,
+                                    <span class="ident">String::from_utf8_lossy</span>(<span class="ident">p</span>.<span class="ident">as_ref</span>()));
+                                <span class="ident">Message::NotAvailable</span>
                             };
 
-                            <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">SendMessage</span> { <span class="ident">io</span>, <span class="ident">message</span>, <span class="ident">protocol</span> };
+                            <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::SendMessage</span> { <span class="ident">io</span>, <span class="ident">message</span>, <span class="ident">protocol</span> };
                         }
-                        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">ProtocolError</span>::<span class="ident">InvalidMessage</span>.<span class="ident">into</span>()))
+                        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">ProtocolError::InvalidMessage</span>.<span class="ident">into</span>()))
                     }
                 }
 
-                <span class="ident">State</span>::<span class="ident">SendMessage</span> { <span class="kw-2">mut</span> <span class="ident">io</span>, <span class="ident">message</span>, <span class="ident">protocol</span> } <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="kw">match</span> <span class="ident">Pin</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">io</span>).<span class="ident">poll_ready</span>(<span class="ident">cx</span>) {
-                        <span class="ident">Poll</span>::<span class="ident">Pending</span> <span class="op">=</span><span class="op">&gt;</span> {
-                            <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">SendMessage</span> { <span class="ident">io</span>, <span class="ident">message</span>, <span class="ident">protocol</span> };
-                            <span class="kw">return</span> <span class="ident">Poll</span>::<span class="ident">Pending</span>
+                <span class="ident">State::SendMessage</span> { <span class="kw-2">mut</span> <span class="ident">io</span>, <span class="ident">message</span>, <span class="ident">protocol</span> } <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="kw">match</span> <span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">io</span>).<span class="ident">poll_ready</span>(<span class="ident">cx</span>) {
+                        <span class="ident">Poll::Pending</span> <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::SendMessage</span> { <span class="ident">io</span>, <span class="ident">message</span>, <span class="ident">protocol</span> };
+                            <span class="kw">return</span> <span class="ident">Poll::Pending</span>
                         },
-                        <span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="prelude-val">Ok</span>(())) <span class="op">=</span><span class="op">&gt;</span> {},
-                        <span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">From</span>::<span class="ident">from</span>(<span class="ident">err</span>))),
+                        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(())) <span class="op">=</span><span class="op">&gt;</span> {},
+                        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">From::from</span>(<span class="ident">err</span>))),
                     }
 
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="ident">Pin</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">io</span>).<span class="ident">start_send</span>(<span class="ident">message</span>) {
-                        <span class="kw">return</span> <span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">From</span>::<span class="ident">from</span>(<span class="ident">err</span>)));
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Message::NotAvailable</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">message</span>  {
+                        <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">last_sent_na</span> <span class="op">=</span> <span class="bool-val">true</span>;
+                    } <span class="kw">else</span> {
+                        <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">last_sent_na</span> <span class="op">=</span> <span class="bool-val">false</span>;
                     }
 
-                    <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">Flush</span> { <span class="ident">io</span>, <span class="ident">protocol</span> };
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">io</span>).<span class="ident">start_send</span>(<span class="ident">message</span>) {
+                        <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">From::from</span>(<span class="ident">err</span>)));
+                    }
+
+                    <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::Flush</span> { <span class="ident">io</span>, <span class="ident">protocol</span> };
                 }
 
-                <span class="ident">State</span>::<span class="ident">Flush</span> { <span class="kw-2">mut</span> <span class="ident">io</span>, <span class="ident">protocol</span> } <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="kw">match</span> <span class="ident">Pin</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">io</span>).<span class="ident">poll_flush</span>(<span class="ident">cx</span>) {
-                        <span class="ident">Poll</span>::<span class="ident">Pending</span> <span class="op">=</span><span class="op">&gt;</span> {
-                            <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">Flush</span> { <span class="ident">io</span>, <span class="ident">protocol</span> };
-                            <span class="kw">return</span> <span class="ident">Poll</span>::<span class="ident">Pending</span>
+                <span class="ident">State::Flush</span> { <span class="kw-2">mut</span> <span class="ident">io</span>, <span class="ident">protocol</span> } <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="kw">match</span> <span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">io</span>).<span class="ident">poll_flush</span>(<span class="ident">cx</span>) {
+                        <span class="ident">Poll::Pending</span> <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::Flush</span> { <span class="ident">io</span>, <span class="ident">protocol</span> };
+                            <span class="kw">return</span> <span class="ident">Poll::Pending</span>
                         },
-                        <span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="prelude-val">Ok</span>(())) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(())) <span class="op">=</span><span class="op">&gt;</span> {
                             <span class="comment">// If a protocol has been selected, finish negotiation.</span>
                             <span class="comment">// Otherwise expect to receive another message.</span>
                             <span class="kw">match</span> <span class="ident">protocol</span> {
                                 <span class="prelude-val">Some</span>(<span class="ident">protocol</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                                    <span class="ident">log</span>::<span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Listener: sent confirmed protocol: {}&quot;</span>,
-                                        <span class="ident">String</span>::<span class="ident">from_utf8_lossy</span>(<span class="ident">protocol</span>.<span class="ident">as_ref</span>()));
-                                    <span class="kw">let</span> <span class="ident">io</span> <span class="op">=</span> <span class="ident">Negotiated</span>::<span class="ident">completed</span>(<span class="ident">io</span>.<span class="ident">into_inner</span>());
-                                    <span class="kw">return</span> <span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="prelude-val">Ok</span>((<span class="ident">protocol</span>, <span class="ident">io</span>)))
+                                    <span class="macro">log::debug!</span>(<span class="string">&quot;Listener: sent confirmed protocol: {}&quot;</span>,
+                                        <span class="ident">String::from_utf8_lossy</span>(<span class="ident">protocol</span>.<span class="ident">as_ref</span>()));
+                                    <span class="kw">let</span> <span class="ident">io</span> <span class="op">=</span> <span class="ident">Negotiated::completed</span>(<span class="ident">io</span>.<span class="ident">into_inner</span>());
+                                    <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>((<span class="ident">protocol</span>, <span class="ident">io</span>)))
                                 }
-                                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">RecvMessage</span> { <span class="ident">io</span> }
+                                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::RecvMessage</span> { <span class="ident">io</span> }
                             }
                         }
-                        <span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">From</span>::<span class="ident">from</span>(<span class="ident">err</span>))),
+                        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">From::from</span>(<span class="ident">err</span>))),
                     }
                 }
 
-                <span class="ident">State</span>::<span class="ident">Done</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;State::poll called after completion&quot;</span>)
+                <span class="ident">State::Done</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;State::poll called after completion&quot;</span>)
             }
         }
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "multistream_select";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="multistream_select" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

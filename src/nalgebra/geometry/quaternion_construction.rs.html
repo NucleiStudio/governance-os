@@ -1,5 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/nalgebra-0.18.1/src/geometry/quaternion_construction.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>quaternion_construction.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="https://nalgebra.org/img/favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../nalgebra/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/nalgebra-0.21.1/src/geometry/quaternion_construction.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>quaternion_construction.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="https://nalgebra.org/img/favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../nalgebra/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -738,27 +738,146 @@
 <span id="737">737</span>
 <span id="738">738</span>
 <span id="739">739</span>
+<span id="740">740</span>
+<span id="741">741</span>
+<span id="742">742</span>
+<span id="743">743</span>
+<span id="744">744</span>
+<span id="745">745</span>
+<span id="746">746</span>
+<span id="747">747</span>
+<span id="748">748</span>
+<span id="749">749</span>
+<span id="750">750</span>
+<span id="751">751</span>
+<span id="752">752</span>
+<span id="753">753</span>
+<span id="754">754</span>
+<span id="755">755</span>
+<span id="756">756</span>
+<span id="757">757</span>
+<span id="758">758</span>
+<span id="759">759</span>
+<span id="760">760</span>
+<span id="761">761</span>
+<span id="762">762</span>
+<span id="763">763</span>
+<span id="764">764</span>
+<span id="765">765</span>
+<span id="766">766</span>
+<span id="767">767</span>
+<span id="768">768</span>
+<span id="769">769</span>
+<span id="770">770</span>
+<span id="771">771</span>
+<span id="772">772</span>
+<span id="773">773</span>
+<span id="774">774</span>
+<span id="775">775</span>
+<span id="776">776</span>
+<span id="777">777</span>
+<span id="778">778</span>
+<span id="779">779</span>
+<span id="780">780</span>
+<span id="781">781</span>
+<span id="782">782</span>
+<span id="783">783</span>
+<span id="784">784</span>
+<span id="785">785</span>
+<span id="786">786</span>
+<span id="787">787</span>
+<span id="788">788</span>
+<span id="789">789</span>
+<span id="790">790</span>
+<span id="791">791</span>
+<span id="792">792</span>
+<span id="793">793</span>
+<span id="794">794</span>
+<span id="795">795</span>
+<span id="796">796</span>
+<span id="797">797</span>
+<span id="798">798</span>
+<span id="799">799</span>
+<span id="800">800</span>
+<span id="801">801</span>
+<span id="802">802</span>
+<span id="803">803</span>
+<span id="804">804</span>
+<span id="805">805</span>
+<span id="806">806</span>
+<span id="807">807</span>
+<span id="808">808</span>
+<span id="809">809</span>
+<span id="810">810</span>
+<span id="811">811</span>
+<span id="812">812</span>
+<span id="813">813</span>
+<span id="814">814</span>
+<span id="815">815</span>
+<span id="816">816</span>
+<span id="817">817</span>
+<span id="818">818</span>
+<span id="819">819</span>
+<span id="820">820</span>
+<span id="821">821</span>
+<span id="822">822</span>
+<span id="823">823</span>
+<span id="824">824</span>
+<span id="825">825</span>
+<span id="826">826</span>
+<span id="827">827</span>
+<span id="828">828</span>
+<span id="829">829</span>
+<span id="830">830</span>
+<span id="831">831</span>
+<span id="832">832</span>
+<span id="833">833</span>
+<span id="834">834</span>
+<span id="835">835</span>
+<span id="836">836</span>
+<span id="837">837</span>
+<span id="838">838</span>
+<span id="839">839</span>
+<span id="840">840</span>
+<span id="841">841</span>
+<span id="842">842</span>
+<span id="843">843</span>
+<span id="844">844</span>
+<span id="845">845</span>
+<span id="846">846</span>
+<span id="847">847</span>
+<span id="848">848</span>
+<span id="849">849</span>
+<span id="850">850</span>
+<span id="851">851</span>
+<span id="852">852</span>
+<span id="853">853</span>
+<span id="854">854</span>
+<span id="855">855</span>
+<span id="856">856</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;arbitrary&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">base</span>::<span class="ident">dimension</span>::<span class="ident">U4</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::base::dimension::U4</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;arbitrary&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">base</span>::<span class="ident">storage</span>::<span class="ident">Owned</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::base::storage::Owned</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;arbitrary&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">quickcheck</span>::{<span class="ident">Arbitrary</span>, <span class="ident">Gen</span>};
 
 <span class="kw">use</span> <span class="ident">num</span>::{<span class="ident">One</span>, <span class="ident">Zero</span>};
-<span class="kw">use</span> <span class="ident">rand</span>::<span class="ident">distributions</span>::{<span class="ident">Distribution</span>, <span class="ident">OpenClosed01</span>, <span class="ident">Standard</span>};
-<span class="kw">use</span> <span class="ident">rand</span>::<span class="ident">Rng</span>;
+<span class="kw">use</span> <span class="ident">rand::distributions</span>::{<span class="ident">Distribution</span>, <span class="ident">OpenClosed01</span>, <span class="ident">Standard</span>};
+<span class="kw">use</span> <span class="ident">rand::Rng</span>;
 
-<span class="kw">use</span> <span class="ident">alga</span>::<span class="ident">general</span>::<span class="ident">RealField</span>;
+<span class="kw">use</span> <span class="ident">simba::scalar::RealField</span>;
+<span class="kw">use</span> <span class="ident">simba::simd</span>::{<span class="ident">SimdBool</span>, <span class="ident">SimdValue</span>};
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">base</span>::<span class="ident">dimension</span>::<span class="ident">U3</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">base</span>::<span class="ident">storage</span>::<span class="ident">Storage</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">base</span>::{<span class="ident">Unit</span>, <span class="ident">Vector</span>, <span class="ident">Vector3</span>, <span class="ident">Vector4</span>, <span class="ident">Matrix3</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::base::dimension::U3</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::base::storage::Storage</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::base</span>::{<span class="ident">Matrix3</span>, <span class="ident">Matrix4</span>, <span class="ident">Unit</span>, <span class="ident">Vector</span>, <span class="ident">Vector3</span>, <span class="ident">Vector4</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Scalar</span>, <span class="ident">SimdRealField</span>};
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">geometry</span>::{<span class="ident">Quaternion</span>, <span class="ident">Rotation3</span>, <span class="ident">UnitQuaternion</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::geometry</span>::{<span class="ident">Quaternion</span>, <span class="ident">Rotation3</span>, <span class="ident">UnitQuaternion</span>};
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">RealField</span><span class="op">&gt;</span> <span class="ident">Quaternion</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">Scalar</span> <span class="op">+</span> <span class="ident">SimdValue</span><span class="op">&gt;</span> <span class="ident">Quaternion</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Creates a quaternion from a 4D vector. The quaternion scalar part corresponds to the `w`</span>
     <span class="doccomment">/// vector component.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
@@ -782,13 +901,15 @@
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">w</span>: <span class="ident">N</span>, <span class="ident">i</span>: <span class="ident">N</span>, <span class="ident">j</span>: <span class="ident">N</span>, <span class="ident">k</span>: <span class="ident">N</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span>::<span class="ident">from</span>(<span class="ident">Vector4</span>::<span class="ident">new</span>(<span class="ident">i</span>, <span class="ident">j</span>, <span class="ident">k</span>, <span class="ident">w</span>))
+        <span class="self">Self</span><span class="ident">::from</span>(<span class="ident">Vector4::new</span>(<span class="ident">i</span>, <span class="ident">j</span>, <span class="ident">k</span>, <span class="ident">w</span>))
     }
+}
 
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">SimdRealField</span><span class="op">&gt;</span> <span class="ident">Quaternion</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Constructs a pure quaternion.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_imag</span>(<span class="ident">vector</span>: <span class="ident">Vector3</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span>::<span class="ident">from_parts</span>(<span class="ident">N</span>::<span class="ident">zero</span>(), <span class="ident">vector</span>)
+        <span class="self">Self</span><span class="ident">::from_parts</span>(<span class="ident">N::zero</span>(), <span class="ident">vector</span>)
     }
 
     <span class="doccomment">/// Creates a new quaternion from its scalar and vector parts. Note that the arguments order does</span>
@@ -808,25 +929,16 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="comment">// FIXME: take a reference to `vector`?</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_parts</span><span class="op">&lt;</span><span class="ident">SB</span><span class="op">&gt;</span>(<span class="ident">scalar</span>: <span class="ident">N</span>, <span class="ident">vector</span>: <span class="ident">Vector</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span>, <span class="ident">SB</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
-    <span class="kw">where</span> <span class="ident">SB</span>: <span class="ident">Storage</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span><span class="op">&gt;</span> {
-        <span class="self">Self</span>::<span class="ident">new</span>(<span class="ident">scalar</span>, <span class="ident">vector</span>[<span class="number">0</span>], <span class="ident">vector</span>[<span class="number">1</span>], <span class="ident">vector</span>[<span class="number">2</span>])
+    <span class="kw">where</span>
+        <span class="ident">SB</span>: <span class="ident">Storage</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span><span class="op">&gt;</span>,
+    {
+        <span class="self">Self</span><span class="ident">::new</span>(<span class="ident">scalar</span>, <span class="ident">vector</span>[<span class="number">0</span>], <span class="ident">vector</span>[<span class="number">1</span>], <span class="ident">vector</span>[<span class="number">2</span>])
     }
 
     <span class="doccomment">/// Constructs a real quaternion.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_real</span>(<span class="ident">r</span>: <span class="ident">N</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span>::<span class="ident">from_parts</span>(<span class="ident">r</span>, <span class="ident">Vector3</span>::<span class="ident">zero</span>())
-    }
-
-    <span class="doccomment">/// Creates a new quaternion from its polar decomposition.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that `axis` is assumed to be a unit vector.</span>
-    <span class="comment">// FIXME: take a reference to `axis`?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_polar_decomposition</span><span class="op">&lt;</span><span class="ident">SB</span><span class="op">&gt;</span>(<span class="ident">scale</span>: <span class="ident">N</span>, <span class="ident">theta</span>: <span class="ident">N</span>, <span class="ident">axis</span>: <span class="ident">Unit</span><span class="op">&lt;</span><span class="ident">Vector</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span>, <span class="ident">SB</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
-    <span class="kw">where</span> <span class="ident">SB</span>: <span class="ident">Storage</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">rot</span> <span class="op">=</span> <span class="ident">UnitQuaternion</span>::<span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>::<span class="ident">from_axis_angle</span>(<span class="kw-2">&amp;</span><span class="ident">axis</span>, <span class="ident">theta</span> <span class="op">*</span> <span class="kw">crate</span>::<span class="ident">convert</span>(<span class="number">2.0f64</span>));
-
-        <span class="ident">rot</span>.<span class="ident">into_inner</span>() <span class="op">*</span> <span class="ident">scale</span>
+        <span class="self">Self</span><span class="ident">::from_parts</span>(<span class="ident">r</span>, <span class="ident">Vector3::zero</span>())
     }
 
     <span class="doccomment">/// The quaternion multiplicative identity.</span>
@@ -842,21 +954,46 @@
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">identity</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span>::<span class="ident">from_real</span>(<span class="ident">N</span>::<span class="ident">one</span>())
+        <span class="self">Self</span><span class="ident">::from_real</span>(<span class="ident">N::one</span>())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">RealField</span><span class="op">&gt;</span> <span class="ident">One</span> <span class="kw">for</span> <span class="ident">Quaternion</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
+<span class="comment">// FIXME: merge with the previous block.</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">SimdRealField</span><span class="op">&gt;</span> <span class="ident">Quaternion</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">N::Element</span>: <span class="ident">SimdRealField</span>,
+{
+    <span class="doccomment">/// Creates a new quaternion from its polar decomposition.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Note that `axis` is assumed to be a unit vector.</span>
+    <span class="comment">// FIXME: take a reference to `axis`?</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_polar_decomposition</span><span class="op">&lt;</span><span class="ident">SB</span><span class="op">&gt;</span>(<span class="ident">scale</span>: <span class="ident">N</span>, <span class="ident">theta</span>: <span class="ident">N</span>, <span class="ident">axis</span>: <span class="ident">Unit</span><span class="op">&lt;</span><span class="ident">Vector</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span>, <span class="ident">SB</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">where</span>
+        <span class="ident">SB</span>: <span class="ident">Storage</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span><span class="op">&gt;</span>,
+    {
+        <span class="kw">let</span> <span class="ident">rot</span> <span class="op">=</span> <span class="ident">UnitQuaternion</span>::<span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span><span class="ident">::from_axis_angle</span>(<span class="kw-2">&amp;</span><span class="ident">axis</span>, <span class="ident">theta</span> <span class="op">*</span> <span class="kw">crate</span><span class="ident">::convert</span>(<span class="number">2.0f64</span>));
+
+        <span class="ident">rot</span>.<span class="ident">into_inner</span>() <span class="op">*</span> <span class="ident">scale</span>
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">SimdRealField</span><span class="op">&gt;</span> <span class="ident">One</span> <span class="kw">for</span> <span class="ident">Quaternion</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">N::Element</span>: <span class="ident">SimdRealField</span>,
+{
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">one</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span>::<span class="ident">identity</span>()
+        <span class="self">Self</span><span class="ident">::identity</span>()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">RealField</span><span class="op">&gt;</span> <span class="ident">Zero</span> <span class="kw">for</span> <span class="ident">Quaternion</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">SimdRealField</span><span class="op">&gt;</span> <span class="ident">Zero</span> <span class="kw">for</span> <span class="ident">Quaternion</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">N::Element</span>: <span class="ident">SimdRealField</span>,
+{
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">zero</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span>::<span class="ident">from</span>(<span class="ident">Vector4</span>::<span class="ident">zero</span>())
+        <span class="self">Self</span><span class="ident">::from</span>(<span class="ident">Vector4::zero</span>())
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
@@ -865,31 +1002,36 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">RealField</span><span class="op">&gt;</span> <span class="ident">Distribution</span><span class="op">&lt;</span><span class="ident">Quaternion</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Standard</span>
-<span class="kw">where</span> <span class="ident">Standard</span>: <span class="ident">Distribution</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">SimdRealField</span><span class="op">&gt;</span> <span class="ident">Distribution</span><span class="op">&lt;</span><span class="ident">Quaternion</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Standard</span>
+<span class="kw">where</span>
+    <span class="ident">Standard</span>: <span class="ident">Distribution</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>,
 {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">sample</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">Rng</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rng</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Quaternion</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
-        <span class="ident">Quaternion</span>::<span class="ident">new</span>(<span class="ident">rng</span>.<span class="ident">gen</span>(), <span class="ident">rng</span>.<span class="ident">gen</span>(), <span class="ident">rng</span>.<span class="ident">gen</span>(), <span class="ident">rng</span>.<span class="ident">gen</span>())
+        <span class="ident">Quaternion::new</span>(<span class="ident">rng</span>.<span class="ident">gen</span>(), <span class="ident">rng</span>.<span class="ident">gen</span>(), <span class="ident">rng</span>.<span class="ident">gen</span>(), <span class="ident">rng</span>.<span class="ident">gen</span>())
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;arbitrary&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">RealField</span> <span class="op">+</span> <span class="ident">Arbitrary</span><span class="op">&gt;</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">Quaternion</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">Owned</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U4</span><span class="op">&gt;</span>: <span class="ident">Send</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">SimdRealField</span> <span class="op">+</span> <span class="ident">Arbitrary</span><span class="op">&gt;</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">Quaternion</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">Owned</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U4</span><span class="op">&gt;</span>: <span class="ident">Send</span>,
 {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span>::<span class="ident">new</span>(
-            <span class="ident">N</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>),
-            <span class="ident">N</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>),
-            <span class="ident">N</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>),
-            <span class="ident">N</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>),
+        <span class="self">Self</span><span class="ident">::new</span>(
+            <span class="ident">N::arbitrary</span>(<span class="ident">g</span>),
+            <span class="ident">N::arbitrary</span>(<span class="ident">g</span>),
+            <span class="ident">N::arbitrary</span>(<span class="ident">g</span>),
+            <span class="ident">N::arbitrary</span>(<span class="ident">g</span>),
         )
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">RealField</span><span class="op">&gt;</span> <span class="ident">UnitQuaternion</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">SimdRealField</span><span class="op">&gt;</span> <span class="ident">UnitQuaternion</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">N::Element</span>: <span class="ident">SimdRealField</span>,
+{
     <span class="doccomment">/// The rotation identity.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Example</span>
@@ -907,7 +1049,7 @@
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">identity</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span>::<span class="ident">new_unchecked</span>(<span class="ident">Quaternion</span>::<span class="ident">identity</span>())
+        <span class="self">Self</span><span class="ident">::new_unchecked</span>(<span class="ident">Quaternion::identity</span>())
     }
 
     <span class="doccomment">/// Creates a new quaternion from a unit vector (the rotation axis) and an angle</span>
@@ -935,11 +1077,13 @@
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_axis_angle</span><span class="op">&lt;</span><span class="ident">SB</span><span class="op">&gt;</span>(<span class="ident">axis</span>: <span class="kw-2">&amp;</span><span class="ident">Unit</span><span class="op">&lt;</span><span class="ident">Vector</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span>, <span class="ident">SB</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">angle</span>: <span class="ident">N</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
-    <span class="kw">where</span> <span class="ident">SB</span>: <span class="ident">Storage</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">sang</span>, <span class="ident">cang</span>) <span class="op">=</span> (<span class="ident">angle</span> <span class="op">/</span> <span class="kw">crate</span>::<span class="ident">convert</span>(<span class="number">2.0f64</span>)).<span class="ident">sin_cos</span>();
+    <span class="kw">where</span>
+        <span class="ident">SB</span>: <span class="ident">Storage</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span><span class="op">&gt;</span>,
+    {
+        <span class="kw">let</span> (<span class="ident">sang</span>, <span class="ident">cang</span>) <span class="op">=</span> (<span class="ident">angle</span> <span class="op">/</span> <span class="kw">crate</span><span class="ident">::convert</span>(<span class="number">2.0f64</span>)).<span class="ident">simd_sin_cos</span>();
 
-        <span class="kw">let</span> <span class="ident">q</span> <span class="op">=</span> <span class="ident">Quaternion</span>::<span class="ident">from_parts</span>(<span class="ident">cang</span>, <span class="ident">axis</span>.<span class="ident">as_ref</span>() <span class="op">*</span> <span class="ident">sang</span>);
-        <span class="self">Self</span>::<span class="ident">new_unchecked</span>(<span class="ident">q</span>)
+        <span class="kw">let</span> <span class="ident">q</span> <span class="op">=</span> <span class="ident">Quaternion::from_parts</span>(<span class="ident">cang</span>, <span class="ident">axis</span>.<span class="ident">as_ref</span>() <span class="op">*</span> <span class="ident">sang</span>);
+        <span class="self">Self</span><span class="ident">::new_unchecked</span>(<span class="ident">q</span>)
     }
 
     <span class="doccomment">/// Creates a new unit quaternion from a quaternion.</span>
@@ -947,7 +1091,7 @@
     <span class="doccomment">/// The input quaternion will be normalized.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_quaternion</span>(<span class="ident">q</span>: <span class="ident">Quaternion</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span>::<span class="ident">new_normalize</span>(<span class="ident">q</span>)
+        <span class="self">Self</span><span class="ident">::new_normalize</span>(<span class="ident">q</span>)
     }
 
     <span class="doccomment">/// Creates a new unit quaternion from Euler angles.</span>
@@ -966,18 +1110,18 @@
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_euler_angles</span>(<span class="ident">roll</span>: <span class="ident">N</span>, <span class="ident">pitch</span>: <span class="ident">N</span>, <span class="ident">yaw</span>: <span class="ident">N</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="kw">let</span> (<span class="ident">sr</span>, <span class="ident">cr</span>) <span class="op">=</span> (<span class="ident">roll</span> <span class="op">*</span> <span class="kw">crate</span>::<span class="ident">convert</span>(<span class="number">0.5f64</span>)).<span class="ident">sin_cos</span>();
-        <span class="kw">let</span> (<span class="ident">sp</span>, <span class="ident">cp</span>) <span class="op">=</span> (<span class="ident">pitch</span> <span class="op">*</span> <span class="kw">crate</span>::<span class="ident">convert</span>(<span class="number">0.5f64</span>)).<span class="ident">sin_cos</span>();
-        <span class="kw">let</span> (<span class="ident">sy</span>, <span class="ident">cy</span>) <span class="op">=</span> (<span class="ident">yaw</span> <span class="op">*</span> <span class="kw">crate</span>::<span class="ident">convert</span>(<span class="number">0.5f64</span>)).<span class="ident">sin_cos</span>();
+        <span class="kw">let</span> (<span class="ident">sr</span>, <span class="ident">cr</span>) <span class="op">=</span> (<span class="ident">roll</span> <span class="op">*</span> <span class="kw">crate</span><span class="ident">::convert</span>(<span class="number">0.5f64</span>)).<span class="ident">simd_sin_cos</span>();
+        <span class="kw">let</span> (<span class="ident">sp</span>, <span class="ident">cp</span>) <span class="op">=</span> (<span class="ident">pitch</span> <span class="op">*</span> <span class="kw">crate</span><span class="ident">::convert</span>(<span class="number">0.5f64</span>)).<span class="ident">simd_sin_cos</span>();
+        <span class="kw">let</span> (<span class="ident">sy</span>, <span class="ident">cy</span>) <span class="op">=</span> (<span class="ident">yaw</span> <span class="op">*</span> <span class="kw">crate</span><span class="ident">::convert</span>(<span class="number">0.5f64</span>)).<span class="ident">simd_sin_cos</span>();
 
-        <span class="kw">let</span> <span class="ident">q</span> <span class="op">=</span> <span class="ident">Quaternion</span>::<span class="ident">new</span>(
+        <span class="kw">let</span> <span class="ident">q</span> <span class="op">=</span> <span class="ident">Quaternion::new</span>(
             <span class="ident">cr</span> <span class="op">*</span> <span class="ident">cp</span> <span class="op">*</span> <span class="ident">cy</span> <span class="op">+</span> <span class="ident">sr</span> <span class="op">*</span> <span class="ident">sp</span> <span class="op">*</span> <span class="ident">sy</span>,
             <span class="ident">sr</span> <span class="op">*</span> <span class="ident">cp</span> <span class="op">*</span> <span class="ident">cy</span> <span class="op">-</span> <span class="ident">cr</span> <span class="op">*</span> <span class="ident">sp</span> <span class="op">*</span> <span class="ident">sy</span>,
             <span class="ident">cr</span> <span class="op">*</span> <span class="ident">sp</span> <span class="op">*</span> <span class="ident">cy</span> <span class="op">+</span> <span class="ident">sr</span> <span class="op">*</span> <span class="ident">cp</span> <span class="op">*</span> <span class="ident">sy</span>,
             <span class="ident">cr</span> <span class="op">*</span> <span class="ident">cp</span> <span class="op">*</span> <span class="ident">sy</span> <span class="op">-</span> <span class="ident">sr</span> <span class="op">*</span> <span class="ident">sp</span> <span class="op">*</span> <span class="ident">cy</span>,
         );
 
-        <span class="self">Self</span>::<span class="ident">new_unchecked</span>(<span class="ident">q</span>)
+        <span class="self">Self</span><span class="ident">::new_unchecked</span>(<span class="ident">q</span>)
     }
 
     <span class="doccomment">/// Builds an unit quaternion from a rotation matrix.</span>
@@ -999,48 +1143,60 @@
         <span class="comment">// Robust matrix to quaternion transformation.</span>
         <span class="comment">// See https://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion</span>
         <span class="kw">let</span> <span class="ident">tr</span> <span class="op">=</span> <span class="ident">rotmat</span>[(<span class="number">0</span>, <span class="number">0</span>)] <span class="op">+</span> <span class="ident">rotmat</span>[(<span class="number">1</span>, <span class="number">1</span>)] <span class="op">+</span> <span class="ident">rotmat</span>[(<span class="number">2</span>, <span class="number">2</span>)];
-        <span class="kw">let</span> <span class="ident">res</span>;
+        <span class="kw">let</span> <span class="ident">_0_25</span>: <span class="ident">N</span> <span class="op">=</span> <span class="kw">crate</span><span class="ident">::convert</span>(<span class="number">0.25</span>);
 
-        <span class="kw">let</span> <span class="ident">_0_25</span>: <span class="ident">N</span> <span class="op">=</span> <span class="kw">crate</span>::<span class="ident">convert</span>(<span class="number">0.25</span>);
+        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">tr</span>.<span class="ident">simd_gt</span>(<span class="ident">N::zero</span>()).<span class="ident">if_else3</span>(
+            <span class="op">|</span><span class="op">|</span> {
+                <span class="kw">let</span> <span class="ident">denom</span> <span class="op">=</span> (<span class="ident">tr</span> <span class="op">+</span> <span class="ident">N::one</span>()).<span class="ident">simd_sqrt</span>() <span class="op">*</span> <span class="kw">crate</span><span class="ident">::convert</span>(<span class="number">2.0</span>);
+                <span class="ident">Quaternion::new</span>(
+                    <span class="ident">_0_25</span> <span class="op">*</span> <span class="ident">denom</span>,
+                    (<span class="ident">rotmat</span>[(<span class="number">2</span>, <span class="number">1</span>)] <span class="op">-</span> <span class="ident">rotmat</span>[(<span class="number">1</span>, <span class="number">2</span>)]) <span class="op">/</span> <span class="ident">denom</span>,
+                    (<span class="ident">rotmat</span>[(<span class="number">0</span>, <span class="number">2</span>)] <span class="op">-</span> <span class="ident">rotmat</span>[(<span class="number">2</span>, <span class="number">0</span>)]) <span class="op">/</span> <span class="ident">denom</span>,
+                    (<span class="ident">rotmat</span>[(<span class="number">1</span>, <span class="number">0</span>)] <span class="op">-</span> <span class="ident">rotmat</span>[(<span class="number">0</span>, <span class="number">1</span>)]) <span class="op">/</span> <span class="ident">denom</span>,
+                )
+            },
+            (
+                <span class="op">|</span><span class="op">|</span> <span class="ident">rotmat</span>[(<span class="number">0</span>, <span class="number">0</span>)].<span class="ident">simd_gt</span>(<span class="ident">rotmat</span>[(<span class="number">1</span>, <span class="number">1</span>)]) <span class="op">&amp;</span> <span class="ident">rotmat</span>[(<span class="number">0</span>, <span class="number">0</span>)].<span class="ident">simd_gt</span>(<span class="ident">rotmat</span>[(<span class="number">2</span>, <span class="number">2</span>)]),
+                <span class="op">|</span><span class="op">|</span> {
+                    <span class="kw">let</span> <span class="ident">denom</span> <span class="op">=</span> (<span class="ident">N::one</span>() <span class="op">+</span> <span class="ident">rotmat</span>[(<span class="number">0</span>, <span class="number">0</span>)] <span class="op">-</span> <span class="ident">rotmat</span>[(<span class="number">1</span>, <span class="number">1</span>)] <span class="op">-</span> <span class="ident">rotmat</span>[(<span class="number">2</span>, <span class="number">2</span>)])
+                        .<span class="ident">simd_sqrt</span>()
+                        <span class="op">*</span> <span class="kw">crate</span><span class="ident">::convert</span>(<span class="number">2.0</span>);
+                    <span class="ident">Quaternion::new</span>(
+                        (<span class="ident">rotmat</span>[(<span class="number">2</span>, <span class="number">1</span>)] <span class="op">-</span> <span class="ident">rotmat</span>[(<span class="number">1</span>, <span class="number">2</span>)]) <span class="op">/</span> <span class="ident">denom</span>,
+                        <span class="ident">_0_25</span> <span class="op">*</span> <span class="ident">denom</span>,
+                        (<span class="ident">rotmat</span>[(<span class="number">0</span>, <span class="number">1</span>)] <span class="op">+</span> <span class="ident">rotmat</span>[(<span class="number">1</span>, <span class="number">0</span>)]) <span class="op">/</span> <span class="ident">denom</span>,
+                        (<span class="ident">rotmat</span>[(<span class="number">0</span>, <span class="number">2</span>)] <span class="op">+</span> <span class="ident">rotmat</span>[(<span class="number">2</span>, <span class="number">0</span>)]) <span class="op">/</span> <span class="ident">denom</span>,
+                    )
+                },
+            ),
+            (
+                <span class="op">|</span><span class="op">|</span> <span class="ident">rotmat</span>[(<span class="number">1</span>, <span class="number">1</span>)].<span class="ident">simd_gt</span>(<span class="ident">rotmat</span>[(<span class="number">2</span>, <span class="number">2</span>)]),
+                <span class="op">|</span><span class="op">|</span> {
+                    <span class="kw">let</span> <span class="ident">denom</span> <span class="op">=</span> (<span class="ident">N::one</span>() <span class="op">+</span> <span class="ident">rotmat</span>[(<span class="number">1</span>, <span class="number">1</span>)] <span class="op">-</span> <span class="ident">rotmat</span>[(<span class="number">0</span>, <span class="number">0</span>)] <span class="op">-</span> <span class="ident">rotmat</span>[(<span class="number">2</span>, <span class="number">2</span>)])
+                        .<span class="ident">simd_sqrt</span>()
+                        <span class="op">*</span> <span class="kw">crate</span><span class="ident">::convert</span>(<span class="number">2.0</span>);
+                    <span class="ident">Quaternion::new</span>(
+                        (<span class="ident">rotmat</span>[(<span class="number">0</span>, <span class="number">2</span>)] <span class="op">-</span> <span class="ident">rotmat</span>[(<span class="number">2</span>, <span class="number">0</span>)]) <span class="op">/</span> <span class="ident">denom</span>,
+                        (<span class="ident">rotmat</span>[(<span class="number">0</span>, <span class="number">1</span>)] <span class="op">+</span> <span class="ident">rotmat</span>[(<span class="number">1</span>, <span class="number">0</span>)]) <span class="op">/</span> <span class="ident">denom</span>,
+                        <span class="ident">_0_25</span> <span class="op">*</span> <span class="ident">denom</span>,
+                        (<span class="ident">rotmat</span>[(<span class="number">1</span>, <span class="number">2</span>)] <span class="op">+</span> <span class="ident">rotmat</span>[(<span class="number">2</span>, <span class="number">1</span>)]) <span class="op">/</span> <span class="ident">denom</span>,
+                    )
+                },
+            ),
+            <span class="op">|</span><span class="op">|</span> {
+                <span class="kw">let</span> <span class="ident">denom</span> <span class="op">=</span> (<span class="ident">N::one</span>() <span class="op">+</span> <span class="ident">rotmat</span>[(<span class="number">2</span>, <span class="number">2</span>)] <span class="op">-</span> <span class="ident">rotmat</span>[(<span class="number">0</span>, <span class="number">0</span>)] <span class="op">-</span> <span class="ident">rotmat</span>[(<span class="number">1</span>, <span class="number">1</span>)])
+                    .<span class="ident">simd_sqrt</span>()
+                    <span class="op">*</span> <span class="kw">crate</span><span class="ident">::convert</span>(<span class="number">2.0</span>);
+                <span class="ident">Quaternion::new</span>(
+                    (<span class="ident">rotmat</span>[(<span class="number">1</span>, <span class="number">0</span>)] <span class="op">-</span> <span class="ident">rotmat</span>[(<span class="number">0</span>, <span class="number">1</span>)]) <span class="op">/</span> <span class="ident">denom</span>,
+                    (<span class="ident">rotmat</span>[(<span class="number">0</span>, <span class="number">2</span>)] <span class="op">+</span> <span class="ident">rotmat</span>[(<span class="number">2</span>, <span class="number">0</span>)]) <span class="op">/</span> <span class="ident">denom</span>,
+                    (<span class="ident">rotmat</span>[(<span class="number">1</span>, <span class="number">2</span>)] <span class="op">+</span> <span class="ident">rotmat</span>[(<span class="number">2</span>, <span class="number">1</span>)]) <span class="op">/</span> <span class="ident">denom</span>,
+                    <span class="ident">_0_25</span> <span class="op">*</span> <span class="ident">denom</span>,
+                )
+            },
+        );
 
-        <span class="kw">if</span> <span class="ident">tr</span> <span class="op">&gt;</span> <span class="ident">N</span>::<span class="ident">zero</span>() {
-            <span class="kw">let</span> <span class="ident">denom</span> <span class="op">=</span> (<span class="ident">tr</span> <span class="op">+</span> <span class="ident">N</span>::<span class="ident">one</span>()).<span class="ident">sqrt</span>() <span class="op">*</span> <span class="kw">crate</span>::<span class="ident">convert</span>(<span class="number">2.0</span>);
-            <span class="ident">res</span> <span class="op">=</span> <span class="ident">Quaternion</span>::<span class="ident">new</span>(
-                <span class="ident">_0_25</span> <span class="op">*</span> <span class="ident">denom</span>,
-                (<span class="ident">rotmat</span>[(<span class="number">2</span>, <span class="number">1</span>)] <span class="op">-</span> <span class="ident">rotmat</span>[(<span class="number">1</span>, <span class="number">2</span>)]) <span class="op">/</span> <span class="ident">denom</span>,
-                (<span class="ident">rotmat</span>[(<span class="number">0</span>, <span class="number">2</span>)] <span class="op">-</span> <span class="ident">rotmat</span>[(<span class="number">2</span>, <span class="number">0</span>)]) <span class="op">/</span> <span class="ident">denom</span>,
-                (<span class="ident">rotmat</span>[(<span class="number">1</span>, <span class="number">0</span>)] <span class="op">-</span> <span class="ident">rotmat</span>[(<span class="number">0</span>, <span class="number">1</span>)]) <span class="op">/</span> <span class="ident">denom</span>,
-            );
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">rotmat</span>[(<span class="number">0</span>, <span class="number">0</span>)] <span class="op">&gt;</span> <span class="ident">rotmat</span>[(<span class="number">1</span>, <span class="number">1</span>)] <span class="op">&amp;&amp;</span> <span class="ident">rotmat</span>[(<span class="number">0</span>, <span class="number">0</span>)] <span class="op">&gt;</span> <span class="ident">rotmat</span>[(<span class="number">2</span>, <span class="number">2</span>)] {
-            <span class="kw">let</span> <span class="ident">denom</span> <span class="op">=</span> (<span class="ident">N</span>::<span class="ident">one</span>() <span class="op">+</span> <span class="ident">rotmat</span>[(<span class="number">0</span>, <span class="number">0</span>)] <span class="op">-</span> <span class="ident">rotmat</span>[(<span class="number">1</span>, <span class="number">1</span>)] <span class="op">-</span> <span class="ident">rotmat</span>[(<span class="number">2</span>, <span class="number">2</span>)]).<span class="ident">sqrt</span>()
-                <span class="op">*</span> <span class="kw">crate</span>::<span class="ident">convert</span>(<span class="number">2.0</span>);
-            <span class="ident">res</span> <span class="op">=</span> <span class="ident">Quaternion</span>::<span class="ident">new</span>(
-                (<span class="ident">rotmat</span>[(<span class="number">2</span>, <span class="number">1</span>)] <span class="op">-</span> <span class="ident">rotmat</span>[(<span class="number">1</span>, <span class="number">2</span>)]) <span class="op">/</span> <span class="ident">denom</span>,
-                <span class="ident">_0_25</span> <span class="op">*</span> <span class="ident">denom</span>,
-                (<span class="ident">rotmat</span>[(<span class="number">0</span>, <span class="number">1</span>)] <span class="op">+</span> <span class="ident">rotmat</span>[(<span class="number">1</span>, <span class="number">0</span>)]) <span class="op">/</span> <span class="ident">denom</span>,
-                (<span class="ident">rotmat</span>[(<span class="number">0</span>, <span class="number">2</span>)] <span class="op">+</span> <span class="ident">rotmat</span>[(<span class="number">2</span>, <span class="number">0</span>)]) <span class="op">/</span> <span class="ident">denom</span>,
-            );
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">rotmat</span>[(<span class="number">1</span>, <span class="number">1</span>)] <span class="op">&gt;</span> <span class="ident">rotmat</span>[(<span class="number">2</span>, <span class="number">2</span>)] {
-            <span class="kw">let</span> <span class="ident">denom</span> <span class="op">=</span> (<span class="ident">N</span>::<span class="ident">one</span>() <span class="op">+</span> <span class="ident">rotmat</span>[(<span class="number">1</span>, <span class="number">1</span>)] <span class="op">-</span> <span class="ident">rotmat</span>[(<span class="number">0</span>, <span class="number">0</span>)] <span class="op">-</span> <span class="ident">rotmat</span>[(<span class="number">2</span>, <span class="number">2</span>)]).<span class="ident">sqrt</span>()
-                <span class="op">*</span> <span class="kw">crate</span>::<span class="ident">convert</span>(<span class="number">2.0</span>);
-            <span class="ident">res</span> <span class="op">=</span> <span class="ident">Quaternion</span>::<span class="ident">new</span>(
-                (<span class="ident">rotmat</span>[(<span class="number">0</span>, <span class="number">2</span>)] <span class="op">-</span> <span class="ident">rotmat</span>[(<span class="number">2</span>, <span class="number">0</span>)]) <span class="op">/</span> <span class="ident">denom</span>,
-                (<span class="ident">rotmat</span>[(<span class="number">0</span>, <span class="number">1</span>)] <span class="op">+</span> <span class="ident">rotmat</span>[(<span class="number">1</span>, <span class="number">0</span>)]) <span class="op">/</span> <span class="ident">denom</span>,
-                <span class="ident">_0_25</span> <span class="op">*</span> <span class="ident">denom</span>,
-                (<span class="ident">rotmat</span>[(<span class="number">1</span>, <span class="number">2</span>)] <span class="op">+</span> <span class="ident">rotmat</span>[(<span class="number">2</span>, <span class="number">1</span>)]) <span class="op">/</span> <span class="ident">denom</span>,
-            );
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">denom</span> <span class="op">=</span> (<span class="ident">N</span>::<span class="ident">one</span>() <span class="op">+</span> <span class="ident">rotmat</span>[(<span class="number">2</span>, <span class="number">2</span>)] <span class="op">-</span> <span class="ident">rotmat</span>[(<span class="number">0</span>, <span class="number">0</span>)] <span class="op">-</span> <span class="ident">rotmat</span>[(<span class="number">1</span>, <span class="number">1</span>)]).<span class="ident">sqrt</span>()
-                <span class="op">*</span> <span class="kw">crate</span>::<span class="ident">convert</span>(<span class="number">2.0</span>);
-            <span class="ident">res</span> <span class="op">=</span> <span class="ident">Quaternion</span>::<span class="ident">new</span>(
-                (<span class="ident">rotmat</span>[(<span class="number">1</span>, <span class="number">0</span>)] <span class="op">-</span> <span class="ident">rotmat</span>[(<span class="number">0</span>, <span class="number">1</span>)]) <span class="op">/</span> <span class="ident">denom</span>,
-                (<span class="ident">rotmat</span>[(<span class="number">0</span>, <span class="number">2</span>)] <span class="op">+</span> <span class="ident">rotmat</span>[(<span class="number">2</span>, <span class="number">0</span>)]) <span class="op">/</span> <span class="ident">denom</span>,
-                (<span class="ident">rotmat</span>[(<span class="number">1</span>, <span class="number">2</span>)] <span class="op">+</span> <span class="ident">rotmat</span>[(<span class="number">2</span>, <span class="number">1</span>)]) <span class="op">/</span> <span class="ident">denom</span>,
-                <span class="ident">_0_25</span> <span class="op">*</span> <span class="ident">denom</span>,
-            );
-        }
-
-        <span class="self">Self</span>::<span class="ident">new_unchecked</span>(<span class="ident">res</span>)
+        <span class="self">Self</span><span class="ident">::new_unchecked</span>(<span class="ident">res</span>)
     }
 
     <span class="doccomment">/// Builds an unit quaternion by extracting the rotation part of the given transformation `m`.</span>
@@ -1048,8 +1204,11 @@
     <span class="doccomment">/// This is an iterative method. See `.from_matrix_eps` to provide mover</span>
     <span class="doccomment">/// convergence parameters and starting solution.</span>
     <span class="doccomment">/// This implements &quot;A Robust Method to Extract the Rotational Part of Deformations&quot; by Müller et al.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_matrix</span>(<span class="ident">m</span>: <span class="kw-2">&amp;</span><span class="ident">Matrix3</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident">Rotation3</span>::<span class="ident">from_matrix</span>(<span class="ident">m</span>).<span class="ident">into</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_matrix</span>(<span class="ident">m</span>: <span class="kw-2">&amp;</span><span class="ident">Matrix3</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">where</span>
+        <span class="ident">N</span>: <span class="ident">RealField</span>,
+    {
+        <span class="ident">Rotation3::from_matrix</span>(<span class="ident">m</span>).<span class="ident">into</span>()
     }
 
     <span class="doccomment">/// Builds an unit quaternion by extracting the rotation part of the given transformation `m`.</span>
@@ -1064,9 +1223,12 @@
     <span class="doccomment">/// * `guess`: an estimate of the solution. Convergence will be significantly faster if an initial solution close</span>
     <span class="doccomment">///           to the actual solution is provided. Can be set to `UnitQuaternion::identity()` if no other</span>
     <span class="doccomment">///           guesses come to mind.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_matrix_eps</span>(<span class="ident">m</span>: <span class="kw-2">&amp;</span><span class="ident">Matrix3</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>, <span class="ident">eps</span>: <span class="ident">N</span>, <span class="ident">max_iter</span>: <span class="ident">usize</span>, <span class="ident">guess</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">guess</span> <span class="op">=</span> <span class="ident">Rotation3</span>::<span class="ident">from</span>(<span class="ident">guess</span>);
-        <span class="ident">Rotation3</span>::<span class="ident">from_matrix_eps</span>(<span class="ident">m</span>, <span class="ident">eps</span>, <span class="ident">max_iter</span>, <span class="ident">guess</span>).<span class="ident">into</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_matrix_eps</span>(<span class="ident">m</span>: <span class="kw-2">&amp;</span><span class="ident">Matrix3</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>, <span class="ident">eps</span>: <span class="ident">N</span>, <span class="ident">max_iter</span>: <span class="ident">usize</span>, <span class="ident">guess</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">where</span>
+        <span class="ident">N</span>: <span class="ident">RealField</span>,
+    {
+        <span class="kw">let</span> <span class="ident">guess</span> <span class="op">=</span> <span class="ident">Rotation3::from</span>(<span class="ident">guess</span>);
+        <span class="ident">Rotation3::from_matrix_eps</span>(<span class="ident">m</span>, <span class="ident">eps</span>, <span class="ident">max_iter</span>, <span class="ident">guess</span>).<span class="ident">into</span>()
     }
 
     <span class="doccomment">/// The unit quaternion needed to make `a` and `b` be collinear and point toward the same</span>
@@ -1085,10 +1247,11 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rotation_between</span><span class="op">&lt;</span><span class="ident">SB</span>, <span class="ident">SC</span><span class="op">&gt;</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">Vector</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span>, <span class="ident">SB</span><span class="op">&gt;</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">Vector</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span>, <span class="ident">SC</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
     <span class="kw">where</span>
+        <span class="ident">N</span>: <span class="ident">RealField</span>,
         <span class="ident">SB</span>: <span class="ident">Storage</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span><span class="op">&gt;</span>,
         <span class="ident">SC</span>: <span class="ident">Storage</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span><span class="op">&gt;</span>,
     {
-        <span class="self">Self</span>::<span class="ident">scaled_rotation_between</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">N</span>::<span class="ident">one</span>())
+        <span class="self">Self</span><span class="ident">::scaled_rotation_between</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">N::one</span>())
     }
 
     <span class="doccomment">/// The smallest rotation needed to make `a` and `b` collinear and point toward the same</span>
@@ -1112,17 +1275,18 @@
         <span class="ident">s</span>: <span class="ident">N</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
     <span class="kw">where</span>
+        <span class="ident">N</span>: <span class="ident">RealField</span>,
         <span class="ident">SB</span>: <span class="ident">Storage</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span><span class="op">&gt;</span>,
         <span class="ident">SC</span>: <span class="ident">Storage</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span><span class="op">&gt;</span>,
     {
         <span class="comment">// FIXME: code duplication with Rotation.</span>
         <span class="kw">if</span> <span class="kw">let</span> (<span class="prelude-val">Some</span>(<span class="ident">na</span>), <span class="prelude-val">Some</span>(<span class="ident">nb</span>)) <span class="op">=</span> (
-            <span class="ident">Unit</span>::<span class="ident">try_new</span>(<span class="ident">a</span>.<span class="ident">clone_owned</span>(), <span class="ident">N</span>::<span class="ident">zero</span>()),
-            <span class="ident">Unit</span>::<span class="ident">try_new</span>(<span class="ident">b</span>.<span class="ident">clone_owned</span>(), <span class="ident">N</span>::<span class="ident">zero</span>()),
+            <span class="ident">Unit::try_new</span>(<span class="ident">a</span>.<span class="ident">clone_owned</span>(), <span class="ident">N::zero</span>()),
+            <span class="ident">Unit::try_new</span>(<span class="ident">b</span>.<span class="ident">clone_owned</span>(), <span class="ident">N::zero</span>()),
         ) {
-            <span class="self">Self</span>::<span class="ident">scaled_rotation_between_axis</span>(<span class="kw-2">&amp;</span><span class="ident">na</span>, <span class="kw-2">&amp;</span><span class="ident">nb</span>, <span class="ident">s</span>)
+            <span class="self">Self</span><span class="ident">::scaled_rotation_between_axis</span>(<span class="kw-2">&amp;</span><span class="ident">na</span>, <span class="kw-2">&amp;</span><span class="ident">nb</span>, <span class="ident">s</span>)
         } <span class="kw">else</span> {
-            <span class="prelude-val">Some</span>(<span class="self">Self</span>::<span class="ident">identity</span>())
+            <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::identity</span>())
         }
     }
 
@@ -1145,10 +1309,11 @@
         <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">Unit</span><span class="op">&lt;</span><span class="ident">Vector</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span>, <span class="ident">SC</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
     <span class="kw">where</span>
+        <span class="ident">N</span>: <span class="ident">RealField</span>,
         <span class="ident">SB</span>: <span class="ident">Storage</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span><span class="op">&gt;</span>,
         <span class="ident">SC</span>: <span class="ident">Storage</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span><span class="op">&gt;</span>,
     {
-        <span class="self">Self</span>::<span class="ident">scaled_rotation_between_axis</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">N</span>::<span class="ident">one</span>())
+        <span class="self">Self</span><span class="ident">::scaled_rotation_between_axis</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">N::one</span>())
     }
 
     <span class="doccomment">/// The smallest rotation needed to make `a` and `b` collinear and point toward the same</span>
@@ -1172,24 +1337,25 @@
         <span class="ident">s</span>: <span class="ident">N</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
     <span class="kw">where</span>
+        <span class="ident">N</span>: <span class="ident">RealField</span>,
         <span class="ident">SB</span>: <span class="ident">Storage</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span><span class="op">&gt;</span>,
         <span class="ident">SC</span>: <span class="ident">Storage</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span><span class="op">&gt;</span>,
     {
         <span class="comment">// FIXME: code duplication with Rotation.</span>
         <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">na</span>.<span class="ident">cross</span>(<span class="kw-2">&amp;</span><span class="ident">nb</span>);
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">axis</span>) <span class="op">=</span> <span class="ident">Unit</span>::<span class="ident">try_new</span>(<span class="ident">c</span>, <span class="ident">N</span>::<span class="ident">default_epsilon</span>()) {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">axis</span>) <span class="op">=</span> <span class="ident">Unit::try_new</span>(<span class="ident">c</span>, <span class="ident">N::default_epsilon</span>()) {
             <span class="kw">let</span> <span class="ident">cos</span> <span class="op">=</span> <span class="ident">na</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">nb</span>);
 
             <span class="comment">// The cosinus may be out of [-1, 1] because of inaccuracies.</span>
-            <span class="kw">if</span> <span class="ident">cos</span> <span class="op">&lt;</span><span class="op">=</span> <span class="op">-</span><span class="ident">N</span>::<span class="ident">one</span>() {
+            <span class="kw">if</span> <span class="ident">cos</span> <span class="op">&lt;</span><span class="op">=</span> <span class="op">-</span><span class="ident">N::one</span>() {
                 <span class="kw">return</span> <span class="prelude-val">None</span>;
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">cos</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">N</span>::<span class="ident">one</span>() {
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="self">Self</span>::<span class="ident">identity</span>());
+            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">cos</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">N::one</span>() {
+                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::identity</span>());
             } <span class="kw">else</span> {
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="self">Self</span>::<span class="ident">from_axis_angle</span>(<span class="kw-2">&amp;</span><span class="ident">axis</span>, <span class="ident">cos</span>.<span class="ident">acos</span>() <span class="op">*</span> <span class="ident">s</span>));
+                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::from_axis_angle</span>(<span class="kw-2">&amp;</span><span class="ident">axis</span>, <span class="ident">cos</span>.<span class="ident">acos</span>() <span class="op">*</span> <span class="ident">s</span>));
             }
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">na</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">nb</span>) <span class="op">&lt;</span> <span class="ident">N</span>::<span class="ident">zero</span>() {
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">na</span>.<span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="ident">nb</span>) <span class="op">&lt;</span> <span class="ident">N::zero</span>() {
             <span class="comment">// PI</span>
             <span class="comment">//</span>
             <span class="comment">// The rotation axis is undefined but the angle not zero. This is not a</span>
@@ -1197,7 +1363,7 @@
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         } <span class="kw">else</span> {
             <span class="comment">// Zero</span>
-            <span class="prelude-val">Some</span>(<span class="self">Self</span>::<span class="ident">identity</span>())
+            <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::identity</span>())
         }
     }
 
@@ -1229,17 +1395,17 @@
         <span class="ident">SB</span>: <span class="ident">Storage</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span><span class="op">&gt;</span>,
         <span class="ident">SC</span>: <span class="ident">Storage</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span><span class="op">&gt;</span>,
     {
-        <span class="self">Self</span>::<span class="ident">from_rotation_matrix</span>(<span class="kw-2">&amp;</span><span class="ident">Rotation3</span>::<span class="ident">face_towards</span>(<span class="ident">dir</span>, <span class="ident">up</span>))
+        <span class="self">Self</span><span class="ident">::from_rotation_matrix</span>(<span class="kw-2">&amp;</span><span class="ident">Rotation3::face_towards</span>(<span class="ident">dir</span>, <span class="ident">up</span>))
     }
 
     <span class="doccomment">/// Deprecated: Use [UnitQuaternion::face_towards] instead.</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span><span class="op">=</span><span class="string">&quot;renamed to `face_towards`&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;renamed to `face_towards`&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_observer_frames</span><span class="op">&lt;</span><span class="ident">SB</span>, <span class="ident">SC</span><span class="op">&gt;</span>(<span class="ident">dir</span>: <span class="kw-2">&amp;</span><span class="ident">Vector</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span>, <span class="ident">SB</span><span class="op">&gt;</span>, <span class="ident">up</span>: <span class="kw-2">&amp;</span><span class="ident">Vector</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span>, <span class="ident">SC</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">SB</span>: <span class="ident">Storage</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span><span class="op">&gt;</span>,
         <span class="ident">SC</span>: <span class="ident">Storage</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span><span class="op">&gt;</span>,
     {
-        <span class="self">Self</span>::<span class="ident">face_towards</span>(<span class="ident">dir</span>, <span class="ident">up</span>)
+        <span class="self">Self</span><span class="ident">::face_towards</span>(<span class="ident">dir</span>, <span class="ident">up</span>)
     }
 
     <span class="doccomment">/// Builds a right-handed look-at view matrix without translation.</span>
@@ -1270,7 +1436,7 @@
         <span class="ident">SB</span>: <span class="ident">Storage</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span><span class="op">&gt;</span>,
         <span class="ident">SC</span>: <span class="ident">Storage</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span><span class="op">&gt;</span>,
     {
-        <span class="self">Self</span>::<span class="ident">face_towards</span>(<span class="kw-2">&amp;</span><span class="op">-</span><span class="ident">dir</span>, <span class="ident">up</span>).<span class="ident">inverse</span>()
+        <span class="self">Self</span><span class="ident">::face_towards</span>(<span class="kw-2">&amp;</span><span class="op">-</span><span class="ident">dir</span>, <span class="ident">up</span>).<span class="ident">inverse</span>()
     }
 
     <span class="doccomment">/// Builds a left-handed look-at view matrix without translation.</span>
@@ -1301,7 +1467,7 @@
         <span class="ident">SB</span>: <span class="ident">Storage</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span><span class="op">&gt;</span>,
         <span class="ident">SC</span>: <span class="ident">Storage</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span><span class="op">&gt;</span>,
     {
-        <span class="self">Self</span>::<span class="ident">face_towards</span>(<span class="ident">dir</span>, <span class="ident">up</span>).<span class="ident">inverse</span>()
+        <span class="self">Self</span><span class="ident">::face_towards</span>(<span class="ident">dir</span>, <span class="ident">up</span>).<span class="ident">inverse</span>()
     }
 
     <span class="doccomment">/// Creates a new unit quaternion rotation from a rotation axis scaled by the rotation angle.</span>
@@ -1327,10 +1493,12 @@
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">SB</span><span class="op">&gt;</span>(<span class="ident">axisangle</span>: <span class="ident">Vector</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span>, <span class="ident">SB</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
-    <span class="kw">where</span> <span class="ident">SB</span>: <span class="ident">Storage</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">two</span>: <span class="ident">N</span> <span class="op">=</span> <span class="kw">crate</span>::<span class="ident">convert</span>(<span class="number">2.0f64</span>);
-        <span class="kw">let</span> <span class="ident">q</span> <span class="op">=</span> <span class="ident">Quaternion</span>::<span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>::<span class="ident">from_imag</span>(<span class="ident">axisangle</span> <span class="op">/</span> <span class="ident">two</span>).<span class="ident">exp</span>();
-        <span class="self">Self</span>::<span class="ident">new_unchecked</span>(<span class="ident">q</span>)
+    <span class="kw">where</span>
+        <span class="ident">SB</span>: <span class="ident">Storage</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span><span class="op">&gt;</span>,
+    {
+        <span class="kw">let</span> <span class="ident">two</span>: <span class="ident">N</span> <span class="op">=</span> <span class="kw">crate</span><span class="ident">::convert</span>(<span class="number">2.0f64</span>);
+        <span class="kw">let</span> <span class="ident">q</span> <span class="op">=</span> <span class="ident">Quaternion</span>::<span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span><span class="ident">::from_imag</span>(<span class="ident">axisangle</span> <span class="op">/</span> <span class="ident">two</span>).<span class="ident">exp</span>();
+        <span class="self">Self</span><span class="ident">::new_unchecked</span>(<span class="ident">q</span>)
     }
 
     <span class="doccomment">/// Creates a new unit quaternion rotation from a rotation axis scaled by the rotation angle.</span>
@@ -1356,10 +1524,12 @@
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_eps</span><span class="op">&lt;</span><span class="ident">SB</span><span class="op">&gt;</span>(<span class="ident">axisangle</span>: <span class="ident">Vector</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span>, <span class="ident">SB</span><span class="op">&gt;</span>, <span class="ident">eps</span>: <span class="ident">N</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
-    <span class="kw">where</span> <span class="ident">SB</span>: <span class="ident">Storage</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">two</span>: <span class="ident">N</span> <span class="op">=</span> <span class="kw">crate</span>::<span class="ident">convert</span>(<span class="number">2.0f64</span>);
-        <span class="kw">let</span> <span class="ident">q</span> <span class="op">=</span> <span class="ident">Quaternion</span>::<span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>::<span class="ident">from_imag</span>(<span class="ident">axisangle</span> <span class="op">/</span> <span class="ident">two</span>).<span class="ident">exp_eps</span>(<span class="ident">eps</span>);
-        <span class="self">Self</span>::<span class="ident">new_unchecked</span>(<span class="ident">q</span>)
+    <span class="kw">where</span>
+        <span class="ident">SB</span>: <span class="ident">Storage</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span><span class="op">&gt;</span>,
+    {
+        <span class="kw">let</span> <span class="ident">two</span>: <span class="ident">N</span> <span class="op">=</span> <span class="kw">crate</span><span class="ident">::convert</span>(<span class="number">2.0f64</span>);
+        <span class="kw">let</span> <span class="ident">q</span> <span class="op">=</span> <span class="ident">Quaternion</span>::<span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span><span class="ident">::from_imag</span>(<span class="ident">axisangle</span> <span class="op">/</span> <span class="ident">two</span>).<span class="ident">exp_eps</span>(<span class="ident">eps</span>);
+        <span class="self">Self</span><span class="ident">::new_unchecked</span>(<span class="ident">q</span>)
     }
 
     <span class="doccomment">/// Creates a new unit quaternion rotation from a rotation axis scaled by the rotation angle.</span>
@@ -1386,8 +1556,10 @@
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_scaled_axis</span><span class="op">&lt;</span><span class="ident">SB</span><span class="op">&gt;</span>(<span class="ident">axisangle</span>: <span class="ident">Vector</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span>, <span class="ident">SB</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
-    <span class="kw">where</span> <span class="ident">SB</span>: <span class="ident">Storage</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span><span class="op">&gt;</span> {
-        <span class="self">Self</span>::<span class="ident">new</span>(<span class="ident">axisangle</span>)
+    <span class="kw">where</span>
+        <span class="ident">SB</span>: <span class="ident">Storage</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span><span class="op">&gt;</span>,
+    {
+        <span class="self">Self</span><span class="ident">::new</span>(<span class="ident">axisangle</span>)
     }
 
     <span class="doccomment">/// Creates a new unit quaternion rotation from a rotation axis scaled by the rotation angle.</span>
@@ -1414,20 +1586,82 @@
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_scaled_axis_eps</span><span class="op">&lt;</span><span class="ident">SB</span><span class="op">&gt;</span>(<span class="ident">axisangle</span>: <span class="ident">Vector</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span>, <span class="ident">SB</span><span class="op">&gt;</span>, <span class="ident">eps</span>: <span class="ident">N</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
-    <span class="kw">where</span> <span class="ident">SB</span>: <span class="ident">Storage</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span><span class="op">&gt;</span> {
-        <span class="self">Self</span>::<span class="ident">new_eps</span>(<span class="ident">axisangle</span>, <span class="ident">eps</span>)
+    <span class="kw">where</span>
+        <span class="ident">SB</span>: <span class="ident">Storage</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U3</span><span class="op">&gt;</span>,
+    {
+        <span class="self">Self</span><span class="ident">::new_eps</span>(<span class="ident">axisangle</span>, <span class="ident">eps</span>)
+    }
+
+    <span class="doccomment">/// Create the mean unit quaternion from a data structure implementing IntoIterator</span>
+    <span class="doccomment">/// returning unit quaternions.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The method will panic if the iterator does not return any quaternions.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Algorithm from: Oshman, Yaakov, and Avishy Carmi. &quot;Attitude estimation from vector</span>
+    <span class="doccomment">/// observations using a genetic-algorithm-embedded quaternion particle filter.&quot; Journal of</span>
+    <span class="doccomment">/// Guidance, Control, and Dynamics 29.4 (2006): 879-891.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Example</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # #[macro_use] extern crate approx;</span>
+    <span class="doccomment">/// # use std::f32;</span>
+    <span class="doccomment">/// # use nalgebra::{UnitQuaternion};</span>
+    <span class="doccomment">/// let q1 = UnitQuaternion::from_euler_angles(0.0, 0.0, 0.0);</span>
+    <span class="doccomment">/// let q2 = UnitQuaternion::from_euler_angles(-0.1, 0.0, 0.0);</span>
+    <span class="doccomment">/// let q3 = UnitQuaternion::from_euler_angles(0.1, 0.0, 0.0);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let quat_vec = vec![q1, q2, q3];</span>
+    <span class="doccomment">/// let q_mean = UnitQuaternion::mean_of(quat_vec);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let euler_angles_mean = q_mean.euler_angles();</span>
+    <span class="doccomment">/// assert_relative_eq!(euler_angles_mean.0, 0.0, epsilon = 1.0e-7)</span>
+    <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mean_of</span>(<span class="ident">unit_quaternions</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="self">Self</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">where</span>
+        <span class="ident">N</span>: <span class="ident">RealField</span>,
+    {
+        <span class="kw">let</span> <span class="ident">quaternions_matrix</span>: <span class="ident">Matrix4</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">unit_quaternions</span>
+            .<span class="ident">into_iter</span>()
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">q</span><span class="op">|</span> <span class="ident">q</span>.<span class="ident">as_vector</span>() <span class="op">*</span> <span class="ident">q</span>.<span class="ident">as_vector</span>().<span class="ident">transpose</span>())
+            .<span class="ident">sum</span>();
+
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">quaternions_matrix</span>.<span class="ident">is_zero</span>());
+
+        <span class="kw">let</span> <span class="ident">eigen_matrix</span> <span class="op">=</span> <span class="ident">quaternions_matrix</span>
+            .<span class="ident">try_symmetric_eigen</span>(<span class="ident">N::RealField::default_epsilon</span>(), <span class="number">10</span>)
+            .<span class="ident">expect</span>(<span class="string">&quot;Quaternions matrix could not be diagonalized. This behavior should not be possible.&quot;</span>);
+
+        <span class="kw">let</span> <span class="ident">max_eigenvalue_index</span> <span class="op">=</span> <span class="ident">eigen_matrix</span>
+            .<span class="ident">eigenvalues</span>
+            .<span class="ident">iter</span>()
+            .<span class="ident">position</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">v</span> <span class="op">=</span><span class="op">=</span> <span class="ident">eigen_matrix</span>.<span class="ident">eigenvalues</span>.<span class="ident">max</span>())
+            .<span class="ident">unwrap</span>();
+
+        <span class="kw">let</span> <span class="ident">max_eigenvector</span> <span class="op">=</span> <span class="ident">eigen_matrix</span>.<span class="ident">eigenvectors</span>.<span class="ident">column</span>(<span class="ident">max_eigenvalue_index</span>);
+        <span class="ident">UnitQuaternion::from_quaternion</span>(<span class="ident">Quaternion::new</span>(
+            <span class="ident">max_eigenvector</span>[<span class="number">0</span>],
+            <span class="ident">max_eigenvector</span>[<span class="number">1</span>],
+            <span class="ident">max_eigenvector</span>[<span class="number">2</span>],
+            <span class="ident">max_eigenvector</span>[<span class="number">3</span>],
+        ))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">RealField</span><span class="op">&gt;</span> <span class="ident">One</span> <span class="kw">for</span> <span class="ident">UnitQuaternion</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">SimdRealField</span><span class="op">&gt;</span> <span class="ident">One</span> <span class="kw">for</span> <span class="ident">UnitQuaternion</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">N::Element</span>: <span class="ident">SimdRealField</span>,
+{
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">one</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span>::<span class="ident">identity</span>()
+        <span class="self">Self</span><span class="ident">::identity</span>()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">RealField</span><span class="op">&gt;</span> <span class="ident">Distribution</span><span class="op">&lt;</span><span class="ident">UnitQuaternion</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Standard</span>
-<span class="kw">where</span> <span class="ident">OpenClosed01</span>: <span class="ident">Distribution</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">SimdRealField</span><span class="op">&gt;</span> <span class="ident">Distribution</span><span class="op">&lt;</span><span class="ident">UnitQuaternion</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Standard</span>
+<span class="kw">where</span>
+    <span class="ident">N::Element</span>: <span class="ident">SimdRealField</span>,
+    <span class="ident">OpenClosed01</span>: <span class="ident">Distribution</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>,
 {
     <span class="doccomment">/// Generate a uniformly distributed random rotation quaternion.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
@@ -1438,15 +1672,15 @@
         <span class="kw">let</span> <span class="ident">x0</span> <span class="op">=</span> <span class="ident">rng</span>.<span class="ident">sample</span>(<span class="ident">OpenClosed01</span>);
         <span class="kw">let</span> <span class="ident">x1</span> <span class="op">=</span> <span class="ident">rng</span>.<span class="ident">sample</span>(<span class="ident">OpenClosed01</span>);
         <span class="kw">let</span> <span class="ident">x2</span> <span class="op">=</span> <span class="ident">rng</span>.<span class="ident">sample</span>(<span class="ident">OpenClosed01</span>);
-        <span class="kw">let</span> <span class="ident">theta1</span> <span class="op">=</span> <span class="ident">N</span>::<span class="ident">two_pi</span>() <span class="op">*</span> <span class="ident">x1</span>;
-        <span class="kw">let</span> <span class="ident">theta2</span> <span class="op">=</span> <span class="ident">N</span>::<span class="ident">two_pi</span>() <span class="op">*</span> <span class="ident">x2</span>;
-        <span class="kw">let</span> <span class="ident">s1</span> <span class="op">=</span> <span class="ident">theta1</span>.<span class="ident">sin</span>();
-        <span class="kw">let</span> <span class="ident">c1</span> <span class="op">=</span> <span class="ident">theta1</span>.<span class="ident">cos</span>();
-        <span class="kw">let</span> <span class="ident">s2</span> <span class="op">=</span> <span class="ident">theta2</span>.<span class="ident">sin</span>();
-        <span class="kw">let</span> <span class="ident">c2</span> <span class="op">=</span> <span class="ident">theta2</span>.<span class="ident">cos</span>();
-        <span class="kw">let</span> <span class="ident">r1</span> <span class="op">=</span> (<span class="ident">N</span>::<span class="ident">one</span>() <span class="op">-</span> <span class="ident">x0</span>).<span class="ident">sqrt</span>();
-        <span class="kw">let</span> <span class="ident">r2</span> <span class="op">=</span> <span class="ident">x0</span>.<span class="ident">sqrt</span>();
-        <span class="ident">Unit</span>::<span class="ident">new_unchecked</span>(<span class="ident">Quaternion</span>::<span class="ident">new</span>(<span class="ident">s1</span> <span class="op">*</span> <span class="ident">r1</span>, <span class="ident">c1</span> <span class="op">*</span> <span class="ident">r1</span>, <span class="ident">s2</span> <span class="op">*</span> <span class="ident">r2</span>, <span class="ident">c2</span> <span class="op">*</span> <span class="ident">r2</span>))
+        <span class="kw">let</span> <span class="ident">theta1</span> <span class="op">=</span> <span class="ident">N::simd_two_pi</span>() <span class="op">*</span> <span class="ident">x1</span>;
+        <span class="kw">let</span> <span class="ident">theta2</span> <span class="op">=</span> <span class="ident">N::simd_two_pi</span>() <span class="op">*</span> <span class="ident">x2</span>;
+        <span class="kw">let</span> <span class="ident">s1</span> <span class="op">=</span> <span class="ident">theta1</span>.<span class="ident">simd_sin</span>();
+        <span class="kw">let</span> <span class="ident">c1</span> <span class="op">=</span> <span class="ident">theta1</span>.<span class="ident">simd_cos</span>();
+        <span class="kw">let</span> <span class="ident">s2</span> <span class="op">=</span> <span class="ident">theta2</span>.<span class="ident">simd_sin</span>();
+        <span class="kw">let</span> <span class="ident">c2</span> <span class="op">=</span> <span class="ident">theta2</span>.<span class="ident">simd_cos</span>();
+        <span class="kw">let</span> <span class="ident">r1</span> <span class="op">=</span> (<span class="ident">N::one</span>() <span class="op">-</span> <span class="ident">x0</span>).<span class="ident">simd_sqrt</span>();
+        <span class="kw">let</span> <span class="ident">r2</span> <span class="op">=</span> <span class="ident">x0</span>.<span class="ident">simd_sqrt</span>();
+        <span class="ident">Unit::new_unchecked</span>(<span class="ident">Quaternion::new</span>(<span class="ident">s1</span> <span class="op">*</span> <span class="ident">r1</span>, <span class="ident">c1</span> <span class="op">*</span> <span class="ident">r1</span>, <span class="ident">s2</span> <span class="op">*</span> <span class="ident">r2</span>, <span class="ident">c2</span> <span class="op">*</span> <span class="ident">r2</span>))
     }
 }
 
@@ -1458,8 +1692,8 @@
 {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">axisangle</span> <span class="op">=</span> <span class="ident">Vector3</span>::<span class="ident">arbitrary</span>(<span class="ident">g</span>);
-        <span class="self">Self</span>::<span class="ident">from_scaled_axis</span>(<span class="ident">axisangle</span>)
+        <span class="kw">let</span> <span class="ident">axisangle</span> <span class="op">=</span> <span class="ident">Vector3::arbitrary</span>(<span class="ident">g</span>);
+        <span class="self">Self</span><span class="ident">::from_scaled_axis</span>(<span class="ident">axisangle</span>)
     }
 }
 
@@ -1467,16 +1701,17 @@
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">rand_xorshift</span>;
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">rand</span>::<span class="ident">SeedableRng</span>;
+    <span class="kw">use</span> <span class="ident">rand::SeedableRng</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">random_unit_quats_are_unit</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">rand_xorshift</span>::<span class="ident">XorShiftRng</span>::<span class="ident">from_seed</span>([<span class="number">0xAB</span>; <span class="number">16</span>]);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">rand_xorshift::XorShiftRng::from_seed</span>([<span class="number">0xAB</span>; <span class="number">16</span>]);
         <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">1000</span> {
             <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">rng</span>.<span class="ident">gen</span>::<span class="op">&lt;</span><span class="ident">UnitQuaternion</span><span class="op">&lt;</span><span class="ident">f32</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-            <span class="macro">assert</span><span class="macro">!</span>(<span class="macro">relative_eq</span><span class="macro">!</span>(<span class="ident">x</span>.<span class="ident">into_inner</span>().<span class="ident">norm</span>(), <span class="number">1.0</span>))
+            <span class="macro">assert!</span>(<span class="macro">relative_eq!</span>(<span class="ident">x</span>.<span class="ident">into_inner</span>().<span class="ident">norm</span>(), <span class="number">1.0</span>))
         }
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "nalgebra";</script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="nalgebra" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
+    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script></body></html>

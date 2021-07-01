@@ -1,3 +1,3 @@
 (function() {var implementors = {};
-implementors["governance_os_runtime"] = [{"text":"impl GetCallMetadata for Call","synthetic":false,"types":[]}];
+implementors["governance_os_runtime"] = [{"text":"impl <a class=\"trait\" href=\"frame_support/traits/trait.GetCallMetadata.html\" title=\"trait frame_support::traits::GetCallMetadata\">GetCallMetadata</a> for <a class=\"enum\" href=\"governance_os_runtime/enum.Call.html\" title=\"enum governance_os_runtime::Call\">Call</a>","synthetic":false,"types":["governance_os_runtime::Call"]}];
 if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

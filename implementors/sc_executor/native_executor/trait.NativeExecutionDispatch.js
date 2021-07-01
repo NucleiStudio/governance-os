@@ -1,3 +1,3 @@
 (function() {var implementors = {};
-implementors["governance_os_node"] = [{"text":"impl NativeExecutionDispatch for Executor","synthetic":false,"types":[]}];
+implementors["governance_os_node"] = [{"text":"impl <a class=\"trait\" href=\"sc_executor/native_executor/trait.NativeExecutionDispatch.html\" title=\"trait sc_executor::native_executor::NativeExecutionDispatch\">NativeExecutionDispatch</a> for <a class=\"struct\" href=\"governance_os_node/executor/struct.Executor.html\" title=\"struct governance_os_node::executor::Executor\">Executor</a>","synthetic":false,"types":["governance_os_node::executor::Executor"]}];
 if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sp-io-2.0.0/src/batch_verifier.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>batch_verifier.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sp-io-3.0.0/src/batch_verifier.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>batch_verifier.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../sp_io/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../sp_io/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -203,7 +203,7 @@
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// This file is part of Substrate.</span>
 
-<span class="comment">// Copyright (C) 2020 Parity Technologies (UK) Ltd.</span>
+<span class="comment">// Copyright (C) 2020-2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// SPDX-License-Identifier: Apache-2.0</span>
 
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -220,14 +220,14 @@
 
 <span class="doccomment">//! Batch/parallel verification.</span>
 
-<span class="kw">use</span> <span class="ident">sp_core</span>::{<span class="ident">ed25519</span>, <span class="ident">sr25519</span>, <span class="ident">ecdsa</span>, <span class="ident">crypto</span>::<span class="ident">Pair</span>, <span class="ident">traits</span>::<span class="ident">SpawnNamed</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::{<span class="ident">Arc</span>, <span class="ident">atomic</span>::{<span class="ident">AtomicBool</span>, <span class="ident">Ordering</span> <span class="kw">as</span> <span class="ident">AtomicOrdering</span>}};
-<span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">future</span>::<span class="ident">FutureExt</span>, <span class="ident">channel</span>::<span class="ident">oneshot</span>};
+<span class="kw">use</span> <span class="ident">sp_core</span>::{<span class="ident">ed25519</span>, <span class="ident">sr25519</span>, <span class="ident">ecdsa</span>, <span class="ident">crypto::Pair</span>, <span class="ident">traits::SpawnNamed</span>};
+<span class="kw">use</span> <span class="ident">std::sync</span>::{<span class="ident">Arc</span>, <span class="ident">atomic</span>::{<span class="ident">AtomicBool</span>, <span class="ident">Ordering</span> <span class="kw">as</span> <span class="ident">AtomicOrdering</span>}};
+<span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">future::FutureExt</span>, <span class="ident">channel::oneshot</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">struct</span> <span class="ident">Sr25519BatchItem</span> {
-	<span class="ident">signature</span>: <span class="ident">sr25519</span>::<span class="ident">Signature</span>,
-	<span class="ident">pub_key</span>: <span class="ident">sr25519</span>::<span class="ident">Public</span>,
+	<span class="ident">signature</span>: <span class="ident">sr25519::Signature</span>,
+	<span class="ident">pub_key</span>: <span class="ident">sr25519::Public</span>,
 	<span class="ident">message</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
 }
 
@@ -238,19 +238,19 @@
 <span class="doccomment">/// call `verify_and_clear to get a result. After that, batch verifier is ready for the</span>
 <span class="doccomment">/// next batching job.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BatchVerifier</span> {
-	<span class="ident">scheduler</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">SpawnNamed</span><span class="op">&gt;</span>,
+	<span class="ident">scheduler</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">SpawnNamed</span><span class="op">&gt;</span>,
 	<span class="ident">sr25519_items</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Sr25519BatchItem</span><span class="op">&gt;</span>,
 	<span class="ident">invalid</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">AtomicBool</span><span class="op">&gt;</span>,
-	<span class="ident">pending_tasks</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">oneshot</span>::<span class="ident">Receiver</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>,
+	<span class="ident">pending_tasks</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">oneshot::Receiver</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">BatchVerifier</span> {
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">scheduler</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">SpawnNamed</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">scheduler</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">SpawnNamed</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
 		<span class="ident">BatchVerifier</span> {
 			<span class="ident">scheduler</span>,
-			<span class="ident">sr25519_items</span>: <span class="ident">Default</span>::<span class="ident">default</span>(),
-			<span class="ident">invalid</span>: <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="bool-val">false</span>.<span class="ident">into</span>()),
-			<span class="ident">pending_tasks</span>: <span class="macro">vec</span><span class="macro">!</span>[],
+			<span class="ident">sr25519_items</span>: <span class="ident">Default::default</span>(),
+			<span class="ident">invalid</span>: <span class="ident">Arc::new</span>(<span class="bool-val">false</span>.<span class="ident">into</span>()),
+			<span class="ident">pending_tasks</span>: <span class="macro">vec!</span>[],
 		}
 	}
 
@@ -264,22 +264,22 @@
 		<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
 		<span class="comment">// there is already invalid transaction encountered</span>
-		<span class="kw">if</span> <span class="self">self</span>.<span class="ident">invalid</span>.<span class="ident">load</span>(<span class="ident">AtomicOrdering</span>::<span class="ident">Relaxed</span>) { <span class="kw">return</span> <span class="bool-val">false</span>; }
+		<span class="kw">if</span> <span class="self">self</span>.<span class="ident">invalid</span>.<span class="ident">load</span>(<span class="ident">AtomicOrdering::Relaxed</span>) { <span class="kw">return</span> <span class="bool-val">false</span>; }
 
 		<span class="kw">let</span> <span class="ident">invalid_clone</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">invalid</span>.<span class="ident">clone</span>();
-		<span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">oneshot</span>::<span class="ident">channel</span>();
+		<span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">oneshot::channel</span>();
 		<span class="self">self</span>.<span class="ident">pending_tasks</span>.<span class="ident">push</span>(<span class="ident">receiver</span>);
 
 		<span class="self">self</span>.<span class="ident">scheduler</span>.<span class="ident">spawn</span>(
 			<span class="ident">name</span>,
-			<span class="ident">async</span> <span class="kw">move</span> {
+			<span class="kw">async</span> <span class="kw">move</span> {
 				<span class="kw">if</span> <span class="op">!</span><span class="ident">f</span>() {
-					<span class="ident">invalid_clone</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">AtomicOrdering</span>::<span class="ident">Relaxed</span>);
+					<span class="ident">invalid_clone</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">AtomicOrdering::Relaxed</span>);
 				}
 				<span class="kw">if</span> <span class="ident">sender</span>.<span class="ident">send</span>(()).<span class="ident">is_err</span>() {
 					<span class="comment">// sanity</span>
-					<span class="ident">log</span>::<span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;Verification halted while result was pending&quot;</span>);
-					<span class="ident">invalid_clone</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">AtomicOrdering</span>::<span class="ident">Relaxed</span>);
+					<span class="macro">log::warn!</span>(<span class="string">&quot;Verification halted while result was pending&quot;</span>);
+					<span class="ident">invalid_clone</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">AtomicOrdering::Relaxed</span>);
 				}
 			}.<span class="ident">boxed</span>(),
 		);
@@ -293,12 +293,12 @@
 	<span class="doccomment">/// (in this case it won&#39;t verify anything else)</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_ed25519</span>(
 		<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-		<span class="ident">signature</span>: <span class="ident">ed25519</span>::<span class="ident">Signature</span>,
-		<span class="ident">pub_key</span>: <span class="ident">ed25519</span>::<span class="ident">Public</span>,
+		<span class="ident">signature</span>: <span class="ident">ed25519::Signature</span>,
+		<span class="ident">pub_key</span>: <span class="ident">ed25519::Public</span>,
 		<span class="ident">message</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
 		<span class="self">self</span>.<span class="ident">spawn_verification_task</span>(
-			<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="ident">ed25519</span>::<span class="ident">Pair</span>::<span class="ident">verify</span>(<span class="kw-2">&amp;</span><span class="ident">signature</span>, <span class="kw-2">&amp;</span><span class="ident">message</span>, <span class="kw-2">&amp;</span><span class="ident">pub_key</span>),
+			<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="ident">ed25519::Pair::verify</span>(<span class="kw-2">&amp;</span><span class="ident">signature</span>, <span class="kw-2">&amp;</span><span class="ident">message</span>, <span class="kw-2">&amp;</span><span class="ident">pub_key</span>),
 			<span class="string">&quot;substrate_ed25519_verify&quot;</span>,
 		)
 	}
@@ -309,17 +309,17 @@
 	<span class="doccomment">/// (in this case it won&#39;t verify anything else)</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_sr25519</span>(
 		<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-		<span class="ident">signature</span>: <span class="ident">sr25519</span>::<span class="ident">Signature</span>,
-		<span class="ident">pub_key</span>: <span class="ident">sr25519</span>::<span class="ident">Public</span>,
+		<span class="ident">signature</span>: <span class="ident">sr25519::Signature</span>,
+		<span class="ident">pub_key</span>: <span class="ident">sr25519::Public</span>,
 		<span class="ident">message</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-		<span class="kw">if</span> <span class="self">self</span>.<span class="ident">invalid</span>.<span class="ident">load</span>(<span class="ident">AtomicOrdering</span>::<span class="ident">Relaxed</span>) { <span class="kw">return</span> <span class="bool-val">false</span>; }
+		<span class="kw">if</span> <span class="self">self</span>.<span class="ident">invalid</span>.<span class="ident">load</span>(<span class="ident">AtomicOrdering::Relaxed</span>) { <span class="kw">return</span> <span class="bool-val">false</span>; }
 		<span class="self">self</span>.<span class="ident">sr25519_items</span>.<span class="ident">push</span>(<span class="ident">Sr25519BatchItem</span> { <span class="ident">signature</span>, <span class="ident">pub_key</span>, <span class="ident">message</span> });
 
 		<span class="kw">if</span> <span class="self">self</span>.<span class="ident">sr25519_items</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">128</span> {
-			<span class="kw">let</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">take</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">sr25519_items</span>);
+			<span class="kw">let</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">std::mem::take</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">sr25519_items</span>);
 			<span class="self">self</span>.<span class="ident">spawn_verification_task</span>(
-				<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="self">Self</span>::<span class="ident">verify_sr25519_batch</span>(<span class="ident">items</span>),
+				<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="self">Self</span><span class="ident">::verify_sr25519_batch</span>(<span class="ident">items</span>),
 				<span class="string">&quot;substrate_sr25519_verify&quot;</span>,
 			)
 		} <span class="kw">else</span> {
@@ -333,12 +333,12 @@
 	<span class="doccomment">/// (in this case it won&#39;t verify anything else)</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_ecdsa</span>(
 		<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-		<span class="ident">signature</span>: <span class="ident">ecdsa</span>::<span class="ident">Signature</span>,
-		<span class="ident">pub_key</span>: <span class="ident">ecdsa</span>::<span class="ident">Public</span>,
+		<span class="ident">signature</span>: <span class="ident">ecdsa::Signature</span>,
+		<span class="ident">pub_key</span>: <span class="ident">ecdsa::Public</span>,
 		<span class="ident">message</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
 		<span class="self">self</span>.<span class="ident">spawn_verification_task</span>(
-			<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="ident">ecdsa</span>::<span class="ident">Pair</span>::<span class="ident">verify</span>(<span class="kw-2">&amp;</span><span class="ident">signature</span>, <span class="kw-2">&amp;</span><span class="ident">message</span>, <span class="kw-2">&amp;</span><span class="ident">pub_key</span>),
+			<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="ident">ecdsa::Pair::verify</span>(<span class="kw-2">&amp;</span><span class="ident">signature</span>, <span class="kw-2">&amp;</span><span class="ident">message</span>, <span class="kw-2">&amp;</span><span class="ident">pub_key</span>),
 			<span class="string">&quot;substrate_ecdsa_verify&quot;</span>,
 		)
 	}
@@ -348,33 +348,33 @@
 		<span class="kw">let</span> <span class="ident">signatures</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">item</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">signature</span>).<span class="ident">collect</span>();
 		<span class="kw">let</span> <span class="ident">pub_keys</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">item</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">pub_key</span>).<span class="ident">collect</span>();
 
-		<span class="ident">sr25519</span>::<span class="ident">verify_batch</span>(<span class="ident">messages</span>, <span class="ident">signatures</span>, <span class="ident">pub_keys</span>)
+		<span class="ident">sr25519::verify_batch</span>(<span class="ident">messages</span>, <span class="ident">signatures</span>, <span class="ident">pub_keys</span>)
 	}
 
 	<span class="doccomment">/// Verify all previously pushed signatures since last call and return</span>
 	<span class="doccomment">/// aggregated result.</span>
 	<span class="attribute">#[<span class="ident">must_use</span>]</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">verify_and_clear</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-		<span class="kw">let</span> <span class="ident">pending</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">take</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">pending_tasks</span>);
-		<span class="kw">let</span> <span class="ident">started</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">time</span>::<span class="ident">Instant</span>::<span class="ident">now</span>();
+		<span class="kw">let</span> <span class="ident">pending</span> <span class="op">=</span> <span class="ident">std::mem::take</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">pending_tasks</span>);
+		<span class="kw">let</span> <span class="ident">started</span> <span class="op">=</span> <span class="ident">std::time::Instant::now</span>();
 
-		<span class="ident">log</span>::<span class="macro">trace</span><span class="macro">!</span>(
+		<span class="macro">log::trace!</span>(
 			<span class="ident">target</span>: <span class="string">&quot;runtime&quot;</span>,
 			<span class="string">&quot;Batch-verification: {} pending tasks, {} sr25519 signatures&quot;</span>,
 			<span class="ident">pending</span>.<span class="ident">len</span>(),
 			<span class="self">self</span>.<span class="ident">sr25519_items</span>.<span class="ident">len</span>(),
 		);
 
-		<span class="kw">if</span> <span class="op">!</span><span class="self">Self</span>::<span class="ident">verify_sr25519_batch</span>(<span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">take</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">sr25519_items</span>)) {
+		<span class="kw">if</span> <span class="op">!</span><span class="self">Self</span><span class="ident">::verify_sr25519_batch</span>(<span class="ident">std::mem::take</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">sr25519_items</span>)) {
 			<span class="kw">return</span> <span class="bool-val">false</span>;
 		}
 
 		<span class="kw">if</span> <span class="ident">pending</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span> {
-			<span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">mpsc</span>::<span class="ident">channel</span>();
+			<span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">std::sync::mpsc::channel</span>();
 			<span class="self">self</span>.<span class="ident">scheduler</span>.<span class="ident">spawn</span>(
 				<span class="string">&quot;substrate_batch_verify_join&quot;</span>,
-				<span class="ident">async</span> <span class="kw">move</span> {
-					<span class="ident">futures</span>::<span class="ident">future</span>::<span class="ident">join_all</span>(<span class="ident">pending</span>).<span class="ident">await</span>;
+				<span class="kw">async</span> <span class="kw">move</span> {
+					<span class="ident">futures::future::join_all</span>(<span class="ident">pending</span>).<span class="kw">await</span>;
 					<span class="ident">sender</span>.<span class="ident">send</span>(())
 						  .<span class="ident">expect</span>(<span class="string">&quot;Channel never panics if receiver is live. \
 								Receiver is always live until received this data; qed. &quot;</span>);
@@ -382,7 +382,7 @@
 			);
 
 			<span class="kw">if</span> <span class="ident">receiver</span>.<span class="ident">recv</span>().<span class="ident">is_err</span>() {
-				<span class="ident">log</span>::<span class="macro">warn</span><span class="macro">!</span>(
+				<span class="macro">log::warn!</span>(
 					<span class="ident">target</span>: <span class="string">&quot;runtime&quot;</span>,
 					<span class="string">&quot;Haven&#39;t received async result from verification task. Returning false.&quot;</span>,
 				);
@@ -391,14 +391,15 @@
 			}
 		}
 
-		<span class="ident">log</span>::<span class="macro">trace</span><span class="macro">!</span>(
+		<span class="macro">log::trace!</span>(
 			<span class="ident">target</span>: <span class="string">&quot;runtime&quot;</span>,
 			<span class="string">&quot;Finalization of batch verification took {} ms&quot;</span>,
 			<span class="ident">started</span>.<span class="ident">elapsed</span>().<span class="ident">as_millis</span>(),
 		);
 
-		<span class="op">!</span><span class="self">self</span>.<span class="ident">invalid</span>.<span class="ident">swap</span>(<span class="bool-val">false</span>, <span class="ident">AtomicOrdering</span>::<span class="ident">Relaxed</span>)
+		<span class="op">!</span><span class="self">self</span>.<span class="ident">invalid</span>.<span class="ident">swap</span>(<span class="bool-val">false</span>, <span class="ident">AtomicOrdering::Relaxed</span>)
 	}
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "sp_io";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sp_io" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

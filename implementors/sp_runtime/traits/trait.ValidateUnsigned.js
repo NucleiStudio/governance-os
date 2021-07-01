@@ -1,4 +1,4 @@
 (function() {var implementors = {};
-implementors["governance_os_runtime"] = [{"text":"impl ValidateUnsigned for Runtime","synthetic":false,"types":[]}];
-implementors["pallet_grandpa"] = [{"text":"impl&lt;T:&nbsp;Trait&gt; ValidateUnsigned for Module&lt;T&gt;","synthetic":false,"types":[]}];
+implementors["governance_os_runtime"] = [{"text":"impl <a class=\"trait\" href=\"sp_runtime/traits/trait.ValidateUnsigned.html\" title=\"trait sp_runtime::traits::ValidateUnsigned\">ValidateUnsigned</a> for <a class=\"struct\" href=\"governance_os_runtime/struct.Runtime.html\" title=\"struct governance_os_runtime::Runtime\">Runtime</a>","synthetic":false,"types":["governance_os_runtime::Runtime"]}];
+implementors["pallet_grandpa"] = [{"text":"impl&lt;T:&nbsp;<a class=\"trait\" href=\"pallet_grandpa/trait.Config.html\" title=\"trait pallet_grandpa::Config\">Config</a>&gt; <a class=\"trait\" href=\"sp_runtime/traits/trait.ValidateUnsigned.html\" title=\"trait sp_runtime::traits::ValidateUnsigned\">ValidateUnsigned</a> for <a class=\"struct\" href=\"pallet_grandpa/struct.Module.html\" title=\"struct pallet_grandpa::Module\">Module</a>&lt;T&gt;","synthetic":false,"types":["pallet_grandpa::Module"]}];
 if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

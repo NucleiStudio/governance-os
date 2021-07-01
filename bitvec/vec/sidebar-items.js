@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["BitVec","A compact `Vec` of bits, whose order and storage type can be customized."],["Drain","State keeper for draining iteration."],["IntoIter","A consuming iterator for `BitVec`."],["Splice","A splicing iterator for `BitVec`."]]});
+initSidebarItems({"struct":[["BitVec","A contiguous growable array of bits."],["Drain","A draining iterator for `BitVec`."],["IntoIter","An iterator that moves out of a `BitVec`."],["Splice","A splicing iterator for `BitVec`."]]});

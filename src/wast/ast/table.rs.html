@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/wast-27.0.0/src/ast/table.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>table.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/wast-35.0.2/src/ast/table.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>table.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../wast/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../wast/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -235,22 +235,20 @@
 <span id="232">232</span>
 <span id="233">233</span>
 <span id="234">234</span>
-<span id="235">235</span>
-<span id="236">236</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">kw</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">parser</span>::{<span class="ident">Parse</span>, <span class="ident">Parser</span>, <span class="prelude-ty">Result</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::ast</span>::{<span class="self">self</span>, <span class="ident">kw</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::parser</span>::{<span class="ident">Parse</span>, <span class="ident">Parser</span>, <span class="prelude-ty">Result</span>};
 
 <span class="doccomment">/// A WebAssembly `table` directive in a module.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Where this table was defined.</span>
-    <span class="kw">pub</span> <span class="ident">span</span>: <span class="ident">ast</span>::<span class="ident">Span</span>,
+    <span class="kw">pub</span> <span class="ident">span</span>: <span class="ident">ast::Span</span>,
     <span class="doccomment">/// An optional name to refer to this table by.</span>
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Id</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ast::Id</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// If present, inline export annotations which indicate names this</span>
     <span class="doccomment">/// definition should be exported under.</span>
-    <span class="kw">pub</span> <span class="ident">exports</span>: <span class="ident">ast</span>::<span class="ident">InlineExport</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">exports</span>: <span class="ident">ast::InlineExport</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
     <span class="doccomment">/// How this table is textually defined in the module.</span>
     <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">TableKind</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
 }
@@ -261,17 +259,17 @@
     <span class="doccomment">/// This table is actually an inlined import definition.</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
     <span class="ident">Import</span> {
-        <span class="ident">import</span>: <span class="ident">ast</span>::<span class="ident">InlineImport</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-        <span class="ident">ty</span>: <span class="ident">ast</span>::<span class="ident">TableType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+        <span class="ident">import</span>: <span class="ident">ast::InlineImport</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+        <span class="ident">ty</span>: <span class="ident">ast::TableType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
     },
 
     <span class="doccomment">/// A typical memory definition which simply says the limits of the table</span>
-    <span class="ident">Normal</span>(<span class="ident">ast</span>::<span class="ident">TableType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
+    <span class="ident">Normal</span>(<span class="ident">ast::TableType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
 
     <span class="doccomment">/// The elem segments of this table, starting from 0, explicitly listed</span>
     <span class="ident">Inline</span> {
         <span class="doccomment">/// The element type of this table.</span>
-        <span class="ident">elem</span>: <span class="ident">ast</span>::<span class="ident">RefType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+        <span class="ident">elem</span>: <span class="ident">ast::RefType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
         <span class="doccomment">/// The element table entries to have, and the length of this list is</span>
         <span class="doccomment">/// the limits of the table as well.</span>
         <span class="ident">payload</span>: <span class="ident">ElemPayload</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
@@ -280,7 +278,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Parse</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">parser</span>: <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">kw</span>::<span class="ident">table</span><span class="op">&gt;</span>()<span class="question-mark">?</span>.<span class="number">0</span>;
+        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">kw::table</span><span class="op">&gt;</span>()<span class="question-mark">?</span>.<span class="number">0</span>;
         <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">exports</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
 
@@ -290,22 +288,22 @@
         <span class="comment">//  *   `(import &quot;a&quot; &quot;b&quot;) limits`</span>
         <span class="comment">//  *   `limits`</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">l</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">lookahead1</span>();
-        <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">peek</span>::<span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">RefType</span><span class="op">&gt;</span>() {
+        <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">peek</span>::<span class="op">&lt;</span><span class="ident">ast::RefType</span><span class="op">&gt;</span>() {
             <span class="kw">let</span> <span class="ident">elem</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parens</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> {
-                <span class="ident">p</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">kw</span>::<span class="ident">elem</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">parser</span>.<span class="ident">peek</span>::<span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">LParen</span><span class="op">&gt;</span>() {
+                <span class="ident">p</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">kw::elem</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">parser</span>.<span class="ident">peek</span>::<span class="op">&lt;</span><span class="ident">ast::LParen</span><span class="op">&gt;</span>() {
                     <span class="prelude-val">Some</span>(<span class="ident">elem</span>)
                 } <span class="kw">else</span> {
                     <span class="prelude-val">None</span>
                 };
-                <span class="ident">ElemPayload</span>::<span class="ident">parse_tail</span>(<span class="ident">parser</span>, <span class="ident">ty</span>)
+                <span class="ident">ElemPayload::parse_tail</span>(<span class="ident">parser</span>, <span class="ident">ty</span>)
             })<span class="question-mark">?</span>;
-            <span class="ident">TableKind</span>::<span class="ident">Inline</span> { <span class="ident">elem</span>, <span class="ident">payload</span> }
+            <span class="ident">TableKind::Inline</span> { <span class="ident">elem</span>, <span class="ident">payload</span> }
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">peek</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>() {
-            <span class="ident">TableKind</span>::<span class="ident">Normal</span>(<span class="ident">parser</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>)
+            <span class="ident">TableKind::Normal</span>(<span class="ident">parser</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>)
         } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">import</span>) <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parse</span>()<span class="question-mark">?</span> {
-            <span class="ident">TableKind</span>::<span class="ident">Import</span> {
+            <span class="ident">TableKind::Import</span> {
                 <span class="ident">import</span>,
                 <span class="ident">ty</span>: <span class="ident">parser</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>,
             }
@@ -325,9 +323,9 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Elem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Where this `elem` was defined.</span>
-    <span class="kw">pub</span> <span class="ident">span</span>: <span class="ident">ast</span>::<span class="ident">Span</span>,
+    <span class="kw">pub</span> <span class="ident">span</span>: <span class="ident">ast::Span</span>,
     <span class="doccomment">/// An optional name by which to refer to this segment.</span>
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Id</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ast::Id</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The way this segment was defined in the module.</span>
     <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">ElemKind</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The payload of this element segment, typically a list of functions.</span>
@@ -348,9 +346,9 @@
     <span class="doccomment">/// An active segment associated with a table.</span>
     <span class="ident">Active</span> {
         <span class="doccomment">/// The table this `elem` is initializing.</span>
-        <span class="ident">table</span>: <span class="ident">ast</span>::<span class="ident">Index</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+        <span class="ident">table</span>: <span class="ident">ast::ItemRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">kw::table</span><span class="op">&gt;</span>,
         <span class="doccomment">/// The offset within `table` that we&#39;ll initialize at.</span>
-        <span class="ident">offset</span>: <span class="ident">ast</span>::<span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+        <span class="ident">offset</span>: <span class="ident">ast::Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
     },
 }
 
@@ -358,50 +356,48 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ElemPayload</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="doccomment">/// This element segment has a contiguous list of function indices</span>
-    <span class="ident">Indices</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Index</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>),
+    <span class="ident">Indices</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ast::ItemRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">kw::func</span><span class="op">&gt;</span><span class="op">&gt;</span>),
 
     <span class="doccomment">/// This element segment has a list of optional function indices,</span>
     <span class="doccomment">/// represented as expressions using `ref.func` and `ref.null`.</span>
     <span class="ident">Exprs</span> {
         <span class="doccomment">/// The desired type of each expression below.</span>
-        <span class="ident">ty</span>: <span class="ident">ast</span>::<span class="ident">RefType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+        <span class="ident">ty</span>: <span class="ident">ast::RefType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
         <span class="doccomment">/// The expressions, currently optional function indices, in this</span>
         <span class="doccomment">/// segment.</span>
-        <span class="ident">exprs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Index</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">exprs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ast::ItemRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">kw::func</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     },
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Parse</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Elem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">parser</span>: <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">kw</span>::<span class="ident">elem</span><span class="op">&gt;</span>()<span class="question-mark">?</span>.<span class="number">0</span>;
+        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">kw::elem</span><span class="op">&gt;</span>()<span class="question-mark">?</span>.<span class="number">0</span>;
         <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">parser</span>.<span class="ident">peek</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>() <span class="op">|</span><span class="op">|</span> (<span class="ident">parser</span>.<span class="ident">peek</span>::<span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">LParen</span><span class="op">&gt;</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">parser</span>.<span class="ident">peek</span>::<span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">RefType</span><span class="op">&gt;</span>()) {
-            <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">parser</span>.<span class="ident">peek2</span>::<span class="op">&lt;</span><span class="ident">kw</span>::<span class="ident">table</span><span class="op">&gt;</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">parser</span>.<span class="ident">parens</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> {
-                    <span class="ident">p</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">kw</span>::<span class="ident">table</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-                    <span class="ident">p</span>.<span class="ident">parse</span>()
-                })<span class="question-mark">?</span>)
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">parser</span>.<span class="ident">peek</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">parser</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>)
+        <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">parser</span>.<span class="ident">peek</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>()
+            <span class="op">|</span><span class="op">|</span> (<span class="ident">parser</span>.<span class="ident">peek</span>::<span class="op">&lt;</span><span class="ident">ast::LParen</span><span class="op">&gt;</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">parser</span>.<span class="ident">peek</span>::<span class="op">&lt;</span><span class="ident">ast::RefType</span><span class="op">&gt;</span>())
+        {
+            <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">index</span>) <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ast::IndexOrRef</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span> {
+                <span class="ident">index</span>.<span class="number">0</span>
             } <span class="kw">else</span> {
-                <span class="prelude-val">None</span>
+                <span class="ident">ast::ItemRef::Item</span> {
+                    <span class="ident">kind</span>: <span class="ident">kw::table</span>(<span class="ident">parser</span>.<span class="ident">prev_span</span>()),
+                    <span class="ident">idx</span>: <span class="ident">ast::Index::Num</span>(<span class="number">0</span>, <span class="ident">span</span>),
+                    <span class="ident">exports</span>: <span class="ident">Vec::new</span>(),
+                }
             };
             <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parens</span>(<span class="op">|</span><span class="ident">parser</span><span class="op">|</span> {
-                <span class="kw">if</span> <span class="ident">parser</span>.<span class="ident">peek</span>::<span class="op">&lt;</span><span class="ident">kw</span>::<span class="ident">offset</span><span class="op">&gt;</span>() {
-                    <span class="ident">parser</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">kw</span>::<span class="ident">offset</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+                <span class="kw">if</span> <span class="ident">parser</span>.<span class="ident">peek</span>::<span class="op">&lt;</span><span class="ident">kw::offset</span><span class="op">&gt;</span>() {
+                    <span class="ident">parser</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">kw::offset</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
                 }
                 <span class="ident">parser</span>.<span class="ident">parse</span>()
             })<span class="question-mark">?</span>;
-            <span class="ident">ElemKind</span>::<span class="ident">Active</span> {
-                <span class="ident">table</span>: <span class="ident">table</span>.<span class="ident">unwrap_or</span>(<span class="ident">ast</span>::<span class="ident">Index</span>::<span class="ident">Num</span>(<span class="number">0</span>, <span class="ident">span</span>)),
-                <span class="ident">offset</span>,
-            }
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">parser</span>.<span class="ident">peek</span>::<span class="op">&lt;</span><span class="ident">kw</span>::<span class="ident">declare</span><span class="op">&gt;</span>() {
-            <span class="ident">parser</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">kw</span>::<span class="ident">declare</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-            <span class="ident">ElemKind</span>::<span class="ident">Declared</span>
+            <span class="ident">ElemKind::Active</span> { <span class="ident">table</span>, <span class="ident">offset</span> }
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">parser</span>.<span class="ident">peek</span>::<span class="op">&lt;</span><span class="ident">kw::declare</span><span class="op">&gt;</span>() {
+            <span class="ident">parser</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">kw::declare</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+            <span class="ident">ElemKind::Declared</span>
         } <span class="kw">else</span> {
-            <span class="ident">ElemKind</span>::<span class="ident">Passive</span>
+            <span class="ident">ElemKind::Passive</span>
         };
         <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">Elem</span> {
@@ -415,33 +411,33 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Parse</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ElemPayload</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">parser</span>: <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident">ElemPayload</span>::<span class="ident">parse_tail</span>(<span class="ident">parser</span>, <span class="ident">parser</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>)
+        <span class="ident">ElemPayload::parse_tail</span>(<span class="ident">parser</span>, <span class="ident">parser</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>)
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ElemPayload</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">parse_tail</span>(<span class="ident">parser</span>: <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">ty</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">RefType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse_tail</span>(<span class="ident">parser</span>: <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">ty</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ast::RefType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ty</span> {
             <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">parser</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">kw</span>::<span class="ident">func</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-                <span class="ident">ast</span>::<span class="ident">RefType</span>::<span class="ident">func</span>()
+                <span class="ident">parser</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">kw::func</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+                <span class="ident">ast::RefType::func</span>()
             }
             <span class="prelude-val">Some</span>(<span class="ident">ty</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ty</span>,
         };
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ast</span>::<span class="ident">HeapType</span>::<span class="ident">Func</span> <span class="op">=</span> <span class="ident">ty</span>.<span class="ident">heap</span> {
-            <span class="kw">if</span> <span class="ident">parser</span>.<span class="ident">peek</span>::<span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Index</span><span class="op">&gt;</span>() {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">elems</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ast::HeapType::Func</span> <span class="op">=</span> <span class="ident">ty</span>.<span class="ident">heap</span> {
+            <span class="kw">if</span> <span class="ident">parser</span>.<span class="ident">peek</span>::<span class="op">&lt;</span><span class="ident">ast::IndexOrRef</span><span class="op">&lt;</span><span class="ident">kw::func</span><span class="op">&gt;</span><span class="op">&gt;</span>() {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">elems</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
                 <span class="kw">while</span> <span class="op">!</span><span class="ident">parser</span>.<span class="ident">is_empty</span>() {
-                    <span class="ident">elems</span>.<span class="ident">push</span>(<span class="ident">parser</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>);
+                    <span class="ident">elems</span>.<span class="ident">push</span>(<span class="ident">parser</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">ast::IndexOrRef</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>.<span class="number">0</span>);
                 }
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">ElemPayload</span>::<span class="ident">Indices</span>(<span class="ident">elems</span>));
+                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">ElemPayload::Indices</span>(<span class="ident">elems</span>));
             }
         }
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">exprs</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">exprs</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
         <span class="kw">while</span> <span class="op">!</span><span class="ident">parser</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">let</span> <span class="ident">func</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parens</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">kw</span>::<span class="ident">item</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span> {
+            <span class="kw">let</span> <span class="ident">func</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parens</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">kw::item</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span> {
                 <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="kw">if</span> <span class="ident">parser</span>.<span class="ident">peek</span>::<span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">LParen</span><span class="op">&gt;</span>() {
+                    <span class="kw">if</span> <span class="ident">parser</span>.<span class="ident">peek</span>::<span class="op">&lt;</span><span class="ident">ast::LParen</span><span class="op">&gt;</span>() {
                         <span class="ident">parser</span>.<span class="ident">parens</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">parse_ref_func</span>(<span class="ident">p</span>, <span class="ident">ty</span>))
                     } <span class="kw">else</span> {
                         <span class="ident">parse_ref_func</span>(<span class="ident">parser</span>, <span class="ident">ty</span>)
@@ -451,28 +447,29 @@
             })<span class="question-mark">?</span>;
             <span class="ident">exprs</span>.<span class="ident">push</span>(<span class="ident">func</span>);
         }
-        <span class="prelude-val">Ok</span>(<span class="ident">ElemPayload</span>::<span class="ident">Exprs</span> { <span class="ident">exprs</span>, <span class="ident">ty</span> })
+        <span class="prelude-val">Ok</span>(<span class="ident">ElemPayload::Exprs</span> { <span class="ident">exprs</span>, <span class="ident">ty</span> })
     }
 }
 
 <span class="kw">fn</span> <span class="ident">parse_ref_func</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
     <span class="ident">parser</span>: <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="ident">ty</span>: <span class="ident">ast</span>::<span class="ident">RefType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ast</span>::<span class="ident">Index</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="ident">ty</span>: <span class="ident">ast::RefType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ast::ItemRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">kw::func</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">l</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">lookahead1</span>();
-    <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">peek</span>::<span class="op">&lt;</span><span class="ident">kw</span>::<span class="ident">ref_null</span><span class="op">&gt;</span>() {
-        <span class="ident">parser</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">kw</span>::<span class="ident">ref_null</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">null_ty</span>: <span class="ident">ast</span>::<span class="ident">HeapType</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
+    <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">peek</span>::<span class="op">&lt;</span><span class="ident">kw::ref_null</span><span class="op">&gt;</span>() {
+        <span class="ident">parser</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">kw::ref_null</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">null_ty</span>: <span class="ident">ast::HeapType</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
         <span class="kw">if</span> <span class="ident">ty</span>.<span class="ident">heap</span> <span class="op">!</span><span class="op">=</span> <span class="ident">null_ty</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">parser</span>.<span class="ident">error</span>(<span class="string">&quot;elem segment item doesn&#39;t match elem segment type&quot;</span>));
         }
         <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">peek</span>::<span class="op">&lt;</span><span class="ident">kw</span>::<span class="ident">ref_func</span><span class="op">&gt;</span>() {
-        <span class="ident">parser</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">kw</span>::<span class="ident">ref_func</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">parser</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>))
+    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">peek</span>::<span class="op">&lt;</span><span class="ident">kw::ref_func</span><span class="op">&gt;</span>() {
+        <span class="ident">parser</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">kw::ref_func</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">parser</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">ast::IndexOrRef</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>.<span class="number">0</span>))
     } <span class="kw">else</span> {
         <span class="prelude-val">Err</span>(<span class="ident">l</span>.<span class="ident">error</span>())
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "wast";</script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="wast" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
+    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script></body></html>

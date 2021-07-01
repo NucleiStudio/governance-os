@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/wast-27.0.0/src/lexer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lexer.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/wast-35.0.2/src/lexer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lexer.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../wast/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../wast/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1126,6 +1126,26 @@
 <span id="1123">1123</span>
 <span id="1124">1124</span>
 <span id="1125">1125</span>
+<span id="1126">1126</span>
+<span id="1127">1127</span>
+<span id="1128">1128</span>
+<span id="1129">1129</span>
+<span id="1130">1130</span>
+<span id="1131">1131</span>
+<span id="1132">1132</span>
+<span id="1133">1133</span>
+<span id="1134">1134</span>
+<span id="1135">1135</span>
+<span id="1136">1136</span>
+<span id="1137">1137</span>
+<span id="1138">1138</span>
+<span id="1139">1139</span>
+<span id="1140">1140</span>
+<span id="1141">1141</span>
+<span id="1142">1142</span>
+<span id="1143">1143</span>
+<span id="1144">1144</span>
+<span id="1145">1145</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Definition of a lexer for the WebAssembly text format.</span>
 <span class="doccomment">//!</span>
@@ -1154,11 +1174,11 @@
 <span class="doccomment">//! [`Lexer`]: crate::lexer::Lexer</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Error</span>, <span class="ident">Span</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">borrow</span>::<span class="ident">Cow</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">char</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">iter</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">str</span>;
+<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+<span class="kw">use</span> <span class="ident">std::char</span>;
+<span class="kw">use</span> <span class="ident">std::fmt</span>;
+<span class="kw">use</span> <span class="ident">std::iter</span>;
+<span class="kw">use</span> <span class="ident">std::str</span>;
 
 <span class="doccomment">/// A structure used to lex the s-expression syntax of WAT files.</span>
 <span class="doccomment">///</span>
@@ -1167,7 +1187,7 @@
 <span class="doccomment">/// returned for any non-lexable text.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Lexer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">it</span>: <span class="ident">iter</span>::<span class="ident">Peekable</span><span class="op">&lt;</span><span class="ident">str</span>::<span class="ident">CharIndices</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">it</span>: <span class="ident">iter::Peekable</span><span class="op">&lt;</span><span class="ident">str::CharIndices</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
 }
 
@@ -1371,7 +1391,7 @@
     <span class="doccomment">/// Returns an error if the input is malformed.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ws</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">ws</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Token</span>::<span class="ident">Whitespace</span>(<span class="ident">ws</span>)));
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Token::Whitespace</span>(<span class="ident">ws</span>)));
         }
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">comment</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">comment</span>()<span class="question-mark">?</span> {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">comment</span>));
@@ -1380,7 +1400,7 @@
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">token</span>));
         }
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">it</span>.<span class="ident">next</span>() {
-            <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="ident">ch</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="self">self</span>.<span class="ident">error</span>(<span class="ident">i</span>, <span class="ident">LexError</span>::<span class="ident">Unexpected</span>(<span class="ident">ch</span>))),
+            <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="ident">ch</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="self">self</span>.<span class="ident">error</span>(<span class="ident">i</span>, <span class="ident">LexError::Unexpected</span>(<span class="ident">ch</span>))),
             <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
         }
     }
@@ -1388,17 +1408,17 @@
     <span class="kw">fn</span> <span class="ident">token</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="comment">// First two are easy, they&#39;re just parens</span>
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pos</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">eat_char</span>(<span class="string">&#39;(&#39;</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Token</span>::<span class="ident">LParen</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">input</span>[<span class="ident">pos</span>..<span class="ident">pos</span> <span class="op">+</span> <span class="number">1</span>])));
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Token::LParen</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">input</span>[<span class="ident">pos</span>..<span class="ident">pos</span> <span class="op">+</span> <span class="number">1</span>])));
         }
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pos</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">eat_char</span>(<span class="string">&#39;)&#39;</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Token</span>::<span class="ident">RParen</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">input</span>[<span class="ident">pos</span>..<span class="ident">pos</span> <span class="op">+</span> <span class="number">1</span>])));
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Token::RParen</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">input</span>[<span class="ident">pos</span>..<span class="ident">pos</span> <span class="op">+</span> <span class="number">1</span>])));
         }
 
         <span class="comment">// Strings are also pretty easy, leading `&quot;` is a dead giveaway</span>
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pos</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">eat_char</span>(<span class="string">&#39;&quot;&#39;</span>) {
             <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">string</span>()<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">src</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">input</span>[<span class="ident">pos</span>..<span class="self">self</span>.<span class="ident">cur</span>()];
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Token</span>::<span class="ident">String</span>(<span class="ident">WasmString</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">WasmStringInner</span> {
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Token::String</span>(<span class="ident">WasmString</span>(<span class="ident">Box::new</span>(<span class="ident">WasmStringInner</span> {
                 <span class="ident">val</span>,
                 <span class="ident">src</span>,
             })))));
@@ -1408,9 +1428,9 @@
             <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="ident">ch</span>)) <span class="kw">if</span> <span class="ident">is_idchar</span>(<span class="ident">ch</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">i</span>, <span class="ident">ch</span>),
             <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="ident">ch</span>)) <span class="kw">if</span> <span class="ident">is_reserved_extra</span>(<span class="ident">ch</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">it</span>.<span class="ident">next</span>();
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Token</span>::<span class="ident">Reserved</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">input</span>[<span class="ident">i</span>..<span class="self">self</span>.<span class="ident">cur</span>()])));
+                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Token::Reserved</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">input</span>[<span class="ident">i</span>..<span class="self">self</span>.<span class="ident">cur</span>()])));
             }
-            <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="ident">ch</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="self">self</span>.<span class="ident">error</span>(<span class="ident">i</span>, <span class="ident">LexError</span>::<span class="ident">Unexpected</span>(<span class="ident">ch</span>))),
+            <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="ident">ch</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="self">self</span>.<span class="ident">error</span>(<span class="ident">i</span>, <span class="ident">LexError::Unexpected</span>(<span class="ident">ch</span>))),
             <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
         };
 
@@ -1426,49 +1446,49 @@
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">number</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">number</span>(<span class="ident">reserved</span>) {
             <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">number</span>))
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">prefix</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;$&#39;</span> <span class="op">&amp;&amp;</span> <span class="ident">reserved</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">1</span> {
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Token</span>::<span class="ident">Id</span>(<span class="ident">reserved</span>)))
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Token::Id</span>(<span class="ident">reserved</span>)))
         } <span class="kw">else</span> <span class="kw">if</span> <span class="string">&#39;a&#39;</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">prefix</span> <span class="op">&amp;&amp;</span> <span class="ident">prefix</span> <span class="op">&lt;</span><span class="op">=</span> <span class="string">&#39;z&#39;</span> {
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Token</span>::<span class="ident">Keyword</span>(<span class="ident">reserved</span>)))
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Token::Keyword</span>(<span class="ident">reserved</span>)))
         } <span class="kw">else</span> {
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Token</span>::<span class="ident">Reserved</span>(<span class="ident">reserved</span>)))
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Token::Reserved</span>(<span class="ident">reserved</span>)))
         }
     }
 
     <span class="kw">fn</span> <span class="ident">number</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">sign</span>, <span class="ident">num</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">src</span>.<span class="ident">starts_with</span>(<span class="string">&#39;+&#39;</span>) {
-            (<span class="prelude-val">Some</span>(<span class="ident">SignToken</span>::<span class="ident">Plus</span>), <span class="kw-2">&amp;</span><span class="ident">src</span>[<span class="number">1</span>..])
+            (<span class="prelude-val">Some</span>(<span class="ident">SignToken::Plus</span>), <span class="kw-2">&amp;</span><span class="ident">src</span>[<span class="number">1</span>..])
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">src</span>.<span class="ident">starts_with</span>(<span class="string">&#39;-&#39;</span>) {
-            (<span class="prelude-val">Some</span>(<span class="ident">SignToken</span>::<span class="ident">Minus</span>), <span class="kw-2">&amp;</span><span class="ident">src</span>[<span class="number">1</span>..])
+            (<span class="prelude-val">Some</span>(<span class="ident">SignToken::Minus</span>), <span class="kw-2">&amp;</span><span class="ident">src</span>[<span class="number">1</span>..])
         } <span class="kw">else</span> {
             (<span class="prelude-val">None</span>, <span class="ident">src</span>)
         };
 
-        <span class="kw">let</span> <span class="ident">negative</span> <span class="op">=</span> <span class="ident">sign</span> <span class="op">=</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">SignToken</span>::<span class="ident">Minus</span>);
+        <span class="kw">let</span> <span class="ident">negative</span> <span class="op">=</span> <span class="ident">sign</span> <span class="op">=</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">SignToken::Minus</span>);
 
         <span class="comment">// Handle `inf` and `nan` which are special numbers here</span>
         <span class="kw">if</span> <span class="ident">num</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;inf&quot;</span> {
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">Token</span>::<span class="ident">Float</span>(<span class="ident">Float</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">FloatInner</span> {
+            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">Token::Float</span>(<span class="ident">Float</span>(<span class="ident">Box::new</span>(<span class="ident">FloatInner</span> {
                 <span class="ident">src</span>,
-                <span class="ident">val</span>: <span class="ident">FloatVal</span>::<span class="ident">Inf</span> { <span class="ident">negative</span> },
+                <span class="ident">val</span>: <span class="ident">FloatVal::Inf</span> { <span class="ident">negative</span> },
             }))));
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">num</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;nan&quot;</span> {
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">Token</span>::<span class="ident">Float</span>(<span class="ident">Float</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">FloatInner</span> {
+            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">Token::Float</span>(<span class="ident">Float</span>(<span class="ident">Box::new</span>(<span class="ident">FloatInner</span> {
                 <span class="ident">src</span>,
-                <span class="ident">val</span>: <span class="ident">FloatVal</span>::<span class="ident">Nan</span> {
+                <span class="ident">val</span>: <span class="ident">FloatVal::Nan</span> {
                     <span class="ident">val</span>: <span class="prelude-val">None</span>,
                     <span class="ident">negative</span>,
                 },
             }))));
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">num</span>.<span class="ident">starts_with</span>(<span class="string">&quot;nan:0x&quot;</span>) {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">it</span> <span class="op">=</span> <span class="ident">num</span>[<span class="number">6</span>..].<span class="ident">chars</span>();
-            <span class="kw">let</span> <span class="ident">to_parse</span> <span class="op">=</span> <span class="ident">skip_undescores</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">it</span>, <span class="bool-val">false</span>, <span class="ident">char</span>::<span class="ident">is_ascii_hexdigit</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">to_parse</span> <span class="op">=</span> <span class="ident">skip_undescores</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">it</span>, <span class="bool-val">false</span>, <span class="ident">char::is_ascii_hexdigit</span>)<span class="question-mark">?</span>;
             <span class="kw">if</span> <span class="ident">it</span>.<span class="ident">next</span>().<span class="ident">is_some</span>() {
                 <span class="kw">return</span> <span class="prelude-val">None</span>;
             }
-            <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">u64</span>::<span class="ident">from_str_radix</span>(<span class="kw-2">&amp;</span><span class="ident">to_parse</span>, <span class="number">16</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">Token</span>::<span class="ident">Float</span>(<span class="ident">Float</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">FloatInner</span> {
+            <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">u64::from_str_radix</span>(<span class="kw-2">&amp;</span><span class="ident">to_parse</span>, <span class="number">16</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
+            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">Token::Float</span>(<span class="ident">Float</span>(<span class="ident">Box::new</span>(<span class="ident">FloatInner</span> {
                 <span class="ident">src</span>,
-                <span class="ident">val</span>: <span class="ident">FloatVal</span>::<span class="ident">Nan</span> {
+                <span class="ident">val</span>: <span class="ident">FloatVal::Nan</span> {
                     <span class="ident">val</span>: <span class="prelude-val">Some</span>(<span class="ident">n</span>),
                     <span class="ident">negative</span>,
                 },
@@ -1480,13 +1500,13 @@
             (
                 <span class="ident">num</span>[<span class="number">2</span>..].<span class="ident">chars</span>(),
                 <span class="bool-val">true</span>,
-                <span class="ident">char</span>::<span class="ident">is_ascii_hexdigit</span> <span class="kw">as</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+                <span class="ident">char::is_ascii_hexdigit</span> <span class="kw">as</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
             )
         } <span class="kw">else</span> {
             (
                 <span class="ident">num</span>.<span class="ident">chars</span>(),
                 <span class="bool-val">false</span>,
-                <span class="ident">char</span>::<span class="ident">is_ascii_digit</span> <span class="kw">as</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+                <span class="ident">char::is_ascii_digit</span> <span class="kw">as</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
             )
         };
 
@@ -1499,7 +1519,7 @@
 
             <span class="comment">// Otherwise this is a valid integer literal!</span>
             <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">Token</span>::<span class="ident">Integer</span>(<span class="ident">Integer</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">IntegerInner</span> {
+                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">Token::Integer</span>(<span class="ident">Integer</span>(<span class="ident">Box::new</span>(<span class="ident">IntegerInner</span> {
                     <span class="ident">sign</span>,
                     <span class="ident">src</span>,
                     <span class="ident">val</span>,
@@ -1535,7 +1555,7 @@
                     }
                     <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
                 };
-                <span class="prelude-val">Some</span>(<span class="ident">skip_undescores</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">it</span>, <span class="ident">negative</span>, <span class="ident">char</span>::<span class="ident">is_ascii_digit</span>)<span class="question-mark">?</span>)
+                <span class="prelude-val">Some</span>(<span class="ident">skip_undescores</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">it</span>, <span class="ident">negative</span>, <span class="ident">char::is_ascii_digit</span>)<span class="question-mark">?</span>)
             }
             (<span class="kw">_</span>, <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>,
@@ -1547,9 +1567,9 @@
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
 
-        <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">Token</span>::<span class="ident">Float</span>(<span class="ident">Float</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">FloatInner</span> {
+        <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">Token::Float</span>(<span class="ident">Float</span>(<span class="ident">Box::new</span>(<span class="ident">FloatInner</span> {
             <span class="ident">src</span>,
-            <span class="ident">val</span>: <span class="ident">FloatVal</span>::<span class="ident">Val</span> {
+            <span class="ident">val</span>: <span class="ident">FloatVal::Val</span> {
                 <span class="ident">hex</span>,
                 <span class="ident">integral</span>: <span class="ident">val</span>,
                 <span class="ident">exponent</span>,
@@ -1558,7 +1578,7 @@
         }))));
 
         <span class="kw">fn</span> <span class="ident">skip_undescores</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-            <span class="ident">it</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">str</span>::<span class="ident">Chars</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+            <span class="ident">it</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">str::Chars</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
             <span class="ident">negative</span>: <span class="ident">bool</span>,
             <span class="ident">good</span>: <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
         ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
@@ -1568,23 +1588,23 @@
             }
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">last_underscore</span> <span class="op">=</span> <span class="bool-val">false</span>;
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">negative</span> {
-                <span class="ident">State</span>::<span class="ident">Collecting</span>(<span class="string">&quot;-&quot;</span>.<span class="ident">to_string</span>())
+                <span class="ident">State::Collecting</span>(<span class="string">&quot;-&quot;</span>.<span class="ident">to_string</span>())
             } <span class="kw">else</span> {
-                <span class="ident">State</span>::<span class="ident">Raw</span>
+                <span class="ident">State::Raw</span>
             };
             <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">it</span>.<span class="ident">as_str</span>();
             <span class="kw">let</span> <span class="ident">first</span> <span class="op">=</span> <span class="ident">it</span>.<span class="ident">next</span>()<span class="question-mark">?</span>;
             <span class="kw">if</span> <span class="op">!</span><span class="ident">good</span>(<span class="kw-2">&amp;</span><span class="ident">first</span>) {
                 <span class="kw">return</span> <span class="prelude-val">None</span>;
             }
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">State</span>::<span class="ident">Collecting</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span> {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">State::Collecting</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span> {
                 <span class="ident">s</span>.<span class="ident">push</span>(<span class="ident">first</span>);
             }
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">last</span> <span class="op">=</span> <span class="number">1</span>;
             <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="ident">it</span>.<span class="ident">clone</span>().<span class="ident">next</span>() {
                 <span class="kw">if</span> <span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;_&#39;</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">last_underscore</span> {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">State</span>::<span class="ident">Raw</span> <span class="op">=</span> <span class="ident">state</span> {
-                        <span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">Collecting</span>(<span class="ident">input</span>[..<span class="ident">last</span>].<span class="ident">to_string</span>());
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">State::Raw</span> <span class="op">=</span> <span class="ident">state</span> {
+                        <span class="ident">state</span> <span class="op">=</span> <span class="ident">State::Collecting</span>(<span class="ident">input</span>[..<span class="ident">last</span>].<span class="ident">to_string</span>());
                     }
                     <span class="ident">it</span>.<span class="ident">next</span>();
                     <span class="ident">last_underscore</span> <span class="op">=</span> <span class="bool-val">true</span>;
@@ -1593,7 +1613,7 @@
                 <span class="kw">if</span> <span class="op">!</span><span class="ident">good</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>) {
                     <span class="kw">break</span>;
                 }
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">State</span>::<span class="ident">Collecting</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span> {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">State::Collecting</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span> {
                     <span class="ident">s</span>.<span class="ident">push</span>(<span class="ident">c</span>);
                 }
                 <span class="ident">last_underscore</span> <span class="op">=</span> <span class="bool-val">false</span>;
@@ -1604,8 +1624,8 @@
                 <span class="kw">return</span> <span class="prelude-val">None</span>;
             }
             <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="ident">state</span> {
-                <span class="ident">State</span>::<span class="ident">Raw</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">input</span>[..<span class="ident">last</span>].<span class="ident">into</span>(),
-                <span class="ident">State</span>::<span class="ident">Collecting</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">into</span>(),
+                <span class="ident">State::Raw</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">input</span>[..<span class="ident">last</span>].<span class="ident">into</span>(),
+                <span class="ident">State::Collecting</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">into</span>(),
             })
         }
     }
@@ -1640,7 +1660,7 @@
                 }
             }
             <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cur</span>();
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Token</span>::<span class="ident">LineComment</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">input</span>[<span class="ident">start</span>..<span class="ident">end</span>])));
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Token::LineComment</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">input</span>[<span class="ident">start</span>..<span class="ident">end</span>])));
         }
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">start</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">eat_str</span>(<span class="string">&quot;(;&quot;</span>) {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">level</span> <span class="op">=</span> <span class="number">1</span>;
@@ -1652,12 +1672,12 @@
                     <span class="ident">level</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
                     <span class="kw">if</span> <span class="ident">level</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
                         <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cur</span>();
-                        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Token</span>::<span class="ident">BlockComment</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">input</span>[<span class="ident">start</span>..<span class="ident">end</span>])));
+                        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Token::BlockComment</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">input</span>[<span class="ident">start</span>..<span class="ident">end</span>])));
                     }
                 }
             }
 
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="self">self</span>.<span class="ident">error</span>(<span class="ident">start</span>, <span class="ident">LexError</span>::<span class="ident">DanglingBlockComment</span>));
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="self">self</span>.<span class="ident">error</span>(<span class="ident">start</span>, <span class="ident">LexError::DanglingBlockComment</span>));
         }
         <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
     }
@@ -1669,19 +1689,19 @@
             <span class="ident">Start</span>(<span class="ident">usize</span>),
             <span class="ident">String</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>),
         }
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">Start</span>(<span class="self">self</span>.<span class="ident">cur</span>());
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">State::Start</span>(<span class="self">self</span>.<span class="ident">cur</span>());
         <span class="kw">loop</span> {
             <span class="kw">match</span> <span class="self">self</span>.<span class="ident">it</span>.<span class="ident">next</span>() {
                 <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="string">&#39;\\&#39;</span>)) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="kw">match</span> <span class="ident">state</span> {
-                        <span class="ident">State</span>::<span class="ident">String</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {}
-                        <span class="ident">State</span>::<span class="ident">Start</span>(<span class="ident">start</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                            <span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">String</span>(<span class="self">self</span>.<span class="ident">input</span>[<span class="ident">start</span>..<span class="ident">i</span>].<span class="ident">as_bytes</span>().<span class="ident">to_vec</span>());
+                        <span class="ident">State::String</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {}
+                        <span class="ident">State::Start</span>(<span class="ident">start</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="ident">state</span> <span class="op">=</span> <span class="ident">State::String</span>(<span class="self">self</span>.<span class="ident">input</span>[<span class="ident">start</span>..<span class="ident">i</span>].<span class="ident">as_bytes</span>().<span class="ident">to_vec</span>());
                         }
                     }
                     <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span> {
-                        <span class="ident">State</span>::<span class="ident">String</span>(<span class="ident">b</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">b</span>,
-                        <span class="ident">State</span>::<span class="ident">Start</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(),
+                        <span class="ident">State::String</span>(<span class="ident">b</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">b</span>,
+                        <span class="ident">State::Start</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
                     };
                     <span class="kw">match</span> <span class="self">self</span>.<span class="ident">it</span>.<span class="ident">next</span>() {
                         <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="string">&#39;&quot;&#39;</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">buf</span>.<span class="ident">push</span>(<span class="string">b&#39;&quot;&#39;</span>),
@@ -1693,8 +1713,8 @@
                         <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="string">&#39;u&#39;</span>)) <span class="op">=</span><span class="op">&gt;</span> {
                             <span class="self">self</span>.<span class="ident">must_eat_char</span>(<span class="string">&#39;{&#39;</span>)<span class="question-mark">?</span>;
                             <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">hexnum</span>()<span class="question-mark">?</span>;
-                            <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">char</span>::<span class="ident">from_u32</span>(<span class="ident">n</span>)
-                                .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">error</span>(<span class="ident">i</span>, <span class="ident">LexError</span>::<span class="ident">InvalidUnicodeValue</span>(<span class="ident">n</span>)))<span class="question-mark">?</span>;
+                            <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">char::from_u32</span>(<span class="ident">n</span>)
+                                .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">error</span>(<span class="ident">i</span>, <span class="ident">LexError::InvalidUnicodeValue</span>(<span class="ident">n</span>)))<span class="question-mark">?</span>;
                             <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="ident">c</span>.<span class="ident">encode_utf8</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="number">0</span>; <span class="number">4</span>]).<span class="ident">as_bytes</span>());
                             <span class="self">self</span>.<span class="ident">must_eat_char</span>(<span class="string">&#39;}&#39;</span>)<span class="question-mark">?</span>;
                         }
@@ -1702,28 +1722,28 @@
                             <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">c2</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">hexdigit</span>()<span class="question-mark">?</span>;
                             <span class="ident">buf</span>.<span class="ident">push</span>(<span class="ident">to_hex</span>(<span class="ident">c1</span>) <span class="op">*</span> <span class="number">16</span> <span class="op">+</span> <span class="ident">c2</span>);
                         }
-                        <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="ident">c</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="self">self</span>.<span class="ident">error</span>(<span class="ident">i</span>, <span class="ident">LexError</span>::<span class="ident">InvalidStringEscape</span>(<span class="ident">c</span>))),
-                        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="self">self</span>.<span class="ident">error</span>(<span class="self">self</span>.<span class="ident">input</span>.<span class="ident">len</span>(), <span class="ident">LexError</span>::<span class="ident">UnexpectedEof</span>)),
+                        <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="ident">c</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="self">self</span>.<span class="ident">error</span>(<span class="ident">i</span>, <span class="ident">LexError::InvalidStringEscape</span>(<span class="ident">c</span>))),
+                        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="self">self</span>.<span class="ident">error</span>(<span class="self">self</span>.<span class="ident">input</span>.<span class="ident">len</span>(), <span class="ident">LexError::UnexpectedEof</span>)),
                     }
                 }
                 <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="string">&#39;&quot;&#39;</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
                 <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="ident">c</span>)) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="kw">if</span> (<span class="ident">c</span> <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">&lt;</span> <span class="number">0x20</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="kw">as</span> <span class="ident">u32</span> <span class="op">=</span><span class="op">=</span> <span class="number">0x7f</span> {
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="self">self</span>.<span class="ident">error</span>(<span class="ident">i</span>, <span class="ident">LexError</span>::<span class="ident">InvalidStringElement</span>(<span class="ident">c</span>)));
+                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="self">self</span>.<span class="ident">error</span>(<span class="ident">i</span>, <span class="ident">LexError::InvalidStringElement</span>(<span class="ident">c</span>)));
                     }
                     <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span> {
-                        <span class="ident">State</span>::<span class="ident">Start</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {}
-                        <span class="ident">State</span>::<span class="ident">String</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">State::Start</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {}
+                        <span class="ident">State::String</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> {
                             <span class="ident">v</span>.<span class="ident">extend</span>(<span class="ident">c</span>.<span class="ident">encode_utf8</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="number">0</span>; <span class="number">4</span>]).<span class="ident">as_bytes</span>());
                         }
                     }
                 }
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="self">self</span>.<span class="ident">error</span>(<span class="self">self</span>.<span class="ident">input</span>.<span class="ident">len</span>(), <span class="ident">LexError</span>::<span class="ident">UnexpectedEof</span>)),
+                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="self">self</span>.<span class="ident">error</span>(<span class="self">self</span>.<span class="ident">input</span>.<span class="ident">len</span>(), <span class="ident">LexError::UnexpectedEof</span>)),
             }
         }
         <span class="kw">match</span> <span class="ident">state</span> {
-            <span class="ident">State</span>::<span class="ident">Start</span>(<span class="ident">pos</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">input</span>[<span class="ident">pos</span>..<span class="self">self</span>.<span class="ident">cur</span>() <span class="op">-</span> <span class="number">1</span>].<span class="ident">as_bytes</span>().<span class="ident">into</span>()),
-            <span class="ident">State</span>::<span class="ident">String</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">s</span>.<span class="ident">into</span>()),
+            <span class="ident">State::Start</span>(<span class="ident">pos</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">input</span>[<span class="ident">pos</span>..<span class="self">self</span>.<span class="ident">cur</span>() <span class="op">-</span> <span class="number">1</span>].<span class="ident">as_bytes</span>().<span class="ident">into</span>()),
+            <span class="ident">State::String</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">s</span>.<span class="ident">into</span>()),
         }
     }
 
@@ -1745,11 +1765,11 @@
             <span class="ident">n</span> <span class="op">=</span> <span class="ident">n</span>
                 .<span class="ident">checked_mul</span>(<span class="number">16</span>)
                 .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">checked_add</span>(<span class="ident">to_hex</span>(<span class="ident">c</span>) <span class="kw">as</span> <span class="ident">u32</span>))
-                .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">error</span>(<span class="ident">i</span>, <span class="ident">LexError</span>::<span class="ident">NumberTooBig</span>))<span class="question-mark">?</span>;
+                .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">error</span>(<span class="ident">i</span>, <span class="ident">LexError::NumberTooBig</span>))<span class="question-mark">?</span>;
         }
         <span class="kw">if</span> <span class="ident">last_underscore</span> {
             <span class="kw">let</span> <span class="ident">cur</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cur</span>();
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="self">self</span>.<span class="ident">error</span>(<span class="ident">cur</span> <span class="op">-</span> <span class="number">1</span>, <span class="ident">LexError</span>::<span class="ident">LoneUnderscore</span>));
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="self">self</span>.<span class="ident">error</span>(<span class="ident">cur</span> <span class="op">-</span> <span class="number">1</span>, <span class="ident">LexError::LoneUnderscore</span>));
         }
         <span class="prelude-val">Ok</span>(<span class="ident">n</span>)
     }
@@ -1762,7 +1782,7 @@
         <span class="kw">if</span> <span class="ident">ch</span>.<span class="ident">is_ascii_hexdigit</span>() {
             <span class="prelude-val">Ok</span>((<span class="ident">i</span>, <span class="ident">to_hex</span>(<span class="ident">ch</span>)))
         } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="self">self</span>.<span class="ident">error</span>(<span class="ident">i</span>, <span class="ident">LexError</span>::<span class="ident">InvalidHexDigit</span>(<span class="ident">ch</span>)))
+            <span class="prelude-val">Err</span>(<span class="self">self</span>.<span class="ident">error</span>(<span class="ident">i</span>, <span class="ident">LexError::InvalidHexDigit</span>(<span class="ident">ch</span>)))
         }
     }
 
@@ -1795,7 +1815,7 @@
     <span class="kw">fn</span> <span class="ident">must_char</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">char</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">it</span>
             .<span class="ident">next</span>()
-            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">error</span>(<span class="self">self</span>.<span class="ident">input</span>.<span class="ident">len</span>(), <span class="ident">LexError</span>::<span class="ident">UnexpectedEof</span>))
+            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">error</span>(<span class="self">self</span>.<span class="ident">input</span>.<span class="ident">len</span>(), <span class="ident">LexError::UnexpectedEof</span>))
     }
 
     <span class="doccomment">/// Expects that a specific character must be read next</span>
@@ -1804,7 +1824,7 @@
         <span class="kw">if</span> <span class="ident">wanted</span> <span class="op">=</span><span class="op">=</span> <span class="ident">found</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">pos</span>)
         } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="self">self</span>.<span class="ident">error</span>(<span class="ident">pos</span>, <span class="ident">LexError</span>::<span class="ident">Expected</span> { <span class="ident">wanted</span>, <span class="ident">found</span> }))
+            <span class="prelude-val">Err</span>(<span class="self">self</span>.<span class="ident">error</span>(<span class="ident">pos</span>, <span class="ident">LexError::Expected</span> { <span class="ident">wanted</span>, <span class="ident">found</span> }))
         }
     }
 
@@ -1820,14 +1840,14 @@
 
     <span class="doccomment">/// Creates an error at `pos` with the specified `kind`</span>
     <span class="kw">fn</span> <span class="ident">error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">pos</span>: <span class="ident">usize</span>, <span class="ident">kind</span>: <span class="ident">LexError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
-        <span class="ident">Error</span>::<span class="ident">lex</span>(<span class="ident">Span</span> { <span class="ident">offset</span>: <span class="ident">pos</span> }, <span class="self">self</span>.<span class="ident">input</span>, <span class="ident">kind</span>)
+        <span class="ident">Error::lex</span>(<span class="ident">Span</span> { <span class="ident">offset</span>: <span class="ident">pos</span> }, <span class="self">self</span>.<span class="ident">input</span>, <span class="ident">kind</span>)
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Lexer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Item</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">parse</span>().<span class="ident">transpose</span>()
     }
 }
@@ -1836,17 +1856,17 @@
     <span class="doccomment">/// Returns the original source text for this token.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">src</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Token</span>::<span class="ident">Whitespace</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
-            <span class="ident">Token</span>::<span class="ident">BlockComment</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
-            <span class="ident">Token</span>::<span class="ident">LineComment</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
-            <span class="ident">Token</span>::<span class="ident">LParen</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
-            <span class="ident">Token</span>::<span class="ident">RParen</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
-            <span class="ident">Token</span>::<span class="ident">String</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">src</span>(),
-            <span class="ident">Token</span>::<span class="ident">Id</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
-            <span class="ident">Token</span>::<span class="ident">Keyword</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
-            <span class="ident">Token</span>::<span class="ident">Reserved</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
-            <span class="ident">Token</span>::<span class="ident">Integer</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i</span>.<span class="ident">src</span>(),
-            <span class="ident">Token</span>::<span class="ident">Float</span>(<span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">src</span>(),
+            <span class="ident">Token::Whitespace</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
+            <span class="ident">Token::BlockComment</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
+            <span class="ident">Token::LineComment</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
+            <span class="ident">Token::LParen</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
+            <span class="ident">Token::RParen</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
+            <span class="ident">Token::String</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">src</span>(),
+            <span class="ident">Token::Id</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
+            <span class="ident">Token::Keyword</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
+            <span class="ident">Token::Reserved</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
+            <span class="ident">Token::Integer</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i</span>.<span class="ident">src</span>(),
+            <span class="ident">Token::Float</span>(<span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">src</span>(),
         }
     }
 }
@@ -1941,24 +1961,44 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">LexError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">LexError</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
         <span class="kw">use</span> <span class="ident">LexError</span>::<span class="kw-2">*</span>;
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">DanglingBlockComment</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;unterminated block comment&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">Unexpected</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;unexpected character {:?}&quot;</span>, <span class="ident">c</span>)<span class="question-mark">?</span>,
-            <span class="ident">InvalidStringElement</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;invalid character in string {:?}&quot;</span>, <span class="ident">c</span>)<span class="question-mark">?</span>,
-            <span class="ident">InvalidStringEscape</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;invalid string escape {:?}&quot;</span>, <span class="ident">c</span>)<span class="question-mark">?</span>,
-            <span class="ident">InvalidHexDigit</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;invalid hex digit {:?}&quot;</span>, <span class="ident">c</span>)<span class="question-mark">?</span>,
-            <span class="ident">InvalidDigit</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;invalid decimal digit {:?}&quot;</span>, <span class="ident">c</span>)<span class="question-mark">?</span>,
-            <span class="ident">Expected</span> { <span class="ident">wanted</span>, <span class="ident">found</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;expected {:?} but found {:?}&quot;</span>, <span class="ident">wanted</span>, <span class="ident">found</span>)<span class="question-mark">?</span>,
-            <span class="ident">UnexpectedEof</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;unexpected end-of-file&quot;</span>)<span class="question-mark">?</span>,
+            <span class="ident">Unexpected</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;unexpected character &#39;{}&#39;&quot;</span>, <span class="ident">escape_char</span>(<span class="kw-2">*</span><span class="ident">c</span>))<span class="question-mark">?</span>,
+            <span class="ident">InvalidStringElement</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;invalid character in string &#39;{}&#39;&quot;</span>, <span class="ident">escape_char</span>(<span class="kw-2">*</span><span class="ident">c</span>))<span class="question-mark">?</span>
+            }
+            <span class="ident">InvalidStringEscape</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;invalid string escape &#39;{}&#39;&quot;</span>, <span class="ident">escape_char</span>(<span class="kw-2">*</span><span class="ident">c</span>))<span class="question-mark">?</span>,
+            <span class="ident">InvalidHexDigit</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;invalid hex digit &#39;{}&#39;&quot;</span>, <span class="ident">escape_char</span>(<span class="kw-2">*</span><span class="ident">c</span>))<span class="question-mark">?</span>,
+            <span class="ident">InvalidDigit</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;invalid decimal digit &#39;{}&#39;&quot;</span>, <span class="ident">escape_char</span>(<span class="kw-2">*</span><span class="ident">c</span>))<span class="question-mark">?</span>,
+            <span class="ident">Expected</span> { <span class="ident">wanted</span>, <span class="ident">found</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(
+                <span class="ident">f</span>,
+                <span class="string">&quot;expected &#39;{}&#39; but found &#39;{}&#39;&quot;</span>,
+                <span class="ident">escape_char</span>(<span class="kw-2">*</span><span class="ident">wanted</span>),
+                <span class="ident">escape_char</span>(<span class="kw-2">*</span><span class="ident">found</span>)
+            )<span class="question-mark">?</span>,
+            <span class="ident">UnexpectedEof</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;unexpected end-of-file&quot;</span>)<span class="question-mark">?</span>,
             <span class="ident">NumberTooBig</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;number is too big to parse&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">InvalidUnicodeValue</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;invalid unicode scalar value 0x{:x}&quot;</span>, <span class="ident">c</span>)<span class="question-mark">?</span>,
-            <span class="ident">LoneUnderscore</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;bare underscore in numeric literal&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">__Nonexhaustive</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(),
+            <span class="ident">InvalidUnicodeValue</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;invalid unicode scalar value 0x{:x}&quot;</span>, <span class="ident">c</span>)<span class="question-mark">?</span>,
+            <span class="ident">LoneUnderscore</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;bare underscore in numeric literal&quot;</span>)<span class="question-mark">?</span>,
+            <span class="ident">__Nonexhaustive</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         }
         <span class="prelude-val">Ok</span>(())
+    }
+}
+
+<span class="kw">fn</span> <span class="ident">escape_char</span>(<span class="ident">c</span>: <span class="ident">char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">match</span> <span class="ident">c</span> {
+        <span class="string">&#39;\t&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">String::from</span>(<span class="string">&quot;\\\t&quot;</span>),
+        <span class="string">&#39;\r&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">String::from</span>(<span class="string">&quot;\\\r&quot;</span>),
+        <span class="string">&#39;\n&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">String::from</span>(<span class="string">&quot;\\\n&quot;</span>),
+        <span class="string">&#39;\\&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">String::from</span>(<span class="string">&quot;\\\\&quot;</span>),
+        <span class="string">&#39;\&#39;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">String::from</span>(<span class="string">&quot;\\\&#39;&quot;</span>),
+        <span class="string">&#39;\&quot;&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">String::from</span>(<span class="string">&quot;\&quot;&quot;</span>),
+        <span class="string">&#39;\x20&#39;</span>..<span class="op">=</span><span class="string">&#39;\x7e&#39;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">String::from</span>(<span class="ident">c</span>),
+        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>.<span class="ident">escape_unicode</span>().<span class="ident">to_string</span>(),
     }
 }
 
@@ -1969,48 +2009,48 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">ws_smoke</span>() {
         <span class="kw">fn</span> <span class="ident">get_whitespace</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
-            <span class="kw">match</span> <span class="ident">Lexer</span>::<span class="ident">new</span>(<span class="ident">input</span>).<span class="ident">parse</span>().<span class="ident">expect</span>(<span class="string">&quot;no first token&quot;</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">Token</span>::<span class="ident">Whitespace</span>(<span class="ident">s</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
-                <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;unexpected {:?}&quot;</span>, <span class="ident">other</span>),
+            <span class="kw">match</span> <span class="ident">Lexer::new</span>(<span class="ident">input</span>).<span class="ident">parse</span>().<span class="ident">expect</span>(<span class="string">&quot;no first token&quot;</span>) {
+                <span class="prelude-val">Some</span>(<span class="ident">Token::Whitespace</span>(<span class="ident">s</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
+                <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;unexpected {:?}&quot;</span>, <span class="ident">other</span>),
             }
         }
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_whitespace</span>(<span class="string">&quot; &quot;</span>), <span class="string">&quot; &quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_whitespace</span>(<span class="string">&quot;  &quot;</span>), <span class="string">&quot;  &quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_whitespace</span>(<span class="string">&quot;  \n &quot;</span>), <span class="string">&quot;  \n &quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_whitespace</span>(<span class="string">&quot;  x&quot;</span>), <span class="string">&quot;  &quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_whitespace</span>(<span class="string">&quot;  ;&quot;</span>), <span class="string">&quot;  &quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">get_whitespace</span>(<span class="string">&quot; &quot;</span>), <span class="string">&quot; &quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">get_whitespace</span>(<span class="string">&quot;  &quot;</span>), <span class="string">&quot;  &quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">get_whitespace</span>(<span class="string">&quot;  \n &quot;</span>), <span class="string">&quot;  \n &quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">get_whitespace</span>(<span class="string">&quot;  x&quot;</span>), <span class="string">&quot;  &quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">get_whitespace</span>(<span class="string">&quot;  ;&quot;</span>), <span class="string">&quot;  &quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">line_comment_smoke</span>() {
         <span class="kw">fn</span> <span class="ident">get_line_comment</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
-            <span class="kw">match</span> <span class="ident">Lexer</span>::<span class="ident">new</span>(<span class="ident">input</span>).<span class="ident">parse</span>().<span class="ident">expect</span>(<span class="string">&quot;no first token&quot;</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">Token</span>::<span class="ident">LineComment</span>(<span class="ident">s</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
-                <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;unexpected {:?}&quot;</span>, <span class="ident">other</span>),
+            <span class="kw">match</span> <span class="ident">Lexer::new</span>(<span class="ident">input</span>).<span class="ident">parse</span>().<span class="ident">expect</span>(<span class="string">&quot;no first token&quot;</span>) {
+                <span class="prelude-val">Some</span>(<span class="ident">Token::LineComment</span>(<span class="ident">s</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
+                <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;unexpected {:?}&quot;</span>, <span class="ident">other</span>),
             }
         }
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_line_comment</span>(<span class="string">&quot;;;&quot;</span>), <span class="string">&quot;;;&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_line_comment</span>(<span class="string">&quot;;; xyz&quot;</span>), <span class="string">&quot;;; xyz&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_line_comment</span>(<span class="string">&quot;;; xyz\nabc&quot;</span>), <span class="string">&quot;;; xyz&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_line_comment</span>(<span class="string">&quot;;;\nabc&quot;</span>), <span class="string">&quot;;;&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_line_comment</span>(<span class="string">&quot;;;   \nabc&quot;</span>), <span class="string">&quot;;;   &quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">get_line_comment</span>(<span class="string">&quot;;;&quot;</span>), <span class="string">&quot;;;&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">get_line_comment</span>(<span class="string">&quot;;; xyz&quot;</span>), <span class="string">&quot;;; xyz&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">get_line_comment</span>(<span class="string">&quot;;; xyz\nabc&quot;</span>), <span class="string">&quot;;; xyz&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">get_line_comment</span>(<span class="string">&quot;;;\nabc&quot;</span>), <span class="string">&quot;;;&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">get_line_comment</span>(<span class="string">&quot;;;   \nabc&quot;</span>), <span class="string">&quot;;;   &quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">block_comment_smoke</span>() {
         <span class="kw">fn</span> <span class="ident">get_block_comment</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
-            <span class="kw">match</span> <span class="ident">Lexer</span>::<span class="ident">new</span>(<span class="ident">input</span>).<span class="ident">parse</span>().<span class="ident">expect</span>(<span class="string">&quot;no first token&quot;</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">Token</span>::<span class="ident">BlockComment</span>(<span class="ident">s</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
-                <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;unexpected {:?}&quot;</span>, <span class="ident">other</span>),
+            <span class="kw">match</span> <span class="ident">Lexer::new</span>(<span class="ident">input</span>).<span class="ident">parse</span>().<span class="ident">expect</span>(<span class="string">&quot;no first token&quot;</span>) {
+                <span class="prelude-val">Some</span>(<span class="ident">Token::BlockComment</span>(<span class="ident">s</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
+                <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;unexpected {:?}&quot;</span>, <span class="ident">other</span>),
             }
         }
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_block_comment</span>(<span class="string">&quot;(;;)&quot;</span>), <span class="string">&quot;(;;)&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_block_comment</span>(<span class="string">&quot;(; ;)&quot;</span>), <span class="string">&quot;(; ;)&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_block_comment</span>(<span class="string">&quot;(; (;;) ;)&quot;</span>), <span class="string">&quot;(; (;;) ;)&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">get_block_comment</span>(<span class="string">&quot;(;;)&quot;</span>), <span class="string">&quot;(;;)&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">get_block_comment</span>(<span class="string">&quot;(; ;)&quot;</span>), <span class="string">&quot;(; ;)&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">get_block_comment</span>(<span class="string">&quot;(; (;;) ;)&quot;</span>), <span class="string">&quot;(; (;;) ;)&quot;</span>);
     }
 
     <span class="kw">fn</span> <span class="ident">get_token</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">Lexer</span>::<span class="ident">new</span>(<span class="ident">input</span>)
+        <span class="ident">Lexer::new</span>(<span class="ident">input</span>)
             .<span class="ident">parse</span>()
             .<span class="ident">expect</span>(<span class="string">&quot;no first token&quot;</span>)
             .<span class="ident">expect</span>(<span class="string">&quot;no token&quot;</span>)
@@ -2018,48 +2058,48 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">lparen</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_token</span>(<span class="string">&quot;((&quot;</span>), <span class="ident">Token</span>::<span class="ident">LParen</span>(<span class="string">&quot;(&quot;</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">get_token</span>(<span class="string">&quot;((&quot;</span>), <span class="ident">Token::LParen</span>(<span class="string">&quot;(&quot;</span>));
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">rparen</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_token</span>(<span class="string">&quot;)(&quot;</span>), <span class="ident">Token</span>::<span class="ident">RParen</span>(<span class="string">&quot;)&quot;</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">get_token</span>(<span class="string">&quot;)(&quot;</span>), <span class="ident">Token::RParen</span>(<span class="string">&quot;)&quot;</span>));
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">strings</span>() {
         <span class="kw">fn</span> <span class="ident">get_string</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
             <span class="kw">match</span> <span class="ident">get_token</span>(<span class="ident">input</span>) {
-                <span class="ident">Token</span>::<span class="ident">String</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">input</span>, <span class="ident">s</span>.<span class="ident">src</span>());
+                <span class="ident">Token::String</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="macro">assert_eq!</span>(<span class="ident">input</span>, <span class="ident">s</span>.<span class="ident">src</span>());
                     <span class="ident">s</span>.<span class="ident">val</span>().<span class="ident">to_vec</span>()
                 }
-                <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;not string {:?}&quot;</span>, <span class="ident">other</span>),
+                <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;not string {:?}&quot;</span>, <span class="ident">other</span>),
             }
         }
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">get_string</span>(<span class="string">&quot;\&quot;\&quot;&quot;</span>), <span class="string">b&quot;&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">get_string</span>(<span class="string">&quot;\&quot;a\&quot;&quot;</span>), <span class="string">b&quot;a&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">get_string</span>(<span class="string">&quot;\&quot;a b c d\&quot;&quot;</span>), <span class="string">b&quot;a b c d&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">get_string</span>(<span class="string">&quot;\&quot;\\\&quot;\&quot;&quot;</span>), <span class="string">b&quot;\&quot;&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">get_string</span>(<span class="string">&quot;\&quot;\\&#39;\&quot;&quot;</span>), <span class="string">b&quot;&#39;&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">get_string</span>(<span class="string">&quot;\&quot;\\n\&quot;&quot;</span>), <span class="string">b&quot;\n&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">get_string</span>(<span class="string">&quot;\&quot;\\t\&quot;&quot;</span>), <span class="string">b&quot;\t&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">get_string</span>(<span class="string">&quot;\&quot;\\r\&quot;&quot;</span>), <span class="string">b&quot;\r&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">get_string</span>(<span class="string">&quot;\&quot;\\\\\&quot;&quot;</span>), <span class="string">b&quot;\\&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">get_string</span>(<span class="string">&quot;\&quot;\\01\&quot;&quot;</span>), <span class="kw-2">&amp;</span>[<span class="number">1</span>]);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">get_string</span>(<span class="string">&quot;\&quot;\\u{1}\&quot;&quot;</span>), <span class="kw-2">&amp;</span>[<span class="number">1</span>]);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">get_string</span>(<span class="string">&quot;\&quot;\&quot;&quot;</span>), <span class="string">b&quot;&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">get_string</span>(<span class="string">&quot;\&quot;a\&quot;&quot;</span>), <span class="string">b&quot;a&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">get_string</span>(<span class="string">&quot;\&quot;a b c d\&quot;&quot;</span>), <span class="string">b&quot;a b c d&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">get_string</span>(<span class="string">&quot;\&quot;\\\&quot;\&quot;&quot;</span>), <span class="string">b&quot;\&quot;&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">get_string</span>(<span class="string">&quot;\&quot;\\&#39;\&quot;&quot;</span>), <span class="string">b&quot;&#39;&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">get_string</span>(<span class="string">&quot;\&quot;\\n\&quot;&quot;</span>), <span class="string">b&quot;\n&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">get_string</span>(<span class="string">&quot;\&quot;\\t\&quot;&quot;</span>), <span class="string">b&quot;\t&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">get_string</span>(<span class="string">&quot;\&quot;\\r\&quot;&quot;</span>), <span class="string">b&quot;\r&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">get_string</span>(<span class="string">&quot;\&quot;\\\\\&quot;&quot;</span>), <span class="string">b&quot;\\&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">get_string</span>(<span class="string">&quot;\&quot;\\01\&quot;&quot;</span>), <span class="kw-2">&amp;</span>[<span class="number">1</span>]);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">get_string</span>(<span class="string">&quot;\&quot;\\u{1}\&quot;&quot;</span>), <span class="kw-2">&amp;</span>[<span class="number">1</span>]);
+        <span class="macro">assert_eq!</span>(
             <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">get_string</span>(<span class="string">&quot;\&quot;\\u{0f3}\&quot;&quot;</span>),
             <span class="string">&#39;\u{0f3}&#39;</span>.<span class="ident">encode_utf8</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="number">0</span>; <span class="number">4</span>]).<span class="ident">as_bytes</span>()
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">get_string</span>(<span class="string">&quot;\&quot;\\u{0_f_3}\&quot;&quot;</span>),
             <span class="string">&#39;\u{0f3}&#39;</span>.<span class="ident">encode_utf8</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="number">0</span>; <span class="number">4</span>]).<span class="ident">as_bytes</span>()
         );
 
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="op">=</span><span class="number">255i32</span> {
-            <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;\&quot;\\{:02x}\&quot;&quot;</span>, <span class="ident">i</span>);
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">get_string</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>), <span class="kw-2">&amp;</span>[<span class="ident">i</span> <span class="kw">as</span> <span class="ident">u8</span>]);
+            <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;\&quot;\\{:02x}\&quot;&quot;</span>, <span class="ident">i</span>);
+            <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">get_string</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>), <span class="kw-2">&amp;</span>[<span class="ident">i</span> <span class="kw">as</span> <span class="ident">u8</span>]);
         }
     }
 
@@ -2067,183 +2107,183 @@
     <span class="kw">fn</span> <span class="ident">id</span>() {
         <span class="kw">fn</span> <span class="ident">get_id</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
             <span class="kw">match</span> <span class="ident">get_token</span>(<span class="ident">input</span>) {
-                <span class="ident">Token</span>::<span class="ident">Id</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
-                <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;not id {:?}&quot;</span>, <span class="ident">other</span>),
+                <span class="ident">Token::Id</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
+                <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;not id {:?}&quot;</span>, <span class="ident">other</span>),
             }
         }
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_id</span>(<span class="string">&quot;$x&quot;</span>), <span class="string">&quot;$x&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_id</span>(<span class="string">&quot;$xyz&quot;</span>), <span class="string">&quot;$xyz&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_id</span>(<span class="string">&quot;$x_z&quot;</span>), <span class="string">&quot;$x_z&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_id</span>(<span class="string">&quot;$0^&quot;</span>), <span class="string">&quot;$0^&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_id</span>(<span class="string">&quot;$0^;;&quot;</span>), <span class="string">&quot;$0^&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_id</span>(<span class="string">&quot;$0^ ;;&quot;</span>), <span class="string">&quot;$0^&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">get_id</span>(<span class="string">&quot;$x&quot;</span>), <span class="string">&quot;$x&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">get_id</span>(<span class="string">&quot;$xyz&quot;</span>), <span class="string">&quot;$xyz&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">get_id</span>(<span class="string">&quot;$x_z&quot;</span>), <span class="string">&quot;$x_z&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">get_id</span>(<span class="string">&quot;$0^&quot;</span>), <span class="string">&quot;$0^&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">get_id</span>(<span class="string">&quot;$0^;;&quot;</span>), <span class="string">&quot;$0^&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">get_id</span>(<span class="string">&quot;$0^ ;;&quot;</span>), <span class="string">&quot;$0^&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">keyword</span>() {
         <span class="kw">fn</span> <span class="ident">get_keyword</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
             <span class="kw">match</span> <span class="ident">get_token</span>(<span class="ident">input</span>) {
-                <span class="ident">Token</span>::<span class="ident">Keyword</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
-                <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;not id {:?}&quot;</span>, <span class="ident">other</span>),
+                <span class="ident">Token::Keyword</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
+                <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;not id {:?}&quot;</span>, <span class="ident">other</span>),
             }
         }
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_keyword</span>(<span class="string">&quot;x&quot;</span>), <span class="string">&quot;x&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_keyword</span>(<span class="string">&quot;xyz&quot;</span>), <span class="string">&quot;xyz&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_keyword</span>(<span class="string">&quot;x_z&quot;</span>), <span class="string">&quot;x_z&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_keyword</span>(<span class="string">&quot;x_z &quot;</span>), <span class="string">&quot;x_z&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_keyword</span>(<span class="string">&quot;x_z &quot;</span>), <span class="string">&quot;x_z&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">get_keyword</span>(<span class="string">&quot;x&quot;</span>), <span class="string">&quot;x&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">get_keyword</span>(<span class="string">&quot;xyz&quot;</span>), <span class="string">&quot;xyz&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">get_keyword</span>(<span class="string">&quot;x_z&quot;</span>), <span class="string">&quot;x_z&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">get_keyword</span>(<span class="string">&quot;x_z &quot;</span>), <span class="string">&quot;x_z&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">get_keyword</span>(<span class="string">&quot;x_z &quot;</span>), <span class="string">&quot;x_z&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">reserved</span>() {
         <span class="kw">fn</span> <span class="ident">get_reserved</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
             <span class="kw">match</span> <span class="ident">get_token</span>(<span class="ident">input</span>) {
-                <span class="ident">Token</span>::<span class="ident">Reserved</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
-                <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;not reserved {:?}&quot;</span>, <span class="ident">other</span>),
+                <span class="ident">Token::Reserved</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
+                <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;not reserved {:?}&quot;</span>, <span class="ident">other</span>),
             }
         }
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_reserved</span>(<span class="string">&quot;$ &quot;</span>), <span class="string">&quot;$&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_reserved</span>(<span class="string">&quot;^_x &quot;</span>), <span class="string">&quot;^_x&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">get_reserved</span>(<span class="string">&quot;$ &quot;</span>), <span class="string">&quot;$&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">get_reserved</span>(<span class="string">&quot;^_x &quot;</span>), <span class="string">&quot;^_x&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">integer</span>() {
         <span class="kw">fn</span> <span class="ident">get_integer</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
             <span class="kw">match</span> <span class="ident">get_token</span>(<span class="ident">input</span>) {
-                <span class="ident">Token</span>::<span class="ident">Integer</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">input</span>, <span class="ident">i</span>.<span class="ident">src</span>());
+                <span class="ident">Token::Integer</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="macro">assert_eq!</span>(<span class="ident">input</span>, <span class="ident">i</span>.<span class="ident">src</span>());
                     <span class="ident">i</span>.<span class="ident">val</span>().<span class="number">0</span>.<span class="ident">to_string</span>()
                 }
-                <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;not integer {:?}&quot;</span>, <span class="ident">other</span>),
+                <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;not integer {:?}&quot;</span>, <span class="ident">other</span>),
             }
         }
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_integer</span>(<span class="string">&quot;1&quot;</span>), <span class="string">&quot;1&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_integer</span>(<span class="string">&quot;0&quot;</span>), <span class="string">&quot;0&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_integer</span>(<span class="string">&quot;-1&quot;</span>), <span class="string">&quot;-1&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_integer</span>(<span class="string">&quot;+1&quot;</span>), <span class="string">&quot;1&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_integer</span>(<span class="string">&quot;+1_000&quot;</span>), <span class="string">&quot;1000&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_integer</span>(<span class="string">&quot;+1_0_0_0&quot;</span>), <span class="string">&quot;1000&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_integer</span>(<span class="string">&quot;+0x10&quot;</span>), <span class="string">&quot;10&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_integer</span>(<span class="string">&quot;-0x10&quot;</span>), <span class="string">&quot;-10&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_integer</span>(<span class="string">&quot;0x10&quot;</span>), <span class="string">&quot;10&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">get_integer</span>(<span class="string">&quot;1&quot;</span>), <span class="string">&quot;1&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">get_integer</span>(<span class="string">&quot;0&quot;</span>), <span class="string">&quot;0&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">get_integer</span>(<span class="string">&quot;-1&quot;</span>), <span class="string">&quot;-1&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">get_integer</span>(<span class="string">&quot;+1&quot;</span>), <span class="string">&quot;1&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">get_integer</span>(<span class="string">&quot;+1_000&quot;</span>), <span class="string">&quot;1000&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">get_integer</span>(<span class="string">&quot;+1_0_0_0&quot;</span>), <span class="string">&quot;1000&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">get_integer</span>(<span class="string">&quot;+0x10&quot;</span>), <span class="string">&quot;10&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">get_integer</span>(<span class="string">&quot;-0x10&quot;</span>), <span class="string">&quot;-10&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">get_integer</span>(<span class="string">&quot;0x10&quot;</span>), <span class="string">&quot;10&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">float</span>() {
         <span class="kw">fn</span> <span class="ident">get_float</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FloatVal</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
             <span class="kw">match</span> <span class="ident">get_token</span>(<span class="ident">input</span>) {
-                <span class="ident">Token</span>::<span class="ident">Float</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">input</span>, <span class="ident">i</span>.<span class="ident">src</span>());
+                <span class="ident">Token::Float</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="macro">assert_eq!</span>(<span class="ident">input</span>, <span class="ident">i</span>.<span class="ident">src</span>());
                     <span class="ident">i</span>.<span class="number">0</span>.<span class="ident">val</span>
                 }
-                <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;not reserved {:?}&quot;</span>, <span class="ident">other</span>),
+                <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;not reserved {:?}&quot;</span>, <span class="ident">other</span>),
             }
         }
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">get_float</span>(<span class="string">&quot;nan&quot;</span>),
-            <span class="ident">FloatVal</span>::<span class="ident">Nan</span> {
+            <span class="ident">FloatVal::Nan</span> {
                 <span class="ident">val</span>: <span class="prelude-val">None</span>,
                 <span class="ident">negative</span>: <span class="bool-val">false</span>
             },
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">get_float</span>(<span class="string">&quot;-nan&quot;</span>),
-            <span class="ident">FloatVal</span>::<span class="ident">Nan</span> {
+            <span class="ident">FloatVal::Nan</span> {
                 <span class="ident">val</span>: <span class="prelude-val">None</span>,
                 <span class="ident">negative</span>: <span class="bool-val">true</span>,
             },
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">get_float</span>(<span class="string">&quot;+nan&quot;</span>),
-            <span class="ident">FloatVal</span>::<span class="ident">Nan</span> {
+            <span class="ident">FloatVal::Nan</span> {
                 <span class="ident">val</span>: <span class="prelude-val">None</span>,
                 <span class="ident">negative</span>: <span class="bool-val">false</span>,
             },
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">get_float</span>(<span class="string">&quot;+nan:0x1&quot;</span>),
-            <span class="ident">FloatVal</span>::<span class="ident">Nan</span> {
+            <span class="ident">FloatVal::Nan</span> {
                 <span class="ident">val</span>: <span class="prelude-val">Some</span>(<span class="number">1</span>),
                 <span class="ident">negative</span>: <span class="bool-val">false</span>,
             },
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">get_float</span>(<span class="string">&quot;nan:0x7f_ffff&quot;</span>),
-            <span class="ident">FloatVal</span>::<span class="ident">Nan</span> {
+            <span class="ident">FloatVal::Nan</span> {
                 <span class="ident">val</span>: <span class="prelude-val">Some</span>(<span class="number">0x7fffff</span>),
                 <span class="ident">negative</span>: <span class="bool-val">false</span>,
             },
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_float</span>(<span class="string">&quot;inf&quot;</span>), <span class="ident">FloatVal</span>::<span class="ident">Inf</span> { <span class="ident">negative</span>: <span class="bool-val">false</span> });
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_float</span>(<span class="string">&quot;-inf&quot;</span>), <span class="ident">FloatVal</span>::<span class="ident">Inf</span> { <span class="ident">negative</span>: <span class="bool-val">true</span> });
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_float</span>(<span class="string">&quot;+inf&quot;</span>), <span class="ident">FloatVal</span>::<span class="ident">Inf</span> { <span class="ident">negative</span>: <span class="bool-val">false</span> });
+        <span class="macro">assert_eq!</span>(<span class="ident">get_float</span>(<span class="string">&quot;inf&quot;</span>), <span class="ident">FloatVal::Inf</span> { <span class="ident">negative</span>: <span class="bool-val">false</span> });
+        <span class="macro">assert_eq!</span>(<span class="ident">get_float</span>(<span class="string">&quot;-inf&quot;</span>), <span class="ident">FloatVal::Inf</span> { <span class="ident">negative</span>: <span class="bool-val">true</span> });
+        <span class="macro">assert_eq!</span>(<span class="ident">get_float</span>(<span class="string">&quot;+inf&quot;</span>), <span class="ident">FloatVal::Inf</span> { <span class="ident">negative</span>: <span class="bool-val">false</span> });
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">get_float</span>(<span class="string">&quot;1.2&quot;</span>),
-            <span class="ident">FloatVal</span>::<span class="ident">Val</span> {
+            <span class="ident">FloatVal::Val</span> {
                 <span class="ident">integral</span>: <span class="string">&quot;1&quot;</span>.<span class="ident">into</span>(),
                 <span class="ident">decimal</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;2&quot;</span>.<span class="ident">into</span>()),
                 <span class="ident">exponent</span>: <span class="prelude-val">None</span>,
                 <span class="ident">hex</span>: <span class="bool-val">false</span>,
             },
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">get_float</span>(<span class="string">&quot;1.2e3&quot;</span>),
-            <span class="ident">FloatVal</span>::<span class="ident">Val</span> {
+            <span class="ident">FloatVal::Val</span> {
                 <span class="ident">integral</span>: <span class="string">&quot;1&quot;</span>.<span class="ident">into</span>(),
                 <span class="ident">decimal</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;2&quot;</span>.<span class="ident">into</span>()),
                 <span class="ident">exponent</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;3&quot;</span>.<span class="ident">into</span>()),
                 <span class="ident">hex</span>: <span class="bool-val">false</span>,
             },
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">get_float</span>(<span class="string">&quot;-1_2.1_1E+0_1&quot;</span>),
-            <span class="ident">FloatVal</span>::<span class="ident">Val</span> {
+            <span class="ident">FloatVal::Val</span> {
                 <span class="ident">integral</span>: <span class="string">&quot;-12&quot;</span>.<span class="ident">into</span>(),
                 <span class="ident">decimal</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;11&quot;</span>.<span class="ident">into</span>()),
                 <span class="ident">exponent</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;01&quot;</span>.<span class="ident">into</span>()),
                 <span class="ident">hex</span>: <span class="bool-val">false</span>,
             },
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">get_float</span>(<span class="string">&quot;+1_2.1_1E-0_1&quot;</span>),
-            <span class="ident">FloatVal</span>::<span class="ident">Val</span> {
+            <span class="ident">FloatVal::Val</span> {
                 <span class="ident">integral</span>: <span class="string">&quot;12&quot;</span>.<span class="ident">into</span>(),
                 <span class="ident">decimal</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;11&quot;</span>.<span class="ident">into</span>()),
                 <span class="ident">exponent</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;-01&quot;</span>.<span class="ident">into</span>()),
                 <span class="ident">hex</span>: <span class="bool-val">false</span>,
             },
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">get_float</span>(<span class="string">&quot;0x1_2.3_4p5_6&quot;</span>),
-            <span class="ident">FloatVal</span>::<span class="ident">Val</span> {
+            <span class="ident">FloatVal::Val</span> {
                 <span class="ident">integral</span>: <span class="string">&quot;12&quot;</span>.<span class="ident">into</span>(),
                 <span class="ident">decimal</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;34&quot;</span>.<span class="ident">into</span>()),
                 <span class="ident">exponent</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;56&quot;</span>.<span class="ident">into</span>()),
                 <span class="ident">hex</span>: <span class="bool-val">true</span>,
             },
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">get_float</span>(<span class="string">&quot;+0x1_2.3_4P-5_6&quot;</span>),
-            <span class="ident">FloatVal</span>::<span class="ident">Val</span> {
+            <span class="ident">FloatVal::Val</span> {
                 <span class="ident">integral</span>: <span class="string">&quot;12&quot;</span>.<span class="ident">into</span>(),
                 <span class="ident">decimal</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;34&quot;</span>.<span class="ident">into</span>()),
                 <span class="ident">exponent</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;-56&quot;</span>.<span class="ident">into</span>()),
                 <span class="ident">hex</span>: <span class="bool-val">true</span>,
             },
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">get_float</span>(<span class="string">&quot;1.&quot;</span>),
-            <span class="ident">FloatVal</span>::<span class="ident">Val</span> {
+            <span class="ident">FloatVal::Val</span> {
                 <span class="ident">integral</span>: <span class="string">&quot;1&quot;</span>.<span class="ident">into</span>(),
                 <span class="ident">decimal</span>: <span class="prelude-val">None</span>,
                 <span class="ident">exponent</span>: <span class="prelude-val">None</span>,
                 <span class="ident">hex</span>: <span class="bool-val">false</span>,
             },
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">get_float</span>(<span class="string">&quot;0x1p-24&quot;</span>),
-            <span class="ident">FloatVal</span>::<span class="ident">Val</span> {
+            <span class="ident">FloatVal::Val</span> {
                 <span class="ident">integral</span>: <span class="string">&quot;1&quot;</span>.<span class="ident">into</span>(),
                 <span class="ident">decimal</span>: <span class="prelude-val">None</span>,
                 <span class="ident">exponent</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;-24&quot;</span>.<span class="ident">into</span>()),
@@ -2253,4 +2293,5 @@
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "wast";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="wast" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

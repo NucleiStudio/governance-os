@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/libp2p-gossipsub-0.22.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/libp2p-gossipsub-0.27.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../libp2p_gossipsub/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../libp2p_gossipsub/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -155,6 +155,13 @@
 <span id="152">152</span>
 <span id="153">153</span>
 <span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Sigma Prime Pty Ltd.</span>
 <span class="comment">//</span>
@@ -199,13 +206,13 @@
 <span class="doccomment">//! implementations, due to undefined elements in the current specification.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! - **Topics** -  In gossipsub, topics configurable by the `hash_topics` configuration parameter.</span>
-<span class="doccomment">//! Topics are of type `TopicHash`. The current go implementation uses raw utf-8 strings, and this</span>
+<span class="doccomment">//! Topics are of type [`TopicHash`]. The current go implementation uses raw utf-8 strings, and this</span>
 <span class="doccomment">//! is default configuration in rust-libp2p. Topics can be hashed (SHA256 hashed then base64</span>
 <span class="doccomment">//! encoded) by setting the `hash_topics` configuration parameter to true.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! - **Sequence Numbers** - A message on the gossipsub network is identified by the source</span>
-<span class="doccomment">//! `PeerId` and a nonce (sequence number) of the message. The sequence numbers in this</span>
-<span class="doccomment">//! implementation are sent as raw bytes across the wire. They are 64-bit big-endian unsigned</span>
+<span class="doccomment">//! [`libp2p_core::PeerId`] and a nonce (sequence number) of the message. The sequence numbers in</span>
+<span class="doccomment">//! this implementation are sent as raw bytes across the wire. They are 64-bit big-endian unsigned</span>
 <span class="doccomment">//! integers. They are chosen at random in this implementation of gossipsub, but are sequential in</span>
 <span class="doccomment">//! the current go implementation.</span>
 <span class="doccomment">//!</span>
@@ -216,39 +223,17 @@
 <span class="doccomment">//! The [`GossipsubConfig`] struct specifies various network performance/tuning configuration</span>
 <span class="doccomment">//! parameters. Specifically it specifies:</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! [`GossipsubConfig`]: struct.GossipsubConfig.html</span>
+<span class="doccomment">//! [`GossipsubConfig`]: struct.Config.html</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! - `protocol_id` - The protocol id that this implementation will accept connections on.</span>
-<span class="doccomment">//! - `history_length` - The number of heartbeats which past messages are kept in cache (default: 5).</span>
-<span class="doccomment">//! - `history_gossip` - The number of past heartbeats that the node will send gossip metadata</span>
-<span class="doccomment">//! about (default: 3).</span>
-<span class="doccomment">//! - `mesh_n` - The target number of peers store in the local mesh network.</span>
-<span class="doccomment">//! (default: 6).</span>
-<span class="doccomment">//! - `mesh_n_low` - The minimum number of peers in the local mesh network before.</span>
-<span class="doccomment">//! trying to add more peers to the mesh from the connected peer pool (default: 4).</span>
-<span class="doccomment">//! - `mesh_n_high` - The maximum number of peers in the local mesh network before removing peers to</span>
-<span class="doccomment">//! reach `mesh_n` peers (default: 12).</span>
-<span class="doccomment">//! - `gossip_lazy` - The number of peers that the local node will gossip to during a heartbeat (default: `mesh_n` = 6).</span>
-<span class="doccomment">//! - `heartbeat_initial_delay - The initial time delay before starting the first heartbeat (default: 5 seconds).</span>
-<span class="doccomment">//! - `heartbeat_interval` - The time between each heartbeat (default: 1 second).</span>
-<span class="doccomment">//! - `fanout_ttl` - The fanout time to live time period. The timeout required before removing peers from the fanout</span>
-<span class="doccomment">//! for a given topic (default: 1 minute).</span>
-<span class="doccomment">//! - `max_transmit_size` - This sets the maximum transmission size for total gossipsub messages on the network.</span>
-<span class="doccomment">//! - `hash_topics` - Whether to hash the topics using base64(SHA256(topic)) or to leave as plain utf-8 strings.</span>
-<span class="doccomment">//! - `manual_propagation` - Whether gossipsub should immediately forward received messages on the</span>
-<span class="doccomment">//! network. For applications requiring message validation, this should be set to false, then the</span>
-<span class="doccomment">//! application should call `propagate_message(message_id, propagation_source)` once validated, to</span>
-<span class="doccomment">//! propagate the message to peers.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This struct implements the `Default` trait and can be initialised via</span>
-<span class="doccomment">//! `GossipsubConfig::default()`.</span>
+<span class="doccomment">//! This struct implements the [`Default`] trait and can be initialised via</span>
+<span class="doccomment">//! [`GossipsubConfig::default()`].</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ## Gossipsub</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! The [`Gossipsub`] struct implements the `NetworkBehaviour` trait allowing it to act as the</span>
-<span class="doccomment">//! routing behaviour in a `Swarm`. This struct requires an instance of `PeerId` and</span>
-<span class="doccomment">//! [`GossipsubConfig`].</span>
+<span class="doccomment">//! The [`Gossipsub`] struct implements the [`libp2p_swarm::NetworkBehaviour`] trait allowing it to</span>
+<span class="doccomment">//! act as the routing behaviour in a [`libp2p_swarm::Swarm`]. This struct requires an instance of</span>
+<span class="doccomment">//! [`libp2p_core::PeerId`] and [`GossipsubConfig`].</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! [`Gossipsub`]: struct.Gossipsub.html</span>
 
@@ -256,59 +241,89 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! An example of initialising a gossipsub compatible swarm:</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! ```ignore</span>
-<span class="doccomment">//! #extern crate libp2p;</span>
-<span class="doccomment">//! #extern crate futures;</span>
-<span class="doccomment">//! #extern crate tokio;</span>
-<span class="doccomment">//! #use libp2p::gossipsub::GossipsubEvent;</span>
-<span class="doccomment">//! #use libp2p::{identity, gossipsub,</span>
-<span class="doccomment">//! #    tokio_codec::{FramedRead, LinesCodec},</span>
-<span class="doccomment">//! #};</span>
-<span class="doccomment">//! let local_key = identity::Keypair::generate_ed25519();</span>
-<span class="doccomment">//! let local_pub_key = local_key.public();</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! use libp2p_gossipsub::GossipsubEvent;</span>
+<span class="doccomment">//! use libp2p_core::{identity::Keypair,transport::{Transport, MemoryTransport}, Multiaddr};</span>
+<span class="doccomment">//! use libp2p_gossipsub::MessageAuthenticity;</span>
+<span class="doccomment">//! let local_key = Keypair::generate_ed25519();</span>
+<span class="doccomment">//! let local_peer_id = libp2p_core::PeerId::from(local_key.public());</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! // Set up an encrypted TCP Transport over the Mplex and Yamux protocols</span>
-<span class="doccomment">//! let transport = libp2p::build_development_transport(local_key);</span>
+<span class="doccomment">//! // Set up an encrypted TCP Transport over the Mplex</span>
+<span class="doccomment">//! // This is test transport (memory).</span>
+<span class="doccomment">//! let noise_keys = libp2p_noise::Keypair::&lt;libp2p_noise::X25519Spec&gt;::new().into_authentic(&amp;local_key).unwrap();</span>
+<span class="doccomment">//! let transport = MemoryTransport::default()</span>
+<span class="doccomment">//!            .upgrade(libp2p_core::upgrade::Version::V1)</span>
+<span class="doccomment">//!            .authenticate(libp2p_noise::NoiseConfig::xx(noise_keys).into_authenticated())</span>
+<span class="doccomment">//!            .multiplex(libp2p_mplex::MplexConfig::new())</span>
+<span class="doccomment">//!            .boxed();</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! // Create a Floodsub/Gossipsub topic</span>
-<span class="doccomment">//! let topic = libp2p::floodsub::TopicBuilder::new(&quot;example&quot;).build();</span>
+<span class="doccomment">//! // Create a Gossipsub topic</span>
+<span class="doccomment">//! let topic = libp2p_gossipsub::IdentTopic::new(&quot;example&quot;);</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // Set the message authenticity - How we expect to publish messages</span>
+<span class="doccomment">//! // Here we expect the publisher to sign the message with their key.</span>
+<span class="doccomment">//! let message_authenticity = MessageAuthenticity::Signed(local_key);</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! // Create a Swarm to manage peers and events</span>
 <span class="doccomment">//! let mut swarm = {</span>
 <span class="doccomment">//!     // set default parameters for gossipsub</span>
-<span class="doccomment">//!     let gossipsub_config = gossipsub::GossipsubConfig::default();</span>
+<span class="doccomment">//!     let gossipsub_config = libp2p_gossipsub::GossipsubConfig::default();</span>
 <span class="doccomment">//!     // build a gossipsub network behaviour</span>
-<span class="doccomment">//!     let mut gossipsub =</span>
-<span class="doccomment">//!         gossipsub::Gossipsub::new(local_pub_key.clone().into_peer_id(), gossipsub_config);</span>
-<span class="doccomment">//!     gossipsub.subscribe(topic.clone());</span>
-<span class="doccomment">//!     libp2p::Swarm::new(</span>
+<span class="doccomment">//!     let mut gossipsub: libp2p_gossipsub::Gossipsub =</span>
+<span class="doccomment">//!         libp2p_gossipsub::Gossipsub::new(message_authenticity, gossipsub_config).unwrap();</span>
+<span class="doccomment">//!     // subscribe to the topic</span>
+<span class="doccomment">//!     gossipsub.subscribe(&amp;topic);</span>
+<span class="doccomment">//!     // create the swarm</span>
+<span class="doccomment">//!     libp2p_swarm::Swarm::new(</span>
 <span class="doccomment">//!         transport,</span>
 <span class="doccomment">//!         gossipsub,</span>
-<span class="doccomment">//!         libp2p::core::topology::MemoryTopology::empty(local_pub_key),</span>
+<span class="doccomment">//!         local_peer_id,</span>
 <span class="doccomment">//!     )</span>
 <span class="doccomment">//! };</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! // Listen on all interfaces and whatever port the OS assigns</span>
-<span class="doccomment">//! let addr = libp2p::Swarm::listen_on(&amp;mut swarm, &quot;/ip4/0.0.0.0/tcp/0&quot;.parse().unwrap()).unwrap();</span>
+<span class="doccomment">//! // Listen on a memory transport.</span>
+<span class="doccomment">//! let memory: Multiaddr = libp2p_core::multiaddr::Protocol::Memory(10).into();</span>
+<span class="doccomment">//! let addr = libp2p_swarm::Swarm::listen_on(&amp;mut swarm, memory).unwrap();</span>
 <span class="doccomment">//! println!(&quot;Listening on {:?}&quot;, addr);</span>
 <span class="doccomment">//! ```</span>
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">error</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">protocol</span>;
 
+<span class="kw">mod</span> <span class="ident">backoff</span>;
 <span class="kw">mod</span> <span class="ident">behaviour</span>;
 <span class="kw">mod</span> <span class="ident">config</span>;
+<span class="kw">mod</span> <span class="ident">gossip_promises</span>;
 <span class="kw">mod</span> <span class="ident">handler</span>;
 <span class="kw">mod</span> <span class="ident">mcache</span>;
+<span class="kw">mod</span> <span class="ident">peer_score</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">subscription_filter</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">time_cache</span>;
 <span class="kw">mod</span> <span class="ident">topic</span>;
+<span class="kw">mod</span> <span class="ident">transform</span>;
+<span class="kw">mod</span> <span class="ident">types</span>;
 
-<span class="kw">mod</span> <span class="ident">rpc_proto</span> {
-    <span class="macro">include</span><span class="macro">!</span>(<span class="macro">concat</span><span class="macro">!</span>(<span class="macro">env</span><span class="macro">!</span>(<span class="string">&quot;OUT_DIR&quot;</span>), <span class="string">&quot;/gossipsub.pb.rs&quot;</span>));
-}
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="attribute">#[<span class="ident">macro_use</span>]</span>
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">derive_builder</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">behaviour</span>::{<span class="ident">Gossipsub</span>, <span class="ident">GossipsubEvent</span>, <span class="ident">GossipsubRpc</span>, <span class="ident">MessageAuthenticity</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">config</span>::{<span class="ident">GossipsubConfig</span>, <span class="ident">GossipsubConfigBuilder</span>, <span class="ident">ValidationMode</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">protocol</span>::{<span class="ident">GossipsubMessage</span>, <span class="ident">MessageId</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">topic</span>::{<span class="ident">Topic</span>, <span class="ident">TopicHash</span>};
+<span class="kw">mod</span> <span class="ident">rpc_proto</span>;
+
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::behaviour</span>::{<span class="ident">Gossipsub</span>, <span class="ident">GossipsubEvent</span>, <span class="ident">MessageAuthenticity</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::transform</span>::{<span class="ident">DataTransform</span>, <span class="ident">IdentityTransform</span>};
+
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::config</span>::{<span class="ident">GossipsubConfig</span>, <span class="ident">GossipsubConfigBuilder</span>, <span class="ident">ValidationMode</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::peer_score</span>::{
+    <span class="ident">score_parameter_decay</span>, <span class="ident">score_parameter_decay_with_base</span>, <span class="ident">PeerScoreParams</span>, <span class="ident">PeerScoreThresholds</span>,
+    <span class="ident">TopicScoreParams</span>,
+};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::topic</span>::{<span class="ident">Hasher</span>, <span class="ident">Topic</span>, <span class="ident">TopicHash</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::types</span>::{
+    <span class="ident">FastMessageId</span>, <span class="ident">GossipsubMessage</span>, <span class="ident">GossipsubRpc</span>, <span class="ident">MessageAcceptance</span>, <span class="ident">MessageId</span>,
+    <span class="ident">RawGossipsubMessage</span>,
+};
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">IdentTopic</span> <span class="op">=</span> <span class="ident">Topic</span><span class="op">&lt;</span><span class="self">self</span><span class="ident">::topic::IdentityHash</span><span class="op">&gt;</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Sha256Topic</span> <span class="op">=</span> <span class="ident">Topic</span><span class="op">&lt;</span><span class="self">self</span><span class="ident">::topic::Sha256Hash</span><span class="op">&gt;</span>;
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "libp2p_gossipsub";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="libp2p_gossipsub" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

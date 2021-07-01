@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/async-std-1.7.0/src/io/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/async-std-1.9.0/src/io/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../async_std/index.html'><div class='logo-container'><img src='https://async.rs/images/logo--hero.svg' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../async_std/index.html'><div class='logo-container'><img src='https://async.rs/images/logo--hero.svg' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -332,294 +332,294 @@
 <span id="329">329</span>
 <span id="330">330</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="doccomment">//! Traits, helpers, and type definitions for core I/O functionality.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The `async_std::io` module contains a number of common things you&#39;ll need</span>
-<span class="doccomment">//! when doing input and output. The most core part of this module is</span>
-<span class="doccomment">//! the [`Read`] and [`Write`] traits, which provide the</span>
-<span class="doccomment">//! most general interface for reading and writing input and output.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This module is an async version of [`std::io`].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`std::io`]: https://doc.rust-lang.org/std/io/index.html</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Read and Write</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Because they are traits, [`Read`] and [`Write`] are implemented by a number</span>
-<span class="doccomment">//! of other types, and you can implement them for your types too. As such,</span>
-<span class="doccomment">//! you&#39;ll see a few different types of I/O throughout the documentation in</span>
-<span class="doccomment">//! this module: [`File`]s, [`TcpStream`]s, and sometimes even [`Vec&lt;T&gt;`]s. For</span>
-<span class="doccomment">//! example, [`Read`] adds a [`read`][`Read::read`] method, which we can use on</span>
-<span class="doccomment">//! [`File`]s:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```no_run</span>
-<span class="doccomment">//! use async_std::fs::File;</span>
-<span class="doccomment">//! use async_std::prelude::*;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! let mut f = File::open(&quot;foo.txt&quot;).await?;</span>
-<span class="doccomment">//! let mut buffer = [0; 10];</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // read up to 10 bytes</span>
-<span class="doccomment">//! let n = f.read(&amp;mut buffer).await?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! println!(&quot;The bytes: {:?}&quot;, &amp;buffer[..n]);</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # Ok(()) }) }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`Read`] and [`Write`] are so important, implementors of the two traits have a</span>
-<span class="doccomment">//! nickname: readers and writers. So you&#39;ll sometimes see &#39;a reader&#39; instead</span>
-<span class="doccomment">//! of &#39;a type that implements the [`Read`] trait&#39;. Much easier!</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Seek and BufRead</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Beyond that, there are two important traits that are provided: [`Seek`]</span>
-<span class="doccomment">//! and [`BufRead`]. Both of these build on top of a reader to control</span>
-<span class="doccomment">//! how the reading happens. [`Seek`] lets you control where the next byte is</span>
-<span class="doccomment">//! coming from:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```no_run</span>
-<span class="doccomment">//! use async_std::fs::File;</span>
-<span class="doccomment">//! use async_std::io::SeekFrom;</span>
-<span class="doccomment">//! use async_std::prelude::*;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! let mut f = File::open(&quot;foo.txt&quot;).await?;</span>
-<span class="doccomment">//! let mut buffer = [0; 10];</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // skip to the last 10 bytes of the file</span>
-<span class="doccomment">//! f.seek(SeekFrom::End(-10)).await?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // read up to 10 bytes</span>
-<span class="doccomment">//! let n = f.read(&amp;mut buffer).await?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! println!(&quot;The bytes: {:?}&quot;, &amp;buffer[..n]);</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # Ok(()) }) }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`BufRead`] uses an internal buffer to provide a number of other ways to read, but</span>
-<span class="doccomment">//! to show it off, we&#39;ll need to talk about buffers in general. Keep reading!</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## BufReader and BufWriter</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Byte-based interfaces are unwieldy and can be inefficient, as we&#39;d need to be</span>
-<span class="doccomment">//! making near-constant calls to the operating system. To help with this,</span>
-<span class="doccomment">//! `std::io` comes with two structs, [`BufReader`] and [`BufWriter`], which wrap</span>
-<span class="doccomment">//! readers and writers. The wrapper uses a buffer, reducing the number of</span>
-<span class="doccomment">//! calls and providing nicer methods for accessing exactly what you want.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! For example, [`BufReader`] works with the [`BufRead`] trait to add extra</span>
-<span class="doccomment">//! methods to any reader:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```no_run</span>
-<span class="doccomment">//! use async_std::fs::File;</span>
-<span class="doccomment">//! use async_std::io::BufReader;</span>
-<span class="doccomment">//! use async_std::prelude::*;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! let f = File::open(&quot;foo.txt&quot;).await?;</span>
-<span class="doccomment">//! let mut reader = BufReader::new(f);</span>
-<span class="doccomment">//! let mut buffer = String::new();</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // read a line into buffer</span>
-<span class="doccomment">//! reader.read_line(&amp;mut buffer).await?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! println!(&quot;{}&quot;, buffer);</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # Ok(()) }) }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`BufWriter`] doesn&#39;t add any new ways of writing; it just buffers every call</span>
-<span class="doccomment">//! to [`write`][`Write::write`]:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```no_run</span>
-<span class="doccomment">//! use async_std::fs::File;</span>
-<span class="doccomment">//! use async_std::io::prelude::*;</span>
-<span class="doccomment">//! use async_std::io::BufWriter;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! let f = File::create(&quot;foo.txt&quot;).await?;</span>
-<span class="doccomment">//! {</span>
-<span class="doccomment">//!     let mut writer = BufWriter::new(f);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     // write a byte to the buffer</span>
-<span class="doccomment">//!     writer.write(&amp;[42]).await?;</span>
-<span class="doccomment">//! } // the buffer is flushed once writer goes out of scope</span>
-<span class="doccomment">//! //</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # Ok(()) }) }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Standard input and output</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! A very common source of input is standard input:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```no_run</span>
-<span class="doccomment">//! use async_std::io;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! let mut input = String::new();</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! io::stdin().read_line(&amp;mut input).await?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! println!(&quot;You typed: {}&quot;, input.trim());</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # Ok(()) }) }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Note that you cannot use the [`?` operator] in functions that do not return</span>
-<span class="doccomment">//! a [`Result&lt;T, E&gt;`][`Result`]. Instead, you can call [`.unwrap()`]</span>
-<span class="doccomment">//! or `match` on the return value to catch any possible errors:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```no_run</span>
-<span class="doccomment">//! use async_std::io;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! let mut input = String::new();</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! io::stdin().read_line(&amp;mut input).await.unwrap();</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # Ok(()) }) }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! And a very common source of output is standard output:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```no_run</span>
-<span class="doccomment">//! use async_std::io;</span>
-<span class="doccomment">//! use async_std::io::prelude::*;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! io::stdout().write(&amp;[42]).await?;</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # Ok(()) }) }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Of course, using [`io::stdout`] directly is less common than something like</span>
-<span class="doccomment">//! [`println!`].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Iterator types</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! A large number of the structures provided by `std::io` are for various</span>
-<span class="doccomment">//! ways of iterating over I/O. For example, [`Lines`] is used to split over</span>
-<span class="doccomment">//! lines:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```no_run</span>
-<span class="doccomment">//! use async_std::fs::File;</span>
-<span class="doccomment">//! use async_std::io::BufReader;</span>
-<span class="doccomment">//! use async_std::prelude::*;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! let f = File::open(&quot;foo.txt&quot;).await?;</span>
-<span class="doccomment">//! let reader = BufReader::new(f);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let mut lines = reader.lines();</span>
-<span class="doccomment">//! while let Some(line) = lines.next().await {</span>
-<span class="doccomment">//!     println!(&quot;{}&quot;, line?);</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # Ok(()) }) }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Functions</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! There are a number of [functions][functions-list] that offer access to various</span>
-<span class="doccomment">//! features. For example, we can use three of these functions to copy everything</span>
-<span class="doccomment">//! from standard input to standard output:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```no_run</span>
-<span class="doccomment">//! use async_std::io;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! io::copy(&amp;mut io::stdin(), &amp;mut io::stdout()).await?;</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # Ok(()) }) }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [functions-list]: #functions-1</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## io::Result</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Last, but certainly not least, is [`io::Result`]. This type is used</span>
-<span class="doccomment">//! as the return type of many `std::io` functions that can cause an error, and</span>
-<span class="doccomment">//! can be returned from your own functions as well. Many of the examples in this</span>
-<span class="doccomment">//! module use the [`?` operator]:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! #![allow(dead_code)]</span>
-<span class="doccomment">//! use async_std::io;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! async fn read_input() -&gt; io::Result&lt;()&gt; {</span>
-<span class="doccomment">//!     let mut input = String::new();</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     io::stdin().read_line(&amp;mut input).await?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     println!(&quot;You typed: {}&quot;, input.trim());</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     Ok(())</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The return type of `read_input`, [`io::Result&lt;()&gt;`][`io::Result`], is a very</span>
-<span class="doccomment">//! common type for functions which don&#39;t have a &#39;real&#39; return value, but do want to</span>
-<span class="doccomment">//! return errors if they happen. In this case, the only purpose of this function is</span>
-<span class="doccomment">//! to read the line and print it, so we use `()`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Platform-specific behavior</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Many I/O functions throughout the standard library are documented to indicate</span>
-<span class="doccomment">//! what various library or syscalls they are delegated to. This is done to help</span>
-<span class="doccomment">//! applications both understand what&#39;s happening under the hood as well as investigate</span>
-<span class="doccomment">//! any possibly unclear semantics. Note, however, that this is informative, not a binding</span>
-<span class="doccomment">//! contract. The implementation of many of these functions are subject to change over</span>
-<span class="doccomment">//! time and may call fewer or more syscalls/library functions.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`Read`]: trait.Read.html</span>
-<span class="doccomment">//! [`Write`]: trait.Write.html</span>
-<span class="doccomment">//! [`Seek`]: trait.Seek.html</span>
-<span class="doccomment">//! [`BufRead`]: trait.BufRead.html</span>
-<span class="doccomment">//! [`File`]: ../fs/struct.File.html</span>
-<span class="doccomment">//! [`TcpStream`]: ../net/struct.TcpStream.html</span>
-<span class="doccomment">//! [`Vec&lt;T&gt;`]: ../vec/struct.Vec.html</span>
-<span class="doccomment">//! [`BufReader`]: struct.BufReader.html</span>
-<span class="doccomment">//! [`BufWriter`]: struct.BufWriter.html</span>
-<span class="doccomment">//! [`Write::write`]: trait.Write.html#tymethod.write</span>
-<span class="doccomment">//! [`io::stdout`]: fn.stdout.html</span>
-<span class="doccomment">//! [`println!`]: ../macro.println.html</span>
-<span class="doccomment">//! [`Lines`]: struct.Lines.html</span>
-<span class="doccomment">//! [`io::Result`]: type.Result.html</span>
-<span class="doccomment">//! [`?` operator]: https://doc.rust-lang.org/stable/book/appendix-02-operators.html</span>
-<span class="doccomment">//! [`Read::read`]: trait.Read.html#tymethod.read</span>
-<span class="doccomment">//! [`Result`]: https://doc.rust-lang.org/std/result/enum.Result.html</span>
-<span class="doccomment">//! [`.unwrap()`]: https://doc.rust-lang.org/std/result/enum.Result.html#method.unwrap</span>
+<span class="doccomment">//! Traits, helpers, and type definitions for core I/O functionality.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The `async_std::io` module contains a number of common things you&#39;ll need</span>
+<span class="doccomment">//! when doing input and output. The most core part of this module is</span>
+<span class="doccomment">//! the [`Read`] and [`Write`] traits, which provide the</span>
+<span class="doccomment">//! most general interface for reading and writing input and output.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! This module is an async version of [`std::io`].</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! [`std::io`]: https://doc.rust-lang.org/std/io/index.html</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Read and Write</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Because they are traits, [`Read`] and [`Write`] are implemented by a number</span>
+<span class="doccomment">//! of other types, and you can implement them for your types too. As such,</span>
+<span class="doccomment">//! you&#39;ll see a few different types of I/O throughout the documentation in</span>
+<span class="doccomment">//! this module: [`File`]s, [`TcpStream`]s, and sometimes even [`Vec&lt;T&gt;`]s. For</span>
+<span class="doccomment">//! example, [`Read`] adds a [`read`][`Read::read`] method, which we can use on</span>
+<span class="doccomment">//! [`File`]s:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```no_run</span>
+<span class="doccomment">//! use async_std::fs::File;</span>
+<span class="doccomment">//! use async_std::prelude::*;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! let mut f = File::open(&quot;foo.txt&quot;).await?;</span>
+<span class="doccomment">//! let mut buffer = [0; 10];</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // read up to 10 bytes</span>
+<span class="doccomment">//! let n = f.read(&amp;mut buffer).await?;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! println!(&quot;The bytes: {:?}&quot;, &amp;buffer[..n]);</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! # Ok(()) }) }</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! [`Read`] and [`Write`] are so important, implementors of the two traits have a</span>
+<span class="doccomment">//! nickname: readers and writers. So you&#39;ll sometimes see &#39;a reader&#39; instead</span>
+<span class="doccomment">//! of &#39;a type that implements the [`Read`] trait&#39;. Much easier!</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Seek and BufRead</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Beyond that, there are two important traits that are provided: [`Seek`]</span>
+<span class="doccomment">//! and [`BufRead`]. Both of these build on top of a reader to control</span>
+<span class="doccomment">//! how the reading happens. [`Seek`] lets you control where the next byte is</span>
+<span class="doccomment">//! coming from:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```no_run</span>
+<span class="doccomment">//! use async_std::fs::File;</span>
+<span class="doccomment">//! use async_std::io::SeekFrom;</span>
+<span class="doccomment">//! use async_std::prelude::*;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! let mut f = File::open(&quot;foo.txt&quot;).await?;</span>
+<span class="doccomment">//! let mut buffer = [0; 10];</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // skip to the last 10 bytes of the file</span>
+<span class="doccomment">//! f.seek(SeekFrom::End(-10)).await?;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // read up to 10 bytes</span>
+<span class="doccomment">//! let n = f.read(&amp;mut buffer).await?;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! println!(&quot;The bytes: {:?}&quot;, &amp;buffer[..n]);</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! # Ok(()) }) }</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! [`BufRead`] uses an internal buffer to provide a number of other ways to read, but</span>
+<span class="doccomment">//! to show it off, we&#39;ll need to talk about buffers in general. Keep reading!</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## BufReader and BufWriter</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Byte-based interfaces are unwieldy and can be inefficient, as we&#39;d need to be</span>
+<span class="doccomment">//! making near-constant calls to the operating system. To help with this,</span>
+<span class="doccomment">//! `std::io` comes with two structs, [`BufReader`] and [`BufWriter`], which wrap</span>
+<span class="doccomment">//! readers and writers. The wrapper uses a buffer, reducing the number of</span>
+<span class="doccomment">//! calls and providing nicer methods for accessing exactly what you want.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! For example, [`BufReader`] works with the [`BufRead`] trait to add extra</span>
+<span class="doccomment">//! methods to any reader:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```no_run</span>
+<span class="doccomment">//! use async_std::fs::File;</span>
+<span class="doccomment">//! use async_std::io::BufReader;</span>
+<span class="doccomment">//! use async_std::prelude::*;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! let f = File::open(&quot;foo.txt&quot;).await?;</span>
+<span class="doccomment">//! let mut reader = BufReader::new(f);</span>
+<span class="doccomment">//! let mut buffer = String::new();</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // read a line into buffer</span>
+<span class="doccomment">//! reader.read_line(&amp;mut buffer).await?;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! println!(&quot;{}&quot;, buffer);</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! # Ok(()) }) }</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! [`BufWriter`] doesn&#39;t add any new ways of writing; it just buffers every call</span>
+<span class="doccomment">//! to [`write`][`Write::write`]:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```no_run</span>
+<span class="doccomment">//! use async_std::fs::File;</span>
+<span class="doccomment">//! use async_std::io::prelude::*;</span>
+<span class="doccomment">//! use async_std::io::BufWriter;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! let f = File::create(&quot;foo.txt&quot;).await?;</span>
+<span class="doccomment">//! {</span>
+<span class="doccomment">//!     let mut writer = BufWriter::new(f);</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!     // write a byte to the buffer</span>
+<span class="doccomment">//!     writer.write(&amp;[42]).await?;</span>
+<span class="doccomment">//! } // the buffer is flushed once writer goes out of scope</span>
+<span class="doccomment">//! //</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! # Ok(()) }) }</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Standard input and output</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! A very common source of input is standard input:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```no_run</span>
+<span class="doccomment">//! use async_std::io;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! let mut input = String::new();</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! io::stdin().read_line(&amp;mut input).await?;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! println!(&quot;You typed: {}&quot;, input.trim());</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! # Ok(()) }) }</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Note that you cannot use the [`?` operator] in functions that do not return</span>
+<span class="doccomment">//! a [`Result&lt;T, E&gt;`][`Result`]. Instead, you can call [`.unwrap()`]</span>
+<span class="doccomment">//! or `match` on the return value to catch any possible errors:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```no_run</span>
+<span class="doccomment">//! use async_std::io;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! let mut input = String::new();</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! io::stdin().read_line(&amp;mut input).await.unwrap();</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! # Ok(()) }) }</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! And a very common source of output is standard output:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```no_run</span>
+<span class="doccomment">//! use async_std::io;</span>
+<span class="doccomment">//! use async_std::io::prelude::*;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! io::stdout().write(&amp;[42]).await?;</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! # Ok(()) }) }</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Of course, using [`io::stdout`] directly is less common than something like</span>
+<span class="doccomment">//! [`println!`].</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Iterator types</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! A large number of the structures provided by `std::io` are for various</span>
+<span class="doccomment">//! ways of iterating over I/O. For example, [`Lines`] is used to split over</span>
+<span class="doccomment">//! lines:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```no_run</span>
+<span class="doccomment">//! use async_std::fs::File;</span>
+<span class="doccomment">//! use async_std::io::BufReader;</span>
+<span class="doccomment">//! use async_std::prelude::*;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! let f = File::open(&quot;foo.txt&quot;).await?;</span>
+<span class="doccomment">//! let reader = BufReader::new(f);</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! let mut lines = reader.lines();</span>
+<span class="doccomment">//! while let Some(line) = lines.next().await {</span>
+<span class="doccomment">//!     println!(&quot;{}&quot;, line?);</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! # Ok(()) }) }</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Functions</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! There are a number of [functions][functions-list] that offer access to various</span>
+<span class="doccomment">//! features. For example, we can use three of these functions to copy everything</span>
+<span class="doccomment">//! from standard input to standard output:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```no_run</span>
+<span class="doccomment">//! use async_std::io;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # fn main() -&gt; std::io::Result&lt;()&gt; { async_std::task::block_on(async {</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! io::copy(&amp;mut io::stdin(), &amp;mut io::stdout()).await?;</span>
+<span class="doccomment">//! #</span>
+<span class="doccomment">//! # Ok(()) }) }</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! [functions-list]: #functions-1</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## io::Result</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Last, but certainly not least, is [`io::Result`]. This type is used</span>
+<span class="doccomment">//! as the return type of many `std::io` functions that can cause an error, and</span>
+<span class="doccomment">//! can be returned from your own functions as well. Many of the examples in this</span>
+<span class="doccomment">//! module use the [`?` operator]:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! #![allow(dead_code)]</span>
+<span class="doccomment">//! use async_std::io;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! async fn read_input() -&gt; io::Result&lt;()&gt; {</span>
+<span class="doccomment">//!     let mut input = String::new();</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!     io::stdin().read_line(&amp;mut input).await?;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!     println!(&quot;You typed: {}&quot;, input.trim());</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!     Ok(())</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The return type of `read_input`, [`io::Result&lt;()&gt;`][`io::Result`], is a very</span>
+<span class="doccomment">//! common type for functions which don&#39;t have a &#39;real&#39; return value, but do want to</span>
+<span class="doccomment">//! return errors if they happen. In this case, the only purpose of this function is</span>
+<span class="doccomment">//! to read the line and print it, so we use `()`.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Platform-specific behavior</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Many I/O functions throughout the standard library are documented to indicate</span>
+<span class="doccomment">//! what various library or syscalls they are delegated to. This is done to help</span>
+<span class="doccomment">//! applications both understand what&#39;s happening under the hood as well as investigate</span>
+<span class="doccomment">//! any possibly unclear semantics. Note, however, that this is informative, not a binding</span>
+<span class="doccomment">//! contract. The implementation of many of these functions are subject to change over</span>
+<span class="doccomment">//! time and may call fewer or more syscalls/library functions.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! [`Read`]: trait.Read.html</span>
+<span class="doccomment">//! [`Write`]: trait.Write.html</span>
+<span class="doccomment">//! [`Seek`]: trait.Seek.html</span>
+<span class="doccomment">//! [`BufRead`]: trait.BufRead.html</span>
+<span class="doccomment">//! [`File`]: ../fs/struct.File.html</span>
+<span class="doccomment">//! [`TcpStream`]: ../net/struct.TcpStream.html</span>
+<span class="doccomment">//! [`Vec&lt;T&gt;`]: ../vec/struct.Vec.html</span>
+<span class="doccomment">//! [`BufReader`]: struct.BufReader.html</span>
+<span class="doccomment">//! [`BufWriter`]: struct.BufWriter.html</span>
+<span class="doccomment">//! [`Write::write`]: trait.Write.html#tymethod.write</span>
+<span class="doccomment">//! [`io::stdout`]: fn.stdout.html</span>
+<span class="doccomment">//! [`println!`]: ../macro.println.html</span>
+<span class="doccomment">//! [`Lines`]: struct.Lines.html</span>
+<span class="doccomment">//! [`io::Result`]: type.Result.html</span>
+<span class="doccomment">//! [`?` operator]: https://doc.rust-lang.org/stable/book/appendix-02-operators.html</span>
+<span class="doccomment">//! [`Read::read`]: trait.Read.html#tymethod.read</span>
+<span class="doccomment">//! [`Result`]: https://doc.rust-lang.org/std/result/enum.Result.html</span>
+<span class="doccomment">//! [`.unwrap()`]: https://doc.rust-lang.org/std/result/enum.Result.html#method.unwrap</span>
 
 <span class="kw">const</span> <span class="ident">DEFAULT_BUF_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">8</span> <span class="op">*</span> <span class="number">1024</span>;
 
-<span class="macro">cfg_std</span><span class="macro">!</span> {
+<span class="macro">cfg_std!</span> {
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::{<span class="ident">Error</span>, <span class="ident">ErrorKind</span>, <span class="ident">IoSlice</span>, <span class="ident">IoSliceMut</span>, <span class="prelude-ty">Result</span>, <span class="ident">SeekFrom</span>};
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">std::io</span>::{<span class="ident">Error</span>, <span class="ident">ErrorKind</span>, <span class="ident">IoSlice</span>, <span class="ident">IoSliceMut</span>, <span class="prelude-ty">Result</span>, <span class="ident">SeekFrom</span>};
 
     <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">buf_read</span>::{<span class="ident">BufRead</span>, <span class="ident">Lines</span>, <span class="ident">Split</span>};
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">buf_reader</span>::<span class="ident">BufReader</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">buf_reader::BufReader</span>;
     <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">buf_writer</span>::{<span class="ident">BufWriter</span>, <span class="ident">IntoInnerError</span>};
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">copy</span>::<span class="ident">copy</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">cursor</span>::<span class="ident">Cursor</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">copy::copy</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">cursor::Cursor</span>;
     <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">empty</span>::{<span class="ident">empty</span>, <span class="ident">Empty</span>};
     <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">read</span>::<span class="kw-2">*</span>;
     <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">repeat</span>::{<span class="ident">repeat</span>, <span class="ident">Repeat</span>};
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">seek</span>::<span class="ident">Seek</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">seek::Seek</span>;
     <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">sink</span>::{<span class="ident">sink</span>, <span class="ident">Sink</span>};
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">write</span>::<span class="ident">Write</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">write::Write</span>;
 
     <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">prelude</span>;
 
@@ -638,8 +638,8 @@
     <span class="kw">mod</span> <span class="ident">sink</span>;
 }
 
-<span class="macro">cfg_default</span><span class="macro">!</span> {
-    <span class="comment">// For use in the print macros.</span>
+<span class="macro">cfg_default!</span> {
+    <span class="comment">// For use in the print macros.</span>
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;unknown&quot;</span>))]</span>
     <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">stdio</span>::{<span class="ident">_eprint</span>, <span class="ident">_print</span>};
@@ -650,7 +650,7 @@
     <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">stdin</span>::{<span class="ident">stdin</span>, <span class="ident">Stdin</span>};
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;unknown&quot;</span>))]</span>
     <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">stdout</span>::{<span class="ident">stdout</span>, <span class="ident">Stdout</span>};
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">timeout</span>::<span class="ident">timeout</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">timeout::timeout</span>;
 
     <span class="kw">mod</span> <span class="ident">timeout</span>;
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;unknown&quot;</span>))]</span>
@@ -663,4 +663,5 @@
     <span class="kw">mod</span> <span class="ident">stdout</span>;
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "async_std";</script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="async_std" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
+    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script></body></html>

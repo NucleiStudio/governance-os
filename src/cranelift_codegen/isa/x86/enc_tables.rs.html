@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/cranelift-codegen-0.66.0/src/isa/x86/enc_tables.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>enc_tables.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script src="../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/cranelift-codegen-0.69.0/src/isa/x86/enc_tables.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>enc_tables.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../../cranelift_codegen/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
+<link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../cranelift_codegen/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1898,25 +1898,25 @@
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Encoding tables for x86 ISAs.</span>
 
-<span class="kw">use</span> <span class="kw">super</span>::<span class="ident">registers</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">bitset</span>::<span class="ident">BitSet</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">cursor</span>::{<span class="ident">Cursor</span>, <span class="ident">FuncCursor</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">flowgraph</span>::<span class="ident">ControlFlowGraph</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">ir</span>::<span class="ident">condcodes</span>::{<span class="ident">FloatCC</span>, <span class="ident">IntCC</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">ir</span>::<span class="ident">types</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">ir</span>::{<span class="self">self</span>, <span class="ident">Function</span>, <span class="ident">Inst</span>, <span class="ident">InstBuilder</span>, <span class="ident">MemFlags</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">isa</span>::<span class="ident">constraints</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">isa</span>::<span class="ident">enc_tables</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">isa</span>::<span class="ident">encoding</span>::<span class="ident">base_size</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">isa</span>::<span class="ident">encoding</span>::{<span class="ident">Encoding</span>, <span class="ident">RecipeSizing</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">isa</span>::<span class="ident">RegUnit</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">isa</span>::{<span class="self">self</span>, <span class="ident">TargetIsa</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">legalizer</span>::<span class="ident">expand_as_libcall</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">predicates</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">regalloc</span>::<span class="ident">RegDiversions</span>;
+<span class="kw">use</span> <span class="kw">super</span><span class="ident">::registers</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::bitset::BitSet</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::cursor</span>::{<span class="ident">Cursor</span>, <span class="ident">FuncCursor</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::flowgraph::ControlFlowGraph</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::ir::condcodes</span>::{<span class="ident">FloatCC</span>, <span class="ident">IntCC</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::ir::types</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::ir</span>::{<span class="self">self</span>, <span class="ident">Function</span>, <span class="ident">Inst</span>, <span class="ident">InstBuilder</span>, <span class="ident">MemFlags</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::isa::constraints</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::isa::enc_tables</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::isa::encoding::base_size</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::isa::encoding</span>::{<span class="ident">Encoding</span>, <span class="ident">RecipeSizing</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::isa::RegUnit</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::isa</span>::{<span class="self">self</span>, <span class="ident">TargetIsa</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::legalizer::expand_as_libcall</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::predicates</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::regalloc::RegDiversions</span>;
 
-<span class="macro">include</span><span class="macro">!</span>(<span class="macro">concat</span><span class="macro">!</span>(<span class="macro">env</span><span class="macro">!</span>(<span class="string">&quot;OUT_DIR&quot;</span>), <span class="string">&quot;/encoding-x86.rs&quot;</span>));
-<span class="macro">include</span><span class="macro">!</span>(<span class="macro">concat</span><span class="macro">!</span>(<span class="macro">env</span><span class="macro">!</span>(<span class="string">&quot;OUT_DIR&quot;</span>), <span class="string">&quot;/legalize-x86.rs&quot;</span>));
+<span class="macro">include!</span>(<span class="macro">concat!</span>(<span class="macro">env!</span>(<span class="string">&quot;OUT_DIR&quot;</span>), <span class="string">&quot;/encoding-x86.rs&quot;</span>));
+<span class="macro">include!</span>(<span class="macro">concat!</span>(<span class="macro">env!</span>(<span class="string">&quot;OUT_DIR&quot;</span>), <span class="string">&quot;/legalize-x86.rs&quot;</span>));
 
 <span class="doccomment">/// Whether the REX prefix is needed for encoding extended registers (via REX.RXB).</span>
 <span class="doccomment">///</span>
@@ -1928,10 +1928,10 @@
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">needs_sib_byte</span>(<span class="ident">reg</span>: <span class="ident">RegUnit</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-    <span class="ident">reg</span> <span class="op">=</span><span class="op">=</span> <span class="ident">RU</span>::<span class="ident">r12</span> <span class="kw">as</span> <span class="ident">RegUnit</span> <span class="op">|</span><span class="op">|</span> <span class="ident">reg</span> <span class="op">=</span><span class="op">=</span> <span class="ident">RU</span>::<span class="ident">rsp</span> <span class="kw">as</span> <span class="ident">RegUnit</span>
+    <span class="ident">reg</span> <span class="op">=</span><span class="op">=</span> <span class="ident">RU::r12</span> <span class="kw">as</span> <span class="ident">RegUnit</span> <span class="op">|</span><span class="op">|</span> <span class="ident">reg</span> <span class="op">=</span><span class="op">=</span> <span class="ident">RU::rsp</span> <span class="kw">as</span> <span class="ident">RegUnit</span>
 }
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">needs_offset</span>(<span class="ident">reg</span>: <span class="ident">RegUnit</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-    <span class="ident">reg</span> <span class="op">=</span><span class="op">=</span> <span class="ident">RU</span>::<span class="ident">r13</span> <span class="kw">as</span> <span class="ident">RegUnit</span> <span class="op">|</span><span class="op">|</span> <span class="ident">reg</span> <span class="op">=</span><span class="op">=</span> <span class="ident">RU</span>::<span class="ident">rbp</span> <span class="kw">as</span> <span class="ident">RegUnit</span>
+    <span class="ident">reg</span> <span class="op">=</span><span class="op">=</span> <span class="ident">RU::r13</span> <span class="kw">as</span> <span class="ident">RegUnit</span> <span class="op">|</span><span class="op">|</span> <span class="ident">reg</span> <span class="op">=</span><span class="op">=</span> <span class="ident">RU::rbp</span> <span class="kw">as</span> <span class="ident">RegUnit</span>
 }
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">needs_sib_byte_or_offset</span>(<span class="ident">reg</span>: <span class="ident">RegUnit</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
     <span class="ident">needs_sib_byte</span>(<span class="ident">reg</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">needs_offset</span>(<span class="ident">reg</span>)
@@ -2205,10 +2205,10 @@
 
 <span class="doccomment">/// If the value&#39;s definition is a constant immediate, returns its unpacked value, or None</span>
 <span class="doccomment">/// otherwise.</span>
-<span class="kw">fn</span> <span class="ident">maybe_iconst_imm</span>(<span class="ident">pos</span>: <span class="kw-2">&amp;</span><span class="ident">FuncCursor</span>, <span class="ident">value</span>: <span class="ident">ir</span>::<span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ir</span>::<span class="ident">ValueDef</span>::<span class="prelude-ty">Result</span>(<span class="ident">inst</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">value_def</span>(<span class="ident">value</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ir</span>::<span class="ident">InstructionData</span>::<span class="ident">UnaryImm</span> {
-            <span class="ident">opcode</span>: <span class="ident">ir</span>::<span class="ident">Opcode</span>::<span class="ident">Iconst</span>,
+<span class="kw">fn</span> <span class="ident">maybe_iconst_imm</span>(<span class="ident">pos</span>: <span class="kw-2">&amp;</span><span class="ident">FuncCursor</span>, <span class="ident">value</span>: <span class="ident">ir::Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
+    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ir::ValueDef::Result</span>(<span class="ident">inst</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">value_def</span>(<span class="ident">value</span>) {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ir::InstructionData::UnaryImm</span> {
+            <span class="ident">opcode</span>: <span class="ident">ir::Opcode::Iconst</span>,
             <span class="ident">imm</span>,
         } <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>[<span class="kw-2">*</span><span class="ident">inst</span>]
         {
@@ -2224,28 +2224,28 @@
 
 <span class="doccomment">/// Expand the `sdiv` and `srem` instructions using `x86_sdivmodx`.</span>
 <span class="kw">fn</span> <span class="ident">expand_sdivrem</span>(
-    <span class="ident">inst</span>: <span class="ident">ir</span>::<span class="ident">Inst</span>,
-    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir</span>::<span class="ident">Function</span>,
+    <span class="ident">inst</span>: <span class="ident">ir::Inst</span>,
+    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir::Function</span>,
     <span class="ident">cfg</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ControlFlowGraph</span>,
-    <span class="ident">isa</span>: <span class="kw-2">&amp;</span><span class="ident">dyn</span> <span class="ident">TargetIsa</span>,
+    <span class="ident">isa</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">TargetIsa</span>,
 ) {
     <span class="kw">let</span> (<span class="ident">x</span>, <span class="ident">y</span>, <span class="ident">is_srem</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">func</span>.<span class="ident">dfg</span>[<span class="ident">inst</span>] {
-        <span class="ident">ir</span>::<span class="ident">InstructionData</span>::<span class="ident">Binary</span> {
-            <span class="ident">opcode</span>: <span class="ident">ir</span>::<span class="ident">Opcode</span>::<span class="ident">Sdiv</span>,
+        <span class="ident">ir::InstructionData::Binary</span> {
+            <span class="ident">opcode</span>: <span class="ident">ir::Opcode::Sdiv</span>,
             <span class="ident">args</span>,
         } <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">args</span>[<span class="number">0</span>], <span class="ident">args</span>[<span class="number">1</span>], <span class="bool-val">false</span>),
-        <span class="ident">ir</span>::<span class="ident">InstructionData</span>::<span class="ident">Binary</span> {
-            <span class="ident">opcode</span>: <span class="ident">ir</span>::<span class="ident">Opcode</span>::<span class="ident">Srem</span>,
+        <span class="ident">ir::InstructionData::Binary</span> {
+            <span class="ident">opcode</span>: <span class="ident">ir::Opcode::Srem</span>,
             <span class="ident">args</span>,
         } <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">args</span>[<span class="number">0</span>], <span class="ident">args</span>[<span class="number">1</span>], <span class="bool-val">true</span>),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Need sdiv/srem: {}&quot;</span>, <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">display_inst</span>(<span class="ident">inst</span>, <span class="prelude-val">None</span>)),
+        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Need sdiv/srem: {}&quot;</span>, <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">display_inst</span>(<span class="ident">inst</span>, <span class="prelude-val">None</span>)),
     };
 
     <span class="kw">let</span> <span class="ident">old_block</span> <span class="op">=</span> <span class="ident">func</span>.<span class="ident">layout</span>.<span class="ident">pp_block</span>(<span class="ident">inst</span>);
     <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">first_result</span>(<span class="ident">inst</span>);
     <span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">value_type</span>(<span class="ident">result</span>);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor</span>::<span class="ident">new</span>(<span class="ident">func</span>).<span class="ident">at_inst</span>(<span class="ident">inst</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor::new</span>(<span class="ident">func</span>).<span class="ident">at_inst</span>(<span class="ident">inst</span>);
     <span class="ident">pos</span>.<span class="ident">use_srcloc</span>(<span class="ident">inst</span>);
     <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">clear_results</span>(<span class="ident">inst</span>);
 
@@ -2253,7 +2253,7 @@
 
     <span class="comment">// If we can tolerate native division traps, sdiv doesn&#39;t need branching.</span>
     <span class="kw">if</span> <span class="op">!</span><span class="ident">avoid_div_traps</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">is_srem</span> {
-        <span class="kw">let</span> <span class="ident">xhi</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">sshr_imm</span>(<span class="ident">x</span>, <span class="ident">i64</span>::<span class="ident">from</span>(<span class="ident">ty</span>.<span class="ident">lane_bits</span>()) <span class="op">-</span> <span class="number">1</span>);
+        <span class="kw">let</span> <span class="ident">xhi</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">sshr_imm</span>(<span class="ident">x</span>, <span class="ident">i64::from</span>(<span class="ident">ty</span>.<span class="ident">lane_bits</span>()) <span class="op">-</span> <span class="number">1</span>);
         <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">with_result</span>(<span class="ident">result</span>).<span class="ident">x86_sdivmodx</span>(<span class="ident">x</span>, <span class="ident">xhi</span>, <span class="ident">y</span>);
         <span class="ident">pos</span>.<span class="ident">remove_inst</span>();
         <span class="kw">return</span>;
@@ -2270,11 +2270,11 @@
 
     <span class="comment">// Put in an explicit division-by-zero trap if the environment requires it.</span>
     <span class="kw">if</span> <span class="ident">avoid_div_traps</span> <span class="op">&amp;&amp;</span> <span class="ident">could_be_zero</span> {
-        <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">trapz</span>(<span class="ident">y</span>, <span class="ident">ir</span>::<span class="ident">TrapCode</span>::<span class="ident">IntegerDivisionByZero</span>);
+        <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">trapz</span>(<span class="ident">y</span>, <span class="ident">ir::TrapCode::IntegerDivisionByZero</span>);
     }
 
     <span class="kw">if</span> <span class="op">!</span><span class="ident">could_be_minus_one</span> {
-        <span class="kw">let</span> <span class="ident">xhi</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">sshr_imm</span>(<span class="ident">x</span>, <span class="ident">i64</span>::<span class="ident">from</span>(<span class="ident">ty</span>.<span class="ident">lane_bits</span>()) <span class="op">-</span> <span class="number">1</span>);
+        <span class="kw">let</span> <span class="ident">xhi</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">sshr_imm</span>(<span class="ident">x</span>, <span class="ident">i64::from</span>(<span class="ident">ty</span>.<span class="ident">lane_bits</span>()) <span class="op">-</span> <span class="number">1</span>);
         <span class="kw">let</span> <span class="ident">reuse</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">is_srem</span> {
             [<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">result</span>)]
         } <span class="kw">else</span> {
@@ -2299,13 +2299,13 @@
 
     <span class="comment">// Start by checking for a -1 divisor which needs to be handled specially.</span>
     <span class="kw">let</span> <span class="ident">is_m1</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">ifcmp_imm</span>(<span class="ident">y</span>, <span class="op">-</span><span class="number">1</span>);
-    <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">brif</span>(<span class="ident">IntCC</span>::<span class="ident">Equal</span>, <span class="ident">is_m1</span>, <span class="ident">minus_one</span>, <span class="kw-2">&amp;</span>[]);
+    <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">brif</span>(<span class="ident">IntCC::Equal</span>, <span class="ident">is_m1</span>, <span class="ident">minus_one</span>, <span class="kw-2">&amp;</span>[]);
     <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">jump</span>(<span class="ident">nominal</span>, <span class="kw-2">&amp;</span>[]);
 
     <span class="comment">// Now it is safe to execute the `x86_sdivmodx` instruction which will still trap on division</span>
     <span class="comment">// by zero.</span>
     <span class="ident">pos</span>.<span class="ident">insert_block</span>(<span class="ident">nominal</span>);
-    <span class="kw">let</span> <span class="ident">xhi</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">sshr_imm</span>(<span class="ident">x</span>, <span class="ident">i64</span>::<span class="ident">from</span>(<span class="ident">ty</span>.<span class="ident">lane_bits</span>()) <span class="op">-</span> <span class="number">1</span>);
+    <span class="kw">let</span> <span class="ident">xhi</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">sshr_imm</span>(<span class="ident">x</span>, <span class="ident">i64::from</span>(<span class="ident">ty</span>.<span class="ident">lane_bits</span>()) <span class="op">-</span> <span class="number">1</span>);
     <span class="kw">let</span> (<span class="ident">quot</span>, <span class="ident">rem</span>) <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">x86_sdivmodx</span>(<span class="ident">x</span>, <span class="ident">xhi</span>, <span class="ident">y</span>);
     <span class="kw">let</span> <span class="ident">divres</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">is_srem</span> { <span class="ident">rem</span> } <span class="kw">else</span> { <span class="ident">quot</span> };
     <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">jump</span>(<span class="ident">done</span>, <span class="kw-2">&amp;</span>[<span class="ident">divres</span>]);
@@ -2317,10 +2317,10 @@
         <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">iconst</span>(<span class="ident">ty</span>, <span class="number">0</span>)
     } <span class="kw">else</span> {
         <span class="comment">// Explicitly check for overflow: Trap when x == INT_MIN.</span>
-        <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">avoid_div_traps</span>, <span class="string">&quot;Native trapping divide handled above&quot;</span>);
+        <span class="macro">debug_assert!</span>(<span class="ident">avoid_div_traps</span>, <span class="string">&quot;Native trapping divide handled above&quot;</span>);
         <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">ifcmp_imm</span>(<span class="ident">x</span>, <span class="op">-</span><span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="ident">ty</span>.<span class="ident">lane_bits</span>() <span class="op">-</span> <span class="number">1</span>));
         <span class="ident">pos</span>.<span class="ident">ins</span>()
-            .<span class="ident">trapif</span>(<span class="ident">IntCC</span>::<span class="ident">Equal</span>, <span class="ident">f</span>, <span class="ident">ir</span>::<span class="ident">TrapCode</span>::<span class="ident">IntegerOverflow</span>);
+            .<span class="ident">trapif</span>(<span class="ident">IntCC::Equal</span>, <span class="ident">f</span>, <span class="ident">ir::TrapCode::IntegerOverflow</span>);
         <span class="comment">// x / -1 = -x.</span>
         <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">irsub_imm</span>(<span class="ident">x</span>, <span class="number">0</span>)
     };
@@ -2340,27 +2340,27 @@
 
 <span class="doccomment">/// Expand the `udiv` and `urem` instructions using `x86_udivmodx`.</span>
 <span class="kw">fn</span> <span class="ident">expand_udivrem</span>(
-    <span class="ident">inst</span>: <span class="ident">ir</span>::<span class="ident">Inst</span>,
-    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir</span>::<span class="ident">Function</span>,
+    <span class="ident">inst</span>: <span class="ident">ir::Inst</span>,
+    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir::Function</span>,
     <span class="ident">_cfg</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ControlFlowGraph</span>,
-    <span class="ident">isa</span>: <span class="kw-2">&amp;</span><span class="ident">dyn</span> <span class="ident">TargetIsa</span>,
+    <span class="ident">isa</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">TargetIsa</span>,
 ) {
     <span class="kw">let</span> (<span class="ident">x</span>, <span class="ident">y</span>, <span class="ident">is_urem</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">func</span>.<span class="ident">dfg</span>[<span class="ident">inst</span>] {
-        <span class="ident">ir</span>::<span class="ident">InstructionData</span>::<span class="ident">Binary</span> {
-            <span class="ident">opcode</span>: <span class="ident">ir</span>::<span class="ident">Opcode</span>::<span class="ident">Udiv</span>,
+        <span class="ident">ir::InstructionData::Binary</span> {
+            <span class="ident">opcode</span>: <span class="ident">ir::Opcode::Udiv</span>,
             <span class="ident">args</span>,
         } <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">args</span>[<span class="number">0</span>], <span class="ident">args</span>[<span class="number">1</span>], <span class="bool-val">false</span>),
-        <span class="ident">ir</span>::<span class="ident">InstructionData</span>::<span class="ident">Binary</span> {
-            <span class="ident">opcode</span>: <span class="ident">ir</span>::<span class="ident">Opcode</span>::<span class="ident">Urem</span>,
+        <span class="ident">ir::InstructionData::Binary</span> {
+            <span class="ident">opcode</span>: <span class="ident">ir::Opcode::Urem</span>,
             <span class="ident">args</span>,
         } <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">args</span>[<span class="number">0</span>], <span class="ident">args</span>[<span class="number">1</span>], <span class="bool-val">true</span>),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Need udiv/urem: {}&quot;</span>, <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">display_inst</span>(<span class="ident">inst</span>, <span class="prelude-val">None</span>)),
+        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Need udiv/urem: {}&quot;</span>, <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">display_inst</span>(<span class="ident">inst</span>, <span class="prelude-val">None</span>)),
     };
     <span class="kw">let</span> <span class="ident">avoid_div_traps</span> <span class="op">=</span> <span class="ident">isa</span>.<span class="ident">flags</span>().<span class="ident">avoid_div_traps</span>();
     <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">first_result</span>(<span class="ident">inst</span>);
     <span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">value_type</span>(<span class="ident">result</span>);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor</span>::<span class="ident">new</span>(<span class="ident">func</span>).<span class="ident">at_inst</span>(<span class="ident">inst</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor::new</span>(<span class="ident">func</span>).<span class="ident">at_inst</span>(<span class="ident">inst</span>);
     <span class="ident">pos</span>.<span class="ident">use_srcloc</span>(<span class="ident">inst</span>);
     <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">clear_results</span>(<span class="ident">inst</span>);
 
@@ -2375,7 +2375,7 @@
             <span class="bool-val">true</span>
         };
         <span class="kw">if</span> <span class="ident">zero_check</span> {
-            <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">trapz</span>(<span class="ident">y</span>, <span class="ident">ir</span>::<span class="ident">TrapCode</span>::<span class="ident">IntegerDivisionByZero</span>);
+            <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">trapz</span>(<span class="ident">y</span>, <span class="ident">ir::TrapCode::IntegerDivisionByZero</span>);
         }
     }
 
@@ -2393,21 +2393,21 @@
 <span class="doccomment">/// Expand the `fmin` and `fmax` instructions using the x86 `x86_fmin` and `x86_fmax`</span>
 <span class="doccomment">/// instructions.</span>
 <span class="kw">fn</span> <span class="ident">expand_minmax</span>(
-    <span class="ident">inst</span>: <span class="ident">ir</span>::<span class="ident">Inst</span>,
-    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir</span>::<span class="ident">Function</span>,
+    <span class="ident">inst</span>: <span class="ident">ir::Inst</span>,
+    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir::Function</span>,
     <span class="ident">cfg</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ControlFlowGraph</span>,
-    <span class="ident">_isa</span>: <span class="kw-2">&amp;</span><span class="ident">dyn</span> <span class="ident">TargetIsa</span>,
+    <span class="ident">_isa</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">TargetIsa</span>,
 ) {
     <span class="kw">let</span> (<span class="ident">x</span>, <span class="ident">y</span>, <span class="ident">x86_opc</span>, <span class="ident">bitwise_opc</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">func</span>.<span class="ident">dfg</span>[<span class="ident">inst</span>] {
-        <span class="ident">ir</span>::<span class="ident">InstructionData</span>::<span class="ident">Binary</span> {
-            <span class="ident">opcode</span>: <span class="ident">ir</span>::<span class="ident">Opcode</span>::<span class="ident">Fmin</span>,
+        <span class="ident">ir::InstructionData::Binary</span> {
+            <span class="ident">opcode</span>: <span class="ident">ir::Opcode::Fmin</span>,
             <span class="ident">args</span>,
-        } <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">args</span>[<span class="number">0</span>], <span class="ident">args</span>[<span class="number">1</span>], <span class="ident">ir</span>::<span class="ident">Opcode</span>::<span class="ident">X86Fmin</span>, <span class="ident">ir</span>::<span class="ident">Opcode</span>::<span class="ident">Bor</span>),
-        <span class="ident">ir</span>::<span class="ident">InstructionData</span>::<span class="ident">Binary</span> {
-            <span class="ident">opcode</span>: <span class="ident">ir</span>::<span class="ident">Opcode</span>::<span class="ident">Fmax</span>,
+        } <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">args</span>[<span class="number">0</span>], <span class="ident">args</span>[<span class="number">1</span>], <span class="ident">ir::Opcode::X86Fmin</span>, <span class="ident">ir::Opcode::Bor</span>),
+        <span class="ident">ir::InstructionData::Binary</span> {
+            <span class="ident">opcode</span>: <span class="ident">ir::Opcode::Fmax</span>,
             <span class="ident">args</span>,
-        } <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">args</span>[<span class="number">0</span>], <span class="ident">args</span>[<span class="number">1</span>], <span class="ident">ir</span>::<span class="ident">Opcode</span>::<span class="ident">X86Fmax</span>, <span class="ident">ir</span>::<span class="ident">Opcode</span>::<span class="ident">Band</span>),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Expected fmin/fmax: {}&quot;</span>, <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">display_inst</span>(<span class="ident">inst</span>, <span class="prelude-val">None</span>)),
+        } <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">args</span>[<span class="number">0</span>], <span class="ident">args</span>[<span class="number">1</span>], <span class="ident">ir::Opcode::X86Fmax</span>, <span class="ident">ir::Opcode::Band</span>),
+        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Expected fmin/fmax: {}&quot;</span>, <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">display_inst</span>(<span class="ident">inst</span>, <span class="prelude-val">None</span>)),
     };
     <span class="kw">let</span> <span class="ident">old_block</span> <span class="op">=</span> <span class="ident">func</span>.<span class="ident">layout</span>.<span class="ident">pp_block</span>(<span class="ident">inst</span>);
 
@@ -2446,9 +2446,9 @@
     <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">attach_block_param</span>(<span class="ident">done</span>, <span class="ident">result</span>);
 
     <span class="comment">// Test for case 1) ordered and not equal.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor</span>::<span class="ident">new</span>(<span class="ident">func</span>).<span class="ident">at_inst</span>(<span class="ident">inst</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor::new</span>(<span class="ident">func</span>).<span class="ident">at_inst</span>(<span class="ident">inst</span>);
     <span class="ident">pos</span>.<span class="ident">use_srcloc</span>(<span class="ident">inst</span>);
-    <span class="kw">let</span> <span class="ident">cmp_ueq</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">fcmp</span>(<span class="ident">FloatCC</span>::<span class="ident">UnorderedOrEqual</span>, <span class="ident">x</span>, <span class="ident">y</span>);
+    <span class="kw">let</span> <span class="ident">cmp_ueq</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">fcmp</span>(<span class="ident">FloatCC::UnorderedOrEqual</span>, <span class="ident">x</span>, <span class="ident">y</span>);
     <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">brnz</span>(<span class="ident">cmp_ueq</span>, <span class="ident">ueq_block</span>, <span class="kw-2">&amp;</span>[]);
     <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">jump</span>(<span class="ident">one_block</span>, <span class="kw-2">&amp;</span>[]);
 
@@ -2469,7 +2469,7 @@
     <span class="ident">pos</span>.<span class="ident">insert_block</span>(<span class="ident">ueq_block</span>);
     <span class="comment">// Test for case 3) (UN) one value is NaN.</span>
     <span class="comment">// TODO: When we get support for flag values, we can reuse the above comparison.</span>
-    <span class="kw">let</span> <span class="ident">cmp_uno</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">fcmp</span>(<span class="ident">FloatCC</span>::<span class="ident">Unordered</span>, <span class="ident">x</span>, <span class="ident">y</span>);
+    <span class="kw">let</span> <span class="ident">cmp_uno</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">fcmp</span>(<span class="ident">FloatCC::Unordered</span>, <span class="ident">x</span>, <span class="ident">y</span>);
     <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">brnz</span>(<span class="ident">cmp_uno</span>, <span class="ident">uno_block</span>, <span class="kw-2">&amp;</span>[]);
     <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">jump</span>(<span class="ident">eq_block</span>, <span class="kw-2">&amp;</span>[]);
 
@@ -2498,26 +2498,26 @@
 <span class="doccomment">/// non-x86-friendly WebAssembly semantics of NaN handling. This logic is kept separate from</span>
 <span class="doccomment">/// [expand_minmax] above (the scalar version) for code clarity.</span>
 <span class="kw">fn</span> <span class="ident">expand_minmax_vector</span>(
-    <span class="ident">inst</span>: <span class="ident">ir</span>::<span class="ident">Inst</span>,
-    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir</span>::<span class="ident">Function</span>,
+    <span class="ident">inst</span>: <span class="ident">ir::Inst</span>,
+    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir::Function</span>,
     <span class="ident">_cfg</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ControlFlowGraph</span>,
-    <span class="ident">_isa</span>: <span class="kw-2">&amp;</span><span class="ident">dyn</span> <span class="ident">TargetIsa</span>,
+    <span class="ident">_isa</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">TargetIsa</span>,
 ) {
     <span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">ctrl_typevar</span>(<span class="ident">inst</span>);
-    <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">ty</span>.<span class="ident">is_vector</span>());
+    <span class="macro">debug_assert!</span>(<span class="ident">ty</span>.<span class="ident">is_vector</span>());
     <span class="kw">let</span> (<span class="ident">x</span>, <span class="ident">y</span>, <span class="ident">x86_opcode</span>, <span class="ident">is_max</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">func</span>.<span class="ident">dfg</span>[<span class="ident">inst</span>] {
-        <span class="ident">ir</span>::<span class="ident">InstructionData</span>::<span class="ident">Binary</span> {
-            <span class="ident">opcode</span>: <span class="ident">ir</span>::<span class="ident">Opcode</span>::<span class="ident">Fmin</span>,
+        <span class="ident">ir::InstructionData::Binary</span> {
+            <span class="ident">opcode</span>: <span class="ident">ir::Opcode::Fmin</span>,
             <span class="ident">args</span>,
-        } <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">args</span>[<span class="number">0</span>], <span class="ident">args</span>[<span class="number">1</span>], <span class="ident">ir</span>::<span class="ident">Opcode</span>::<span class="ident">X86Fmin</span>, <span class="bool-val">false</span>),
-        <span class="ident">ir</span>::<span class="ident">InstructionData</span>::<span class="ident">Binary</span> {
-            <span class="ident">opcode</span>: <span class="ident">ir</span>::<span class="ident">Opcode</span>::<span class="ident">Fmax</span>,
+        } <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">args</span>[<span class="number">0</span>], <span class="ident">args</span>[<span class="number">1</span>], <span class="ident">ir::Opcode::X86Fmin</span>, <span class="bool-val">false</span>),
+        <span class="ident">ir::InstructionData::Binary</span> {
+            <span class="ident">opcode</span>: <span class="ident">ir::Opcode::Fmax</span>,
             <span class="ident">args</span>,
-        } <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">args</span>[<span class="number">0</span>], <span class="ident">args</span>[<span class="number">1</span>], <span class="ident">ir</span>::<span class="ident">Opcode</span>::<span class="ident">X86Fmax</span>, <span class="bool-val">true</span>),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Expected fmin/fmax: {}&quot;</span>, <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">display_inst</span>(<span class="ident">inst</span>, <span class="prelude-val">None</span>)),
+        } <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">args</span>[<span class="number">0</span>], <span class="ident">args</span>[<span class="number">1</span>], <span class="ident">ir::Opcode::X86Fmax</span>, <span class="bool-val">true</span>),
+        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Expected fmin/fmax: {}&quot;</span>, <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">display_inst</span>(<span class="ident">inst</span>, <span class="prelude-val">None</span>)),
     };
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor</span>::<span class="ident">new</span>(<span class="ident">func</span>).<span class="ident">at_inst</span>(<span class="ident">inst</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor::new</span>(<span class="ident">func</span>).<span class="ident">at_inst</span>(<span class="ident">inst</span>);
     <span class="ident">pos</span>.<span class="ident">use_srcloc</span>(<span class="ident">inst</span>);
 
     <span class="comment">// This sequence is complex due to how x86 handles NaNs and +0/-0. If x86 finds a NaN in</span>
@@ -2538,7 +2538,7 @@
         <span class="kw">let</span> <span class="ident">propagate_nans_and_plus_zero</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">bor</span>(<span class="ident">backward</span>, <span class="ident">difference</span>);
         <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">fsub</span>(<span class="ident">propagate_nans_and_plus_zero</span>, <span class="ident">difference</span>);
         <span class="comment">// Discover which lanes have NaNs in them.</span>
-        <span class="kw">let</span> <span class="ident">find_nan_lanes_mask</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">fcmp</span>(<span class="ident">FloatCC</span>::<span class="ident">Unordered</span>, <span class="ident">difference</span>, <span class="ident">value</span>);
+        <span class="kw">let</span> <span class="ident">find_nan_lanes_mask</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">fcmp</span>(<span class="ident">FloatCC::Unordered</span>, <span class="ident">difference</span>, <span class="ident">value</span>);
         (<span class="ident">value</span>, <span class="ident">find_nan_lanes_mask</span>)
     } <span class="kw">else</span> {
         <span class="comment">// For minimum:</span>
@@ -2546,7 +2546,7 @@
         <span class="kw">let</span> <span class="ident">propagate_nans</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">bor</span>(<span class="ident">backward</span>, <span class="ident">forward</span>);
         <span class="comment">// Find which lanes contain a NaN with an unordered comparison, filling the mask with</span>
         <span class="comment">// 1s.</span>
-        <span class="kw">let</span> <span class="ident">find_nan_lanes_mask</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">fcmp</span>(<span class="ident">FloatCC</span>::<span class="ident">Unordered</span>, <span class="ident">forward</span>, <span class="ident">propagate_nans</span>);
+        <span class="kw">let</span> <span class="ident">find_nan_lanes_mask</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">fcmp</span>(<span class="ident">FloatCC::Unordered</span>, <span class="ident">forward</span>, <span class="ident">propagate_nans</span>);
         <span class="kw">let</span> <span class="ident">bitcast_find_nan_lanes_mask</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">raw_bitcast</span>(<span class="ident">ty</span>, <span class="ident">find_nan_lanes_mask</span>);
         <span class="comment">// Then flood the value lane with all 1s if that lane is a NaN. This causes all NaNs</span>
         <span class="comment">// along this code path to be quieted and negative: after the upcoming shift and and_not,</span>
@@ -2569,7 +2569,7 @@
     <span class="kw">let</span> (<span class="ident">shift_by</span>, <span class="ident">ty_as_int</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">ty</span> {
         <span class="ident">F32X4</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="number">10</span>, <span class="ident">I32X4</span>),
         <span class="ident">F64X2</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="number">13</span>, <span class="ident">I64X2</span>),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unimplemented</span><span class="macro">!</span>(<span class="string">&quot;this legalization only understands 128-bit floating point types&quot;</span>),
+        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unimplemented!</span>(<span class="string">&quot;this legalization only understands 128-bit floating point types&quot;</span>),
     };
 
     <span class="comment">// In order to clear the NaN payload for canonical NaNs, we shift right the NaN lanes (all</span>
@@ -2594,35 +2594,35 @@
 <span class="doccomment">/// Note that this is the scalar implementation; for the vector implemenation see</span>
 <span class="doccomment">/// [expand_fcvt_from_uint_vector].</span>
 <span class="kw">fn</span> <span class="ident">expand_fcvt_from_uint</span>(
-    <span class="ident">inst</span>: <span class="ident">ir</span>::<span class="ident">Inst</span>,
-    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir</span>::<span class="ident">Function</span>,
+    <span class="ident">inst</span>: <span class="ident">ir::Inst</span>,
+    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir::Function</span>,
     <span class="ident">cfg</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ControlFlowGraph</span>,
-    <span class="ident">_isa</span>: <span class="kw-2">&amp;</span><span class="ident">dyn</span> <span class="ident">TargetIsa</span>,
+    <span class="ident">_isa</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">TargetIsa</span>,
 ) {
     <span class="kw">let</span> <span class="ident">x</span>;
     <span class="kw">match</span> <span class="ident">func</span>.<span class="ident">dfg</span>[<span class="ident">inst</span>] {
-        <span class="ident">ir</span>::<span class="ident">InstructionData</span>::<span class="ident">Unary</span> {
-            <span class="ident">opcode</span>: <span class="ident">ir</span>::<span class="ident">Opcode</span>::<span class="ident">FcvtFromUint</span>,
+        <span class="ident">ir::InstructionData::Unary</span> {
+            <span class="ident">opcode</span>: <span class="ident">ir::Opcode::FcvtFromUint</span>,
             <span class="ident">arg</span>,
         } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">arg</span>,
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Need fcvt_from_uint: {}&quot;</span>, <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">display_inst</span>(<span class="ident">inst</span>, <span class="prelude-val">None</span>)),
+        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Need fcvt_from_uint: {}&quot;</span>, <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">display_inst</span>(<span class="ident">inst</span>, <span class="prelude-val">None</span>)),
     }
     <span class="kw">let</span> <span class="ident">xty</span> <span class="op">=</span> <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">value_type</span>(<span class="ident">x</span>);
     <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">first_result</span>(<span class="ident">inst</span>);
     <span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">value_type</span>(<span class="ident">result</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor</span>::<span class="ident">new</span>(<span class="ident">func</span>).<span class="ident">at_inst</span>(<span class="ident">inst</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor::new</span>(<span class="ident">func</span>).<span class="ident">at_inst</span>(<span class="ident">inst</span>);
     <span class="ident">pos</span>.<span class="ident">use_srcloc</span>(<span class="ident">inst</span>);
 
     <span class="comment">// Conversion from an unsigned int smaller than 64bit is easy on x86-64.</span>
     <span class="kw">match</span> <span class="ident">xty</span> {
-        <span class="ident">ir</span>::<span class="ident">types</span>::<span class="ident">I8</span> <span class="op">|</span> <span class="ident">ir</span>::<span class="ident">types</span>::<span class="ident">I16</span> <span class="op">|</span> <span class="ident">ir</span>::<span class="ident">types</span>::<span class="ident">I32</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">ir::types::I8</span> <span class="op">|</span> <span class="ident">ir::types::I16</span> <span class="op">|</span> <span class="ident">ir::types::I32</span> <span class="op">=</span><span class="op">&gt;</span> {
             <span class="comment">// TODO: This should be guarded by an ISA check.</span>
-            <span class="kw">let</span> <span class="ident">wide</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">uextend</span>(<span class="ident">ir</span>::<span class="ident">types</span>::<span class="ident">I64</span>, <span class="ident">x</span>);
+            <span class="kw">let</span> <span class="ident">wide</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">uextend</span>(<span class="ident">ir::types::I64</span>, <span class="ident">x</span>);
             <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">replace</span>(<span class="ident">inst</span>).<span class="ident">fcvt_from_sint</span>(<span class="ident">ty</span>, <span class="ident">wide</span>);
             <span class="kw">return</span>;
         }
-        <span class="ident">ir</span>::<span class="ident">types</span>::<span class="ident">I64</span> <span class="op">=</span><span class="op">&gt;</span> {}
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unimplemented</span><span class="macro">!</span>(),
+        <span class="ident">ir::types::I64</span> <span class="op">=</span><span class="op">&gt;</span> {}
+        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unimplemented!</span>(),
     }
 
     <span class="kw">let</span> <span class="ident">old_block</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">layout</span>.<span class="ident">pp_block</span>(<span class="ident">inst</span>);
@@ -2641,7 +2641,7 @@
     <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">attach_block_param</span>(<span class="ident">done</span>, <span class="ident">result</span>);
 
     <span class="comment">// If x as a signed int is not negative, we can use the existing `fcvt_from_sint` instruction.</span>
-    <span class="kw">let</span> <span class="ident">is_neg</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">icmp_imm</span>(<span class="ident">IntCC</span>::<span class="ident">SignedLessThan</span>, <span class="ident">x</span>, <span class="number">0</span>);
+    <span class="kw">let</span> <span class="ident">is_neg</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">icmp_imm</span>(<span class="ident">IntCC::SignedLessThan</span>, <span class="ident">x</span>, <span class="number">0</span>);
     <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">brnz</span>(<span class="ident">is_neg</span>, <span class="ident">neg_block</span>, <span class="kw-2">&amp;</span>[]);
     <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">jump</span>(<span class="ident">poszero_block</span>, <span class="kw-2">&amp;</span>[]);
 
@@ -2680,25 +2680,25 @@
 <span class="doccomment">/// groups are set up; TODO if we change the SIMD legalization groups, then this logic could be</span>
 <span class="doccomment">/// merged into [expand_fcvt_from_uint] (see https://github.com/bytecodealliance/wasmtime/issues/1745).</span>
 <span class="kw">fn</span> <span class="ident">expand_fcvt_from_uint_vector</span>(
-    <span class="ident">inst</span>: <span class="ident">ir</span>::<span class="ident">Inst</span>,
-    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir</span>::<span class="ident">Function</span>,
+    <span class="ident">inst</span>: <span class="ident">ir::Inst</span>,
+    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir::Function</span>,
     <span class="ident">_cfg</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ControlFlowGraph</span>,
-    <span class="ident">isa</span>: <span class="kw-2">&amp;</span><span class="ident">dyn</span> <span class="ident">TargetIsa</span>,
+    <span class="ident">isa</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">TargetIsa</span>,
 ) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor</span>::<span class="ident">new</span>(<span class="ident">func</span>).<span class="ident">at_inst</span>(<span class="ident">inst</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor::new</span>(<span class="ident">func</span>).<span class="ident">at_inst</span>(<span class="ident">inst</span>);
     <span class="ident">pos</span>.<span class="ident">use_srcloc</span>(<span class="ident">inst</span>);
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ir</span>::<span class="ident">InstructionData</span>::<span class="ident">Unary</span> {
-        <span class="ident">opcode</span>: <span class="ident">ir</span>::<span class="ident">Opcode</span>::<span class="ident">FcvtFromUint</span>,
+    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ir::InstructionData::Unary</span> {
+        <span class="ident">opcode</span>: <span class="ident">ir::Opcode::FcvtFromUint</span>,
         <span class="ident">arg</span>,
     } <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>[<span class="ident">inst</span>]
     {
         <span class="kw">let</span> <span class="ident">controlling_type</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">ctrl_typevar</span>(<span class="ident">inst</span>);
         <span class="kw">if</span> <span class="ident">controlling_type</span> <span class="op">=</span><span class="op">=</span> <span class="ident">F32X4</span> {
-            <span class="macro">debug_assert_eq</span><span class="macro">!</span>(<span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">value_type</span>(<span class="ident">arg</span>), <span class="ident">I32X4</span>);
+            <span class="macro">debug_assert_eq!</span>(<span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">value_type</span>(<span class="ident">arg</span>), <span class="ident">I32X4</span>);
             <span class="kw">let</span> <span class="ident">x86_isa</span> <span class="op">=</span> <span class="ident">isa</span>
                 .<span class="ident">as_any</span>()
-                .<span class="ident">downcast_ref</span>::<span class="op">&lt;</span><span class="ident">isa</span>::<span class="ident">x86</span>::<span class="ident">Isa</span><span class="op">&gt;</span>()
+                .<span class="ident">downcast_ref</span>::<span class="op">&lt;</span><span class="ident">isa::x86::Isa</span><span class="op">&gt;</span>()
                 .<span class="ident">expect</span>(<span class="string">&quot;the target ISA must be x86 at this point&quot;</span>);
             <span class="kw">if</span> <span class="ident">x86_isa</span>.<span class="ident">isa_flags</span>.<span class="ident">use_avx512vl_simd</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">x86_isa</span>.<span class="ident">isa_flags</span>.<span class="ident">use_avx512f_simd</span>() {
                 <span class="comment">// If we have certain AVX512 features, we can lower this instruction simply.</span>
@@ -2707,7 +2707,7 @@
                 <span class="comment">// Otherwise, we default to a very lengthy SSE4.1-compatible sequence: PXOR,</span>
                 <span class="comment">// PBLENDW, PSUB, CVTDQ2PS, PSRLD, CVTDQ2PS, ADDPS, ADDPS</span>
                 <span class="kw">let</span> <span class="ident">bitcast_arg</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">raw_bitcast</span>(<span class="ident">I16X8</span>, <span class="ident">arg</span>);
-                <span class="kw">let</span> <span class="ident">zero_constant</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">constants</span>.<span class="ident">insert</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="number">0</span>; <span class="number">16</span>].<span class="ident">into</span>());
+                <span class="kw">let</span> <span class="ident">zero_constant</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">constants</span>.<span class="ident">insert</span>(<span class="macro">vec!</span>[<span class="number">0</span>; <span class="number">16</span>].<span class="ident">into</span>());
                 <span class="kw">let</span> <span class="ident">zero</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">vconst</span>(<span class="ident">I16X8</span>, <span class="ident">zero_constant</span>);
                 <span class="kw">let</span> <span class="ident">low</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">x86_pblendw</span>(<span class="ident">zero</span>, <span class="ident">bitcast_arg</span>, <span class="number">0x55</span>);
                 <span class="kw">let</span> <span class="ident">bitcast_low</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">raw_bitcast</span>(<span class="ident">I32X4</span>, <span class="ident">low</span>);
@@ -2719,25 +2719,25 @@
                 <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">replace</span>(<span class="ident">inst</span>).<span class="ident">fadd</span>(<span class="ident">double_high</span>, <span class="ident">convert_low</span>);
             }
         } <span class="kw">else</span> {
-            <span class="macro">unimplemented</span><span class="macro">!</span>(<span class="string">&quot;cannot legalize {}&quot;</span>, <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">display_inst</span>(<span class="ident">inst</span>, <span class="prelude-val">None</span>))
+            <span class="macro">unimplemented!</span>(<span class="string">&quot;cannot legalize {}&quot;</span>, <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">display_inst</span>(<span class="ident">inst</span>, <span class="prelude-val">None</span>))
         }
     }
 }
 
 <span class="kw">fn</span> <span class="ident">expand_fcvt_to_sint</span>(
-    <span class="ident">inst</span>: <span class="ident">ir</span>::<span class="ident">Inst</span>,
-    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir</span>::<span class="ident">Function</span>,
+    <span class="ident">inst</span>: <span class="ident">ir::Inst</span>,
+    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir::Function</span>,
     <span class="ident">cfg</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ControlFlowGraph</span>,
-    <span class="ident">_isa</span>: <span class="kw-2">&amp;</span><span class="ident">dyn</span> <span class="ident">TargetIsa</span>,
+    <span class="ident">_isa</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">TargetIsa</span>,
 ) {
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">ir</span>::<span class="ident">immediates</span>::{<span class="ident">Ieee32</span>, <span class="ident">Ieee64</span>};
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::ir::immediates</span>::{<span class="ident">Ieee32</span>, <span class="ident">Ieee64</span>};
 
     <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">func</span>.<span class="ident">dfg</span>[<span class="ident">inst</span>] {
-        <span class="ident">ir</span>::<span class="ident">InstructionData</span>::<span class="ident">Unary</span> {
-            <span class="ident">opcode</span>: <span class="ident">ir</span>::<span class="ident">Opcode</span>::<span class="ident">FcvtToSint</span>,
+        <span class="ident">ir::InstructionData::Unary</span> {
+            <span class="ident">opcode</span>: <span class="ident">ir::Opcode::FcvtToSint</span>,
             <span class="ident">arg</span>,
         } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">arg</span>,
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Need fcvt_to_sint: {}&quot;</span>, <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">display_inst</span>(<span class="ident">inst</span>, <span class="prelude-val">None</span>)),
+        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Need fcvt_to_sint: {}&quot;</span>, <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">display_inst</span>(<span class="ident">inst</span>, <span class="prelude-val">None</span>)),
     };
     <span class="kw">let</span> <span class="ident">old_block</span> <span class="op">=</span> <span class="ident">func</span>.<span class="ident">layout</span>.<span class="ident">pp_block</span>(<span class="ident">inst</span>);
     <span class="kw">let</span> <span class="ident">xty</span> <span class="op">=</span> <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">value_type</span>(<span class="ident">x</span>);
@@ -2754,12 +2754,12 @@
     <span class="comment">// It produces an INT_MIN result instead.</span>
     <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">replace</span>(<span class="ident">inst</span>).<span class="ident">x86_cvtt2si</span>(<span class="ident">ty</span>, <span class="ident">x</span>);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor</span>::<span class="ident">new</span>(<span class="ident">func</span>).<span class="ident">after_inst</span>(<span class="ident">inst</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor::new</span>(<span class="ident">func</span>).<span class="ident">after_inst</span>(<span class="ident">inst</span>);
     <span class="ident">pos</span>.<span class="ident">use_srcloc</span>(<span class="ident">inst</span>);
 
     <span class="kw">let</span> <span class="ident">is_done</span> <span class="op">=</span> <span class="ident">pos</span>
         .<span class="ident">ins</span>()
-        .<span class="ident">icmp_imm</span>(<span class="ident">IntCC</span>::<span class="ident">NotEqual</span>, <span class="ident">result</span>, <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="ident">ty</span>.<span class="ident">lane_bits</span>() <span class="op">-</span> <span class="number">1</span>));
+        .<span class="ident">icmp_imm</span>(<span class="ident">IntCC::NotEqual</span>, <span class="ident">result</span>, <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="ident">ty</span>.<span class="ident">lane_bits</span>() <span class="op">-</span> <span class="number">1</span>));
     <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">brnz</span>(<span class="ident">is_done</span>, <span class="ident">done</span>, <span class="kw-2">&amp;</span>[]);
     <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">jump</span>(<span class="ident">maybe_trap_block</span>, <span class="kw-2">&amp;</span>[]);
 
@@ -2772,50 +2772,50 @@
     <span class="ident">pos</span>.<span class="ident">insert_block</span>(<span class="ident">maybe_trap_block</span>);
 
     <span class="comment">// Check for NaN.</span>
-    <span class="kw">let</span> <span class="ident">is_nan</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">fcmp</span>(<span class="ident">FloatCC</span>::<span class="ident">Unordered</span>, <span class="ident">x</span>, <span class="ident">x</span>);
+    <span class="kw">let</span> <span class="ident">is_nan</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">fcmp</span>(<span class="ident">FloatCC::Unordered</span>, <span class="ident">x</span>, <span class="ident">x</span>);
     <span class="ident">pos</span>.<span class="ident">ins</span>()
-        .<span class="ident">trapnz</span>(<span class="ident">is_nan</span>, <span class="ident">ir</span>::<span class="ident">TrapCode</span>::<span class="ident">BadConversionToInteger</span>);
+        .<span class="ident">trapnz</span>(<span class="ident">is_nan</span>, <span class="ident">ir::TrapCode::BadConversionToInteger</span>);
 
     <span class="comment">// Check for case 1: INT_MIN is the correct result.</span>
     <span class="comment">// Determine the smallest floating point number that would convert to INT_MIN.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">overflow_cc</span> <span class="op">=</span> <span class="ident">FloatCC</span>::<span class="ident">LessThan</span>;
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">overflow_cc</span> <span class="op">=</span> <span class="ident">FloatCC::LessThan</span>;
     <span class="kw">let</span> <span class="ident">output_bits</span> <span class="op">=</span> <span class="ident">ty</span>.<span class="ident">lane_bits</span>();
     <span class="kw">let</span> <span class="ident">flimit</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">xty</span> {
-        <span class="ident">ir</span>::<span class="ident">types</span>::<span class="ident">F32</span> <span class="op">=</span><span class="op">&gt;</span>
+        <span class="ident">ir::types::F32</span> <span class="op">=</span><span class="op">&gt;</span>
         <span class="comment">// An f32 can represent `i16::min_value() - 1` exactly with precision to spare, so</span>
         <span class="comment">// there are values less than -2^(N-1) that convert correctly to INT_MIN.</span>
         {
             <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">f32const</span>(<span class="kw">if</span> <span class="ident">output_bits</span> <span class="op">&lt;</span> <span class="number">32</span> {
-                <span class="ident">overflow_cc</span> <span class="op">=</span> <span class="ident">FloatCC</span>::<span class="ident">LessThanOrEqual</span>;
-                <span class="ident">Ieee32</span>::<span class="ident">fcvt_to_sint_negative_overflow</span>(<span class="ident">output_bits</span>)
+                <span class="ident">overflow_cc</span> <span class="op">=</span> <span class="ident">FloatCC::LessThanOrEqual</span>;
+                <span class="ident">Ieee32::fcvt_to_sint_negative_overflow</span>(<span class="ident">output_bits</span>)
             } <span class="kw">else</span> {
-                <span class="ident">Ieee32</span>::<span class="ident">pow2</span>(<span class="ident">output_bits</span> <span class="op">-</span> <span class="number">1</span>).<span class="ident">neg</span>()
+                <span class="ident">Ieee32::pow2</span>(<span class="ident">output_bits</span> <span class="op">-</span> <span class="number">1</span>).<span class="ident">neg</span>()
             })
         }
-        <span class="ident">ir</span>::<span class="ident">types</span>::<span class="ident">F64</span> <span class="op">=</span><span class="op">&gt;</span>
+        <span class="ident">ir::types::F64</span> <span class="op">=</span><span class="op">&gt;</span>
         <span class="comment">// An f64 can represent `i32::min_value() - 1` exactly with precision to spare, so</span>
         <span class="comment">// there are values less than -2^(N-1) that convert correctly to INT_MIN.</span>
         {
             <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">f64const</span>(<span class="kw">if</span> <span class="ident">output_bits</span> <span class="op">&lt;</span> <span class="number">64</span> {
-                <span class="ident">overflow_cc</span> <span class="op">=</span> <span class="ident">FloatCC</span>::<span class="ident">LessThanOrEqual</span>;
-                <span class="ident">Ieee64</span>::<span class="ident">fcvt_to_sint_negative_overflow</span>(<span class="ident">output_bits</span>)
+                <span class="ident">overflow_cc</span> <span class="op">=</span> <span class="ident">FloatCC::LessThanOrEqual</span>;
+                <span class="ident">Ieee64::fcvt_to_sint_negative_overflow</span>(<span class="ident">output_bits</span>)
             } <span class="kw">else</span> {
-                <span class="ident">Ieee64</span>::<span class="ident">pow2</span>(<span class="ident">output_bits</span> <span class="op">-</span> <span class="number">1</span>).<span class="ident">neg</span>()
+                <span class="ident">Ieee64::pow2</span>(<span class="ident">output_bits</span> <span class="op">-</span> <span class="number">1</span>).<span class="ident">neg</span>()
             })
         }
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Can&#39;t convert {}&quot;</span>, <span class="ident">xty</span>),
+        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Can&#39;t convert {}&quot;</span>, <span class="ident">xty</span>),
     };
     <span class="kw">let</span> <span class="ident">overflow</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">fcmp</span>(<span class="ident">overflow_cc</span>, <span class="ident">x</span>, <span class="ident">flimit</span>);
-    <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">trapnz</span>(<span class="ident">overflow</span>, <span class="ident">ir</span>::<span class="ident">TrapCode</span>::<span class="ident">IntegerOverflow</span>);
+    <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">trapnz</span>(<span class="ident">overflow</span>, <span class="ident">ir::TrapCode::IntegerOverflow</span>);
 
     <span class="comment">// Finally, we could have a positive value that is too large.</span>
     <span class="kw">let</span> <span class="ident">fzero</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">xty</span> {
-        <span class="ident">ir</span>::<span class="ident">types</span>::<span class="ident">F32</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">f32const</span>(<span class="ident">Ieee32</span>::<span class="ident">with_bits</span>(<span class="number">0</span>)),
-        <span class="ident">ir</span>::<span class="ident">types</span>::<span class="ident">F64</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">f64const</span>(<span class="ident">Ieee64</span>::<span class="ident">with_bits</span>(<span class="number">0</span>)),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Can&#39;t convert {}&quot;</span>, <span class="ident">xty</span>),
+        <span class="ident">ir::types::F32</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">f32const</span>(<span class="ident">Ieee32::with_bits</span>(<span class="number">0</span>)),
+        <span class="ident">ir::types::F64</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">f64const</span>(<span class="ident">Ieee64::with_bits</span>(<span class="number">0</span>)),
+        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Can&#39;t convert {}&quot;</span>, <span class="ident">xty</span>),
     };
-    <span class="kw">let</span> <span class="ident">overflow</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">fcmp</span>(<span class="ident">FloatCC</span>::<span class="ident">GreaterThanOrEqual</span>, <span class="ident">x</span>, <span class="ident">fzero</span>);
-    <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">trapnz</span>(<span class="ident">overflow</span>, <span class="ident">ir</span>::<span class="ident">TrapCode</span>::<span class="ident">IntegerOverflow</span>);
+    <span class="kw">let</span> <span class="ident">overflow</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">fcmp</span>(<span class="ident">FloatCC::GreaterThanOrEqual</span>, <span class="ident">x</span>, <span class="ident">fzero</span>);
+    <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">trapnz</span>(<span class="ident">overflow</span>, <span class="ident">ir::TrapCode::IntegerOverflow</span>);
 
     <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">jump</span>(<span class="ident">done</span>, <span class="kw-2">&amp;</span>[]);
     <span class="ident">pos</span>.<span class="ident">insert_block</span>(<span class="ident">done</span>);
@@ -2826,19 +2826,19 @@
 }
 
 <span class="kw">fn</span> <span class="ident">expand_fcvt_to_sint_sat</span>(
-    <span class="ident">inst</span>: <span class="ident">ir</span>::<span class="ident">Inst</span>,
-    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir</span>::<span class="ident">Function</span>,
+    <span class="ident">inst</span>: <span class="ident">ir::Inst</span>,
+    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir::Function</span>,
     <span class="ident">cfg</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ControlFlowGraph</span>,
-    <span class="ident">_isa</span>: <span class="kw-2">&amp;</span><span class="ident">dyn</span> <span class="ident">TargetIsa</span>,
+    <span class="ident">_isa</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">TargetIsa</span>,
 ) {
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">ir</span>::<span class="ident">immediates</span>::{<span class="ident">Ieee32</span>, <span class="ident">Ieee64</span>};
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::ir::immediates</span>::{<span class="ident">Ieee32</span>, <span class="ident">Ieee64</span>};
 
     <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">func</span>.<span class="ident">dfg</span>[<span class="ident">inst</span>] {
-        <span class="ident">ir</span>::<span class="ident">InstructionData</span>::<span class="ident">Unary</span> {
-            <span class="ident">opcode</span>: <span class="ident">ir</span>::<span class="ident">Opcode</span>::<span class="ident">FcvtToSintSat</span>,
+        <span class="ident">ir::InstructionData::Unary</span> {
+            <span class="ident">opcode</span>: <span class="ident">ir::Opcode::FcvtToSintSat</span>,
             <span class="ident">arg</span>,
         } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">arg</span>,
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(
+        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(
             <span class="string">&quot;Need fcvt_to_sint_sat: {}&quot;</span>,
             <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">display_inst</span>(<span class="ident">inst</span>, <span class="prelude-val">None</span>)
         ),
@@ -2857,7 +2857,7 @@
     <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">clear_results</span>(<span class="ident">inst</span>);
     <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">attach_block_param</span>(<span class="ident">done_block</span>, <span class="ident">result</span>);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor</span>::<span class="ident">new</span>(<span class="ident">func</span>).<span class="ident">at_inst</span>(<span class="ident">inst</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor::new</span>(<span class="ident">func</span>).<span class="ident">at_inst</span>(<span class="ident">inst</span>);
     <span class="ident">pos</span>.<span class="ident">use_srcloc</span>(<span class="ident">inst</span>);
 
     <span class="comment">// The `x86_cvtt2si` performs the desired conversion, but it doesn&#39;t trap on NaN or</span>
@@ -2866,7 +2866,7 @@
 
     <span class="kw">let</span> <span class="ident">is_done</span> <span class="op">=</span> <span class="ident">pos</span>
         .<span class="ident">ins</span>()
-        .<span class="ident">icmp_imm</span>(<span class="ident">IntCC</span>::<span class="ident">NotEqual</span>, <span class="ident">cvtt2si</span>, <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="ident">ty</span>.<span class="ident">lane_bits</span>() <span class="op">-</span> <span class="number">1</span>));
+        .<span class="ident">icmp_imm</span>(<span class="ident">IntCC::NotEqual</span>, <span class="ident">cvtt2si</span>, <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="ident">ty</span>.<span class="ident">lane_bits</span>() <span class="op">-</span> <span class="number">1</span>));
     <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">brnz</span>(<span class="ident">is_done</span>, <span class="ident">done_block</span>, <span class="kw-2">&amp;</span>[<span class="ident">cvtt2si</span>]);
     <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">jump</span>(<span class="ident">intmin_block</span>, <span class="kw-2">&amp;</span>[]);
 
@@ -2879,46 +2879,46 @@
 
     <span class="comment">// Check for NaN, which is truncated to 0.</span>
     <span class="kw">let</span> <span class="ident">zero</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">iconst</span>(<span class="ident">ty</span>, <span class="number">0</span>);
-    <span class="kw">let</span> <span class="ident">is_nan</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">fcmp</span>(<span class="ident">FloatCC</span>::<span class="ident">Unordered</span>, <span class="ident">x</span>, <span class="ident">x</span>);
+    <span class="kw">let</span> <span class="ident">is_nan</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">fcmp</span>(<span class="ident">FloatCC::Unordered</span>, <span class="ident">x</span>, <span class="ident">x</span>);
     <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">brnz</span>(<span class="ident">is_nan</span>, <span class="ident">done_block</span>, <span class="kw-2">&amp;</span>[<span class="ident">zero</span>]);
     <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">jump</span>(<span class="ident">minsat_block</span>, <span class="kw-2">&amp;</span>[]);
 
     <span class="comment">// Check for case 1: INT_MIN is the correct result.</span>
     <span class="comment">// Determine the smallest floating point number that would convert to INT_MIN.</span>
     <span class="ident">pos</span>.<span class="ident">insert_block</span>(<span class="ident">minsat_block</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">overflow_cc</span> <span class="op">=</span> <span class="ident">FloatCC</span>::<span class="ident">LessThan</span>;
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">overflow_cc</span> <span class="op">=</span> <span class="ident">FloatCC::LessThan</span>;
     <span class="kw">let</span> <span class="ident">output_bits</span> <span class="op">=</span> <span class="ident">ty</span>.<span class="ident">lane_bits</span>();
     <span class="kw">let</span> <span class="ident">flimit</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">xty</span> {
-        <span class="ident">ir</span>::<span class="ident">types</span>::<span class="ident">F32</span> <span class="op">=</span><span class="op">&gt;</span>
+        <span class="ident">ir::types::F32</span> <span class="op">=</span><span class="op">&gt;</span>
         <span class="comment">// An f32 can represent `i16::min_value() - 1` exactly with precision to spare, so</span>
         <span class="comment">// there are values less than -2^(N-1) that convert correctly to INT_MIN.</span>
         {
             <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">f32const</span>(<span class="kw">if</span> <span class="ident">output_bits</span> <span class="op">&lt;</span> <span class="number">32</span> {
-                <span class="ident">overflow_cc</span> <span class="op">=</span> <span class="ident">FloatCC</span>::<span class="ident">LessThanOrEqual</span>;
-                <span class="ident">Ieee32</span>::<span class="ident">fcvt_to_sint_negative_overflow</span>(<span class="ident">output_bits</span>)
+                <span class="ident">overflow_cc</span> <span class="op">=</span> <span class="ident">FloatCC::LessThanOrEqual</span>;
+                <span class="ident">Ieee32::fcvt_to_sint_negative_overflow</span>(<span class="ident">output_bits</span>)
             } <span class="kw">else</span> {
-                <span class="ident">Ieee32</span>::<span class="ident">pow2</span>(<span class="ident">output_bits</span> <span class="op">-</span> <span class="number">1</span>).<span class="ident">neg</span>()
+                <span class="ident">Ieee32::pow2</span>(<span class="ident">output_bits</span> <span class="op">-</span> <span class="number">1</span>).<span class="ident">neg</span>()
             })
         }
-        <span class="ident">ir</span>::<span class="ident">types</span>::<span class="ident">F64</span> <span class="op">=</span><span class="op">&gt;</span>
+        <span class="ident">ir::types::F64</span> <span class="op">=</span><span class="op">&gt;</span>
         <span class="comment">// An f64 can represent `i32::min_value() - 1` exactly with precision to spare, so</span>
         <span class="comment">// there are values less than -2^(N-1) that convert correctly to INT_MIN.</span>
         {
             <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">f64const</span>(<span class="kw">if</span> <span class="ident">output_bits</span> <span class="op">&lt;</span> <span class="number">64</span> {
-                <span class="ident">overflow_cc</span> <span class="op">=</span> <span class="ident">FloatCC</span>::<span class="ident">LessThanOrEqual</span>;
-                <span class="ident">Ieee64</span>::<span class="ident">fcvt_to_sint_negative_overflow</span>(<span class="ident">output_bits</span>)
+                <span class="ident">overflow_cc</span> <span class="op">=</span> <span class="ident">FloatCC::LessThanOrEqual</span>;
+                <span class="ident">Ieee64::fcvt_to_sint_negative_overflow</span>(<span class="ident">output_bits</span>)
             } <span class="kw">else</span> {
-                <span class="ident">Ieee64</span>::<span class="ident">pow2</span>(<span class="ident">output_bits</span> <span class="op">-</span> <span class="number">1</span>).<span class="ident">neg</span>()
+                <span class="ident">Ieee64::pow2</span>(<span class="ident">output_bits</span> <span class="op">-</span> <span class="number">1</span>).<span class="ident">neg</span>()
             })
         }
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Can&#39;t convert {}&quot;</span>, <span class="ident">xty</span>),
+        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Can&#39;t convert {}&quot;</span>, <span class="ident">xty</span>),
     };
 
     <span class="kw">let</span> <span class="ident">overflow</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">fcmp</span>(<span class="ident">overflow_cc</span>, <span class="ident">x</span>, <span class="ident">flimit</span>);
     <span class="kw">let</span> <span class="ident">min_imm</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ty</span> {
-        <span class="ident">ir</span>::<span class="ident">types</span>::<span class="ident">I32</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i32</span>::<span class="ident">min_value</span>() <span class="kw">as</span> <span class="ident">i64</span>,
-        <span class="ident">ir</span>::<span class="ident">types</span>::<span class="ident">I64</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i64</span>::<span class="ident">min_value</span>(),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Don&#39;t know the min value for {}&quot;</span>, <span class="ident">ty</span>),
+        <span class="ident">ir::types::I32</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i32::min_value</span>() <span class="kw">as</span> <span class="ident">i64</span>,
+        <span class="ident">ir::types::I64</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i64::min_value</span>(),
+        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Don&#39;t know the min value for {}&quot;</span>, <span class="ident">ty</span>),
     };
     <span class="kw">let</span> <span class="ident">min_value</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">iconst</span>(<span class="ident">ty</span>, <span class="ident">min_imm</span>);
     <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">brnz</span>(<span class="ident">overflow</span>, <span class="ident">done_block</span>, <span class="kw-2">&amp;</span>[<span class="ident">min_value</span>]);
@@ -2927,19 +2927,19 @@
     <span class="comment">// Finally, we could have a positive value that is too large.</span>
     <span class="ident">pos</span>.<span class="ident">insert_block</span>(<span class="ident">maxsat_block</span>);
     <span class="kw">let</span> <span class="ident">fzero</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">xty</span> {
-        <span class="ident">ir</span>::<span class="ident">types</span>::<span class="ident">F32</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">f32const</span>(<span class="ident">Ieee32</span>::<span class="ident">with_bits</span>(<span class="number">0</span>)),
-        <span class="ident">ir</span>::<span class="ident">types</span>::<span class="ident">F64</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">f64const</span>(<span class="ident">Ieee64</span>::<span class="ident">with_bits</span>(<span class="number">0</span>)),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Can&#39;t convert {}&quot;</span>, <span class="ident">xty</span>),
+        <span class="ident">ir::types::F32</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">f32const</span>(<span class="ident">Ieee32::with_bits</span>(<span class="number">0</span>)),
+        <span class="ident">ir::types::F64</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">f64const</span>(<span class="ident">Ieee64::with_bits</span>(<span class="number">0</span>)),
+        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Can&#39;t convert {}&quot;</span>, <span class="ident">xty</span>),
     };
 
     <span class="kw">let</span> <span class="ident">max_imm</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ty</span> {
-        <span class="ident">ir</span>::<span class="ident">types</span>::<span class="ident">I32</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i32</span>::<span class="ident">max_value</span>() <span class="kw">as</span> <span class="ident">i64</span>,
-        <span class="ident">ir</span>::<span class="ident">types</span>::<span class="ident">I64</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i64</span>::<span class="ident">max_value</span>(),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Don&#39;t know the max value for {}&quot;</span>, <span class="ident">ty</span>),
+        <span class="ident">ir::types::I32</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i32::max_value</span>() <span class="kw">as</span> <span class="ident">i64</span>,
+        <span class="ident">ir::types::I64</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i64::max_value</span>(),
+        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Don&#39;t know the max value for {}&quot;</span>, <span class="ident">ty</span>),
     };
     <span class="kw">let</span> <span class="ident">max_value</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">iconst</span>(<span class="ident">ty</span>, <span class="ident">max_imm</span>);
 
-    <span class="kw">let</span> <span class="ident">overflow</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">fcmp</span>(<span class="ident">FloatCC</span>::<span class="ident">GreaterThanOrEqual</span>, <span class="ident">x</span>, <span class="ident">fzero</span>);
+    <span class="kw">let</span> <span class="ident">overflow</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">fcmp</span>(<span class="ident">FloatCC::GreaterThanOrEqual</span>, <span class="ident">x</span>, <span class="ident">fzero</span>);
     <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">brnz</span>(<span class="ident">overflow</span>, <span class="ident">done_block</span>, <span class="kw-2">&amp;</span>[<span class="ident">max_value</span>]);
 
     <span class="comment">// Recycle the original instruction.</span>
@@ -2962,29 +2962,29 @@
 <span class="doccomment">/// the SIMD legalization groups, then this logic could be merged into [expand_fcvt_to_sint_sat]</span>
 <span class="doccomment">/// (see https://github.com/bytecodealliance/wasmtime/issues/1745).</span>
 <span class="kw">fn</span> <span class="ident">expand_fcvt_to_sint_sat_vector</span>(
-    <span class="ident">inst</span>: <span class="ident">ir</span>::<span class="ident">Inst</span>,
-    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir</span>::<span class="ident">Function</span>,
+    <span class="ident">inst</span>: <span class="ident">ir::Inst</span>,
+    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir::Function</span>,
     <span class="ident">_cfg</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ControlFlowGraph</span>,
-    <span class="ident">_isa</span>: <span class="kw-2">&amp;</span><span class="ident">dyn</span> <span class="ident">TargetIsa</span>,
+    <span class="ident">_isa</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">TargetIsa</span>,
 ) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor</span>::<span class="ident">new</span>(<span class="ident">func</span>).<span class="ident">at_inst</span>(<span class="ident">inst</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor::new</span>(<span class="ident">func</span>).<span class="ident">at_inst</span>(<span class="ident">inst</span>);
     <span class="ident">pos</span>.<span class="ident">use_srcloc</span>(<span class="ident">inst</span>);
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ir</span>::<span class="ident">InstructionData</span>::<span class="ident">Unary</span> {
-        <span class="ident">opcode</span>: <span class="ident">ir</span>::<span class="ident">Opcode</span>::<span class="ident">FcvtToSintSat</span>,
+    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ir::InstructionData::Unary</span> {
+        <span class="ident">opcode</span>: <span class="ident">ir::Opcode::FcvtToSintSat</span>,
         <span class="ident">arg</span>,
     } <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>[<span class="ident">inst</span>]
     {
         <span class="kw">let</span> <span class="ident">controlling_type</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">ctrl_typevar</span>(<span class="ident">inst</span>);
         <span class="kw">if</span> <span class="ident">controlling_type</span> <span class="op">=</span><span class="op">=</span> <span class="ident">I32X4</span> {
-            <span class="macro">debug_assert_eq</span><span class="macro">!</span>(<span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">value_type</span>(<span class="ident">arg</span>), <span class="ident">F32X4</span>);
+            <span class="macro">debug_assert_eq!</span>(<span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">value_type</span>(<span class="ident">arg</span>), <span class="ident">F32X4</span>);
             <span class="comment">// We must both quiet any NaNs--setting that lane to 0--and saturate any</span>
             <span class="comment">// lanes that might overflow during conversion to the highest/lowest signed integer</span>
             <span class="comment">// allowed in that lane.</span>
 
             <span class="comment">// Saturate NaNs: `fcmp eq` will not match if a lane contains a NaN. We use ANDPS to</span>
             <span class="comment">// avoid doing the comparison twice (we need the zeroed lanes to find differences).</span>
-            <span class="kw">let</span> <span class="ident">zeroed_nans</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">fcmp</span>(<span class="ident">FloatCC</span>::<span class="ident">Equal</span>, <span class="ident">arg</span>, <span class="ident">arg</span>);
+            <span class="kw">let</span> <span class="ident">zeroed_nans</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">fcmp</span>(<span class="ident">FloatCC::Equal</span>, <span class="ident">arg</span>, <span class="ident">arg</span>);
             <span class="kw">let</span> <span class="ident">zeroed_nans_bitcast</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">raw_bitcast</span>(<span class="ident">F32X4</span>, <span class="ident">zeroed_nans</span>);
             <span class="kw">let</span> <span class="ident">zeroed_nans_copy</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">band</span>(<span class="ident">arg</span>, <span class="ident">zeroed_nans_bitcast</span>);
 
@@ -3006,25 +3006,25 @@
             <span class="comment">// cases) has no effect.</span>
             <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">replace</span>(<span class="ident">inst</span>).<span class="ident">bxor</span>(<span class="ident">converted</span>, <span class="ident">mask</span>);
         } <span class="kw">else</span> {
-            <span class="macro">unimplemented</span><span class="macro">!</span>(<span class="string">&quot;cannot legalize {}&quot;</span>, <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">display_inst</span>(<span class="ident">inst</span>, <span class="prelude-val">None</span>))
+            <span class="macro">unimplemented!</span>(<span class="string">&quot;cannot legalize {}&quot;</span>, <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">display_inst</span>(<span class="ident">inst</span>, <span class="prelude-val">None</span>))
         }
     }
 }
 
 <span class="kw">fn</span> <span class="ident">expand_fcvt_to_uint</span>(
-    <span class="ident">inst</span>: <span class="ident">ir</span>::<span class="ident">Inst</span>,
-    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir</span>::<span class="ident">Function</span>,
+    <span class="ident">inst</span>: <span class="ident">ir::Inst</span>,
+    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir::Function</span>,
     <span class="ident">cfg</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ControlFlowGraph</span>,
-    <span class="ident">_isa</span>: <span class="kw-2">&amp;</span><span class="ident">dyn</span> <span class="ident">TargetIsa</span>,
+    <span class="ident">_isa</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">TargetIsa</span>,
 ) {
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">ir</span>::<span class="ident">immediates</span>::{<span class="ident">Ieee32</span>, <span class="ident">Ieee64</span>};
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::ir::immediates</span>::{<span class="ident">Ieee32</span>, <span class="ident">Ieee64</span>};
 
     <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">func</span>.<span class="ident">dfg</span>[<span class="ident">inst</span>] {
-        <span class="ident">ir</span>::<span class="ident">InstructionData</span>::<span class="ident">Unary</span> {
-            <span class="ident">opcode</span>: <span class="ident">ir</span>::<span class="ident">Opcode</span>::<span class="ident">FcvtToUint</span>,
+        <span class="ident">ir::InstructionData::Unary</span> {
+            <span class="ident">opcode</span>: <span class="ident">ir::Opcode::FcvtToUint</span>,
             <span class="ident">arg</span>,
         } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">arg</span>,
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Need fcvt_to_uint: {}&quot;</span>, <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">display_inst</span>(<span class="ident">inst</span>, <span class="prelude-val">None</span>)),
+        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Need fcvt_to_uint: {}&quot;</span>, <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">display_inst</span>(<span class="ident">inst</span>, <span class="prelude-val">None</span>)),
     };
 
     <span class="kw">let</span> <span class="ident">old_block</span> <span class="op">=</span> <span class="ident">func</span>.<span class="ident">layout</span>.<span class="ident">pp_block</span>(<span class="ident">inst</span>);
@@ -3048,39 +3048,39 @@
     <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">clear_results</span>(<span class="ident">inst</span>);
     <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">attach_block_param</span>(<span class="ident">done</span>, <span class="ident">result</span>);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor</span>::<span class="ident">new</span>(<span class="ident">func</span>).<span class="ident">at_inst</span>(<span class="ident">inst</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor::new</span>(<span class="ident">func</span>).<span class="ident">at_inst</span>(<span class="ident">inst</span>);
     <span class="ident">pos</span>.<span class="ident">use_srcloc</span>(<span class="ident">inst</span>);
 
     <span class="comment">// Start by materializing the floating point constant 2^(N-1) where N is the number of bits in</span>
     <span class="comment">// the destination integer type.</span>
     <span class="kw">let</span> <span class="ident">pow2nm1</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">xty</span> {
-        <span class="ident">ir</span>::<span class="ident">types</span>::<span class="ident">F32</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">f32const</span>(<span class="ident">Ieee32</span>::<span class="ident">pow2</span>(<span class="ident">ty</span>.<span class="ident">lane_bits</span>() <span class="op">-</span> <span class="number">1</span>)),
-        <span class="ident">ir</span>::<span class="ident">types</span>::<span class="ident">F64</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">f64const</span>(<span class="ident">Ieee64</span>::<span class="ident">pow2</span>(<span class="ident">ty</span>.<span class="ident">lane_bits</span>() <span class="op">-</span> <span class="number">1</span>)),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Can&#39;t convert {}&quot;</span>, <span class="ident">xty</span>),
+        <span class="ident">ir::types::F32</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">f32const</span>(<span class="ident">Ieee32::pow2</span>(<span class="ident">ty</span>.<span class="ident">lane_bits</span>() <span class="op">-</span> <span class="number">1</span>)),
+        <span class="ident">ir::types::F64</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">f64const</span>(<span class="ident">Ieee64::pow2</span>(<span class="ident">ty</span>.<span class="ident">lane_bits</span>() <span class="op">-</span> <span class="number">1</span>)),
+        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Can&#39;t convert {}&quot;</span>, <span class="ident">xty</span>),
     };
     <span class="kw">let</span> <span class="ident">is_large</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">ffcmp</span>(<span class="ident">x</span>, <span class="ident">pow2nm1</span>);
     <span class="ident">pos</span>.<span class="ident">ins</span>()
-        .<span class="ident">brff</span>(<span class="ident">FloatCC</span>::<span class="ident">GreaterThanOrEqual</span>, <span class="ident">is_large</span>, <span class="ident">large</span>, <span class="kw-2">&amp;</span>[]);
+        .<span class="ident">brff</span>(<span class="ident">FloatCC::GreaterThanOrEqual</span>, <span class="ident">is_large</span>, <span class="ident">large</span>, <span class="kw-2">&amp;</span>[]);
     <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">jump</span>(<span class="ident">below_uint_max_block</span>, <span class="kw-2">&amp;</span>[]);
 
     <span class="comment">// We need to generate a specific trap code when `x` is NaN, so reuse the flags from the</span>
     <span class="comment">// previous comparison.</span>
     <span class="ident">pos</span>.<span class="ident">insert_block</span>(<span class="ident">below_uint_max_block</span>);
     <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">trapff</span>(
-        <span class="ident">FloatCC</span>::<span class="ident">Unordered</span>,
+        <span class="ident">FloatCC::Unordered</span>,
         <span class="ident">is_large</span>,
-        <span class="ident">ir</span>::<span class="ident">TrapCode</span>::<span class="ident">BadConversionToInteger</span>,
+        <span class="ident">ir::TrapCode::BadConversionToInteger</span>,
     );
 
     <span class="comment">// Now we know that x &lt; 2^(N-1) and not NaN.</span>
     <span class="kw">let</span> <span class="ident">sres</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">x86_cvtt2si</span>(<span class="ident">ty</span>, <span class="ident">x</span>);
     <span class="kw">let</span> <span class="ident">is_neg</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">ifcmp_imm</span>(<span class="ident">sres</span>, <span class="number">0</span>);
     <span class="ident">pos</span>.<span class="ident">ins</span>()
-        .<span class="ident">brif</span>(<span class="ident">IntCC</span>::<span class="ident">SignedGreaterThanOrEqual</span>, <span class="ident">is_neg</span>, <span class="ident">done</span>, <span class="kw-2">&amp;</span>[<span class="ident">sres</span>]);
+        .<span class="ident">brif</span>(<span class="ident">IntCC::SignedGreaterThanOrEqual</span>, <span class="ident">is_neg</span>, <span class="ident">done</span>, <span class="kw-2">&amp;</span>[<span class="ident">sres</span>]);
     <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">jump</span>(<span class="ident">below_zero_block</span>, <span class="kw-2">&amp;</span>[]);
 
     <span class="ident">pos</span>.<span class="ident">insert_block</span>(<span class="ident">below_zero_block</span>);
-    <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">trap</span>(<span class="ident">ir</span>::<span class="ident">TrapCode</span>::<span class="ident">IntegerOverflow</span>);
+    <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">trap</span>(<span class="ident">ir::TrapCode::IntegerOverflow</span>);
 
     <span class="comment">// Handle the case where x &gt;= 2^(N-1) and not NaN.</span>
     <span class="ident">pos</span>.<span class="ident">insert_block</span>(<span class="ident">large</span>);
@@ -3088,7 +3088,7 @@
     <span class="kw">let</span> <span class="ident">lres</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">x86_cvtt2si</span>(<span class="ident">ty</span>, <span class="ident">adjx</span>);
     <span class="kw">let</span> <span class="ident">is_neg</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">ifcmp_imm</span>(<span class="ident">lres</span>, <span class="number">0</span>);
     <span class="ident">pos</span>.<span class="ident">ins</span>()
-        .<span class="ident">trapif</span>(<span class="ident">IntCC</span>::<span class="ident">SignedLessThan</span>, <span class="ident">is_neg</span>, <span class="ident">ir</span>::<span class="ident">TrapCode</span>::<span class="ident">IntegerOverflow</span>);
+        .<span class="ident">trapif</span>(<span class="ident">IntCC::SignedLessThan</span>, <span class="ident">is_neg</span>, <span class="ident">ir::TrapCode::IntegerOverflow</span>);
     <span class="kw">let</span> <span class="ident">lfinal</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">iadd_imm</span>(<span class="ident">lres</span>, <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="ident">ty</span>.<span class="ident">lane_bits</span>() <span class="op">-</span> <span class="number">1</span>));
 
     <span class="comment">// Recycle the original instruction as a jump.</span>
@@ -3106,19 +3106,19 @@
 }
 
 <span class="kw">fn</span> <span class="ident">expand_fcvt_to_uint_sat</span>(
-    <span class="ident">inst</span>: <span class="ident">ir</span>::<span class="ident">Inst</span>,
-    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir</span>::<span class="ident">Function</span>,
+    <span class="ident">inst</span>: <span class="ident">ir::Inst</span>,
+    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir::Function</span>,
     <span class="ident">cfg</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ControlFlowGraph</span>,
-    <span class="ident">_isa</span>: <span class="kw-2">&amp;</span><span class="ident">dyn</span> <span class="ident">TargetIsa</span>,
+    <span class="ident">_isa</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">TargetIsa</span>,
 ) {
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">ir</span>::<span class="ident">immediates</span>::{<span class="ident">Ieee32</span>, <span class="ident">Ieee64</span>};
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::ir::immediates</span>::{<span class="ident">Ieee32</span>, <span class="ident">Ieee64</span>};
 
     <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">func</span>.<span class="ident">dfg</span>[<span class="ident">inst</span>] {
-        <span class="ident">ir</span>::<span class="ident">InstructionData</span>::<span class="ident">Unary</span> {
-            <span class="ident">opcode</span>: <span class="ident">ir</span>::<span class="ident">Opcode</span>::<span class="ident">FcvtToUintSat</span>,
+        <span class="ident">ir::InstructionData::Unary</span> {
+            <span class="ident">opcode</span>: <span class="ident">ir::Opcode::FcvtToUintSat</span>,
             <span class="ident">arg</span>,
         } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">arg</span>,
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(
+        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(
             <span class="string">&quot;Need fcvt_to_uint_sat: {}&quot;</span>,
             <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">display_inst</span>(<span class="ident">inst</span>, <span class="prelude-val">None</span>)
         ),
@@ -3146,25 +3146,25 @@
     <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">clear_results</span>(<span class="ident">inst</span>);
     <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">attach_block_param</span>(<span class="ident">done</span>, <span class="ident">result</span>);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor</span>::<span class="ident">new</span>(<span class="ident">func</span>).<span class="ident">at_inst</span>(<span class="ident">inst</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor::new</span>(<span class="ident">func</span>).<span class="ident">at_inst</span>(<span class="ident">inst</span>);
     <span class="ident">pos</span>.<span class="ident">use_srcloc</span>(<span class="ident">inst</span>);
 
     <span class="comment">// Start by materializing the floating point constant 2^(N-1) where N is the number of bits in</span>
     <span class="comment">// the destination integer type.</span>
     <span class="kw">let</span> <span class="ident">pow2nm1</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">xty</span> {
-        <span class="ident">ir</span>::<span class="ident">types</span>::<span class="ident">F32</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">f32const</span>(<span class="ident">Ieee32</span>::<span class="ident">pow2</span>(<span class="ident">ty</span>.<span class="ident">lane_bits</span>() <span class="op">-</span> <span class="number">1</span>)),
-        <span class="ident">ir</span>::<span class="ident">types</span>::<span class="ident">F64</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">f64const</span>(<span class="ident">Ieee64</span>::<span class="ident">pow2</span>(<span class="ident">ty</span>.<span class="ident">lane_bits</span>() <span class="op">-</span> <span class="number">1</span>)),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Can&#39;t convert {}&quot;</span>, <span class="ident">xty</span>),
+        <span class="ident">ir::types::F32</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">f32const</span>(<span class="ident">Ieee32::pow2</span>(<span class="ident">ty</span>.<span class="ident">lane_bits</span>() <span class="op">-</span> <span class="number">1</span>)),
+        <span class="ident">ir::types::F64</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">f64const</span>(<span class="ident">Ieee64::pow2</span>(<span class="ident">ty</span>.<span class="ident">lane_bits</span>() <span class="op">-</span> <span class="number">1</span>)),
+        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Can&#39;t convert {}&quot;</span>, <span class="ident">xty</span>),
     };
     <span class="kw">let</span> <span class="ident">zero</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">iconst</span>(<span class="ident">ty</span>, <span class="number">0</span>);
     <span class="kw">let</span> <span class="ident">is_large</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">ffcmp</span>(<span class="ident">x</span>, <span class="ident">pow2nm1</span>);
     <span class="ident">pos</span>.<span class="ident">ins</span>()
-        .<span class="ident">brff</span>(<span class="ident">FloatCC</span>::<span class="ident">GreaterThanOrEqual</span>, <span class="ident">is_large</span>, <span class="ident">large</span>, <span class="kw-2">&amp;</span>[]);
+        .<span class="ident">brff</span>(<span class="ident">FloatCC::GreaterThanOrEqual</span>, <span class="ident">is_large</span>, <span class="ident">large</span>, <span class="kw-2">&amp;</span>[]);
     <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">jump</span>(<span class="ident">below_pow2nm1_or_nan_block</span>, <span class="kw-2">&amp;</span>[]);
 
     <span class="comment">// We need to generate zero when `x` is NaN, so reuse the flags from the previous comparison.</span>
     <span class="ident">pos</span>.<span class="ident">insert_block</span>(<span class="ident">below_pow2nm1_or_nan_block</span>);
-    <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">brff</span>(<span class="ident">FloatCC</span>::<span class="ident">Unordered</span>, <span class="ident">is_large</span>, <span class="ident">done</span>, <span class="kw-2">&amp;</span>[<span class="ident">zero</span>]);
+    <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">brff</span>(<span class="ident">FloatCC::Unordered</span>, <span class="ident">is_large</span>, <span class="ident">done</span>, <span class="kw-2">&amp;</span>[<span class="ident">zero</span>]);
     <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">jump</span>(<span class="ident">below_pow2nm1_block</span>, <span class="kw-2">&amp;</span>[]);
 
     <span class="comment">// Now we know that x &lt; 2^(N-1) and not NaN. If the result of the cvtt2si is positive, we&#39;re</span>
@@ -3173,7 +3173,7 @@
     <span class="kw">let</span> <span class="ident">sres</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">x86_cvtt2si</span>(<span class="ident">ty</span>, <span class="ident">x</span>);
     <span class="kw">let</span> <span class="ident">is_neg</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">ifcmp_imm</span>(<span class="ident">sres</span>, <span class="number">0</span>);
     <span class="ident">pos</span>.<span class="ident">ins</span>()
-        .<span class="ident">brif</span>(<span class="ident">IntCC</span>::<span class="ident">SignedGreaterThanOrEqual</span>, <span class="ident">is_neg</span>, <span class="ident">done</span>, <span class="kw-2">&amp;</span>[<span class="ident">sres</span>]);
+        .<span class="ident">brif</span>(<span class="ident">IntCC::SignedGreaterThanOrEqual</span>, <span class="ident">is_neg</span>, <span class="ident">done</span>, <span class="kw-2">&amp;</span>[<span class="ident">sres</span>]);
     <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">jump</span>(<span class="ident">done</span>, <span class="kw-2">&amp;</span>[<span class="ident">zero</span>]);
 
     <span class="comment">// Handle the case where x &gt;= 2^(N-1) and not NaN.</span>
@@ -3183,14 +3183,14 @@
     <span class="kw">let</span> <span class="ident">max_value</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">iconst</span>(
         <span class="ident">ty</span>,
         <span class="kw">match</span> <span class="ident">ty</span> {
-            <span class="ident">ir</span>::<span class="ident">types</span>::<span class="ident">I32</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">u32</span>::<span class="ident">max_value</span>() <span class="kw">as</span> <span class="ident">i64</span>,
-            <span class="ident">ir</span>::<span class="ident">types</span>::<span class="ident">I64</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">u64</span>::<span class="ident">max_value</span>() <span class="kw">as</span> <span class="ident">i64</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Can&#39;t convert {}&quot;</span>, <span class="ident">ty</span>),
+            <span class="ident">ir::types::I32</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">u32::max_value</span>() <span class="kw">as</span> <span class="ident">i64</span>,
+            <span class="ident">ir::types::I64</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">u64::max_value</span>() <span class="kw">as</span> <span class="ident">i64</span>,
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Can&#39;t convert {}&quot;</span>, <span class="ident">ty</span>),
         },
     );
     <span class="kw">let</span> <span class="ident">is_neg</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">ifcmp_imm</span>(<span class="ident">lres</span>, <span class="number">0</span>);
     <span class="ident">pos</span>.<span class="ident">ins</span>()
-        .<span class="ident">brif</span>(<span class="ident">IntCC</span>::<span class="ident">SignedLessThan</span>, <span class="ident">is_neg</span>, <span class="ident">done</span>, <span class="kw-2">&amp;</span>[<span class="ident">max_value</span>]);
+        .<span class="ident">brif</span>(<span class="ident">IntCC::SignedLessThan</span>, <span class="ident">is_neg</span>, <span class="ident">done</span>, <span class="kw-2">&amp;</span>[<span class="ident">max_value</span>]);
     <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">jump</span>(<span class="ident">uint_large_block</span>, <span class="kw-2">&amp;</span>[]);
 
     <span class="ident">pos</span>.<span class="ident">insert_block</span>(<span class="ident">uint_large_block</span>);
@@ -3222,26 +3222,26 @@
 <span class="doccomment">/// set up; TODO if we change the SIMD legalization groups, then this logic could be merged into</span>
 <span class="doccomment">/// [expand_fcvt_to_uint_sat] (see https://github.com/bytecodealliance/wasmtime/issues/1745).</span>
 <span class="kw">fn</span> <span class="ident">expand_fcvt_to_uint_sat_vector</span>(
-    <span class="ident">inst</span>: <span class="ident">ir</span>::<span class="ident">Inst</span>,
-    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir</span>::<span class="ident">Function</span>,
+    <span class="ident">inst</span>: <span class="ident">ir::Inst</span>,
+    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir::Function</span>,
     <span class="ident">_cfg</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ControlFlowGraph</span>,
-    <span class="ident">_isa</span>: <span class="kw-2">&amp;</span><span class="ident">dyn</span> <span class="ident">TargetIsa</span>,
+    <span class="ident">_isa</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">TargetIsa</span>,
 ) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor</span>::<span class="ident">new</span>(<span class="ident">func</span>).<span class="ident">at_inst</span>(<span class="ident">inst</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor::new</span>(<span class="ident">func</span>).<span class="ident">at_inst</span>(<span class="ident">inst</span>);
     <span class="ident">pos</span>.<span class="ident">use_srcloc</span>(<span class="ident">inst</span>);
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ir</span>::<span class="ident">InstructionData</span>::<span class="ident">Unary</span> {
-        <span class="ident">opcode</span>: <span class="ident">ir</span>::<span class="ident">Opcode</span>::<span class="ident">FcvtToUintSat</span>,
+    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ir::InstructionData::Unary</span> {
+        <span class="ident">opcode</span>: <span class="ident">ir::Opcode::FcvtToUintSat</span>,
         <span class="ident">arg</span>,
     } <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>[<span class="ident">inst</span>]
     {
         <span class="kw">let</span> <span class="ident">controlling_type</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">ctrl_typevar</span>(<span class="ident">inst</span>);
         <span class="kw">if</span> <span class="ident">controlling_type</span> <span class="op">=</span><span class="op">=</span> <span class="ident">I32X4</span> {
-            <span class="macro">debug_assert_eq</span><span class="macro">!</span>(<span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">value_type</span>(<span class="ident">arg</span>), <span class="ident">F32X4</span>);
+            <span class="macro">debug_assert_eq!</span>(<span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">value_type</span>(<span class="ident">arg</span>), <span class="ident">F32X4</span>);
             <span class="comment">// We must both quiet any NaNs--setting that lane to 0--and saturate any</span>
             <span class="comment">// lanes that might overflow during conversion to the highest/lowest integer</span>
             <span class="comment">// allowed in that lane.</span>
-            <span class="kw">let</span> <span class="ident">zeroes_constant</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">constants</span>.<span class="ident">insert</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="number">0x00</span>; <span class="number">16</span>].<span class="ident">into</span>());
+            <span class="kw">let</span> <span class="ident">zeroes_constant</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">constants</span>.<span class="ident">insert</span>(<span class="macro">vec!</span>[<span class="number">0x00</span>; <span class="number">16</span>].<span class="ident">into</span>());
             <span class="kw">let</span> <span class="ident">max_signed_constant</span> <span class="op">=</span> <span class="ident">pos</span>
                 .<span class="ident">func</span>
                 .<span class="ident">dfg</span>
@@ -3258,7 +3258,7 @@
             <span class="kw">let</span> <span class="ident">minus_max_signed</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">fsub</span>(<span class="ident">ge_zero</span>, <span class="ident">max_signed</span>);
             <span class="kw">let</span> <span class="ident">le_max_signed</span> <span class="op">=</span>
                 <span class="ident">pos</span>.<span class="ident">ins</span>()
-                    .<span class="ident">fcmp</span>(<span class="ident">FloatCC</span>::<span class="ident">LessThanOrEqual</span>, <span class="ident">max_signed</span>, <span class="ident">minus_max_signed</span>);
+                    .<span class="ident">fcmp</span>(<span class="ident">FloatCC::LessThanOrEqual</span>, <span class="ident">max_signed</span>, <span class="ident">minus_max_signed</span>);
             <span class="comment">// Identify lanes that have minus_max_signed &gt; max_signed || minus_max_signed &lt; 0.</span>
             <span class="comment">// These lanes have the MSB set to 1 after the XOR. We are trying to calculate a</span>
             <span class="comment">// valid, in-range addend.</span>
@@ -3276,7 +3276,7 @@
             <span class="kw">let</span> <span class="ident">converted</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">x86_cvtt2si</span>(<span class="ident">I32X4</span>, <span class="ident">ge_zero</span>);
             <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">replace</span>(<span class="ident">inst</span>).<span class="ident">iadd</span>(<span class="ident">converted</span>, <span class="ident">addend</span>);
         } <span class="kw">else</span> {
-            <span class="macro">unreachable</span><span class="macro">!</span>(
+            <span class="macro">unreachable!</span>(
                 <span class="string">&quot;{} should not be legalized in expand_fcvt_to_uint_sat_vector&quot;</span>,
                 <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">display_inst</span>(<span class="ident">inst</span>, <span class="prelude-val">None</span>)
             )
@@ -3286,15 +3286,15 @@
 
 <span class="doccomment">/// Convert shuffle instructions.</span>
 <span class="kw">fn</span> <span class="ident">convert_shuffle</span>(
-    <span class="ident">inst</span>: <span class="ident">ir</span>::<span class="ident">Inst</span>,
-    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir</span>::<span class="ident">Function</span>,
+    <span class="ident">inst</span>: <span class="ident">ir::Inst</span>,
+    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir::Function</span>,
     <span class="ident">_cfg</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ControlFlowGraph</span>,
-    <span class="ident">_isa</span>: <span class="kw-2">&amp;</span><span class="ident">dyn</span> <span class="ident">TargetIsa</span>,
+    <span class="ident">_isa</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">TargetIsa</span>,
 ) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor</span>::<span class="ident">new</span>(<span class="ident">func</span>).<span class="ident">at_inst</span>(<span class="ident">inst</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor::new</span>(<span class="ident">func</span>).<span class="ident">at_inst</span>(<span class="ident">inst</span>);
     <span class="ident">pos</span>.<span class="ident">use_srcloc</span>(<span class="ident">inst</span>);
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ir</span>::<span class="ident">InstructionData</span>::<span class="ident">Shuffle</span> { <span class="ident">args</span>, <span class="ident">mask</span>, .. } <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>[<span class="ident">inst</span>] {
+    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ir::InstructionData::Shuffle</span> { <span class="ident">args</span>, <span class="ident">mask</span>, .. } <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>[<span class="ident">inst</span>] {
         <span class="comment">// A mask-building helper: in 128-bit SIMD, 0-15 indicate which lane to read from and a 1</span>
         <span class="comment">// in the most significant position zeroes the lane.</span>
         <span class="kw">let</span> <span class="ident">zero_unknown_lane_index</span> <span class="op">=</span> <span class="op">|</span><span class="ident">b</span>: <span class="ident">u8</span><span class="op">|</span> <span class="kw">if</span> <span class="ident">b</span> <span class="op">&gt;</span> <span class="number">15</span> { <span class="number">0b10000000</span> } <span class="kw">else</span> { <span class="ident">b</span> };
@@ -3361,16 +3361,16 @@
 <span class="doccomment">/// Because floats already exist in XMM registers, we can keep them there when executing a CLIF</span>
 <span class="doccomment">/// extractlane instruction</span>
 <span class="kw">fn</span> <span class="ident">convert_extractlane</span>(
-    <span class="ident">inst</span>: <span class="ident">ir</span>::<span class="ident">Inst</span>,
-    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir</span>::<span class="ident">Function</span>,
+    <span class="ident">inst</span>: <span class="ident">ir::Inst</span>,
+    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir::Function</span>,
     <span class="ident">_cfg</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ControlFlowGraph</span>,
-    <span class="ident">_isa</span>: <span class="kw-2">&amp;</span><span class="ident">dyn</span> <span class="ident">TargetIsa</span>,
+    <span class="ident">_isa</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">TargetIsa</span>,
 ) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor</span>::<span class="ident">new</span>(<span class="ident">func</span>).<span class="ident">at_inst</span>(<span class="ident">inst</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor::new</span>(<span class="ident">func</span>).<span class="ident">at_inst</span>(<span class="ident">inst</span>);
     <span class="ident">pos</span>.<span class="ident">use_srcloc</span>(<span class="ident">inst</span>);
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ir</span>::<span class="ident">InstructionData</span>::<span class="ident">BinaryImm8</span> {
-        <span class="ident">opcode</span>: <span class="ident">ir</span>::<span class="ident">Opcode</span>::<span class="ident">Extractlane</span>,
+    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ir::InstructionData::BinaryImm8</span> {
+        <span class="ident">opcode</span>: <span class="ident">ir::Opcode::Extractlane</span>,
         <span class="ident">arg</span>,
         <span class="ident">imm</span>: <span class="ident">lane</span>,
     } <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>[<span class="ident">inst</span>]
@@ -3389,14 +3389,14 @@
                         <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">x86_pshufd</span>(<span class="ident">arg</span>, <span class="ident">shuffle_mask</span>)
                     }
                     <span class="ident">F64X2</span> <span class="op">=</span><span class="op">&gt;</span> {
-                        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">lane</span>, <span class="number">1</span>);
+                        <span class="macro">assert_eq!</span>(<span class="ident">lane</span>, <span class="number">1</span>);
                         <span class="comment">// Because we know the lane == 1, we move the upper 64 bits to the lower</span>
                         <span class="comment">// 64 bits, leaving the top 64 bits as-is.</span>
                         <span class="kw">let</span> <span class="ident">shuffle_mask</span> <span class="op">=</span> <span class="number">0b11_10_11_10</span>;
                         <span class="kw">let</span> <span class="ident">bitcast</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">raw_bitcast</span>(<span class="ident">F32X4</span>, <span class="ident">arg</span>);
                         <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">x86_pshufd</span>(<span class="ident">bitcast</span>, <span class="ident">shuffle_mask</span>)
                     }
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(),
+                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
                 }
             } <span class="kw">else</span> {
                 <span class="comment">// Remove the extractlane instruction, leaving the float where it is.</span>
@@ -3417,16 +3417,16 @@
 <span class="doccomment">/// Because floats exist in XMM registers, we can keep them there when executing a CLIF</span>
 <span class="doccomment">/// insertlane instruction</span>
 <span class="kw">fn</span> <span class="ident">convert_insertlane</span>(
-    <span class="ident">inst</span>: <span class="ident">ir</span>::<span class="ident">Inst</span>,
-    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir</span>::<span class="ident">Function</span>,
+    <span class="ident">inst</span>: <span class="ident">ir::Inst</span>,
+    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir::Function</span>,
     <span class="ident">_cfg</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ControlFlowGraph</span>,
-    <span class="ident">_isa</span>: <span class="kw-2">&amp;</span><span class="ident">dyn</span> <span class="ident">TargetIsa</span>,
+    <span class="ident">_isa</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">TargetIsa</span>,
 ) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor</span>::<span class="ident">new</span>(<span class="ident">func</span>).<span class="ident">at_inst</span>(<span class="ident">inst</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor::new</span>(<span class="ident">func</span>).<span class="ident">at_inst</span>(<span class="ident">inst</span>);
     <span class="ident">pos</span>.<span class="ident">use_srcloc</span>(<span class="ident">inst</span>);
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ir</span>::<span class="ident">InstructionData</span>::<span class="ident">TernaryImm8</span> {
-        <span class="ident">opcode</span>: <span class="ident">ir</span>::<span class="ident">Opcode</span>::<span class="ident">Insertlane</span>,
+    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ir::InstructionData::TernaryImm8</span> {
+        <span class="ident">opcode</span>: <span class="ident">ir::Opcode::Insertlane</span>,
         <span class="ident">args</span>: [<span class="ident">vector</span>, <span class="ident">replacement</span>],
         <span class="ident">imm</span>: <span class="ident">lane</span>,
     } <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>[<span class="ident">inst</span>]
@@ -3436,7 +3436,7 @@
             <span class="comment">// Floats are already in XMM registers and can stay there.</span>
             <span class="kw">match</span> <span class="ident">value_type</span> {
                 <span class="ident">F32X4</span> <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">lane</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">3</span>);
+                    <span class="macro">assert!</span>(<span class="ident">lane</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">3</span>);
                     <span class="kw">let</span> <span class="ident">immediate</span> <span class="op">=</span> <span class="number">0b00_00_00_00</span> <span class="op">|</span> <span class="ident">lane</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>;
                     <span class="comment">// Insert 32-bits from replacement (at index 00, bits 7:8) to vector (lane</span>
                     <span class="comment">// shifted into bits 5:6).</span>
@@ -3455,7 +3455,7 @@
                             .<span class="ident">replace</span>(<span class="ident">inst</span>)
                             .<span class="ident">x86_movsd</span>(<span class="ident">vector</span>, <span class="ident">replacement_as_vector</span>)
                     } <span class="kw">else</span> {
-                        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">lane</span>, <span class="number">1</span>);
+                        <span class="macro">assert_eq!</span>(<span class="ident">lane</span>, <span class="number">1</span>);
                         <span class="comment">// Move the low 64 bits of replacement vector to the high 64 bits of the</span>
                         <span class="comment">// vector.</span>
                         <span class="ident">pos</span>.<span class="ident">func</span>
@@ -3464,7 +3464,7 @@
                             .<span class="ident">x86_movlhps</span>(<span class="ident">vector</span>, <span class="ident">replacement_as_vector</span>)
                     }
                 }
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(),
+                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
             };
         } <span class="kw">else</span> {
             <span class="comment">// For non-floats, lower with the usual PINSR* instruction.</span>
@@ -3478,39 +3478,39 @@
 
 <span class="doccomment">/// For SIMD or scalar integer negation, convert `ineg` to `vconst + isub` or `iconst + isub`.</span>
 <span class="kw">fn</span> <span class="ident">convert_ineg</span>(
-    <span class="ident">inst</span>: <span class="ident">ir</span>::<span class="ident">Inst</span>,
-    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir</span>::<span class="ident">Function</span>,
+    <span class="ident">inst</span>: <span class="ident">ir::Inst</span>,
+    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir::Function</span>,
     <span class="ident">_cfg</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ControlFlowGraph</span>,
-    <span class="ident">_isa</span>: <span class="kw-2">&amp;</span><span class="ident">dyn</span> <span class="ident">TargetIsa</span>,
+    <span class="ident">_isa</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">TargetIsa</span>,
 ) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor</span>::<span class="ident">new</span>(<span class="ident">func</span>).<span class="ident">at_inst</span>(<span class="ident">inst</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor::new</span>(<span class="ident">func</span>).<span class="ident">at_inst</span>(<span class="ident">inst</span>);
     <span class="ident">pos</span>.<span class="ident">use_srcloc</span>(<span class="ident">inst</span>);
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ir</span>::<span class="ident">InstructionData</span>::<span class="ident">Unary</span> {
-        <span class="ident">opcode</span>: <span class="ident">ir</span>::<span class="ident">Opcode</span>::<span class="ident">Ineg</span>,
+    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ir::InstructionData::Unary</span> {
+        <span class="ident">opcode</span>: <span class="ident">ir::Opcode::Ineg</span>,
         <span class="ident">arg</span>,
     } <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>[<span class="ident">inst</span>]
     {
         <span class="kw">let</span> <span class="ident">value_type</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">value_type</span>(<span class="ident">arg</span>);
         <span class="kw">let</span> <span class="ident">zero_value</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">value_type</span>.<span class="ident">is_vector</span>() <span class="op">&amp;&amp;</span> <span class="ident">value_type</span>.<span class="ident">lane_type</span>().<span class="ident">is_int</span>() {
-            <span class="kw">let</span> <span class="ident">zero_immediate</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">constants</span>.<span class="ident">insert</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="number">0</span>; <span class="number">16</span>].<span class="ident">into</span>());
+            <span class="kw">let</span> <span class="ident">zero_immediate</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">constants</span>.<span class="ident">insert</span>(<span class="macro">vec!</span>[<span class="number">0</span>; <span class="number">16</span>].<span class="ident">into</span>());
             <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">vconst</span>(<span class="ident">value_type</span>, <span class="ident">zero_immediate</span>) <span class="comment">// this should be legalized to a PXOR</span>
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">value_type</span>.<span class="ident">is_int</span>() {
             <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">iconst</span>(<span class="ident">value_type</span>, <span class="number">0</span>)
         } <span class="kw">else</span> {
-            <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Can&#39;t convert ineg of type {}&quot;</span>, <span class="ident">value_type</span>)
+            <span class="macro">panic!</span>(<span class="string">&quot;Can&#39;t convert ineg of type {}&quot;</span>, <span class="ident">value_type</span>)
         };
         <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">replace</span>(<span class="ident">inst</span>).<span class="ident">isub</span>(<span class="ident">zero_value</span>, <span class="ident">arg</span>);
     } <span class="kw">else</span> {
-        <span class="macro">unreachable</span><span class="macro">!</span>()
+        <span class="macro">unreachable!</span>()
     }
 }
 
 <span class="kw">fn</span> <span class="ident">expand_dword_to_xmm</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span><span class="op">&gt;</span>(
     <span class="ident">pos</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">FuncCursor</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">arg</span>: <span class="ident">ir</span>::<span class="ident">Value</span>,
-    <span class="ident">arg_type</span>: <span class="ident">ir</span>::<span class="ident">Type</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ir</span>::<span class="ident">Value</span> {
+    <span class="ident">arg</span>: <span class="ident">ir::Value</span>,
+    <span class="ident">arg_type</span>: <span class="ident">ir::Type</span>,
+) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ir::Value</span> {
     <span class="kw">if</span> <span class="ident">arg_type</span> <span class="op">=</span><span class="op">=</span> <span class="ident">I64</span> {
         <span class="kw">let</span> (<span class="ident">arg_lo</span>, <span class="ident">arg_hi</span>) <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">isplit</span>(<span class="ident">arg</span>);
         <span class="kw">let</span> <span class="ident">arg</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">scalar_to_vector</span>(<span class="ident">I32X4</span>, <span class="ident">arg_lo</span>);
@@ -3524,9 +3524,9 @@
 
 <span class="kw">fn</span> <span class="ident">contract_dword_from_xmm</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span><span class="op">&gt;</span>(
     <span class="ident">pos</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">FuncCursor</span><span class="op">&lt;</span><span class="lifetime">&#39;f</span><span class="op">&gt;</span>,
-    <span class="ident">inst</span>: <span class="ident">ir</span>::<span class="ident">Inst</span>,
-    <span class="ident">ret</span>: <span class="ident">ir</span>::<span class="ident">Value</span>,
-    <span class="ident">ret_type</span>: <span class="ident">ir</span>::<span class="ident">Type</span>,
+    <span class="ident">inst</span>: <span class="ident">ir::Inst</span>,
+    <span class="ident">ret</span>: <span class="ident">ir::Value</span>,
+    <span class="ident">ret_type</span>: <span class="ident">ir::Type</span>,
 ) {
     <span class="kw">if</span> <span class="ident">ret_type</span> <span class="op">=</span><span class="op">=</span> <span class="ident">I64</span> {
         <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">raw_bitcast</span>(<span class="ident">I32X4</span>, <span class="ident">ret</span>);
@@ -3556,23 +3556,23 @@
 <span class="comment">// conversion could be provided in the CDSL if we could use varargs there (TODO); i.e. `load_complex`</span>
 <span class="comment">// has a varargs field that we can&#39;t modify with the CDSL in legalize.rs.</span>
 <span class="kw">fn</span> <span class="ident">convert_ushr</span>(
-    <span class="ident">inst</span>: <span class="ident">ir</span>::<span class="ident">Inst</span>,
-    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir</span>::<span class="ident">Function</span>,
+    <span class="ident">inst</span>: <span class="ident">ir::Inst</span>,
+    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir::Function</span>,
     <span class="ident">_cfg</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ControlFlowGraph</span>,
-    <span class="ident">isa</span>: <span class="kw-2">&amp;</span><span class="ident">dyn</span> <span class="ident">TargetIsa</span>,
+    <span class="ident">isa</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">TargetIsa</span>,
 ) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor</span>::<span class="ident">new</span>(<span class="ident">func</span>).<span class="ident">at_inst</span>(<span class="ident">inst</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor::new</span>(<span class="ident">func</span>).<span class="ident">at_inst</span>(<span class="ident">inst</span>);
     <span class="ident">pos</span>.<span class="ident">use_srcloc</span>(<span class="ident">inst</span>);
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ir</span>::<span class="ident">InstructionData</span>::<span class="ident">Binary</span> {
-        <span class="ident">opcode</span>: <span class="ident">ir</span>::<span class="ident">Opcode</span>::<span class="ident">Ushr</span>,
+    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ir::InstructionData::Binary</span> {
+        <span class="ident">opcode</span>: <span class="ident">ir::Opcode::Ushr</span>,
         <span class="ident">args</span>: [<span class="ident">arg0</span>, <span class="ident">arg1</span>],
     } <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>[<span class="ident">inst</span>]
     {
         <span class="comment">// Note that for Wasm, the bounding of the shift index has happened during translation</span>
         <span class="kw">let</span> <span class="ident">arg0_type</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">value_type</span>(<span class="ident">arg0</span>);
         <span class="kw">let</span> <span class="ident">arg1_type</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">value_type</span>(<span class="ident">arg1</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">arg1_type</span>.<span class="ident">is_vector</span>() <span class="op">&amp;&amp;</span> <span class="ident">arg1_type</span>.<span class="ident">is_int</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">arg1_type</span>.<span class="ident">is_vector</span>() <span class="op">&amp;&amp;</span> <span class="ident">arg1_type</span>.<span class="ident">is_int</span>());
 
         <span class="comment">// TODO it may be more clear to use scalar_to_vector here; the current issue is that</span>
         <span class="comment">// scalar_to_vector has the restriction that the vector produced has a matching lane size</span>
@@ -3595,7 +3595,7 @@
             <span class="kw">let</span> <span class="ident">mask_offset</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">ishl_imm</span>(<span class="ident">arg1</span>, <span class="number">4</span>);
             <span class="kw">let</span> <span class="ident">mask</span> <span class="op">=</span>
                 <span class="ident">pos</span>.<span class="ident">ins</span>()
-                    .<span class="ident">load_complex</span>(<span class="ident">arg0_type</span>, <span class="ident">MemFlags</span>::<span class="ident">new</span>(), <span class="kw-2">&amp;</span>[<span class="ident">mask_address</span>, <span class="ident">mask_offset</span>], <span class="number">0</span>);
+                    .<span class="ident">load_complex</span>(<span class="ident">arg0_type</span>, <span class="ident">MemFlags::new</span>(), <span class="kw-2">&amp;</span>[<span class="ident">mask_address</span>, <span class="ident">mask_offset</span>], <span class="number">0</span>);
             <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">replace</span>(<span class="ident">inst</span>).<span class="ident">band</span>(<span class="ident">shifted</span>, <span class="ident">mask</span>);
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">arg0_type</span>.<span class="ident">is_vector</span>() {
             <span class="comment">// x86 has encodings for these shifts.</span>
@@ -3604,7 +3604,7 @@
             <span class="comment">// 64 bit shifts need to be legalized on x86_32.</span>
             <span class="kw">let</span> <span class="ident">x86_isa</span> <span class="op">=</span> <span class="ident">isa</span>
                 .<span class="ident">as_any</span>()
-                .<span class="ident">downcast_ref</span>::<span class="op">&lt;</span><span class="ident">isa</span>::<span class="ident">x86</span>::<span class="ident">Isa</span><span class="op">&gt;</span>()
+                .<span class="ident">downcast_ref</span>::<span class="op">&lt;</span><span class="ident">isa::x86::Isa</span><span class="op">&gt;</span>()
                 .<span class="ident">expect</span>(<span class="string">&quot;the target ISA must be x86 at this point&quot;</span>);
             <span class="kw">if</span> <span class="ident">x86_isa</span>.<span class="ident">isa_flags</span>.<span class="ident">has_sse41</span>() {
                 <span class="comment">// if we have pinstrq/pextrq (SSE 4.1), legalize to that</span>
@@ -3618,7 +3618,7 @@
             }
         } <span class="kw">else</span> {
             <span class="comment">// Everything else should be already legal.</span>
-            <span class="macro">unreachable</span><span class="macro">!</span>()
+            <span class="macro">unreachable!</span>()
         }
     }
 }
@@ -3640,23 +3640,23 @@
 <span class="comment">// conversion could be provided in the CDSL if we could use varargs there (TODO); i.e. `load_complex`</span>
 <span class="comment">// has a varargs field that we can&#39;t modify with the CDSL in legalize.rs.</span>
 <span class="kw">fn</span> <span class="ident">convert_ishl</span>(
-    <span class="ident">inst</span>: <span class="ident">ir</span>::<span class="ident">Inst</span>,
-    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir</span>::<span class="ident">Function</span>,
+    <span class="ident">inst</span>: <span class="ident">ir::Inst</span>,
+    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir::Function</span>,
     <span class="ident">_cfg</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ControlFlowGraph</span>,
-    <span class="ident">isa</span>: <span class="kw-2">&amp;</span><span class="ident">dyn</span> <span class="ident">TargetIsa</span>,
+    <span class="ident">isa</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">TargetIsa</span>,
 ) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor</span>::<span class="ident">new</span>(<span class="ident">func</span>).<span class="ident">at_inst</span>(<span class="ident">inst</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor::new</span>(<span class="ident">func</span>).<span class="ident">at_inst</span>(<span class="ident">inst</span>);
     <span class="ident">pos</span>.<span class="ident">use_srcloc</span>(<span class="ident">inst</span>);
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ir</span>::<span class="ident">InstructionData</span>::<span class="ident">Binary</span> {
-        <span class="ident">opcode</span>: <span class="ident">ir</span>::<span class="ident">Opcode</span>::<span class="ident">Ishl</span>,
+    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ir::InstructionData::Binary</span> {
+        <span class="ident">opcode</span>: <span class="ident">ir::Opcode::Ishl</span>,
         <span class="ident">args</span>: [<span class="ident">arg0</span>, <span class="ident">arg1</span>],
     } <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>[<span class="ident">inst</span>]
     {
         <span class="comment">// Note that for Wasm, the bounding of the shift index has happened during translation</span>
         <span class="kw">let</span> <span class="ident">arg0_type</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">value_type</span>(<span class="ident">arg0</span>);
         <span class="kw">let</span> <span class="ident">arg1_type</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">value_type</span>(<span class="ident">arg1</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">arg1_type</span>.<span class="ident">is_vector</span>() <span class="op">&amp;&amp;</span> <span class="ident">arg1_type</span>.<span class="ident">is_int</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">arg1_type</span>.<span class="ident">is_vector</span>() <span class="op">&amp;&amp;</span> <span class="ident">arg1_type</span>.<span class="ident">is_int</span>());
 
         <span class="comment">// TODO it may be more clear to use scalar_to_vector here; the current issue is that</span>
         <span class="comment">// scalar_to_vector has the restriction that the vector produced has a matching lane size</span>
@@ -3679,7 +3679,7 @@
             <span class="kw">let</span> <span class="ident">mask_offset</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">ins</span>().<span class="ident">ishl_imm</span>(<span class="ident">arg1</span>, <span class="number">4</span>);
             <span class="kw">let</span> <span class="ident">mask</span> <span class="op">=</span>
                 <span class="ident">pos</span>.<span class="ident">ins</span>()
-                    .<span class="ident">load_complex</span>(<span class="ident">arg0_type</span>, <span class="ident">MemFlags</span>::<span class="ident">new</span>(), <span class="kw-2">&amp;</span>[<span class="ident">mask_address</span>, <span class="ident">mask_offset</span>], <span class="number">0</span>);
+                    .<span class="ident">load_complex</span>(<span class="ident">arg0_type</span>, <span class="ident">MemFlags::new</span>(), <span class="kw-2">&amp;</span>[<span class="ident">mask_address</span>, <span class="ident">mask_offset</span>], <span class="number">0</span>);
             <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">replace</span>(<span class="ident">inst</span>).<span class="ident">band</span>(<span class="ident">shifted</span>, <span class="ident">mask</span>);
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">arg0_type</span>.<span class="ident">is_vector</span>() {
             <span class="comment">// x86 has encodings for these shifts.</span>
@@ -3688,7 +3688,7 @@
             <span class="comment">// 64 bit shifts need to be legalized on x86_32.</span>
             <span class="kw">let</span> <span class="ident">x86_isa</span> <span class="op">=</span> <span class="ident">isa</span>
                 .<span class="ident">as_any</span>()
-                .<span class="ident">downcast_ref</span>::<span class="op">&lt;</span><span class="ident">isa</span>::<span class="ident">x86</span>::<span class="ident">Isa</span><span class="op">&gt;</span>()
+                .<span class="ident">downcast_ref</span>::<span class="op">&lt;</span><span class="ident">isa::x86::Isa</span><span class="op">&gt;</span>()
                 .<span class="ident">expect</span>(<span class="string">&quot;the target ISA must be x86 at this point&quot;</span>);
             <span class="kw">if</span> <span class="ident">x86_isa</span>.<span class="ident">isa_flags</span>.<span class="ident">has_sse41</span>() {
                 <span class="comment">// if we have pinstrq/pextrq (SSE 4.1), legalize to that</span>
@@ -3702,23 +3702,23 @@
             }
         } <span class="kw">else</span> {
             <span class="comment">// Everything else should be already legal.</span>
-            <span class="macro">unreachable</span><span class="macro">!</span>()
+            <span class="macro">unreachable!</span>()
         }
     }
 }
 
 <span class="doccomment">/// Convert an imul.i64x2 to a valid code sequence on x86, first with AVX512 and then with SSE2.</span>
 <span class="kw">fn</span> <span class="ident">convert_i64x2_imul</span>(
-    <span class="ident">inst</span>: <span class="ident">ir</span>::<span class="ident">Inst</span>,
-    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir</span>::<span class="ident">Function</span>,
+    <span class="ident">inst</span>: <span class="ident">ir::Inst</span>,
+    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir::Function</span>,
     <span class="ident">_cfg</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ControlFlowGraph</span>,
-    <span class="ident">isa</span>: <span class="kw-2">&amp;</span><span class="ident">dyn</span> <span class="ident">TargetIsa</span>,
+    <span class="ident">isa</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">TargetIsa</span>,
 ) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor</span>::<span class="ident">new</span>(<span class="ident">func</span>).<span class="ident">at_inst</span>(<span class="ident">inst</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">FuncCursor::new</span>(<span class="ident">func</span>).<span class="ident">at_inst</span>(<span class="ident">inst</span>);
     <span class="ident">pos</span>.<span class="ident">use_srcloc</span>(<span class="ident">inst</span>);
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ir</span>::<span class="ident">InstructionData</span>::<span class="ident">Binary</span> {
-        <span class="ident">opcode</span>: <span class="ident">ir</span>::<span class="ident">Opcode</span>::<span class="ident">Imul</span>,
+    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ir::InstructionData::Binary</span> {
+        <span class="ident">opcode</span>: <span class="ident">ir::Opcode::Imul</span>,
         <span class="ident">args</span>: [<span class="ident">arg0</span>, <span class="ident">arg1</span>],
     } <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>[<span class="ident">inst</span>]
     {
@@ -3726,7 +3726,7 @@
         <span class="kw">if</span> <span class="ident">ty</span> <span class="op">=</span><span class="op">=</span> <span class="ident">I64X2</span> {
             <span class="kw">let</span> <span class="ident">x86_isa</span> <span class="op">=</span> <span class="ident">isa</span>
                 .<span class="ident">as_any</span>()
-                .<span class="ident">downcast_ref</span>::<span class="op">&lt;</span><span class="ident">isa</span>::<span class="ident">x86</span>::<span class="ident">Isa</span><span class="op">&gt;</span>()
+                .<span class="ident">downcast_ref</span>::<span class="op">&lt;</span><span class="ident">isa::x86::Isa</span><span class="op">&gt;</span>()
                 .<span class="ident">expect</span>(<span class="string">&quot;the target ISA must be x86 at this point&quot;</span>);
             <span class="kw">if</span> <span class="ident">x86_isa</span>.<span class="ident">isa_flags</span>.<span class="ident">use_avx512dq_simd</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">x86_isa</span>.<span class="ident">isa_flags</span>.<span class="ident">use_avx512vl_simd</span>() {
                 <span class="comment">// If we have certain AVX512 features, we can lower this instruction simply.</span>
@@ -3746,7 +3746,7 @@
                 <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">replace</span>(<span class="ident">inst</span>).<span class="ident">iadd</span>(<span class="ident">low</span>, <span class="ident">high</span>);
             }
         } <span class="kw">else</span> {
-            <span class="macro">unreachable</span><span class="macro">!</span>(
+            <span class="macro">unreachable!</span>(
                 <span class="string">&quot;{} should be encodable; it cannot be legalized by convert_i64x2_imul&quot;</span>,
                 <span class="ident">pos</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">display_inst</span>(<span class="ident">inst</span>, <span class="prelude-val">None</span>)
             );
@@ -3755,40 +3755,41 @@
 }
 
 <span class="kw">fn</span> <span class="ident">expand_tls_value</span>(
-    <span class="ident">inst</span>: <span class="ident">ir</span>::<span class="ident">Inst</span>,
-    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir</span>::<span class="ident">Function</span>,
+    <span class="ident">inst</span>: <span class="ident">ir::Inst</span>,
+    <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ir::Function</span>,
     <span class="ident">_cfg</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ControlFlowGraph</span>,
-    <span class="ident">isa</span>: <span class="kw-2">&amp;</span><span class="ident">dyn</span> <span class="ident">TargetIsa</span>,
+    <span class="ident">isa</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">TargetIsa</span>,
 ) {
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">settings</span>::<span class="ident">TlsModel</span>;
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::settings::TlsModel</span>;
 
-    <span class="macro">assert</span><span class="macro">!</span>(
-        <span class="ident">isa</span>.<span class="ident">triple</span>().<span class="ident">architecture</span> <span class="op">=</span><span class="op">=</span> <span class="ident">target_lexicon</span>::<span class="ident">Architecture</span>::<span class="ident">X86_64</span>,
+    <span class="macro">assert!</span>(
+        <span class="ident">isa</span>.<span class="ident">triple</span>().<span class="ident">architecture</span> <span class="op">=</span><span class="op">=</span> <span class="ident">target_lexicon::Architecture::X86_64</span>,
         <span class="string">&quot;Not yet implemented for {:?}&quot;</span>,
         <span class="ident">isa</span>.<span class="ident">triple</span>(),
     );
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ir</span>::<span class="ident">InstructionData</span>::<span class="ident">UnaryGlobalValue</span> {
-        <span class="ident">opcode</span>: <span class="ident">ir</span>::<span class="ident">Opcode</span>::<span class="ident">TlsValue</span>,
+    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ir::InstructionData::UnaryGlobalValue</span> {
+        <span class="ident">opcode</span>: <span class="ident">ir::Opcode::TlsValue</span>,
         <span class="ident">global_value</span>,
     } <span class="op">=</span> <span class="ident">func</span>.<span class="ident">dfg</span>[<span class="ident">inst</span>]
     {
         <span class="kw">let</span> <span class="ident">ctrl_typevar</span> <span class="op">=</span> <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">ctrl_typevar</span>(<span class="ident">inst</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">ctrl_typevar</span>, <span class="ident">ir</span>::<span class="ident">types</span>::<span class="ident">I64</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">ctrl_typevar</span>, <span class="ident">ir::types::I64</span>);
 
         <span class="kw">match</span> <span class="ident">isa</span>.<span class="ident">flags</span>().<span class="ident">tls_model</span>() {
-            <span class="ident">TlsModel</span>::<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;tls_model flag is not set.&quot;</span>),
-            <span class="ident">TlsModel</span>::<span class="ident">ElfGd</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">TlsModel::None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;tls_model flag is not set.&quot;</span>),
+            <span class="ident">TlsModel::ElfGd</span> <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">replace</span>(<span class="ident">inst</span>).<span class="ident">x86_elf_tls_get_addr</span>(<span class="ident">global_value</span>);
             }
-            <span class="ident">TlsModel</span>::<span class="ident">Macho</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">TlsModel::Macho</span> <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">replace</span>(<span class="ident">inst</span>).<span class="ident">x86_macho_tls_get_addr</span>(<span class="ident">global_value</span>);
             }
-            <span class="ident">model</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unimplemented</span><span class="macro">!</span>(<span class="string">&quot;tls_value for tls model {:?}&quot;</span>, <span class="ident">model</span>),
+            <span class="ident">model</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unimplemented!</span>(<span class="string">&quot;tls_value for tls model {:?}&quot;</span>, <span class="ident">model</span>),
         }
     } <span class="kw">else</span> {
-        <span class="macro">unreachable</span><span class="macro">!</span>();
+        <span class="macro">unreachable!</span>();
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../../";window.currentCrate = "cranelift_codegen";</script><script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script><script defer src="../../../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="cranelift_codegen" data-search-index-js="../../../../search-index.js" data-search-js="../../../../search.js"></div>
+    <script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script></body></html>

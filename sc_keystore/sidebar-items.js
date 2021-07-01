@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["Error","Keystore error."]],"struct":[["Store","Key store."]],"type":[["KeyStorePtr","Keystore pointer"],["Result","Keystore Result"]]});
+initSidebarItems({"enum":[["Error","Keystore error."]],"struct":[["LocalKeystore","A local based keystore that is either memory-based or filesystem-based."]],"type":[["Result","Keystore Result"]]});

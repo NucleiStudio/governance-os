@@ -1,5 +1,4 @@
 (function() {var implementors = {};
-implementors["chacha20"] = [{"text":"impl&lt;R:&nbsp;Rounds&gt; NewStreamCipher for Cipher&lt;R&gt;","synthetic":false,"types":[]},{"text":"impl NewStreamCipher for XChaCha20","synthetic":false,"types":[]}];
-implementors["salsa20"] = [{"text":"impl NewStreamCipher for XSalsa20","synthetic":false,"types":[]},{"text":"impl&lt;R:&nbsp;Rounds&gt; NewStreamCipher for Salsa&lt;R&gt;","synthetic":false,"types":[]}];
+implementors["chacha20"] = [{"text":"impl&lt;R:&nbsp;Rounds&gt; <a class=\"trait\" href=\"stream_cipher/trait.NewStreamCipher.html\" title=\"trait stream_cipher::NewStreamCipher\">NewStreamCipher</a> for <a class=\"struct\" href=\"chacha20/struct.Cipher.html\" title=\"struct chacha20::Cipher\">Cipher</a>&lt;R&gt;","synthetic":false,"types":["chacha20::cipher::Cipher"]},{"text":"impl <a class=\"trait\" href=\"stream_cipher/trait.NewStreamCipher.html\" title=\"trait stream_cipher::NewStreamCipher\">NewStreamCipher</a> for <a class=\"struct\" href=\"chacha20/struct.XChaCha20.html\" title=\"struct chacha20::XChaCha20\">XChaCha20</a>","synthetic":false,"types":["chacha20::xchacha20::XChaCha20"]}];
 implementors["stream_cipher"] = [];
 if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

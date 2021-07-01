@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/libp2p-swarm-0.22.0/src/behaviour.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>behaviour.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/libp2p-swarm-0.27.2/src/behaviour.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>behaviour.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../libp2p_swarm/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../libp2p_swarm/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -364,6 +364,10 @@
 <span id="361">361</span>
 <span id="362">362</span>
 <span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2019 Parity Technologies (UK) Ltd.</span>
 <span class="comment">//</span>
@@ -385,9 +389,10 @@
 <span class="comment">// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER</span>
 <span class="comment">// DEALINGS IN THE SOFTWARE.</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">protocols_handler</span>::{<span class="ident">IntoProtocolsHandler</span>, <span class="ident">ProtocolsHandler</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">AddressScore</span>, <span class="ident">AddressRecord</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::protocols_handler</span>::{<span class="ident">IntoProtocolsHandler</span>, <span class="ident">ProtocolsHandler</span>};
 <span class="kw">use</span> <span class="ident">libp2p_core</span>::{<span class="ident">ConnectedPoint</span>, <span class="ident">Multiaddr</span>, <span class="ident">PeerId</span>, <span class="ident">connection</span>::{<span class="ident">ConnectionId</span>, <span class="ident">ListenerId</span>}};
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">error</span>, <span class="ident">task</span>::<span class="ident">Context</span>, <span class="ident">task</span>::<span class="ident">Poll</span>};
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">error</span>, <span class="ident">task::Context</span>, <span class="ident">task::Poll</span>};
 
 <span class="doccomment">/// A behaviour for the network. Allows customizing the swarm.</span>
 <span class="doccomment">///</span>
@@ -438,7 +443,7 @@
     <span class="doccomment">/// spawned (ie. the objects returned by `new_handler`) can communicate by passing messages.</span>
     <span class="doccomment">/// Messages sent from the handler to the behaviour are injected with `inject_event`, and</span>
     <span class="doccomment">/// the behaviour can send a message to the handler by making `poll` return `SendEvent`.</span>
-    <span class="kw">fn</span> <span class="ident">new_handler</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">ProtocolsHandler</span>;
+    <span class="kw">fn</span> <span class="ident">new_handler</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::ProtocolsHandler</span>;
 
     <span class="doccomment">/// Addresses that this behaviour is aware of for this specific peer, and that may allow</span>
     <span class="doccomment">/// reaching the peer.</span>
@@ -495,14 +500,14 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">peer_id</span>: <span class="ident">PeerId</span>,
         <span class="ident">connection</span>: <span class="ident">ConnectionId</span>,
-        <span class="ident">event</span>: <span class="op">&lt;</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">ProtocolsHandler</span> <span class="kw">as</span> <span class="ident">IntoProtocolsHandler</span><span class="op">&gt;</span>::<span class="ident">Handler</span> <span class="kw">as</span> <span class="ident">ProtocolsHandler</span><span class="op">&gt;</span>::<span class="ident">OutEvent</span>
+        <span class="ident">event</span>: <span class="op">&lt;</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::ProtocolsHandler</span> <span class="kw">as</span> <span class="ident">IntoProtocolsHandler</span><span class="op">&gt;</span><span class="ident">::Handler</span> <span class="kw">as</span> <span class="ident">ProtocolsHandler</span><span class="op">&gt;</span><span class="ident">::OutEvent</span>
     );
 
     <span class="doccomment">/// Indicates to the behaviour that we tried to reach an address, but failed.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If we were trying to reach a specific node, its ID is passed as parameter. If this is the</span>
     <span class="doccomment">/// last address to attempt for the given node, then `inject_dial_failure` is called afterwards.</span>
-    <span class="kw">fn</span> <span class="ident">inject_addr_reach_failure</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_peer_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PeerId</span><span class="op">&gt;</span>, <span class="ident">_addr</span>: <span class="kw-2">&amp;</span><span class="ident">Multiaddr</span>, <span class="ident">_error</span>: <span class="kw-2">&amp;</span><span class="ident">dyn</span> <span class="ident">error</span>::<span class="ident">Error</span>) {
+    <span class="kw">fn</span> <span class="ident">inject_addr_reach_failure</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_peer_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PeerId</span><span class="op">&gt;</span>, <span class="ident">_addr</span>: <span class="kw-2">&amp;</span><span class="ident">Multiaddr</span>, <span class="ident">_error</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">error::Error</span>) {
     }
 
     <span class="doccomment">/// Indicates to the behaviour that we tried to dial all the addresses known for a node, but</span>
@@ -527,11 +532,11 @@
     }
 
     <span class="doccomment">/// A listener experienced an error.</span>
-    <span class="kw">fn</span> <span class="ident">inject_listener_error</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_id</span>: <span class="ident">ListenerId</span>, <span class="ident">_err</span>: <span class="kw-2">&amp;</span>(<span class="ident">dyn</span> <span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)) {
+    <span class="kw">fn</span> <span class="ident">inject_listener_error</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_id</span>: <span class="ident">ListenerId</span>, <span class="ident">_err</span>: <span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)) {
     }
 
     <span class="doccomment">/// A listener closed.</span>
-    <span class="kw">fn</span> <span class="ident">inject_listener_closed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_id</span>: <span class="ident">ListenerId</span>, <span class="ident">_reason</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="kw-2">&amp;</span><span class="ident">std</span>::<span class="ident">io</span>::<span class="ident">Error</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">inject_listener_closed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">_id</span>: <span class="ident">ListenerId</span>, <span class="ident">_reason</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="kw-2">&amp;</span><span class="ident">std::io::Error</span><span class="op">&gt;</span>) {
     }
 
     <span class="doccomment">/// Polls for things that swarm should do.</span>
@@ -539,7 +544,7 @@
     <span class="doccomment">/// This API mimics the API of the `Stream` trait. The method may register the current task in</span>
     <span class="doccomment">/// order to wake it up at a later point in time.</span>
     <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">impl</span> <span class="ident">PollParameters</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">NetworkBehaviourAction</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">ProtocolsHandler</span> <span class="kw">as</span> <span class="ident">IntoProtocolsHandler</span><span class="op">&gt;</span>::<span class="ident">Handler</span> <span class="kw">as</span> <span class="ident">ProtocolsHandler</span><span class="op">&gt;</span>::<span class="ident">InEvent</span>, <span class="self">Self</span>::<span class="ident">OutEvent</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+        <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">NetworkBehaviourAction</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::ProtocolsHandler</span> <span class="kw">as</span> <span class="ident">IntoProtocolsHandler</span><span class="op">&gt;</span><span class="ident">::Handler</span> <span class="kw">as</span> <span class="ident">ProtocolsHandler</span><span class="op">&gt;</span><span class="ident">::InEvent</span>, <span class="self">Self</span><span class="ident">::OutEvent</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 }
 
 <span class="doccomment">/// Parameters passed to `poll()`, that the `NetworkBehaviour` has access to.</span>
@@ -549,7 +554,7 @@
     <span class="doccomment">/// Iterator returned by [`listened_addresses`](PollParameters::listened_addresses).</span>
     <span class="kw">type</span> <span class="ident">ListenedAddressesIter</span>: <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Multiaddr</span><span class="op">&gt;</span>;
     <span class="doccomment">/// Iterator returned by [`external_addresses`](PollParameters::external_addresses).</span>
-    <span class="kw">type</span> <span class="ident">ExternalAddressesIter</span>: <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Multiaddr</span><span class="op">&gt;</span>;
+    <span class="kw">type</span> <span class="ident">ExternalAddressesIter</span>: <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">AddressRecord</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Returns the list of protocol the behaviour supports when a remote negotiates a protocol on</span>
     <span class="doccomment">/// an inbound substream.</span>
@@ -557,13 +562,13 @@
     <span class="doccomment">/// The iterator&#39;s elements are the ASCII names as reported on the wire.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Note that the list is computed once at initialization and never refreshed.</span>
-    <span class="kw">fn</span> <span class="ident">supported_protocols</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">SupportedProtocolsIter</span>;
+    <span class="kw">fn</span> <span class="ident">supported_protocols</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::SupportedProtocolsIter</span>;
 
     <span class="doccomment">/// Returns the list of the addresses we&#39;re listening on.</span>
-    <span class="kw">fn</span> <span class="ident">listened_addresses</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">ListenedAddressesIter</span>;
+    <span class="kw">fn</span> <span class="ident">listened_addresses</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::ListenedAddressesIter</span>;
 
     <span class="doccomment">/// Returns the list of the addresses nodes can use to reach us.</span>
-    <span class="kw">fn</span> <span class="ident">external_addresses</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">ExternalAddressesIter</span>;
+    <span class="kw">fn</span> <span class="ident">external_addresses</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::ExternalAddressesIter</span>;
 
     <span class="doccomment">/// Returns the peer id of the local node.</span>
     <span class="kw">fn</span> <span class="ident">local_peer_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">PeerId</span>;
@@ -584,7 +589,7 @@
 <span class="doccomment">/// in whose context it is executing.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`Swarm`]: super::Swarm</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">NetworkBehaviourAction</span><span class="op">&lt;</span><span class="ident">TInEvent</span>, <span class="ident">TOutEvent</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Instructs the `Swarm` to return an event when it is being polled.</span>
     <span class="ident">GenerateEvent</span>(<span class="ident">TOutEvent</span>),
@@ -630,14 +635,15 @@
     <span class="ident">NotifyHandler</span> {
         <span class="doccomment">/// The peer for whom a `ProtocolsHandler` should be notified.</span>
         <span class="ident">peer_id</span>: <span class="ident">PeerId</span>,
-        <span class="doccomment">/// The ID of the connection whose `ProtocolsHandler` to notify.</span>
+        <span class="doccomment">/// The options w.r.t. which connection handler to notify of the event.</span>
         <span class="ident">handler</span>: <span class="ident">NotifyHandler</span>,
         <span class="doccomment">/// The event to send.</span>
         <span class="ident">event</span>: <span class="ident">TInEvent</span>,
     },
 
-    <span class="doccomment">/// Informs the `Swarm` about a multi-address observed by a remote for</span>
-    <span class="doccomment">/// the local node.</span>
+    <span class="doccomment">/// Informs the `Swarm` about an address observed by a remote for</span>
+    <span class="doccomment">/// the local node by which the local node is supposedly publicly</span>
+    <span class="doccomment">/// reachable.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// It is advisable to issue `ReportObservedAddr` actions at a fixed frequency</span>
     <span class="doccomment">/// per node. This way address information will be more accurate over time</span>
@@ -645,6 +651,10 @@
     <span class="ident">ReportObservedAddr</span> {
         <span class="doccomment">/// The observed address of the local node.</span>
         <span class="ident">address</span>: <span class="ident">Multiaddr</span>,
+        <span class="doccomment">/// The score to associate with this observation, i.e.</span>
+        <span class="doccomment">/// an indicator for the trusworthiness of this address</span>
+        <span class="doccomment">/// relative to other observed addresses.</span>
+        <span class="ident">score</span>: <span class="ident">AddressScore</span>,
     },
 }
 
@@ -652,49 +662,47 @@
     <span class="doccomment">/// Map the handler event.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_in</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="ident">TInEvent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">E</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">NetworkBehaviourAction</span><span class="op">&lt;</span><span class="ident">E</span>, <span class="ident">TOutEvent</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">NetworkBehaviourAction</span>::<span class="ident">GenerateEvent</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span>
-                <span class="ident">NetworkBehaviourAction</span>::<span class="ident">GenerateEvent</span>(<span class="ident">e</span>),
-            <span class="ident">NetworkBehaviourAction</span>::<span class="ident">DialAddress</span> { <span class="ident">address</span> } <span class="op">=</span><span class="op">&gt;</span>
-                <span class="ident">NetworkBehaviourAction</span>::<span class="ident">DialAddress</span> { <span class="ident">address</span> },
-            <span class="ident">NetworkBehaviourAction</span>::<span class="ident">DialPeer</span> { <span class="ident">peer_id</span>, <span class="ident">condition</span> } <span class="op">=</span><span class="op">&gt;</span>
-                <span class="ident">NetworkBehaviourAction</span>::<span class="ident">DialPeer</span> { <span class="ident">peer_id</span>, <span class="ident">condition</span> },
-            <span class="ident">NetworkBehaviourAction</span>::<span class="ident">NotifyHandler</span> { <span class="ident">peer_id</span>, <span class="ident">handler</span>, <span class="ident">event</span> } <span class="op">=</span><span class="op">&gt;</span>
-                <span class="ident">NetworkBehaviourAction</span>::<span class="ident">NotifyHandler</span> {
+            <span class="ident">NetworkBehaviourAction::GenerateEvent</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span>
+                <span class="ident">NetworkBehaviourAction::GenerateEvent</span>(<span class="ident">e</span>),
+            <span class="ident">NetworkBehaviourAction::DialAddress</span> { <span class="ident">address</span> } <span class="op">=</span><span class="op">&gt;</span>
+                <span class="ident">NetworkBehaviourAction::DialAddress</span> { <span class="ident">address</span> },
+            <span class="ident">NetworkBehaviourAction::DialPeer</span> { <span class="ident">peer_id</span>, <span class="ident">condition</span> } <span class="op">=</span><span class="op">&gt;</span>
+                <span class="ident">NetworkBehaviourAction::DialPeer</span> { <span class="ident">peer_id</span>, <span class="ident">condition</span> },
+            <span class="ident">NetworkBehaviourAction::NotifyHandler</span> { <span class="ident">peer_id</span>, <span class="ident">handler</span>, <span class="ident">event</span> } <span class="op">=</span><span class="op">&gt;</span>
+                <span class="ident">NetworkBehaviourAction::NotifyHandler</span> {
                     <span class="ident">peer_id</span>,
                     <span class="ident">handler</span>,
                     <span class="ident">event</span>: <span class="ident">f</span>(<span class="ident">event</span>)
                 },
-            <span class="ident">NetworkBehaviourAction</span>::<span class="ident">ReportObservedAddr</span> { <span class="ident">address</span> } <span class="op">=</span><span class="op">&gt;</span>
-                <span class="ident">NetworkBehaviourAction</span>::<span class="ident">ReportObservedAddr</span> { <span class="ident">address</span> }
+            <span class="ident">NetworkBehaviourAction::ReportObservedAddr</span> { <span class="ident">address</span>, <span class="ident">score</span> } <span class="op">=</span><span class="op">&gt;</span>
+                <span class="ident">NetworkBehaviourAction::ReportObservedAddr</span> { <span class="ident">address</span>, <span class="ident">score</span> }
         }
     }
 
     <span class="doccomment">/// Map the event the swarm will return.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_out</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="ident">TOutEvent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">E</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">NetworkBehaviourAction</span><span class="op">&lt;</span><span class="ident">TInEvent</span>, <span class="ident">E</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">NetworkBehaviourAction</span>::<span class="ident">GenerateEvent</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span>
-                <span class="ident">NetworkBehaviourAction</span>::<span class="ident">GenerateEvent</span>(<span class="ident">f</span>(<span class="ident">e</span>)),
-            <span class="ident">NetworkBehaviourAction</span>::<span class="ident">DialAddress</span> { <span class="ident">address</span> } <span class="op">=</span><span class="op">&gt;</span>
-                <span class="ident">NetworkBehaviourAction</span>::<span class="ident">DialAddress</span> { <span class="ident">address</span> },
-            <span class="ident">NetworkBehaviourAction</span>::<span class="ident">DialPeer</span> { <span class="ident">peer_id</span>, <span class="ident">condition</span> } <span class="op">=</span><span class="op">&gt;</span>
-                <span class="ident">NetworkBehaviourAction</span>::<span class="ident">DialPeer</span> { <span class="ident">peer_id</span>, <span class="ident">condition</span> },
-            <span class="ident">NetworkBehaviourAction</span>::<span class="ident">NotifyHandler</span> { <span class="ident">peer_id</span>, <span class="ident">handler</span>, <span class="ident">event</span> } <span class="op">=</span><span class="op">&gt;</span>
-                <span class="ident">NetworkBehaviourAction</span>::<span class="ident">NotifyHandler</span> { <span class="ident">peer_id</span>, <span class="ident">handler</span>, <span class="ident">event</span> },
-            <span class="ident">NetworkBehaviourAction</span>::<span class="ident">ReportObservedAddr</span> { <span class="ident">address</span> } <span class="op">=</span><span class="op">&gt;</span>
-                <span class="ident">NetworkBehaviourAction</span>::<span class="ident">ReportObservedAddr</span> { <span class="ident">address</span> }
+            <span class="ident">NetworkBehaviourAction::GenerateEvent</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span>
+                <span class="ident">NetworkBehaviourAction::GenerateEvent</span>(<span class="ident">f</span>(<span class="ident">e</span>)),
+            <span class="ident">NetworkBehaviourAction::DialAddress</span> { <span class="ident">address</span> } <span class="op">=</span><span class="op">&gt;</span>
+                <span class="ident">NetworkBehaviourAction::DialAddress</span> { <span class="ident">address</span> },
+            <span class="ident">NetworkBehaviourAction::DialPeer</span> { <span class="ident">peer_id</span>, <span class="ident">condition</span> } <span class="op">=</span><span class="op">&gt;</span>
+                <span class="ident">NetworkBehaviourAction::DialPeer</span> { <span class="ident">peer_id</span>, <span class="ident">condition</span> },
+            <span class="ident">NetworkBehaviourAction::NotifyHandler</span> { <span class="ident">peer_id</span>, <span class="ident">handler</span>, <span class="ident">event</span> } <span class="op">=</span><span class="op">&gt;</span>
+                <span class="ident">NetworkBehaviourAction::NotifyHandler</span> { <span class="ident">peer_id</span>, <span class="ident">handler</span>, <span class="ident">event</span> },
+            <span class="ident">NetworkBehaviourAction::ReportObservedAddr</span> { <span class="ident">address</span>, <span class="ident">score</span> } <span class="op">=</span><span class="op">&gt;</span>
+                <span class="ident">NetworkBehaviourAction::ReportObservedAddr</span> { <span class="ident">address</span>, <span class="ident">score</span> }
         }
     }
 }
 
-<span class="doccomment">/// The options w.r.t. which connection handlers to notify of an event.</span>
+<span class="doccomment">/// The options w.r.t. which connection handler to notify of an event.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">NotifyHandler</span> {
     <span class="doccomment">/// Notify a particular connection handler.</span>
     <span class="ident">One</span>(<span class="ident">ConnectionId</span>),
     <span class="doccomment">/// Notify an arbitrary connection handler.</span>
     <span class="ident">Any</span>,
-    <span class="doccomment">/// Notify all connection handlers.</span>
-    <span class="ident">All</span>
 }
 
 <span class="doccomment">/// The available conditions under which a new dialing attempt to</span>
@@ -725,8 +733,9 @@
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">DialPeerCondition</span> {
     <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident">DialPeerCondition</span>::<span class="ident">Disconnected</span>
+        <span class="ident">DialPeerCondition::Disconnected</span>
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "libp2p_swarm";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="libp2p_swarm" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

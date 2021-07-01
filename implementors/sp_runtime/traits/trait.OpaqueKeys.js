@@ -1,4 +1,4 @@
 (function() {var implementors = {};
-implementors["governance_os_runtime"] = [{"text":"impl OpaqueKeys for SessionKeys","synthetic":false,"types":[]}];
+implementors["governance_os_runtime"] = [{"text":"impl <a class=\"trait\" href=\"sp_runtime/traits/trait.OpaqueKeys.html\" title=\"trait sp_runtime::traits::OpaqueKeys\">OpaqueKeys</a> for <a class=\"struct\" href=\"governance_os_runtime/struct.SessionKeys.html\" title=\"struct governance_os_runtime::SessionKeys\">SessionKeys</a>","synthetic":false,"types":["governance_os_runtime::pallets_consensus::SessionKeys"]}];
 implementors["sp_runtime"] = [];
 if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

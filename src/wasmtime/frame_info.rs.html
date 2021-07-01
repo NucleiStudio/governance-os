@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/wasmtime-0.19.0/src/frame_info.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>frame_info.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/wasmtime-0.22.0/src/frame_info.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>frame_info.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../wasmtime/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../wasmtime/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -279,27 +279,123 @@
 <span id="276">276</span>
 <span id="277">277</span>
 <span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cmp</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">BTreeMap</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::{<span class="ident">Arc</span>, <span class="ident">RwLock</span>};
-<span class="kw">use</span> <span class="ident">wasmtime_environ</span>::<span class="ident">entity</span>::<span class="ident">EntityRef</span>;
-<span class="kw">use</span> <span class="ident">wasmtime_environ</span>::<span class="ident">ir</span>;
-<span class="kw">use</span> <span class="ident">wasmtime_environ</span>::<span class="ident">wasm</span>::<span class="ident">FuncIndex</span>;
+<span class="kw">use</span> <span class="ident">std::cmp</span>;
+<span class="kw">use</span> <span class="ident">std::collections::BTreeMap</span>;
+<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<span class="kw">use</span> <span class="ident">wasmtime_environ::entity::EntityRef</span>;
+<span class="kw">use</span> <span class="ident">wasmtime_environ::ir</span>;
+<span class="kw">use</span> <span class="ident">wasmtime_environ::wasm::FuncIndex</span>;
 <span class="kw">use</span> <span class="ident">wasmtime_environ</span>::{<span class="ident">FunctionAddressMap</span>, <span class="ident">Module</span>, <span class="ident">TrapInformation</span>};
-<span class="kw">use</span> <span class="ident">wasmtime_jit</span>::<span class="ident">CompiledModule</span>;
-
-<span class="ident">lazy_static</span>::<span class="macro">lazy_static</span><span class="macro">!</span> {
-    <span class="doccomment">/// This is a global cache of backtrace frame information for all active</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This global cache is used during `Trap` creation to symbolicate frames.</span>
-    <span class="doccomment">/// This is populated on module compilation, and it is cleared out whenever</span>
-    <span class="doccomment">/// all references to a module are dropped.</span>
-    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">FRAME_INFO</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">GlobalFrameInfo</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Default</span>::<span class="ident">default</span>();
-}
+<span class="kw">use</span> <span class="ident">wasmtime_jit</span>::{<span class="ident">CompiledModule</span>, <span class="ident">SymbolizeContext</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GlobalFrameInfo</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StoreFrameInfo</span> {
     <span class="doccomment">/// An internal map that keeps track of backtrace frame information for</span>
     <span class="doccomment">/// each module.</span>
     <span class="doccomment">///</span>
@@ -312,20 +408,12 @@
     <span class="ident">ranges</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">ModuleFrameInfo</span><span class="op">&gt;</span>,
 }
 
-<span class="doccomment">/// An RAII structure used to unregister a module&#39;s frame information when the</span>
-<span class="doccomment">/// module is destroyed.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GlobalFrameInfoRegistration</span> {
-    <span class="doccomment">/// The key that will be removed from the global `ranges` map when this is</span>
-    <span class="doccomment">/// dropped.</span>
-    <span class="ident">key</span>: <span class="ident">usize</span>,
-}
-
 <span class="kw">struct</span> <span class="ident">ModuleFrameInfo</span> {
     <span class="ident">start</span>: <span class="ident">usize</span>,
     <span class="ident">functions</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">FunctionInfo</span><span class="op">&gt;</span>,
     <span class="ident">module</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Module</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-    <span class="ident">module_code</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">std</span>::<span class="ident">any</span>::<span class="ident">Any</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>,
+    <span class="ident">symbolize</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SymbolizeContext</span><span class="op">&gt;</span>,
+    <span class="ident">has_unparsed_debuginfo</span>: <span class="ident">bool</span>,
 }
 
 <span class="kw">struct</span> <span class="ident">FunctionInfo</span> {
@@ -335,18 +423,20 @@
     <span class="ident">instr_map</span>: <span class="ident">FunctionAddressMap</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">GlobalFrameInfo</span> {
+<span class="kw">impl</span> <span class="ident">StoreFrameInfo</span> {
     <span class="doccomment">/// Fetches frame information about a program counter in a backtrace.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns an object if this `pc` is known to some previously registered</span>
-    <span class="doccomment">/// module, or returns `None` if no information can be found.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lookup_frame_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">pc</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FrameInfo</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// module, or returns `None` if no information can be found. The boolean</span>
+    <span class="doccomment">/// returned indicates whether the original module has unparsed debug</span>
+    <span class="doccomment">/// information due to the compiler&#39;s configuration.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lookup_frame_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">pc</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">FrameInfo</span>, <span class="ident">bool</span>)<span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">module</span>, <span class="ident">func</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">func</span>(<span class="ident">pc</span>)<span class="question-mark">?</span>;
 
         <span class="comment">// Use our relative position from the start of the function to find the</span>
         <span class="comment">// machine instruction that corresponds to `pc`, which then allows us to</span>
         <span class="comment">// map that to a wasm original source location.</span>
-        <span class="kw">let</span> <span class="ident">rel_pos</span> <span class="op">=</span> <span class="ident">pc</span> <span class="op">-</span> <span class="ident">func</span>.<span class="ident">start</span>;
+        <span class="kw">let</span> <span class="ident">rel_pos</span> <span class="op">=</span> (<span class="ident">pc</span> <span class="op">-</span> <span class="ident">func</span>.<span class="ident">start</span>) <span class="kw">as</span> <span class="ident">u32</span>;
         <span class="kw">let</span> <span class="ident">pos</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">func</span>
             .<span class="ident">instr_map</span>
             .<span class="ident">instructions</span>
@@ -359,38 +449,69 @@
             <span class="comment">// instructions cover `pc`.</span>
             <span class="prelude-val">Err</span>(<span class="number">0</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
 
-            <span class="comment">// This would be at the `nth` slot, so check `n-1` to see if we&#39;re</span>
-            <span class="comment">// part of that instruction. This happens due to the minus one when</span>
-            <span class="comment">// this function is called form trap symbolication, where we don&#39;t</span>
-            <span class="comment">// always get called with a `pc` that&#39;s an exact instruction</span>
-            <span class="comment">// boundary.</span>
-            <span class="prelude-val">Err</span>(<span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">instr</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">func</span>.<span class="ident">instr_map</span>.<span class="ident">instructions</span>[<span class="ident">n</span> <span class="op">-</span> <span class="number">1</span>];
-                <span class="kw">if</span> <span class="ident">instr</span>.<span class="ident">code_offset</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">rel_pos</span> <span class="op">&amp;&amp;</span> <span class="ident">rel_pos</span> <span class="op">&lt;</span> <span class="ident">instr</span>.<span class="ident">code_offset</span> <span class="op">+</span> <span class="ident">instr</span>.<span class="ident">code_len</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">n</span> <span class="op">-</span> <span class="number">1</span>)
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">None</span>
-                }
-            }
+            <span class="comment">// This would be at the `nth` slot, so we&#39;re at the `n-1`th slot.</span>
+            <span class="prelude-val">Err</span>(<span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">n</span> <span class="op">-</span> <span class="number">1</span>),
         };
 
         <span class="comment">// In debug mode for now assert that we found a mapping for `pc` within</span>
         <span class="comment">// the function, because otherwise something is buggy along the way and</span>
         <span class="comment">// not accounting for all the instructions. This isn&#39;t super critical</span>
         <span class="comment">// though so we can omit this check in release mode.</span>
-        <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">pos</span>.<span class="ident">is_some</span>(), <span class="string">&quot;failed to find instruction for {:x}&quot;</span>, <span class="ident">pc</span>);
+        <span class="macro">debug_assert!</span>(<span class="ident">pos</span>.<span class="ident">is_some</span>(), <span class="string">&quot;failed to find instruction for {:x}&quot;</span>, <span class="ident">pc</span>);
 
         <span class="kw">let</span> <span class="ident">instr</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">pos</span> {
             <span class="prelude-val">Some</span>(<span class="ident">pos</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">func</span>.<span class="ident">instr_map</span>.<span class="ident">instructions</span>[<span class="ident">pos</span>].<span class="ident">srcloc</span>,
             <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">func</span>.<span class="ident">instr_map</span>.<span class="ident">start_srcloc</span>,
         };
-        <span class="prelude-val">Some</span>(<span class="ident">FrameInfo</span> {
-            <span class="ident">module_name</span>: <span class="ident">module</span>.<span class="ident">module</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-            <span class="ident">func_index</span>: <span class="ident">func</span>.<span class="ident">index</span>.<span class="ident">index</span>() <span class="kw">as</span> <span class="ident">u32</span>,
-            <span class="ident">func_name</span>: <span class="ident">module</span>.<span class="ident">module</span>.<span class="ident">func_names</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">func</span>.<span class="ident">index</span>).<span class="ident">cloned</span>(),
-            <span class="ident">instr</span>,
-            <span class="ident">func_start</span>: <span class="ident">func</span>.<span class="ident">instr_map</span>.<span class="ident">start_srcloc</span>,
-        })
+
+        <span class="comment">// Use our wasm-relative pc to symbolize this frame. If there&#39;s a</span>
+        <span class="comment">// symbolication context (dwarf debug info) available then we can try to</span>
+        <span class="comment">// look this up there.</span>
+        <span class="comment">//</span>
+        <span class="comment">// Note that dwarf pcs are code-section-relative, hence the subtraction</span>
+        <span class="comment">// from the location of `instr`. Also note that all errors are ignored</span>
+        <span class="comment">// here for now since technically wasm modules can always have any</span>
+        <span class="comment">// custom section contents.</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">symbols</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">module</span>.<span class="ident">symbolize</span> {
+            <span class="kw">let</span> <span class="ident">to_lookup</span> <span class="op">=</span> (<span class="ident">instr</span>.<span class="ident">bits</span>() <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">-</span> <span class="ident">s</span>.<span class="ident">code_section_offset</span>();
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="kw-2">mut</span> <span class="ident">frames</span>) <span class="op">=</span> <span class="ident">s</span>.<span class="ident">addr2line</span>().<span class="ident">find_frames</span>(<span class="ident">to_lookup</span>) {
+                <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">frame</span>)) <span class="op">=</span> <span class="ident">frames</span>.<span class="ident">next</span>() {
+                    <span class="ident">symbols</span>.<span class="ident">push</span>(<span class="ident">FrameSymbol</span> {
+                        <span class="ident">name</span>: <span class="ident">frame</span>
+                            .<span class="ident">function</span>
+                            .<span class="ident">as_ref</span>()
+                            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">l</span><span class="op">|</span> <span class="ident">l</span>.<span class="ident">raw_name</span>().<span class="ident">ok</span>())
+                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">to_string</span>()),
+                        <span class="ident">file</span>: <span class="ident">frame</span>
+                            .<span class="ident">location</span>
+                            .<span class="ident">as_ref</span>()
+                            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">l</span><span class="op">|</span> <span class="ident">l</span>.<span class="ident">file</span>)
+                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">to_string</span>()),
+                        <span class="ident">line</span>: <span class="ident">frame</span>.<span class="ident">location</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">l</span><span class="op">|</span> <span class="ident">l</span>.<span class="ident">line</span>),
+                        <span class="ident">column</span>: <span class="ident">frame</span>.<span class="ident">location</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">l</span><span class="op">|</span> <span class="ident">l</span>.<span class="ident">column</span>),
+                    });
+                }
+            }
+        }
+
+        <span class="prelude-val">Some</span>((
+            <span class="ident">FrameInfo</span> {
+                <span class="ident">module_name</span>: <span class="ident">module</span>.<span class="ident">module</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
+                <span class="ident">func_index</span>: <span class="ident">func</span>.<span class="ident">index</span>.<span class="ident">index</span>() <span class="kw">as</span> <span class="ident">u32</span>,
+                <span class="ident">func_name</span>: <span class="ident">module</span>.<span class="ident">module</span>.<span class="ident">func_names</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">func</span>.<span class="ident">index</span>).<span class="ident">cloned</span>(),
+                <span class="ident">instr</span>,
+                <span class="ident">func_start</span>: <span class="ident">func</span>.<span class="ident">instr_map</span>.<span class="ident">start_srcloc</span>,
+                <span class="ident">symbols</span>,
+            },
+            <span class="ident">module</span>.<span class="ident">has_unparsed_debuginfo</span>,
+        ))
+    }
+
+    <span class="doccomment">/// Returns whether the `pc` specified is contaained within some module&#39;s</span>
+    <span class="doccomment">/// function.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains_pc</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">pc</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">func</span>(<span class="ident">pc</span>).<span class="ident">is_some</span>()
     }
 
     <span class="doccomment">/// Fetches trap information about a program counter in a backtrace.</span>
@@ -414,73 +535,64 @@
         }
         <span class="prelude-val">Some</span>((<span class="ident">info</span>, <span class="ident">func</span>))
     }
-}
 
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">GlobalFrameInfoRegistration</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="kw-2">mut</span> <span class="ident">info</span>) <span class="op">=</span> <span class="ident">FRAME_INFO</span>.<span class="ident">write</span>() {
-            <span class="ident">info</span>.<span class="ident">ranges</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">key</span>);
+    <span class="doccomment">/// Registers a new compiled module&#39;s frame information.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This function will register the `names` information for all of the</span>
+    <span class="doccomment">/// compiled functions within `module`. If the `module` has no functions</span>
+    <span class="doccomment">/// then `None` will be returned. Otherwise the returned object, when</span>
+    <span class="doccomment">/// dropped, will be used to unregister all name information from this map.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">register</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">module</span>: <span class="kw-2">&amp;</span><span class="ident">CompiledModule</span>) {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">min</span> <span class="op">=</span> <span class="ident">usize::max_value</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">max</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">functions</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
+        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">allocated</span>, <span class="ident">traps</span>, <span class="ident">address_map</span>) <span class="kw">in</span> <span class="ident">module</span>.<span class="ident">trap_information</span>() {
+            <span class="kw">let</span> (<span class="ident">start</span>, <span class="ident">end</span>) <span class="op">=</span> <span class="kw">unsafe</span> {
+                <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">allocated</span>).<span class="ident">as_ptr</span>();
+                <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">allocated</span>).<span class="ident">len</span>();
+                <span class="comment">// First and last byte of the function text.</span>
+                (<span class="ident">ptr</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">ptr</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="ident">len</span> <span class="op">-</span> <span class="number">1</span>)
+            };
+            <span class="comment">// Skip empty functions.</span>
+            <span class="kw">if</span> <span class="ident">end</span> <span class="op">&lt;</span> <span class="ident">start</span> {
+                <span class="kw">continue</span>;
+            }
+            <span class="ident">min</span> <span class="op">=</span> <span class="ident">cmp::min</span>(<span class="ident">min</span>, <span class="ident">start</span>);
+            <span class="ident">max</span> <span class="op">=</span> <span class="ident">cmp::max</span>(<span class="ident">max</span>, <span class="ident">end</span>);
+            <span class="kw">let</span> <span class="ident">func</span> <span class="op">=</span> <span class="ident">FunctionInfo</span> {
+                <span class="ident">start</span>,
+                <span class="ident">index</span>: <span class="ident">module</span>.<span class="ident">module</span>().<span class="ident">func_index</span>(<span class="ident">i</span>),
+                <span class="ident">traps</span>: <span class="ident">traps</span>.<span class="ident">to_vec</span>(),
+                <span class="ident">instr_map</span>: <span class="ident">address_map</span>.<span class="ident">clone</span>(),
+            };
+            <span class="macro">assert!</span>(<span class="ident">functions</span>.<span class="ident">insert</span>(<span class="ident">end</span>, <span class="ident">func</span>).<span class="ident">is_none</span>());
         }
-    }
-}
+        <span class="kw">if</span> <span class="ident">functions</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+            <span class="kw">return</span>;
+        }
 
-<span class="doccomment">/// Registers a new compiled module&#39;s frame information.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This function will register the `names` information for all of the</span>
-<span class="doccomment">/// compiled functions within `module`. If the `module` has no functions</span>
-<span class="doccomment">/// then `None` will be returned. Otherwise the returned object, when</span>
-<span class="doccomment">/// dropped, will be used to unregister all name information from this map.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">register</span>(<span class="ident">module</span>: <span class="kw-2">&amp;</span><span class="ident">CompiledModule</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GlobalFrameInfoRegistration</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">min</span> <span class="op">=</span> <span class="ident">usize</span>::<span class="ident">max_value</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">max</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">functions</span> <span class="op">=</span> <span class="ident">BTreeMap</span>::<span class="ident">new</span>();
-    <span class="kw">for</span> (((<span class="ident">i</span>, <span class="ident">allocated</span>), <span class="ident">traps</span>), <span class="ident">instrs</span>) <span class="kw">in</span> <span class="ident">module</span>
-        .<span class="ident">finished_functions</span>()
-        .<span class="ident">iter</span>()
-        .<span class="ident">zip</span>(<span class="ident">module</span>.<span class="ident">traps</span>().<span class="ident">values</span>())
-        .<span class="ident">zip</span>(<span class="ident">module</span>.<span class="ident">address_transform</span>().<span class="ident">values</span>())
-    {
-        <span class="kw">let</span> (<span class="ident">start</span>, <span class="ident">end</span>) <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">allocated</span>).<span class="ident">as_ptr</span>();
-            <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">allocated</span>).<span class="ident">len</span>();
-            (<span class="ident">ptr</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">ptr</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="ident">len</span>)
-        };
-        <span class="ident">min</span> <span class="op">=</span> <span class="ident">cmp</span>::<span class="ident">min</span>(<span class="ident">min</span>, <span class="ident">start</span>);
-        <span class="ident">max</span> <span class="op">=</span> <span class="ident">cmp</span>::<span class="ident">max</span>(<span class="ident">max</span>, <span class="ident">end</span>);
-        <span class="kw">let</span> <span class="ident">func</span> <span class="op">=</span> <span class="ident">FunctionInfo</span> {
-            <span class="ident">start</span>,
-            <span class="ident">index</span>: <span class="ident">module</span>.<span class="ident">module</span>().<span class="ident">local</span>.<span class="ident">func_index</span>(<span class="ident">i</span>),
-            <span class="ident">traps</span>: <span class="ident">traps</span>.<span class="ident">to_vec</span>(),
-            <span class="ident">instr_map</span>: (<span class="kw-2">*</span><span class="ident">instrs</span>).<span class="ident">clone</span>(),
-        };
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">functions</span>.<span class="ident">insert</span>(<span class="ident">end</span>, <span class="ident">func</span>).<span class="ident">is_none</span>());
-    }
-    <span class="kw">if</span> <span class="ident">functions</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
-        <span class="kw">return</span> <span class="prelude-val">None</span>;
-    }
+        <span class="comment">// First up assert that our chunk of jit functions doesn&#39;t collide with</span>
+        <span class="comment">// any other known chunks of jit functions...</span>
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">prev</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">ranges</span>.<span class="ident">range</span>(<span class="ident">max</span>..).<span class="ident">next</span>() {
+            <span class="macro">assert!</span>(<span class="ident">prev</span>.<span class="ident">start</span> <span class="op">&gt;</span> <span class="ident">max</span>);
+        }
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">prev_end</span>, <span class="kw">_</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">ranges</span>.<span class="ident">range</span>(..<span class="op">=</span><span class="ident">min</span>).<span class="ident">next_back</span>() {
+            <span class="macro">assert!</span>(<span class="kw-2">*</span><span class="ident">prev_end</span> <span class="op">&lt;</span> <span class="ident">min</span>);
+        }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">FRAME_INFO</span>.<span class="ident">write</span>().<span class="ident">unwrap</span>();
-    <span class="comment">// First up assert that our chunk of jit functions doesn&#39;t collide with</span>
-    <span class="comment">// any other known chunks of jit functions...</span>
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">prev</span>)) <span class="op">=</span> <span class="ident">info</span>.<span class="ident">ranges</span>.<span class="ident">range</span>(<span class="ident">max</span>..).<span class="ident">next</span>() {
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">prev</span>.<span class="ident">start</span> <span class="op">&gt;</span> <span class="ident">max</span>);
+        <span class="comment">// ... then insert our range and assert nothing was there previously</span>
+        <span class="kw">let</span> <span class="ident">prev</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ranges</span>.<span class="ident">insert</span>(
+            <span class="ident">max</span>,
+            <span class="ident">ModuleFrameInfo</span> {
+                <span class="ident">start</span>: <span class="ident">min</span>,
+                <span class="ident">functions</span>,
+                <span class="ident">module</span>: <span class="ident">module</span>.<span class="ident">module</span>().<span class="ident">clone</span>(),
+                <span class="ident">symbolize</span>: <span class="ident">module</span>.<span class="ident">symbolize_context</span>().<span class="ident">ok</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>),
+                <span class="ident">has_unparsed_debuginfo</span>: <span class="ident">module</span>.<span class="ident">has_unparsed_debuginfo</span>(),
+            },
+        );
+        <span class="macro">assert!</span>(<span class="ident">prev</span>.<span class="ident">is_none</span>());
     }
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">prev_end</span>, <span class="kw">_</span>)) <span class="op">=</span> <span class="ident">info</span>.<span class="ident">ranges</span>.<span class="ident">range</span>(..<span class="op">=</span><span class="ident">min</span>).<span class="ident">next_back</span>() {
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="kw-2">*</span><span class="ident">prev_end</span> <span class="op">&lt;</span> <span class="ident">min</span>);
-    }
-
-    <span class="comment">// ... then insert our range and assert nothing was there previously</span>
-    <span class="kw">let</span> <span class="ident">prev</span> <span class="op">=</span> <span class="ident">info</span>.<span class="ident">ranges</span>.<span class="ident">insert</span>(
-        <span class="ident">max</span>,
-        <span class="ident">ModuleFrameInfo</span> {
-            <span class="ident">start</span>: <span class="ident">min</span>,
-            <span class="ident">functions</span>,
-            <span class="ident">module</span>: <span class="ident">module</span>.<span class="ident">module</span>().<span class="ident">clone</span>(),
-            <span class="ident">module_code</span>: <span class="ident">module</span>.<span class="ident">code</span>().<span class="ident">clone</span>(),
-        },
-    );
-    <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">prev</span>.<span class="ident">is_none</span>());
-    <span class="prelude-val">Some</span>(<span class="ident">GlobalFrameInfoRegistration</span> { <span class="ident">key</span>: <span class="ident">max</span> })
 }
 
 <span class="doccomment">/// Description of a frame in a backtrace for a [`Trap`].</span>
@@ -495,8 +607,22 @@
     <span class="ident">module_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="ident">func_index</span>: <span class="ident">u32</span>,
     <span class="ident">func_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">func_start</span>: <span class="ident">ir</span>::<span class="ident">SourceLoc</span>,
-    <span class="ident">instr</span>: <span class="ident">ir</span>::<span class="ident">SourceLoc</span>,
+    <span class="ident">func_start</span>: <span class="ident">ir::SourceLoc</span>,
+    <span class="ident">instr</span>: <span class="ident">ir::SourceLoc</span>,
+    <span class="ident">symbols</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FrameSymbol</span><span class="op">&gt;</span>,
+}
+
+<span class="doccomment">/// Debug information for a symbol that is attached to a [`FrameInfo`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// When DWARF debug information is present in a wasm file then this structure</span>
+<span class="doccomment">/// can be found on a [`FrameInfo`] and can be used to learn about filenames,</span>
+<span class="doccomment">/// line numbers, etc, which are the origin of a function in a stack trace.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FrameSymbol</span> {
+    <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="ident">file</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="ident">line</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">column</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">FrameInfo</span> {
@@ -557,6 +683,91 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">func_offset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
         (<span class="self">self</span>.<span class="ident">instr</span>.<span class="ident">bits</span>() <span class="op">-</span> <span class="self">self</span>.<span class="ident">func_start</span>.<span class="ident">bits</span>()) <span class="kw">as</span> <span class="ident">usize</span>
     }
+
+    <span class="doccomment">/// Returns the debug symbols found, if any, for this function frame.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// When a wasm program is compiled with DWARF debug information then this</span>
+    <span class="doccomment">/// function may be populated to return symbols which contain extra debug</span>
+    <span class="doccomment">/// information about a frame including the filename and line number. If no</span>
+    <span class="doccomment">/// debug information was found or if it was malformed then this will return</span>
+    <span class="doccomment">/// an empty array.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">symbols</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">FrameSymbol</span>] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">symbols</span>
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">FrameSymbol</span> {
+    <span class="doccomment">/// Returns the function name associated with this symbol.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Note that this may not be present with malformed debug information, or</span>
+    <span class="doccomment">/// the debug information may not include it. Also note that the symbol is</span>
+    <span class="doccomment">/// frequently mangled, so you might need to run some form of demangling</span>
+    <span class="doccomment">/// over it.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">as_deref</span>()
+    }
+
+    <span class="doccomment">/// Returns the source code filename this symbol was defined in.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Note that this may not be present with malformed debug information, or</span>
+    <span class="doccomment">/// the debug information may not include it.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">file</span>.<span class="ident">as_deref</span>()
+    }
+
+    <span class="doccomment">/// Returns the 1-indexed source code line number this symbol was defined</span>
+    <span class="doccomment">/// on.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Note that this may not be present with malformed debug information, or</span>
+    <span class="doccomment">/// the debug information may not include it.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">line</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">line</span>
+    }
+
+    <span class="doccomment">/// Returns the 1-indexed source code column number this symbol was defined</span>
+    <span class="doccomment">/// on.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Note that this may not be present with malformed debug information, or</span>
+    <span class="doccomment">/// the debug information may not include it.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">column</span>
+    }
+}
+
+<span class="attribute">#[<span class="ident">test</span>]</span>
+<span class="kw">fn</span> <span class="ident">test_frame_info</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">anyhow::Error</span><span class="op">&gt;</span> {
+    <span class="kw">use</span> <span class="kw">crate</span>::<span class="kw-2">*</span>;
+    <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">Store::default</span>();
+    <span class="kw">let</span> <span class="ident">module</span> <span class="op">=</span> <span class="ident">Module::new</span>(
+        <span class="ident">store</span>.<span class="ident">engine</span>(),
+        <span class="string">r#&quot;
+            (module
+                (func (export &quot;add&quot;) (param $x i32) (param $y i32) (result i32) (i32.add (local.get $x) (local.get $y)))
+                (func (export &quot;sub&quot;) (param $x i32) (param $y i32) (result i32) (i32.sub (local.get $x) (local.get $y)))
+                (func (export &quot;mul&quot;) (param $x i32) (param $y i32) (result i32) (i32.mul (local.get $x) (local.get $y)))
+                (func (export &quot;div_s&quot;) (param $x i32) (param $y i32) (result i32) (i32.div_s (local.get $x) (local.get $y)))
+                (func (export &quot;div_u&quot;) (param $x i32) (param $y i32) (result i32) (i32.div_u (local.get $x) (local.get $y)))
+                (func (export &quot;rem_s&quot;) (param $x i32) (param $y i32) (result i32) (i32.rem_s (local.get $x) (local.get $y)))
+                (func (export &quot;rem_u&quot;) (param $x i32) (param $y i32) (result i32) (i32.rem_u (local.get $x) (local.get $y)))
+            )
+         &quot;#</span>,
+    )<span class="question-mark">?</span>;
+    <span class="comment">// Create an instance to ensure the frame information is registered.</span>
+    <span class="ident">Instance::new</span>(<span class="kw-2">&amp;</span><span class="ident">store</span>, <span class="kw-2">&amp;</span><span class="ident">module</span>, <span class="kw-2">&amp;</span>[])<span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">store</span>.<span class="ident">frame_info</span>().<span class="ident">borrow</span>();
+    <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">alloc</span>) <span class="kw">in</span> <span class="ident">module</span>.<span class="ident">compiled_module</span>().<span class="ident">finished_functions</span>() {
+        <span class="kw">let</span> (<span class="ident">start</span>, <span class="ident">end</span>) <span class="op">=</span> <span class="kw">unsafe</span> {
+            <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">alloc</span>).<span class="ident">as_ptr</span>();
+            <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">alloc</span>).<span class="ident">len</span>();
+            (<span class="ident">ptr</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">ptr</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="ident">len</span>)
+        };
+        <span class="kw">for</span> <span class="ident">pc</span> <span class="kw">in</span> <span class="ident">start</span>..<span class="ident">end</span> {
+            <span class="kw">let</span> (<span class="ident">frame</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">info</span>.<span class="ident">lookup_frame_info</span>(<span class="ident">pc</span>).<span class="ident">unwrap</span>();
+            <span class="macro">assert!</span>(<span class="ident">frame</span>.<span class="ident">func_index</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">i</span>.<span class="ident">as_u32</span>());
+        }
+    }
+    <span class="prelude-val">Ok</span>(())
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "wasmtime";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="wasmtime" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

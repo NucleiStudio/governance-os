@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/x25519-dalek-0.6.0/src/x25519.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>x25519.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/x25519-dalek-1.1.0/src/x25519.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>x25519.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../x25519_dalek/index.html'><div class='logo-container'><img src='https://doc.dalek.rs/assets/dalek-logo-clear.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../x25519_dalek/index.html'><div class='logo-container'><img src='https://doc.dalek.rs/assets/dalek-logo-clear.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -402,6 +402,14 @@
 <span id="399">399</span>
 <span id="400">400</span>
 <span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// -*- mode: rust; -*-</span>
 <span class="comment">//</span>
@@ -419,23 +427,22 @@
 <span class="doccomment">//! This implements x25519 key exchange as specified by Mike Hamburg</span>
 <span class="doccomment">//! and Adam Langley in [RFC7748](https://tools.ietf.org/html/rfc7748).</span>
 
-<span class="kw">use</span> <span class="ident">curve25519_dalek</span>::<span class="ident">constants</span>::<span class="ident">ED25519_BASEPOINT_TABLE</span>;
-<span class="kw">use</span> <span class="ident">curve25519_dalek</span>::<span class="ident">montgomery</span>::<span class="ident">MontgomeryPoint</span>;
-<span class="kw">use</span> <span class="ident">curve25519_dalek</span>::<span class="ident">scalar</span>::<span class="ident">Scalar</span>;
+<span class="kw">use</span> <span class="ident">curve25519_dalek::constants::ED25519_BASEPOINT_TABLE</span>;
+<span class="kw">use</span> <span class="ident">curve25519_dalek::montgomery::MontgomeryPoint</span>;
+<span class="kw">use</span> <span class="ident">curve25519_dalek::scalar::Scalar</span>;
 
-<span class="kw">use</span> <span class="ident">rand_core</span>::<span class="ident">CryptoRng</span>;
-<span class="kw">use</span> <span class="ident">rand_core</span>::<span class="ident">RngCore</span>;
+<span class="kw">use</span> <span class="ident">rand_core::CryptoRng</span>;
+<span class="kw">use</span> <span class="ident">rand_core::RngCore</span>;
 
-<span class="kw">use</span> <span class="ident">zeroize</span>::<span class="ident">Zeroize</span>;
+<span class="kw">use</span> <span class="ident">zeroize::Zeroize</span>;
 
-<span class="doccomment">/// A `PublicKey` is the corresponding public key converted from</span>
-<span class="doccomment">/// an `EphemeralSecret` or a `StaticSecret` key.</span>
+<span class="doccomment">/// A Diffie-Hellman public key, corresponding to an [`EphemeralSecret`] or [`StaticSecret`] key.</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;our_serde&quot;</span>))]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(
     <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>,
-    <span class="ident">derive</span>(<span class="ident">our_serde</span>::<span class="ident">Serialize</span>, <span class="ident">our_serde</span>::<span class="ident">Deserialize</span>)
+    <span class="ident">derive</span>(<span class="ident">our_serde::Serialize</span>, <span class="ident">our_serde::Deserialize</span>)
 )]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PublicKey</span>(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">MontgomeryPoint</span>);
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PublicKey</span> {
@@ -446,6 +453,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">PublicKey</span> {
+    <span class="doccomment">/// Convert this public key to a byte array.</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">32</span>] {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">to_bytes</span>()
+    }
+
     <span class="doccomment">/// View this public key as a byte array.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">32</span>] {
@@ -453,24 +466,27 @@
     }
 }
 
-<span class="doccomment">/// A `EphemeralSecret` is a short lived Diffie-Hellman secret key</span>
-<span class="doccomment">/// used to create a `SharedSecret` when given their `PublicKey`.</span>
+<span class="doccomment">/// A short-lived Diffie-Hellman secret key that can only be used to compute a single</span>
+<span class="doccomment">/// [`SharedSecret`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This type is identical to the [`StaticSecret`] type, except that the</span>
+<span class="doccomment">/// [`EphemeralSecret::diffie_hellman`] method consumes and then wipes the secret key, and there</span>
+<span class="doccomment">/// are no serialization methods defined.  This means that [`EphemeralSecret`]s can only be</span>
+<span class="doccomment">/// generated from fresh randomness by [`EphemeralSecret::new`] and the compiler statically checks</span>
+<span class="doccomment">/// that the resulting secret is used at most once.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Zeroize</span>)]</span>
 <span class="attribute">#[<span class="ident">zeroize</span>(<span class="ident">drop</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EphemeralSecret</span>(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">Scalar</span>);
 
 <span class="kw">impl</span> <span class="ident">EphemeralSecret</span> {
     <span class="doccomment">/// Perform a Diffie-Hellman key agreement between `self` and</span>
-    <span class="doccomment">/// `their_public` key to produce a `SharedSecret`.</span>
+    <span class="doccomment">/// `their_public` key to produce a [`SharedSecret`].</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">diffie_hellman</span>(<span class="self">self</span>, <span class="ident">their_public</span>: <span class="kw-2">&amp;</span><span class="ident">PublicKey</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SharedSecret</span> {
         <span class="ident">SharedSecret</span>(<span class="self">self</span>.<span class="number">0</span> <span class="op">*</span> <span class="ident">their_public</span>.<span class="number">0</span>)
     }
 
-    <span class="doccomment">/// Generate an x25519 `EphemeralSecret` key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">csprng</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">RngCore</span> <span class="op">+</span> <span class="ident">CryptoRng</span>,
-    {
+    <span class="doccomment">/// Generate an x25519 [`EphemeralSecret`] key.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">RngCore</span> <span class="op">+</span> <span class="ident">CryptoRng</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">csprng</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">32</span>];
 
         <span class="ident">csprng</span>.<span class="ident">fill_bytes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bytes</span>);
@@ -480,20 +496,31 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">EphemeralSecret</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PublicKey</span> {
-    <span class="doccomment">/// Given an x25519 `EphemeralSecret` key, compute its corresponding</span>
-    <span class="doccomment">/// `PublicKey` key.</span>
+    <span class="doccomment">/// Given an x25519 [`EphemeralSecret`] key, compute its corresponding [`PublicKey`].</span>
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">secret</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">EphemeralSecret</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PublicKey</span> {
         <span class="ident">PublicKey</span>((<span class="kw-2">&amp;</span><span class="ident">ED25519_BASEPOINT_TABLE</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">secret</span>.<span class="number">0</span>).<span class="ident">to_montgomery</span>())
     }
 }
 
-<span class="doccomment">/// A `StaticSecret` is a static Diffie-Hellman secret key that</span>
-<span class="doccomment">/// can be saved and loaded to create a `SharedSecret` when given</span>
-<span class="doccomment">/// their `PublicKey`.</span>
+<span class="doccomment">/// A Diffie-Hellman secret key that can be used to compute multiple [`SharedSecret`]s.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This type is identical to the [`EphemeralSecret`] type, except that the</span>
+<span class="doccomment">/// [`StaticSecret::diffie_hellman`] method does not consume the secret key, and the type provides</span>
+<span class="doccomment">/// serialization methods to save and load key material.  This means that the secret may be used</span>
+<span class="doccomment">/// multiple times (but does not *have to be*).</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Some protocols, such as Noise, already handle the static/ephemeral distinction, so the</span>
+<span class="doccomment">/// additional guarantees provided by [`EphemeralSecret`] are not helpful or would cause duplicate</span>
+<span class="doccomment">/// code paths.  In this case, it may be useful to</span>
+<span class="doccomment">/// ```rust,ignore</span>
+<span class="doccomment">/// use x25519_dalek::StaticSecret as SecretKey;</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// since the only difference between the two is that [`StaticSecret`] does not enforce at</span>
+<span class="doccomment">/// compile-time that the key is only used once.</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;our_serde&quot;</span>))]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(
     <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>,
-    <span class="ident">derive</span>(<span class="ident">our_serde</span>::<span class="ident">Serialize</span>, <span class="ident">our_serde</span>::<span class="ident">Deserialize</span>)
+    <span class="ident">derive</span>(<span class="ident">our_serde::Serialize</span>, <span class="ident">our_serde::Deserialize</span>)
 )]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Zeroize</span>)]</span>
 <span class="attribute">#[<span class="ident">zeroize</span>(<span class="ident">drop</span>)]</span>
@@ -508,11 +535,8 @@
         <span class="ident">SharedSecret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span> <span class="op">*</span> <span class="ident">their_public</span>.<span class="number">0</span>)
     }
 
-    <span class="doccomment">/// Generate a x25519 `StaticSecret` key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">csprng</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">RngCore</span> <span class="op">+</span> <span class="ident">CryptoRng</span>,
-    {
+    <span class="doccomment">/// Generate an x25519 key.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">RngCore</span> <span class="op">+</span> <span class="ident">CryptoRng</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">csprng</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">32</span>];
 
         <span class="ident">csprng</span>.<span class="ident">fill_bytes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bytes</span>);
@@ -520,34 +544,41 @@
         <span class="ident">StaticSecret</span>(<span class="ident">clamp_scalar</span>(<span class="ident">bytes</span>))
     }
 
-    <span class="doccomment">/// Save a x25519 `StaticSecret` key&#39;s bytes.</span>
+    <span class="doccomment">/// Extract this key&#39;s bytes for serialization.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">32</span>] {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">to_bytes</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StaticSecret</span> {
-    <span class="doccomment">/// Load a `StaticSecret` from a byte array.</span>
+    <span class="doccomment">/// Load a secret key from a byte array.</span>
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">bytes</span>: [<span class="ident">u8</span>; <span class="number">32</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StaticSecret</span> {
         <span class="ident">StaticSecret</span>(<span class="ident">clamp_scalar</span>(<span class="ident">bytes</span>))
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">StaticSecret</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PublicKey</span> {
-    <span class="doccomment">/// Given an x25519 `StaticSecret` key, compute its corresponding</span>
-    <span class="doccomment">/// `PublicKey` key.</span>
+    <span class="doccomment">/// Given an x25519 [`StaticSecret`] key, compute its corresponding [`PublicKey`].</span>
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">secret</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">StaticSecret</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PublicKey</span> {
         <span class="ident">PublicKey</span>((<span class="kw-2">&amp;</span><span class="ident">ED25519_BASEPOINT_TABLE</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">secret</span>.<span class="number">0</span>).<span class="ident">to_montgomery</span>())
     }
 }
 
-<span class="doccomment">/// A `SharedSecret` is a Diffie-Hellman shared secret that’s generated</span>
-<span class="doccomment">/// from your `EphemeralSecret` or `StaticSecret` and their `PublicKey`.</span>
+<span class="doccomment">/// The result of a Diffie-Hellman key exchange.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Each party computes this using their [`EphemeralSecret`] or [`StaticSecret`] and their</span>
+<span class="doccomment">/// counterparty&#39;s [`PublicKey`].</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Zeroize</span>)]</span>
 <span class="attribute">#[<span class="ident">zeroize</span>(<span class="ident">drop</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SharedSecret</span>(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">MontgomeryPoint</span>);
 
 <span class="kw">impl</span> <span class="ident">SharedSecret</span> {
+    <span class="doccomment">/// Convert this shared secret to a byte array.</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">32</span>] {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">to_bytes</span>()
+    }
+
     <span class="doccomment">/// View this shared secret key as a byte array.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">32</span>] {
@@ -568,7 +599,7 @@
     <span class="ident">scalar</span>[<span class="number">31</span>] <span class="op">&amp;=</span> <span class="number">127</span>;
     <span class="ident">scalar</span>[<span class="number">31</span>] <span class="op">|</span><span class="op">=</span> <span class="number">64</span>;
 
-    <span class="ident">Scalar</span>::<span class="ident">from_bits</span>(<span class="ident">scalar</span>)
+    <span class="ident">Scalar::from_bits</span>(<span class="ident">scalar</span>)
 }
 
 <span class="doccomment">/// The bare, byte-oriented x25519 function, exactly as specified in RFC7748.</span>
@@ -592,7 +623,7 @@
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;our_serde&quot;</span>))]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(
     <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>,
-    <span class="ident">derive</span>(<span class="ident">our_serde</span>::<span class="ident">Serialize</span>, <span class="ident">our_serde</span>::<span class="ident">Deserialize</span>)
+    <span class="ident">derive</span>(<span class="ident">our_serde::Serialize</span>, <span class="ident">our_serde::Deserialize</span>)
 )]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">serde</span>(<span class="ident">remote</span> <span class="op">=</span> <span class="string">&quot;Scalar&quot;</span>))]</span>
 <span class="kw">struct</span> <span class="ident">AllowUnreducedScalarBytes</span>(
@@ -608,22 +639,7 @@
 <span class="kw">mod</span> <span class="ident">test</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
-    <span class="kw">use</span> <span class="ident">rand_core</span>::<span class="ident">OsRng</span>;
-
-    <span class="comment">// This was previously a doctest but it got moved to the README to</span>
-    <span class="comment">// avoid duplication where it then wasn&#39;t being run, so now it</span>
-    <span class="comment">// lives here.</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">alice_and_bob</span>() {
-        <span class="kw">let</span> <span class="ident">alice_secret</span> <span class="op">=</span> <span class="ident">EphemeralSecret</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">OsRng</span>);
-        <span class="kw">let</span> <span class="ident">alice_public</span> <span class="op">=</span> <span class="ident">PublicKey</span>::<span class="ident">from</span>(<span class="kw-2">&amp;</span><span class="ident">alice_secret</span>);
-        <span class="kw">let</span> <span class="ident">bob_secret</span> <span class="op">=</span> <span class="ident">EphemeralSecret</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">OsRng</span>);
-        <span class="kw">let</span> <span class="ident">bob_public</span> <span class="op">=</span> <span class="ident">PublicKey</span>::<span class="ident">from</span>(<span class="kw-2">&amp;</span><span class="ident">bob_secret</span>);
-        <span class="kw">let</span> <span class="ident">alice_shared_secret</span> <span class="op">=</span> <span class="ident">alice_secret</span>.<span class="ident">diffie_hellman</span>(<span class="kw-2">&amp;</span><span class="ident">bob_public</span>);
-        <span class="kw">let</span> <span class="ident">bob_shared_secret</span> <span class="op">=</span> <span class="ident">bob_secret</span>.<span class="ident">diffie_hellman</span>(<span class="kw-2">&amp;</span><span class="ident">alice_public</span>);
-
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">alice_shared_secret</span>.<span class="ident">as_bytes</span>(), <span class="ident">bob_shared_secret</span>.<span class="ident">as_bytes</span>());
-    }
+    <span class="kw">use</span> <span class="ident">rand_core::OsRng</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">byte_basepoint_matches_edwards_scalar_mul</span>() {
@@ -638,7 +654,7 @@
                 .<span class="ident">to_montgomery</span>()
                 .<span class="ident">to_bytes</span>();
 
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">result</span>, <span class="ident">expected</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">result</span>, <span class="ident">expected</span>);
         }
     }
 
@@ -647,13 +663,13 @@
     <span class="kw">fn</span> <span class="ident">serde_bincode_public_key_roundtrip</span>() {
         <span class="kw">use</span> <span class="ident">bincode</span>;
 
-        <span class="kw">let</span> <span class="ident">public_key</span> <span class="op">=</span> <span class="ident">PublicKey</span>::<span class="ident">from</span>(<span class="ident">X25519_BASEPOINT_BYTES</span>);
+        <span class="kw">let</span> <span class="ident">public_key</span> <span class="op">=</span> <span class="ident">PublicKey::from</span>(<span class="ident">X25519_BASEPOINT_BYTES</span>);
 
-        <span class="kw">let</span> <span class="ident">encoded</span> <span class="op">=</span> <span class="ident">bincode</span>::<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="ident">public_key</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">decoded</span>: <span class="ident">PublicKey</span> <span class="op">=</span> <span class="ident">bincode</span>::<span class="ident">deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">encoded</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">encoded</span> <span class="op">=</span> <span class="ident">bincode::serialize</span>(<span class="kw-2">&amp;</span><span class="ident">public_key</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">decoded</span>: <span class="ident">PublicKey</span> <span class="op">=</span> <span class="ident">bincode::deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">encoded</span>).<span class="ident">unwrap</span>();
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">encoded</span>.<span class="ident">len</span>(), <span class="number">32</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">decoded</span>.<span class="ident">as_bytes</span>(), <span class="ident">public_key</span>.<span class="ident">as_bytes</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">encoded</span>.<span class="ident">len</span>(), <span class="number">32</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">decoded</span>.<span class="ident">as_bytes</span>(), <span class="ident">public_key</span>.<span class="ident">as_bytes</span>());
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -661,10 +677,10 @@
     <span class="kw">fn</span> <span class="ident">serde_bincode_public_key_matches_from_bytes</span>() {
         <span class="kw">use</span> <span class="ident">bincode</span>;
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">PublicKey</span>::<span class="ident">from</span>(<span class="ident">X25519_BASEPOINT_BYTES</span>);
-        <span class="kw">let</span> <span class="ident">decoded</span>: <span class="ident">PublicKey</span> <span class="op">=</span> <span class="ident">bincode</span>::<span class="ident">deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">X25519_BASEPOINT_BYTES</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">PublicKey::from</span>(<span class="ident">X25519_BASEPOINT_BYTES</span>);
+        <span class="kw">let</span> <span class="ident">decoded</span>: <span class="ident">PublicKey</span> <span class="op">=</span> <span class="ident">bincode::deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">X25519_BASEPOINT_BYTES</span>).<span class="ident">unwrap</span>();
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">decoded</span>.<span class="ident">as_bytes</span>(), <span class="ident">expected</span>.<span class="ident">as_bytes</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">decoded</span>.<span class="ident">as_bytes</span>(), <span class="ident">expected</span>.<span class="ident">as_bytes</span>());
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -674,11 +690,11 @@
 
         <span class="kw">let</span> <span class="ident">static_secret</span> <span class="op">=</span> <span class="ident">StaticSecret</span>(<span class="ident">clamp_scalar</span>([<span class="number">0x24</span>; <span class="number">32</span>]));
 
-        <span class="kw">let</span> <span class="ident">encoded</span> <span class="op">=</span> <span class="ident">bincode</span>::<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="ident">static_secret</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">decoded</span>: <span class="ident">StaticSecret</span> <span class="op">=</span> <span class="ident">bincode</span>::<span class="ident">deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">encoded</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">encoded</span> <span class="op">=</span> <span class="ident">bincode::serialize</span>(<span class="kw-2">&amp;</span><span class="ident">static_secret</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">decoded</span>: <span class="ident">StaticSecret</span> <span class="op">=</span> <span class="ident">bincode::deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">encoded</span>).<span class="ident">unwrap</span>();
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">encoded</span>.<span class="ident">len</span>(), <span class="number">32</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">decoded</span>.<span class="ident">to_bytes</span>(), <span class="ident">static_secret</span>.<span class="ident">to_bytes</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">encoded</span>.<span class="ident">len</span>(), <span class="number">32</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">decoded</span>.<span class="ident">to_bytes</span>(), <span class="ident">static_secret</span>.<span class="ident">to_bytes</span>());
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -688,15 +704,15 @@
 
         <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">StaticSecret</span>(<span class="ident">clamp_scalar</span>([<span class="number">0x24</span>; <span class="number">32</span>]));
         <span class="kw">let</span> <span class="ident">clamped_bytes</span> <span class="op">=</span> <span class="ident">clamp_scalar</span>([<span class="number">0x24</span>; <span class="number">32</span>]).<span class="ident">to_bytes</span>();
-        <span class="kw">let</span> <span class="ident">decoded</span>: <span class="ident">StaticSecret</span> <span class="op">=</span> <span class="ident">bincode</span>::<span class="ident">deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">clamped_bytes</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">decoded</span>: <span class="ident">StaticSecret</span> <span class="op">=</span> <span class="ident">bincode::deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">clamped_bytes</span>).<span class="ident">unwrap</span>();
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">decoded</span>.<span class="ident">to_bytes</span>(), <span class="ident">expected</span>.<span class="ident">to_bytes</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">decoded</span>.<span class="ident">to_bytes</span>(), <span class="ident">expected</span>.<span class="ident">to_bytes</span>());
     }
 
     <span class="kw">fn</span> <span class="ident">do_rfc7748_ladder_test1</span>(<span class="ident">input_scalar</span>: [<span class="ident">u8</span>; <span class="number">32</span>], <span class="ident">input_point</span>: [<span class="ident">u8</span>; <span class="number">32</span>], <span class="ident">expected</span>: [<span class="ident">u8</span>; <span class="number">32</span>]) {
         <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">x25519</span>(<span class="ident">input_scalar</span>, <span class="ident">input_point</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">result</span>, <span class="ident">expected</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">result</span>, <span class="ident">expected</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -744,13 +760,13 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="attribute">#[<span class="ident">ignore</span>]</span> <span class="comment">// Run only if you want to burn a lot of CPU doing 1,000,000 DH operations</span>
     <span class="kw">fn</span> <span class="ident">rfc7748_ladder_test2</span>() {
-        <span class="kw">use</span> <span class="ident">curve25519_dalek</span>::<span class="ident">constants</span>::<span class="ident">X25519_BASEPOINT</span>;
+        <span class="kw">use</span> <span class="ident">curve25519_dalek::constants::X25519_BASEPOINT</span>;
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">k</span>: [<span class="ident">u8</span>; <span class="number">32</span>] <span class="op">=</span> <span class="ident">X25519_BASEPOINT</span>.<span class="number">0</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">u</span>: [<span class="ident">u8</span>; <span class="number">32</span>] <span class="op">=</span> <span class="ident">X25519_BASEPOINT</span>.<span class="number">0</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span>: [<span class="ident">u8</span>; <span class="number">32</span>];
 
-        <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">do_iterations</span> {
+        <span class="macro">macro_rules!</span> <span class="ident">do_iterations</span> {
             (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span> {
                     <span class="ident">result</span> <span class="op">=</span> <span class="ident">x25519</span>(<span class="ident">k</span>, <span class="ident">u</span>);
@@ -775,8 +791,8 @@
         <span class="comment">// After 1,000,000 iterations:</span>
         <span class="comment">//     7c3911e0ab2586fd864497297e575e6f3bc601c0883c30df5f4dd2d24f665424</span>
 
-        <span class="macro">do_iterations</span><span class="macro">!</span>(<span class="number">1</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">do_iterations!</span>(<span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(
             <span class="ident">k</span>,
             [
                 <span class="number">0x42</span>, <span class="number">0x2c</span>, <span class="number">0x8e</span>, <span class="number">0x7a</span>, <span class="number">0x62</span>, <span class="number">0x27</span>, <span class="number">0xd7</span>, <span class="number">0xbc</span>, <span class="number">0xa1</span>, <span class="number">0x35</span>, <span class="number">0x0b</span>, <span class="number">0x3e</span>, <span class="number">0x2b</span>, <span class="number">0xb7</span>,
@@ -784,8 +800,8 @@
                 <span class="number">0x11</span>, <span class="number">0xae</span>, <span class="number">0x30</span>, <span class="number">0x79</span>,
             ]
         );
-        <span class="macro">do_iterations</span><span class="macro">!</span>(<span class="number">999</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">do_iterations!</span>(<span class="number">999</span>);
+        <span class="macro">assert_eq!</span>(
             <span class="ident">k</span>,
             [
                 <span class="number">0x68</span>, <span class="number">0x4c</span>, <span class="number">0xf5</span>, <span class="number">0x9b</span>, <span class="number">0xa8</span>, <span class="number">0x33</span>, <span class="number">0x09</span>, <span class="number">0x55</span>, <span class="number">0x28</span>, <span class="number">0x00</span>, <span class="number">0xef</span>, <span class="number">0x56</span>, <span class="number">0x6f</span>, <span class="number">0x2f</span>,
@@ -793,8 +809,8 @@
                 <span class="number">0x99</span>, <span class="number">0x53</span>, <span class="number">0x2c</span>, <span class="number">0x51</span>,
             ]
         );
-        <span class="macro">do_iterations</span><span class="macro">!</span>(<span class="number">999_000</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">do_iterations!</span>(<span class="number">999_000</span>);
+        <span class="macro">assert_eq!</span>(
             <span class="ident">k</span>,
             [
                 <span class="number">0x7c</span>, <span class="number">0x39</span>, <span class="number">0x11</span>, <span class="number">0xe0</span>, <span class="number">0xab</span>, <span class="number">0x25</span>, <span class="number">0x86</span>, <span class="number">0xfd</span>, <span class="number">0x86</span>, <span class="number">0x44</span>, <span class="number">0x97</span>, <span class="number">0x29</span>, <span class="number">0x7e</span>, <span class="number">0x57</span>,
@@ -805,4 +821,5 @@
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "x25519_dalek";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="x25519_dalek" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

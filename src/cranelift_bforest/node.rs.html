@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/cranelift-bforest-0.66.0/src/node.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>node.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/cranelift-bforest-0.69.0/src/node.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>node.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../cranelift_bforest/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../cranelift_bforest/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -811,8 +811,8 @@
 <span class="doccomment">//! B+-tree nodes.</span>
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">slice_insert</span>, <span class="ident">slice_shift</span>, <span class="ident">Forest</span>, <span class="ident">Node</span>, <span class="ident">SetValue</span>, <span class="ident">INNER_SIZE</span>};
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">borrow</span>::{<span class="ident">Borrow</span>, <span class="ident">BorrowMut</span>};
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">fmt</span>;
+<span class="kw">use</span> <span class="ident">core::borrow</span>::{<span class="ident">Borrow</span>, <span class="ident">BorrowMut</span>};
+<span class="kw">use</span> <span class="ident">core::fmt</span>;
 
 <span class="doccomment">/// B+-tree node.</span>
 <span class="doccomment">///</span>
@@ -834,7 +834,7 @@
         <span class="doccomment">///</span>
         <span class="doccomment">/// The key in `keys[i]` is greater than all keys in `tree[i]` and less than or equal to</span>
         <span class="doccomment">/// all keys in `tree[i+1]`.</span>
-        <span class="ident">keys</span>: [<span class="ident">F</span>::<span class="ident">Key</span>; <span class="ident">INNER_SIZE</span> <span class="op">-</span> <span class="number">1</span>],
+        <span class="ident">keys</span>: [<span class="ident">F::Key</span>; <span class="ident">INNER_SIZE</span> <span class="op">-</span> <span class="number">1</span>],
 
         <span class="doccomment">/// Sub-trees.</span>
         <span class="ident">tree</span>: [<span class="ident">Node</span>; <span class="ident">INNER_SIZE</span>],
@@ -844,10 +844,10 @@
         <span class="ident">size</span>: <span class="ident">u8</span>,
 
         <span class="comment">// Key array.</span>
-        <span class="ident">keys</span>: <span class="ident">F</span>::<span class="ident">LeafKeys</span>,
+        <span class="ident">keys</span>: <span class="ident">F::LeafKeys</span>,
 
         <span class="comment">// Value array.</span>
-        <span class="ident">vals</span>: <span class="ident">F</span>::<span class="ident">LeafValues</span>,
+        <span class="ident">vals</span>: <span class="ident">F::LeafValues</span>,
     },
     <span class="doccomment">/// An unused node on the free list.</span>
     <span class="ident">Free</span> { <span class="ident">next</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Node</span><span class="op">&gt;</span> },
@@ -866,7 +866,7 @@
     <span class="doccomment">/// Is this a free/unused node?</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_free</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="self">Self</span>::<span class="ident">Free</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+            <span class="self">Self</span><span class="ident">::Free</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
         }
     }
@@ -877,19 +877,19 @@
     <span class="doccomment">/// a leaf node.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">entries</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="self">Self</span>::<span class="ident">Inner</span> { <span class="ident">size</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">usize</span>::<span class="ident">from</span>(<span class="ident">size</span>) <span class="op">+</span> <span class="number">1</span>,
-            <span class="self">Self</span>::<span class="ident">Leaf</span> { <span class="ident">size</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">usize</span>::<span class="ident">from</span>(<span class="ident">size</span>),
-            <span class="self">Self</span>::<span class="ident">Free</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;freed node&quot;</span>),
+            <span class="self">Self</span><span class="ident">::Inner</span> { <span class="ident">size</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">usize::from</span>(<span class="ident">size</span>) <span class="op">+</span> <span class="number">1</span>,
+            <span class="self">Self</span><span class="ident">::Leaf</span> { <span class="ident">size</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">usize::from</span>(<span class="ident">size</span>),
+            <span class="self">Self</span><span class="ident">::Free</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;freed node&quot;</span>),
         }
     }
 
     <span class="doccomment">/// Create an inner node with a single key and two sub-trees.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inner</span>(<span class="ident">left</span>: <span class="ident">Node</span>, <span class="ident">key</span>: <span class="ident">F</span>::<span class="ident">Key</span>, <span class="ident">right</span>: <span class="ident">Node</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inner</span>(<span class="ident">left</span>: <span class="ident">Node</span>, <span class="ident">key</span>: <span class="ident">F::Key</span>, <span class="ident">right</span>: <span class="ident">Node</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="comment">// Splat the key and right node to the whole array.</span>
         <span class="comment">// Saves us from inventing a default/reserved value.</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tree</span> <span class="op">=</span> [<span class="ident">right</span>; <span class="ident">INNER_SIZE</span>];
         <span class="ident">tree</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">left</span>;
-        <span class="self">Self</span>::<span class="ident">Inner</span> {
+        <span class="self">Self</span><span class="ident">::Inner</span> {
             <span class="ident">size</span>: <span class="number">1</span>,
             <span class="ident">keys</span>: [<span class="ident">key</span>; <span class="ident">INNER_SIZE</span> <span class="op">-</span> <span class="number">1</span>],
             <span class="ident">tree</span>,
@@ -897,94 +897,94 @@
     }
 
     <span class="doccomment">/// Create a leaf node with a single key-value pair.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">leaf</span>(<span class="ident">key</span>: <span class="ident">F</span>::<span class="ident">Key</span>, <span class="ident">value</span>: <span class="ident">F</span>::<span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span>::<span class="ident">Leaf</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">leaf</span>(<span class="ident">key</span>: <span class="ident">F::Key</span>, <span class="ident">value</span>: <span class="ident">F::Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="self">Self</span><span class="ident">::Leaf</span> {
             <span class="ident">size</span>: <span class="number">1</span>,
-            <span class="ident">keys</span>: <span class="ident">F</span>::<span class="ident">splat_key</span>(<span class="ident">key</span>),
-            <span class="ident">vals</span>: <span class="ident">F</span>::<span class="ident">splat_value</span>(<span class="ident">value</span>),
+            <span class="ident">keys</span>: <span class="ident">F::splat_key</span>(<span class="ident">key</span>),
+            <span class="ident">vals</span>: <span class="ident">F::splat_value</span>(<span class="ident">value</span>),
         }
     }
 
     <span class="doccomment">/// Unwrap an inner node into two slices (keys, trees).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unwrap_inner</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="kw-2">&amp;</span>[<span class="ident">F</span>::<span class="ident">Key</span>], <span class="kw-2">&amp;</span>[<span class="ident">Node</span>]) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unwrap_inner</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="kw-2">&amp;</span>[<span class="ident">F::Key</span>], <span class="kw-2">&amp;</span>[<span class="ident">Node</span>]) {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="self">Self</span>::<span class="ident">Inner</span> {
+            <span class="self">Self</span><span class="ident">::Inner</span> {
                 <span class="ident">size</span>,
                 <span class="kw-2">ref</span> <span class="ident">keys</span>,
                 <span class="kw-2">ref</span> <span class="ident">tree</span>,
             } <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">usize</span>::<span class="ident">from</span>(<span class="ident">size</span>);
+                <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">usize::from</span>(<span class="ident">size</span>);
                 <span class="comment">// TODO: We could probably use `get_unchecked()` here since `size` is always in</span>
                 <span class="comment">// range.</span>
                 (<span class="kw-2">&amp;</span><span class="ident">keys</span>[<span class="number">0</span>..<span class="ident">size</span>], <span class="kw-2">&amp;</span><span class="ident">tree</span>[<span class="number">0</span>..<span class="op">=</span><span class="ident">size</span>])
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Expected inner node&quot;</span>),
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Expected inner node&quot;</span>),
         }
     }
 
     <span class="doccomment">/// Unwrap a leaf node into two slices (keys, values) of the same length.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unwrap_leaf</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="kw-2">&amp;</span>[<span class="ident">F</span>::<span class="ident">Key</span>], <span class="kw-2">&amp;</span>[<span class="ident">F</span>::<span class="ident">Value</span>]) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unwrap_leaf</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="kw-2">&amp;</span>[<span class="ident">F::Key</span>], <span class="kw-2">&amp;</span>[<span class="ident">F::Value</span>]) {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="self">Self</span>::<span class="ident">Leaf</span> {
+            <span class="self">Self</span><span class="ident">::Leaf</span> {
                 <span class="ident">size</span>,
                 <span class="kw-2">ref</span> <span class="ident">keys</span>,
                 <span class="kw-2">ref</span> <span class="ident">vals</span>,
             } <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">usize</span>::<span class="ident">from</span>(<span class="ident">size</span>);
+                <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">usize::from</span>(<span class="ident">size</span>);
                 <span class="kw">let</span> <span class="ident">keys</span> <span class="op">=</span> <span class="ident">keys</span>.<span class="ident">borrow</span>();
                 <span class="kw">let</span> <span class="ident">vals</span> <span class="op">=</span> <span class="ident">vals</span>.<span class="ident">borrow</span>();
                 <span class="comment">// TODO: We could probably use `get_unchecked()` here since `size` is always in</span>
                 <span class="comment">// range.</span>
                 (<span class="kw-2">&amp;</span><span class="ident">keys</span>[<span class="number">0</span>..<span class="ident">size</span>], <span class="kw-2">&amp;</span><span class="ident">vals</span>[<span class="number">0</span>..<span class="ident">size</span>])
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Expected leaf node&quot;</span>),
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Expected leaf node&quot;</span>),
         }
     }
 
     <span class="doccomment">/// Unwrap a mutable leaf node into two slices (keys, values) of the same length.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unwrap_leaf_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">F</span>::<span class="ident">Key</span>], <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">F</span>::<span class="ident">Value</span>]) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unwrap_leaf_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">F::Key</span>], <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">F::Value</span>]) {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="self">Self</span>::<span class="ident">Leaf</span> {
+            <span class="self">Self</span><span class="ident">::Leaf</span> {
                 <span class="ident">size</span>,
                 <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">keys</span>,
                 <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">vals</span>,
             } <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">usize</span>::<span class="ident">from</span>(<span class="ident">size</span>);
+                <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">usize::from</span>(<span class="ident">size</span>);
                 <span class="kw">let</span> <span class="ident">keys</span> <span class="op">=</span> <span class="ident">keys</span>.<span class="ident">borrow_mut</span>();
                 <span class="kw">let</span> <span class="ident">vals</span> <span class="op">=</span> <span class="ident">vals</span>.<span class="ident">borrow_mut</span>();
                 <span class="comment">// TODO: We could probably use `get_unchecked_mut()` here since `size` is always in</span>
                 <span class="comment">// range.</span>
                 (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">keys</span>[<span class="number">0</span>..<span class="ident">size</span>], <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">vals</span>[<span class="number">0</span>..<span class="ident">size</span>])
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Expected leaf node&quot;</span>),
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Expected leaf node&quot;</span>),
         }
     }
 
     <span class="doccomment">/// Get the critical key for a leaf node.</span>
     <span class="doccomment">/// This is simply the first key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">leaf_crit_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">F</span>::<span class="ident">Key</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">leaf_crit_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">F::Key</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="self">Self</span>::<span class="ident">Leaf</span> { <span class="ident">size</span>, <span class="kw-2">ref</span> <span class="ident">keys</span>, .. } <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">size</span> <span class="op">&gt;</span> <span class="number">0</span>, <span class="string">&quot;Empty leaf node&quot;</span>);
+            <span class="self">Self</span><span class="ident">::Leaf</span> { <span class="ident">size</span>, <span class="kw-2">ref</span> <span class="ident">keys</span>, .. } <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="macro">debug_assert!</span>(<span class="ident">size</span> <span class="op">&gt;</span> <span class="number">0</span>, <span class="string">&quot;Empty leaf node&quot;</span>);
                 <span class="ident">keys</span>.<span class="ident">borrow</span>()[<span class="number">0</span>]
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Expected leaf node&quot;</span>),
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Expected leaf node&quot;</span>),
         }
     }
 
     <span class="doccomment">/// Try to insert `(key, node)` at key-position `index` in an inner node.</span>
     <span class="doccomment">/// This means that `key` is inserted at `keys[i]` and `node` is inserted at `tree[i + 1]`.</span>
     <span class="doccomment">/// If the node is full, this leaves the node unchanged and returns false.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_inner_insert</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>, <span class="ident">key</span>: <span class="ident">F</span>::<span class="ident">Key</span>, <span class="ident">node</span>: <span class="ident">Node</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_inner_insert</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>, <span class="ident">key</span>: <span class="ident">F::Key</span>, <span class="ident">node</span>: <span class="ident">Node</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="self">Self</span>::<span class="ident">Inner</span> {
+            <span class="self">Self</span><span class="ident">::Inner</span> {
                 <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">size</span>,
                 <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">keys</span>,
                 <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">tree</span>,
             } <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">sz</span> <span class="op">=</span> <span class="ident">usize</span>::<span class="ident">from</span>(<span class="kw-2">*</span><span class="ident">size</span>);
-                <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">sz</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">keys</span>.<span class="ident">len</span>());
-                <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">index</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">sz</span>, <span class="string">&quot;Can&#39;t insert at {} with {} keys&quot;</span>, <span class="ident">index</span>, <span class="ident">sz</span>);
+                <span class="kw">let</span> <span class="ident">sz</span> <span class="op">=</span> <span class="ident">usize::from</span>(<span class="kw-2">*</span><span class="ident">size</span>);
+                <span class="macro">debug_assert!</span>(<span class="ident">sz</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">keys</span>.<span class="ident">len</span>());
+                <span class="macro">debug_assert!</span>(<span class="ident">index</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">sz</span>, <span class="string">&quot;Can&#39;t insert at {} with {} keys&quot;</span>, <span class="ident">index</span>, <span class="ident">sz</span>);
 
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ks</span>) <span class="op">=</span> <span class="ident">keys</span>.<span class="ident">get_mut</span>(<span class="number">0</span>..<span class="op">=</span><span class="ident">sz</span>) {
                     <span class="kw-2">*</span><span class="ident">size</span> <span class="op">=</span> (<span class="ident">sz</span> <span class="op">+</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">u8</span>;
@@ -995,24 +995,24 @@
                     <span class="bool-val">false</span>
                 }
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Expected inner node&quot;</span>),
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Expected inner node&quot;</span>),
         }
     }
 
     <span class="doccomment">/// Try to insert `key, value` at `index` in a leaf node, but fail and return false if the node</span>
     <span class="doccomment">/// is full.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_leaf_insert</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>, <span class="ident">key</span>: <span class="ident">F</span>::<span class="ident">Key</span>, <span class="ident">value</span>: <span class="ident">F</span>::<span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_leaf_insert</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>, <span class="ident">key</span>: <span class="ident">F::Key</span>, <span class="ident">value</span>: <span class="ident">F::Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="self">Self</span>::<span class="ident">Leaf</span> {
+            <span class="self">Self</span><span class="ident">::Leaf</span> {
                 <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">size</span>,
                 <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">keys</span>,
                 <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">vals</span>,
             } <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">sz</span> <span class="op">=</span> <span class="ident">usize</span>::<span class="ident">from</span>(<span class="kw-2">*</span><span class="ident">size</span>);
+                <span class="kw">let</span> <span class="ident">sz</span> <span class="op">=</span> <span class="ident">usize::from</span>(<span class="kw-2">*</span><span class="ident">size</span>);
                 <span class="kw">let</span> <span class="ident">keys</span> <span class="op">=</span> <span class="ident">keys</span>.<span class="ident">borrow_mut</span>();
                 <span class="kw">let</span> <span class="ident">vals</span> <span class="op">=</span> <span class="ident">vals</span>.<span class="ident">borrow_mut</span>();
-                <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">sz</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">keys</span>.<span class="ident">len</span>());
-                <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">index</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">sz</span>);
+                <span class="macro">debug_assert!</span>(<span class="ident">sz</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">keys</span>.<span class="ident">len</span>());
+                <span class="macro">debug_assert!</span>(<span class="ident">index</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">sz</span>);
 
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ks</span>) <span class="op">=</span> <span class="ident">keys</span>.<span class="ident">get_mut</span>(<span class="number">0</span>..<span class="op">=</span><span class="ident">sz</span>) {
                     <span class="kw-2">*</span><span class="ident">size</span> <span class="op">=</span> (<span class="ident">sz</span> <span class="op">+</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">u8</span>;
@@ -1023,7 +1023,7 @@
                     <span class="bool-val">false</span>
                 }
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Expected leaf node&quot;</span>),
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Expected leaf node&quot;</span>),
         }
     }
 
@@ -1034,12 +1034,12 @@
     <span class="doccomment">/// node will be split in half with a bias towards an even split after the insertion is retried.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">split</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">insert_index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SplitOff</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="self">Self</span>::<span class="ident">Inner</span> {
+            <span class="self">Self</span><span class="ident">::Inner</span> {
                 <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">size</span>,
                 <span class="kw-2">ref</span> <span class="ident">keys</span>,
                 <span class="kw-2">ref</span> <span class="ident">tree</span>,
             } <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">debug_assert_eq</span><span class="macro">!</span>(<span class="ident">usize</span>::<span class="ident">from</span>(<span class="kw-2">*</span><span class="ident">size</span>), <span class="ident">keys</span>.<span class="ident">len</span>(), <span class="string">&quot;Node not full&quot;</span>);
+                <span class="macro">debug_assert_eq!</span>(<span class="ident">usize::from</span>(<span class="kw-2">*</span><span class="ident">size</span>), <span class="ident">keys</span>.<span class="ident">len</span>(), <span class="string">&quot;Node not full&quot;</span>);
 
                 <span class="comment">// Number of tree entries in the lhs node.</span>
                 <span class="kw">let</span> <span class="ident">l_ents</span> <span class="op">=</span> <span class="ident">split_pos</span>(<span class="ident">tree</span>.<span class="ident">len</span>(), <span class="ident">insert_index</span> <span class="op">+</span> <span class="number">1</span>);
@@ -1066,21 +1066,21 @@
                     <span class="ident">lhs_entries</span>: <span class="ident">l_ents</span>,
                     <span class="ident">rhs_entries</span>: <span class="ident">r_ents</span>,
                     <span class="ident">crit_key</span>: <span class="ident">keys</span>[<span class="ident">l_ents</span> <span class="op">-</span> <span class="number">1</span>],
-                    <span class="ident">rhs_data</span>: <span class="self">Self</span>::<span class="ident">Inner</span> {
+                    <span class="ident">rhs_data</span>: <span class="self">Self</span><span class="ident">::Inner</span> {
                         <span class="ident">size</span>: (<span class="ident">r_ents</span> <span class="op">-</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">u8</span>,
                         <span class="ident">keys</span>: <span class="ident">r_keys</span>,
                         <span class="ident">tree</span>: <span class="ident">r_tree</span>,
                     },
                 }
             }
-            <span class="self">Self</span>::<span class="ident">Leaf</span> {
+            <span class="self">Self</span><span class="ident">::Leaf</span> {
                 <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">size</span>,
                 <span class="kw-2">ref</span> <span class="ident">keys</span>,
                 <span class="kw-2">ref</span> <span class="ident">vals</span>,
             } <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="ident">o_keys</span> <span class="op">=</span> <span class="ident">keys</span>.<span class="ident">borrow</span>();
                 <span class="kw">let</span> <span class="ident">o_vals</span> <span class="op">=</span> <span class="ident">vals</span>.<span class="ident">borrow</span>();
-                <span class="macro">debug_assert_eq</span><span class="macro">!</span>(<span class="ident">usize</span>::<span class="ident">from</span>(<span class="kw-2">*</span><span class="ident">size</span>), <span class="ident">o_keys</span>.<span class="ident">len</span>(), <span class="string">&quot;Node not full&quot;</span>);
+                <span class="macro">debug_assert_eq!</span>(<span class="ident">usize::from</span>(<span class="kw-2">*</span><span class="ident">size</span>), <span class="ident">o_keys</span>.<span class="ident">len</span>(), <span class="string">&quot;Node not full&quot;</span>);
 
                 <span class="kw">let</span> <span class="ident">l_size</span> <span class="op">=</span> <span class="ident">split_pos</span>(<span class="ident">o_keys</span>.<span class="ident">len</span>(), <span class="ident">insert_index</span>);
                 <span class="kw">let</span> <span class="ident">r_size</span> <span class="op">=</span> <span class="ident">o_keys</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">l_size</span>;
@@ -1099,14 +1099,14 @@
                     <span class="ident">lhs_entries</span>: <span class="ident">l_size</span>,
                     <span class="ident">rhs_entries</span>: <span class="ident">r_size</span>,
                     <span class="ident">crit_key</span>: <span class="ident">o_keys</span>[<span class="ident">l_size</span>],
-                    <span class="ident">rhs_data</span>: <span class="self">Self</span>::<span class="ident">Leaf</span> {
+                    <span class="ident">rhs_data</span>: <span class="self">Self</span><span class="ident">::Leaf</span> {
                         <span class="ident">size</span>: <span class="ident">r_size</span> <span class="kw">as</span> <span class="ident">u8</span>,
                         <span class="ident">keys</span>: <span class="ident">r_keys</span>,
                         <span class="ident">vals</span>: <span class="ident">r_vals</span>,
                     },
                 }
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Expected leaf node&quot;</span>),
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Expected leaf node&quot;</span>),
         }
     }
 
@@ -1119,23 +1119,23 @@
     <span class="doccomment">/// Return an indication of the node&#39;s health (i.e. below half capacity).</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inner_remove</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Removed</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="self">Self</span>::<span class="ident">Inner</span> {
+            <span class="self">Self</span><span class="ident">::Inner</span> {
                 <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">size</span>,
                 <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">keys</span>,
                 <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">tree</span>,
             } <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">ents</span> <span class="op">=</span> <span class="ident">usize</span>::<span class="ident">from</span>(<span class="kw-2">*</span><span class="ident">size</span>) <span class="op">+</span> <span class="number">1</span>;
-                <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">ents</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">tree</span>.<span class="ident">len</span>());
-                <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">index</span> <span class="op">&lt;</span> <span class="ident">ents</span>);
+                <span class="kw">let</span> <span class="ident">ents</span> <span class="op">=</span> <span class="ident">usize::from</span>(<span class="kw-2">*</span><span class="ident">size</span>) <span class="op">+</span> <span class="number">1</span>;
+                <span class="macro">debug_assert!</span>(<span class="ident">ents</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">tree</span>.<span class="ident">len</span>());
+                <span class="macro">debug_assert!</span>(<span class="ident">index</span> <span class="op">&lt;</span> <span class="ident">ents</span>);
                 <span class="comment">// Leave an invalid 0xff size when node becomes empty.</span>
                 <span class="kw-2">*</span><span class="ident">size</span> <span class="op">=</span> <span class="ident">ents</span>.<span class="ident">wrapping_sub</span>(<span class="number">2</span>) <span class="kw">as</span> <span class="ident">u8</span>;
                 <span class="kw">if</span> <span class="ident">ents</span> <span class="op">&gt;</span> <span class="number">1</span> {
                     <span class="ident">slice_shift</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">keys</span>[<span class="ident">index</span>.<span class="ident">saturating_sub</span>(<span class="number">1</span>)..<span class="ident">ents</span> <span class="op">-</span> <span class="number">1</span>], <span class="number">1</span>);
                 }
                 <span class="ident">slice_shift</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">tree</span>[<span class="ident">index</span>..<span class="ident">ents</span>], <span class="number">1</span>);
-                <span class="ident">Removed</span>::<span class="ident">new</span>(<span class="ident">index</span>, <span class="ident">ents</span> <span class="op">-</span> <span class="number">1</span>, <span class="ident">tree</span>.<span class="ident">len</span>())
+                <span class="ident">Removed::new</span>(<span class="ident">index</span>, <span class="ident">ents</span> <span class="op">-</span> <span class="number">1</span>, <span class="ident">tree</span>.<span class="ident">len</span>())
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Expected inner node&quot;</span>),
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Expected inner node&quot;</span>),
         }
     }
 
@@ -1144,20 +1144,20 @@
     <span class="doccomment">/// Return an indication of the node&#39;s health (i.e. below half capacity).</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">leaf_remove</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Removed</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="self">Self</span>::<span class="ident">Leaf</span> {
+            <span class="self">Self</span><span class="ident">::Leaf</span> {
                 <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">size</span>,
                 <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">keys</span>,
                 <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">vals</span>,
             } <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">sz</span> <span class="op">=</span> <span class="ident">usize</span>::<span class="ident">from</span>(<span class="kw-2">*</span><span class="ident">size</span>);
+                <span class="kw">let</span> <span class="ident">sz</span> <span class="op">=</span> <span class="ident">usize::from</span>(<span class="kw-2">*</span><span class="ident">size</span>);
                 <span class="kw">let</span> <span class="ident">keys</span> <span class="op">=</span> <span class="ident">keys</span>.<span class="ident">borrow_mut</span>();
                 <span class="kw">let</span> <span class="ident">vals</span> <span class="op">=</span> <span class="ident">vals</span>.<span class="ident">borrow_mut</span>();
                 <span class="kw-2">*</span><span class="ident">size</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
                 <span class="ident">slice_shift</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">keys</span>[<span class="ident">index</span>..<span class="ident">sz</span>], <span class="number">1</span>);
                 <span class="ident">slice_shift</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">vals</span>[<span class="ident">index</span>..<span class="ident">sz</span>], <span class="number">1</span>);
-                <span class="ident">Removed</span>::<span class="ident">new</span>(<span class="ident">index</span>, <span class="ident">sz</span> <span class="op">-</span> <span class="number">1</span>, <span class="ident">keys</span>.<span class="ident">len</span>())
+                <span class="ident">Removed::new</span>(<span class="ident">index</span>, <span class="ident">sz</span> <span class="op">-</span> <span class="number">1</span>, <span class="ident">keys</span>.<span class="ident">len</span>())
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Expected leaf node&quot;</span>),
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Expected leaf node&quot;</span>),
         }
     }
 
@@ -1171,22 +1171,22 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// In the first case, `None` is returned. In the second case, the new critical key for the</span>
     <span class="doccomment">/// right sibling node is returned.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">balance</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">crit_key</span>: <span class="ident">F</span>::<span class="ident">Key</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">F</span>::<span class="ident">Key</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">balance</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">crit_key</span>: <span class="ident">F::Key</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">F::Key</span><span class="op">&gt;</span> {
         <span class="kw">match</span> (<span class="self">self</span>, <span class="ident">rhs</span>) {
             (
-                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>::<span class="ident">Inner</span> {
+                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="ident">::Inner</span> {
                     <span class="ident">size</span>: <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">l_size</span>,
                     <span class="ident">keys</span>: <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">l_keys</span>,
                     <span class="ident">tree</span>: <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">l_tree</span>,
                 },
-                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>::<span class="ident">Inner</span> {
+                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="ident">::Inner</span> {
                     <span class="ident">size</span>: <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">r_size</span>,
                     <span class="ident">keys</span>: <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">r_keys</span>,
                     <span class="ident">tree</span>: <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">r_tree</span>,
                 },
             ) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">l_ents</span> <span class="op">=</span> <span class="ident">usize</span>::<span class="ident">from</span>(<span class="kw-2">*</span><span class="ident">l_size</span>) <span class="op">+</span> <span class="number">1</span>;
-                <span class="kw">let</span> <span class="ident">r_ents</span> <span class="op">=</span> <span class="ident">usize</span>::<span class="ident">from</span>(<span class="kw-2">*</span><span class="ident">r_size</span>) <span class="op">+</span> <span class="number">1</span>;
+                <span class="kw">let</span> <span class="ident">l_ents</span> <span class="op">=</span> <span class="ident">usize::from</span>(<span class="kw-2">*</span><span class="ident">l_size</span>) <span class="op">+</span> <span class="number">1</span>;
+                <span class="kw">let</span> <span class="ident">r_ents</span> <span class="op">=</span> <span class="ident">usize::from</span>(<span class="kw-2">*</span><span class="ident">r_size</span>) <span class="op">+</span> <span class="number">1</span>;
                 <span class="kw">let</span> <span class="ident">ents</span> <span class="op">=</span> <span class="ident">l_ents</span> <span class="op">+</span> <span class="ident">r_ents</span>;
 
                 <span class="kw">if</span> <span class="ident">ents</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">r_tree</span>.<span class="ident">len</span>() {
@@ -1206,7 +1206,7 @@
                     <span class="comment">// Split evenly with a bias to putting one entry in LHS.</span>
                     <span class="kw">let</span> <span class="ident">r_goal</span> <span class="op">=</span> <span class="ident">ents</span> <span class="op">/</span> <span class="number">2</span>;
                     <span class="kw">let</span> <span class="ident">l_goal</span> <span class="op">=</span> <span class="ident">ents</span> <span class="op">-</span> <span class="ident">r_goal</span>;
-                    <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">l_goal</span> <span class="op">&gt;</span> <span class="ident">l_ents</span>, <span class="string">&quot;Node must be underflowed&quot;</span>);
+                    <span class="macro">debug_assert!</span>(<span class="ident">l_goal</span> <span class="op">&gt;</span> <span class="ident">l_ents</span>, <span class="string">&quot;Node must be underflowed&quot;</span>);
 
                     <span class="ident">l_keys</span>[<span class="ident">l_ents</span> <span class="op">-</span> <span class="number">1</span>] <span class="op">=</span> <span class="ident">crit_key</span>;
                     <span class="ident">l_keys</span>[<span class="ident">l_ents</span>..<span class="ident">l_goal</span> <span class="op">-</span> <span class="number">1</span>].<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">r_keys</span>[<span class="number">0</span>..<span class="ident">l_goal</span> <span class="op">-</span> <span class="number">1</span> <span class="op">-</span> <span class="ident">l_ents</span>]);
@@ -1222,21 +1222,21 @@
                 }
             }
             (
-                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>::<span class="ident">Leaf</span> {
+                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="ident">::Leaf</span> {
                     <span class="ident">size</span>: <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">l_size</span>,
                     <span class="ident">keys</span>: <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">l_keys</span>,
                     <span class="ident">vals</span>: <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">l_vals</span>,
                 },
-                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>::<span class="ident">Leaf</span> {
+                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="ident">::Leaf</span> {
                     <span class="ident">size</span>: <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">r_size</span>,
                     <span class="ident">keys</span>: <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">r_keys</span>,
                     <span class="ident">vals</span>: <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">r_vals</span>,
                 },
             ) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">l_ents</span> <span class="op">=</span> <span class="ident">usize</span>::<span class="ident">from</span>(<span class="kw-2">*</span><span class="ident">l_size</span>);
+                <span class="kw">let</span> <span class="ident">l_ents</span> <span class="op">=</span> <span class="ident">usize::from</span>(<span class="kw-2">*</span><span class="ident">l_size</span>);
                 <span class="kw">let</span> <span class="ident">l_keys</span> <span class="op">=</span> <span class="ident">l_keys</span>.<span class="ident">borrow_mut</span>();
                 <span class="kw">let</span> <span class="ident">l_vals</span> <span class="op">=</span> <span class="ident">l_vals</span>.<span class="ident">borrow_mut</span>();
-                <span class="kw">let</span> <span class="ident">r_ents</span> <span class="op">=</span> <span class="ident">usize</span>::<span class="ident">from</span>(<span class="kw-2">*</span><span class="ident">r_size</span>);
+                <span class="kw">let</span> <span class="ident">r_ents</span> <span class="op">=</span> <span class="ident">usize::from</span>(<span class="kw-2">*</span><span class="ident">r_size</span>);
                 <span class="kw">let</span> <span class="ident">r_keys</span> <span class="op">=</span> <span class="ident">r_keys</span>.<span class="ident">borrow_mut</span>();
                 <span class="kw">let</span> <span class="ident">r_vals</span> <span class="op">=</span> <span class="ident">r_vals</span>.<span class="ident">borrow_mut</span>();
                 <span class="kw">let</span> <span class="ident">ents</span> <span class="op">=</span> <span class="ident">l_ents</span> <span class="op">+</span> <span class="ident">r_ents</span>;
@@ -1256,7 +1256,7 @@
                     <span class="comment">// Split evenly with a bias to putting one entry in LHS.</span>
                     <span class="kw">let</span> <span class="ident">r_goal</span> <span class="op">=</span> <span class="ident">ents</span> <span class="op">/</span> <span class="number">2</span>;
                     <span class="kw">let</span> <span class="ident">l_goal</span> <span class="op">=</span> <span class="ident">ents</span> <span class="op">-</span> <span class="ident">r_goal</span>;
-                    <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">l_goal</span> <span class="op">&gt;</span> <span class="ident">l_ents</span>, <span class="string">&quot;Node must be underflowed&quot;</span>);
+                    <span class="macro">debug_assert!</span>(<span class="ident">l_goal</span> <span class="op">&gt;</span> <span class="ident">l_ents</span>, <span class="string">&quot;Node must be underflowed&quot;</span>);
 
                     <span class="ident">l_keys</span>[<span class="ident">l_ents</span>..<span class="ident">l_goal</span>].<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">r_keys</span>[<span class="number">0</span>..<span class="ident">l_goal</span> <span class="op">-</span> <span class="ident">l_ents</span>]);
                     <span class="ident">l_vals</span>[<span class="ident">l_ents</span>..<span class="ident">l_goal</span>].<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">r_vals</span>[<span class="number">0</span>..<span class="ident">l_goal</span> <span class="op">-</span> <span class="ident">l_ents</span>]);
@@ -1269,7 +1269,7 @@
                     <span class="prelude-val">Some</span>(<span class="ident">r_keys</span>[<span class="number">0</span>])
                 }
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Mismatched nodes&quot;</span>),
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Mismatched nodes&quot;</span>),
         }
     }
 }
@@ -1303,7 +1303,7 @@
     <span class="doccomment">/// The critical key separating the LHS and RHS nodes. All keys in the LHS sub-tree are less</span>
     <span class="doccomment">/// than the critical key, and all entries in the RHS sub-tree are greater or equal to the</span>
     <span class="doccomment">/// critical key.</span>
-    <span class="kw">pub</span> <span class="ident">crit_key</span>: <span class="ident">F</span>::<span class="ident">Key</span>,
+    <span class="kw">pub</span> <span class="ident">crit_key</span>: <span class="ident">F::Key</span>,
 
     <span class="doccomment">/// The RHS node data containing the elements that were removed from the original node (now the</span>
     <span class="doccomment">/// LHS).</span>
@@ -1332,62 +1332,62 @@
     <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">removed</span>: <span class="ident">usize</span>, <span class="ident">new_size</span>: <span class="ident">usize</span>, <span class="ident">capacity</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="kw">if</span> <span class="number">2</span> <span class="op">*</span> <span class="ident">new_size</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">capacity</span> {
             <span class="kw">if</span> <span class="ident">removed</span> <span class="op">=</span><span class="op">=</span> <span class="ident">new_size</span> {
-                <span class="self">Self</span>::<span class="ident">Rightmost</span>
+                <span class="self">Self</span><span class="ident">::Rightmost</span>
             } <span class="kw">else</span> {
-                <span class="self">Self</span>::<span class="ident">Healthy</span>
+                <span class="self">Self</span><span class="ident">::Healthy</span>
             }
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">new_size</span> <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="self">Self</span>::<span class="ident">Underflow</span>
+            <span class="self">Self</span><span class="ident">::Underflow</span>
         } <span class="kw">else</span> {
-            <span class="self">Self</span>::<span class="ident">Empty</span>
+            <span class="self">Self</span><span class="ident">::Empty</span>
         }
     }
 }
 
 <span class="comment">// Display &quot;: value&quot; or nothing at all for `()`.</span>
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">trait</span> <span class="ident">ValDisp</span> {
-    <span class="kw">fn</span> <span class="ident">valfmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span>;
+    <span class="kw">fn</span> <span class="ident">valfmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">ValDisp</span> <span class="kw">for</span> <span class="ident">SetValue</span> {
-    <span class="kw">fn</span> <span class="ident">valfmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+    <span class="kw">fn</span> <span class="ident">valfmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">fmt</span>::<span class="ident">Display</span><span class="op">&gt;</span> <span class="ident">ValDisp</span> <span class="kw">for</span> <span class="ident">T</span> {
-    <span class="kw">fn</span> <span class="ident">valfmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
-        <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;:{}&quot;</span>, <span class="self">self</span>)
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">fmt::Display</span><span class="op">&gt;</span> <span class="ident">ValDisp</span> <span class="kw">for</span> <span class="ident">T</span> {
+    <span class="kw">fn</span> <span class="ident">valfmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;:{}&quot;</span>, <span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">NodeData</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">NodeData</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">F</span>: <span class="ident">Forest</span>,
-    <span class="ident">F</span>::<span class="ident">Key</span>: <span class="ident">fmt</span>::<span class="ident">Display</span>,
-    <span class="ident">F</span>::<span class="ident">Value</span>: <span class="ident">ValDisp</span>,
+    <span class="ident">F::Key</span>: <span class="ident">fmt::Display</span>,
+    <span class="ident">F::Value</span>: <span class="ident">ValDisp</span>,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="self">Self</span>::<span class="ident">Inner</span> { <span class="ident">size</span>, <span class="ident">keys</span>, <span class="ident">tree</span> } <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;[ {}&quot;</span>, <span class="ident">tree</span>[<span class="number">0</span>])<span class="question-mark">?</span>;
-                <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">usize</span>::<span class="ident">from</span>(<span class="ident">size</span>) {
-                    <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot; {} {}&quot;</span>, <span class="ident">keys</span>[<span class="ident">i</span>], <span class="ident">tree</span>[<span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>])<span class="question-mark">?</span>;
+            <span class="self">Self</span><span class="ident">::Inner</span> { <span class="ident">size</span>, <span class="ident">keys</span>, <span class="ident">tree</span> } <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;[ {}&quot;</span>, <span class="ident">tree</span>[<span class="number">0</span>])<span class="question-mark">?</span>;
+                <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">usize::from</span>(<span class="ident">size</span>) {
+                    <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot; {} {}&quot;</span>, <span class="ident">keys</span>[<span class="ident">i</span>], <span class="ident">tree</span>[<span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>])<span class="question-mark">?</span>;
                 }
-                <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot; ]&quot;</span>)
+                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot; ]&quot;</span>)
             }
-            <span class="self">Self</span>::<span class="ident">Leaf</span> { <span class="ident">size</span>, <span class="ident">keys</span>, <span class="ident">vals</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="self">Self</span><span class="ident">::Leaf</span> { <span class="ident">size</span>, <span class="ident">keys</span>, <span class="ident">vals</span> } <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="ident">keys</span> <span class="op">=</span> <span class="ident">keys</span>.<span class="ident">borrow</span>();
                 <span class="kw">let</span> <span class="ident">vals</span> <span class="op">=</span> <span class="ident">vals</span>.<span class="ident">borrow</span>();
-                <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;[&quot;</span>)<span class="question-mark">?</span>;
-                <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">usize</span>::<span class="ident">from</span>(<span class="ident">size</span>) {
-                    <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot; {}&quot;</span>, <span class="ident">keys</span>[<span class="ident">i</span>])<span class="question-mark">?</span>;
+                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;[&quot;</span>)<span class="question-mark">?</span>;
+                <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">usize::from</span>(<span class="ident">size</span>) {
+                    <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot; {}&quot;</span>, <span class="ident">keys</span>[<span class="ident">i</span>])<span class="question-mark">?</span>;
                     <span class="ident">vals</span>[<span class="ident">i</span>].<span class="ident">valfmt</span>(<span class="ident">f</span>)<span class="question-mark">?</span>;
                 }
-                <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot; ]&quot;</span>)
+                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot; ]&quot;</span>)
             }
-            <span class="self">Self</span>::<span class="ident">Free</span> { <span class="ident">next</span>: <span class="prelude-val">Some</span>(<span class="ident">n</span>) } <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;[ free -&gt; {} ]&quot;</span>, <span class="ident">n</span>),
-            <span class="self">Self</span>::<span class="ident">Free</span> { <span class="ident">next</span>: <span class="prelude-val">None</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;[ free ]&quot;</span>),
+            <span class="self">Self</span><span class="ident">::Free</span> { <span class="ident">next</span>: <span class="prelude-val">Some</span>(<span class="ident">n</span>) } <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;[ free -&gt; {} ]&quot;</span>, <span class="ident">n</span>),
+            <span class="self">Self</span><span class="ident">::Free</span> { <span class="ident">next</span>: <span class="prelude-val">None</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;[ free ]&quot;</span>),
         }
     }
 }
@@ -1395,8 +1395,8 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">alloc</span>::<span class="ident">string</span>::<span class="ident">ToString</span>;
-    <span class="kw">use</span> <span class="ident">core</span>::<span class="ident">mem</span>;
+    <span class="kw">use</span> <span class="ident">alloc::string::ToString</span>;
+    <span class="kw">use</span> <span class="ident">core::mem</span>;
 
     <span class="comment">// Forest impl for a set implementation.</span>
     <span class="kw">struct</span> <span class="ident">TF</span>();
@@ -1407,11 +1407,11 @@
         <span class="kw">type</span> <span class="ident">LeafKeys</span> <span class="op">=</span> [<span class="ident">char</span>; <span class="number">15</span>];
         <span class="kw">type</span> <span class="ident">LeafValues</span> <span class="op">=</span> [<span class="ident">SetValue</span>; <span class="number">15</span>];
 
-        <span class="kw">fn</span> <span class="ident">splat_key</span>(<span class="ident">key</span>: <span class="self">Self</span>::<span class="ident">Key</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">LeafKeys</span> {
+        <span class="kw">fn</span> <span class="ident">splat_key</span>(<span class="ident">key</span>: <span class="self">Self</span><span class="ident">::Key</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::LeafKeys</span> {
             [<span class="ident">key</span>; <span class="number">15</span>]
         }
 
-        <span class="kw">fn</span> <span class="ident">splat_value</span>(<span class="ident">value</span>: <span class="self">Self</span>::<span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">LeafValues</span> {
+        <span class="kw">fn</span> <span class="ident">splat_value</span>(<span class="ident">value</span>: <span class="self">Self</span><span class="ident">::Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::LeafValues</span> {
             [<span class="ident">value</span>; <span class="number">15</span>]
         }
     }
@@ -1422,122 +1422,122 @@
         <span class="kw">let</span> <span class="ident">n2</span> <span class="op">=</span> <span class="ident">Node</span>(<span class="number">2</span>);
         <span class="kw">let</span> <span class="ident">n3</span> <span class="op">=</span> <span class="ident">Node</span>(<span class="number">3</span>);
         <span class="kw">let</span> <span class="ident">n4</span> <span class="op">=</span> <span class="ident">Node</span>(<span class="number">4</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">NodeData</span>::<span class="op">&lt;</span><span class="ident">TF</span><span class="op">&gt;</span>::<span class="ident">inner</span>(<span class="ident">n1</span>, <span class="string">&#39;c&#39;</span>, <span class="ident">n4</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">mem</span>::<span class="ident">size_of_val</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>), <span class="number">64</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">inner</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ node1 c node4 ]&quot;</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">NodeData</span>::<span class="op">&lt;</span><span class="ident">TF</span><span class="op">&gt;</span><span class="ident">::inner</span>(<span class="ident">n1</span>, <span class="string">&#39;c&#39;</span>, <span class="ident">n4</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">mem::size_of_val</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>), <span class="number">64</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">inner</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ node1 c node4 ]&quot;</span>);
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">inner</span>.<span class="ident">try_inner_insert</span>(<span class="number">0</span>, <span class="string">&#39;a&#39;</span>, <span class="ident">n2</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">inner</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ node1 a node2 c node4 ]&quot;</span>);
+        <span class="macro">assert!</span>(<span class="ident">inner</span>.<span class="ident">try_inner_insert</span>(<span class="number">0</span>, <span class="string">&#39;a&#39;</span>, <span class="ident">n2</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">inner</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ node1 a node2 c node4 ]&quot;</span>);
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">inner</span>.<span class="ident">try_inner_insert</span>(<span class="number">1</span>, <span class="string">&#39;b&#39;</span>, <span class="ident">n3</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">inner</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ node1 a node2 b node3 c node4 ]&quot;</span>);
+        <span class="macro">assert!</span>(<span class="ident">inner</span>.<span class="ident">try_inner_insert</span>(<span class="number">1</span>, <span class="string">&#39;b&#39;</span>, <span class="ident">n3</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">inner</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ node1 a node2 b node3 c node4 ]&quot;</span>);
 
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">3</span>..<span class="number">7</span> {
-            <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">inner</span>.<span class="ident">try_inner_insert</span>(
-                <span class="ident">usize</span>::<span class="ident">from</span>(<span class="ident">i</span>),
+            <span class="macro">assert!</span>(<span class="ident">inner</span>.<span class="ident">try_inner_insert</span>(
+                <span class="ident">usize::from</span>(<span class="ident">i</span>),
                 (<span class="string">&#39;a&#39;</span> <span class="kw">as</span> <span class="ident">u8</span> <span class="op">+</span> <span class="ident">i</span>) <span class="kw">as</span> <span class="ident">char</span>,
                 <span class="ident">Node</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">u32</span> <span class="op">+</span> <span class="number">2</span>),
             ));
         }
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">inner</span>.<span class="ident">to_string</span>(),
             <span class="string">&quot;[ node1 a node2 b node3 c node4 d node5 e node6 f node7 g node8 ]&quot;</span>
         );
 
         <span class="comment">// Now the node is full and insertion should fail anywhere.</span>
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">inner</span>.<span class="ident">try_inner_insert</span>(<span class="number">0</span>, <span class="string">&#39;x&#39;</span>, <span class="ident">n3</span>));
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">inner</span>.<span class="ident">try_inner_insert</span>(<span class="number">4</span>, <span class="string">&#39;x&#39;</span>, <span class="ident">n3</span>));
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">inner</span>.<span class="ident">try_inner_insert</span>(<span class="number">7</span>, <span class="string">&#39;x&#39;</span>, <span class="ident">n3</span>));
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">inner</span>.<span class="ident">try_inner_insert</span>(<span class="number">0</span>, <span class="string">&#39;x&#39;</span>, <span class="ident">n3</span>));
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">inner</span>.<span class="ident">try_inner_insert</span>(<span class="number">4</span>, <span class="string">&#39;x&#39;</span>, <span class="ident">n3</span>));
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">inner</span>.<span class="ident">try_inner_insert</span>(<span class="number">7</span>, <span class="string">&#39;x&#39;</span>, <span class="ident">n3</span>));
 
         <span class="comment">// Splitting should be independent of the hint because we have an even number of node</span>
         <span class="comment">// references.</span>
         <span class="kw">let</span> <span class="ident">saved</span> <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">clone</span>();
         <span class="kw">let</span> <span class="ident">sp</span> <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">split</span>(<span class="number">1</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sp</span>.<span class="ident">lhs_entries</span>, <span class="number">4</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sp</span>.<span class="ident">rhs_entries</span>, <span class="number">4</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sp</span>.<span class="ident">crit_key</span>, <span class="string">&#39;d&#39;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">sp</span>.<span class="ident">lhs_entries</span>, <span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">sp</span>.<span class="ident">rhs_entries</span>, <span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">sp</span>.<span class="ident">crit_key</span>, <span class="string">&#39;d&#39;</span>);
         <span class="comment">// The critical key is not present in either of the resulting nodes.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">inner</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ node1 a node2 b node3 c node4 ]&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sp</span>.<span class="ident">rhs_data</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ node5 e node6 f node7 g node8 ]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">inner</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ node1 a node2 b node3 c node4 ]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">sp</span>.<span class="ident">rhs_data</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ node5 e node6 f node7 g node8 ]&quot;</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">inner</span>.<span class="ident">inner_remove</span>(<span class="number">0</span>), <span class="ident">Removed</span>::<span class="ident">Underflow</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">inner</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ node2 b node3 c node4 ]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">inner</span>.<span class="ident">inner_remove</span>(<span class="number">0</span>), <span class="ident">Removed::Underflow</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">inner</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ node2 b node3 c node4 ]&quot;</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">inner</span>.<span class="ident">inner_remove</span>(<span class="number">1</span>), <span class="ident">Removed</span>::<span class="ident">Underflow</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">inner</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ node2 c node4 ]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">inner</span>.<span class="ident">inner_remove</span>(<span class="number">1</span>), <span class="ident">Removed::Underflow</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">inner</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ node2 c node4 ]&quot;</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">inner</span>.<span class="ident">inner_remove</span>(<span class="number">1</span>), <span class="ident">Removed</span>::<span class="ident">Underflow</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">inner</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ node2 ]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">inner</span>.<span class="ident">inner_remove</span>(<span class="number">1</span>), <span class="ident">Removed::Underflow</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">inner</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ node2 ]&quot;</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">inner</span>.<span class="ident">inner_remove</span>(<span class="number">0</span>), <span class="ident">Removed</span>::<span class="ident">Empty</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">inner</span>.<span class="ident">inner_remove</span>(<span class="number">0</span>), <span class="ident">Removed::Empty</span>);
 
         <span class="ident">inner</span> <span class="op">=</span> <span class="ident">saved</span>;
         <span class="kw">let</span> <span class="ident">sp</span> <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">split</span>(<span class="number">6</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sp</span>.<span class="ident">lhs_entries</span>, <span class="number">4</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sp</span>.<span class="ident">rhs_entries</span>, <span class="number">4</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sp</span>.<span class="ident">crit_key</span>, <span class="string">&#39;d&#39;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">inner</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ node1 a node2 b node3 c node4 ]&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sp</span>.<span class="ident">rhs_data</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ node5 e node6 f node7 g node8 ]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">sp</span>.<span class="ident">lhs_entries</span>, <span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">sp</span>.<span class="ident">rhs_entries</span>, <span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">sp</span>.<span class="ident">crit_key</span>, <span class="string">&#39;d&#39;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">inner</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ node1 a node2 b node3 c node4 ]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">sp</span>.<span class="ident">rhs_data</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ node5 e node6 f node7 g node8 ]&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">leaf</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">leaf</span> <span class="op">=</span> <span class="ident">NodeData</span>::<span class="op">&lt;</span><span class="ident">TF</span><span class="op">&gt;</span>::<span class="ident">leaf</span>(<span class="string">&#39;d&#39;</span>, <span class="ident">SetValue</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">leaf</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ d ]&quot;</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">leaf</span> <span class="op">=</span> <span class="ident">NodeData</span>::<span class="op">&lt;</span><span class="ident">TF</span><span class="op">&gt;</span><span class="ident">::leaf</span>(<span class="string">&#39;d&#39;</span>, <span class="ident">SetValue</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">leaf</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ d ]&quot;</span>);
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">leaf</span>.<span class="ident">try_leaf_insert</span>(<span class="number">0</span>, <span class="string">&#39;a&#39;</span>, <span class="ident">SetValue</span>()));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">leaf</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ a d ]&quot;</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">leaf</span>.<span class="ident">try_leaf_insert</span>(<span class="number">1</span>, <span class="string">&#39;b&#39;</span>, <span class="ident">SetValue</span>()));
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">leaf</span>.<span class="ident">try_leaf_insert</span>(<span class="number">2</span>, <span class="string">&#39;c&#39;</span>, <span class="ident">SetValue</span>()));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">leaf</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ a b c d ]&quot;</span>);
+        <span class="macro">assert!</span>(<span class="ident">leaf</span>.<span class="ident">try_leaf_insert</span>(<span class="number">0</span>, <span class="string">&#39;a&#39;</span>, <span class="ident">SetValue</span>()));
+        <span class="macro">assert_eq!</span>(<span class="ident">leaf</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ a d ]&quot;</span>);
+        <span class="macro">assert!</span>(<span class="ident">leaf</span>.<span class="ident">try_leaf_insert</span>(<span class="number">1</span>, <span class="string">&#39;b&#39;</span>, <span class="ident">SetValue</span>()));
+        <span class="macro">assert!</span>(<span class="ident">leaf</span>.<span class="ident">try_leaf_insert</span>(<span class="number">2</span>, <span class="string">&#39;c&#39;</span>, <span class="ident">SetValue</span>()));
+        <span class="macro">assert_eq!</span>(<span class="ident">leaf</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ a b c d ]&quot;</span>);
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">4</span>..<span class="number">15</span> {
-            <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">leaf</span>.<span class="ident">try_leaf_insert</span>(<span class="ident">usize</span>::<span class="ident">from</span>(<span class="ident">i</span>), (<span class="string">&#39;a&#39;</span> <span class="kw">as</span> <span class="ident">u8</span> <span class="op">+</span> <span class="ident">i</span>) <span class="kw">as</span> <span class="ident">char</span>, <span class="ident">SetValue</span>()));
+            <span class="macro">assert!</span>(<span class="ident">leaf</span>.<span class="ident">try_leaf_insert</span>(<span class="ident">usize::from</span>(<span class="ident">i</span>), (<span class="string">&#39;a&#39;</span> <span class="kw">as</span> <span class="ident">u8</span> <span class="op">+</span> <span class="ident">i</span>) <span class="kw">as</span> <span class="ident">char</span>, <span class="ident">SetValue</span>()));
         }
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">leaf</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ a b c d e f g h i j k l m n o ]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">leaf</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ a b c d e f g h i j k l m n o ]&quot;</span>);
 
         <span class="comment">// Now the node is full and insertion should fail anywhere.</span>
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">leaf</span>.<span class="ident">try_leaf_insert</span>(<span class="number">0</span>, <span class="string">&#39;x&#39;</span>, <span class="ident">SetValue</span>()));
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">leaf</span>.<span class="ident">try_leaf_insert</span>(<span class="number">8</span>, <span class="string">&#39;x&#39;</span>, <span class="ident">SetValue</span>()));
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">leaf</span>.<span class="ident">try_leaf_insert</span>(<span class="number">15</span>, <span class="string">&#39;x&#39;</span>, <span class="ident">SetValue</span>()));
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">leaf</span>.<span class="ident">try_leaf_insert</span>(<span class="number">0</span>, <span class="string">&#39;x&#39;</span>, <span class="ident">SetValue</span>()));
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">leaf</span>.<span class="ident">try_leaf_insert</span>(<span class="number">8</span>, <span class="string">&#39;x&#39;</span>, <span class="ident">SetValue</span>()));
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">leaf</span>.<span class="ident">try_leaf_insert</span>(<span class="number">15</span>, <span class="string">&#39;x&#39;</span>, <span class="ident">SetValue</span>()));
 
         <span class="comment">// The index given to `split` is not the split position, it&#39;s a hint for balancing the node.</span>
         <span class="kw">let</span> <span class="ident">saved</span> <span class="op">=</span> <span class="ident">leaf</span>.<span class="ident">clone</span>();
         <span class="kw">let</span> <span class="ident">sp</span> <span class="op">=</span> <span class="ident">leaf</span>.<span class="ident">split</span>(<span class="number">12</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sp</span>.<span class="ident">lhs_entries</span>, <span class="number">8</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sp</span>.<span class="ident">rhs_entries</span>, <span class="number">7</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sp</span>.<span class="ident">crit_key</span>, <span class="string">&#39;i&#39;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">leaf</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ a b c d e f g h ]&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sp</span>.<span class="ident">rhs_data</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ i j k l m n o ]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">sp</span>.<span class="ident">lhs_entries</span>, <span class="number">8</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">sp</span>.<span class="ident">rhs_entries</span>, <span class="number">7</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">sp</span>.<span class="ident">crit_key</span>, <span class="string">&#39;i&#39;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">leaf</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ a b c d e f g h ]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">sp</span>.<span class="ident">rhs_data</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ i j k l m n o ]&quot;</span>);
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">leaf</span>.<span class="ident">try_leaf_insert</span>(<span class="number">8</span>, <span class="string">&#39;i&#39;</span>, <span class="ident">SetValue</span>()));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">leaf</span>.<span class="ident">leaf_remove</span>(<span class="number">2</span>), <span class="ident">Removed</span>::<span class="ident">Healthy</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">leaf</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ a b d e f g h i ]&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">leaf</span>.<span class="ident">leaf_remove</span>(<span class="number">7</span>), <span class="ident">Removed</span>::<span class="ident">Underflow</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">leaf</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ a b d e f g h ]&quot;</span>);
+        <span class="macro">assert!</span>(<span class="ident">leaf</span>.<span class="ident">try_leaf_insert</span>(<span class="number">8</span>, <span class="string">&#39;i&#39;</span>, <span class="ident">SetValue</span>()));
+        <span class="macro">assert_eq!</span>(<span class="ident">leaf</span>.<span class="ident">leaf_remove</span>(<span class="number">2</span>), <span class="ident">Removed::Healthy</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">leaf</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ a b d e f g h i ]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">leaf</span>.<span class="ident">leaf_remove</span>(<span class="number">7</span>), <span class="ident">Removed::Underflow</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">leaf</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ a b d e f g h ]&quot;</span>);
 
         <span class="ident">leaf</span> <span class="op">=</span> <span class="ident">saved</span>;
         <span class="kw">let</span> <span class="ident">sp</span> <span class="op">=</span> <span class="ident">leaf</span>.<span class="ident">split</span>(<span class="number">7</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sp</span>.<span class="ident">lhs_entries</span>, <span class="number">7</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sp</span>.<span class="ident">rhs_entries</span>, <span class="number">8</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sp</span>.<span class="ident">crit_key</span>, <span class="string">&#39;h&#39;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">leaf</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ a b c d e f g ]&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sp</span>.<span class="ident">rhs_data</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ h i j k l m n o ]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">sp</span>.<span class="ident">lhs_entries</span>, <span class="number">7</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">sp</span>.<span class="ident">rhs_entries</span>, <span class="number">8</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">sp</span>.<span class="ident">crit_key</span>, <span class="string">&#39;h&#39;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">leaf</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ a b c d e f g ]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">sp</span>.<span class="ident">rhs_data</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ h i j k l m n o ]&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">optimal_split_pos</span>() {
         <span class="comment">// An even split is easy.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">split_pos</span>(<span class="number">8</span>, <span class="number">0</span>), <span class="number">4</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">split_pos</span>(<span class="number">8</span>, <span class="number">8</span>), <span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">split_pos</span>(<span class="number">8</span>, <span class="number">0</span>), <span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">split_pos</span>(<span class="number">8</span>, <span class="number">8</span>), <span class="number">4</span>);
 
         <span class="comment">// Easy cases for odd splits.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">split_pos</span>(<span class="number">7</span>, <span class="number">0</span>), <span class="number">3</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">split_pos</span>(<span class="number">7</span>, <span class="number">7</span>), <span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">split_pos</span>(<span class="number">7</span>, <span class="number">0</span>), <span class="number">3</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">split_pos</span>(<span class="number">7</span>, <span class="number">7</span>), <span class="number">4</span>);
 
         <span class="comment">// If the insertion point is the same as the split position, we</span>
         <span class="comment">// will append to the lhs node.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">split_pos</span>(<span class="number">7</span>, <span class="number">3</span>), <span class="number">3</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">split_pos</span>(<span class="number">7</span>, <span class="number">4</span>), <span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">split_pos</span>(<span class="number">7</span>, <span class="number">3</span>), <span class="number">3</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">split_pos</span>(<span class="number">7</span>, <span class="number">4</span>), <span class="number">4</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -1545,41 +1545,41 @@
         <span class="kw">let</span> <span class="ident">n1</span> <span class="op">=</span> <span class="ident">Node</span>(<span class="number">1</span>);
         <span class="kw">let</span> <span class="ident">n2</span> <span class="op">=</span> <span class="ident">Node</span>(<span class="number">2</span>);
         <span class="kw">let</span> <span class="ident">n3</span> <span class="op">=</span> <span class="ident">Node</span>(<span class="number">3</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lhs</span> <span class="op">=</span> <span class="ident">NodeData</span>::<span class="op">&lt;</span><span class="ident">TF</span><span class="op">&gt;</span>::<span class="ident">inner</span>(<span class="ident">n1</span>, <span class="string">&#39;a&#39;</span>, <span class="ident">n2</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">lhs</span>.<span class="ident">try_inner_insert</span>(<span class="number">1</span>, <span class="string">&#39;b&#39;</span>, <span class="ident">n3</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">lhs</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ node1 a node2 b node3 ]&quot;</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lhs</span> <span class="op">=</span> <span class="ident">NodeData</span>::<span class="op">&lt;</span><span class="ident">TF</span><span class="op">&gt;</span><span class="ident">::inner</span>(<span class="ident">n1</span>, <span class="string">&#39;a&#39;</span>, <span class="ident">n2</span>);
+        <span class="macro">assert!</span>(<span class="ident">lhs</span>.<span class="ident">try_inner_insert</span>(<span class="number">1</span>, <span class="string">&#39;b&#39;</span>, <span class="ident">n3</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">lhs</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ node1 a node2 b node3 ]&quot;</span>);
 
         <span class="kw">let</span> <span class="ident">n11</span> <span class="op">=</span> <span class="ident">Node</span>(<span class="number">11</span>);
         <span class="kw">let</span> <span class="ident">n12</span> <span class="op">=</span> <span class="ident">Node</span>(<span class="number">12</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rhs</span> <span class="op">=</span> <span class="ident">NodeData</span>::<span class="op">&lt;</span><span class="ident">TF</span><span class="op">&gt;</span>::<span class="ident">inner</span>(<span class="ident">n11</span>, <span class="string">&#39;p&#39;</span>, <span class="ident">n12</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rhs</span> <span class="op">=</span> <span class="ident">NodeData</span>::<span class="op">&lt;</span><span class="ident">TF</span><span class="op">&gt;</span><span class="ident">::inner</span>(<span class="ident">n11</span>, <span class="string">&#39;p&#39;</span>, <span class="ident">n12</span>);
 
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">1</span>..<span class="number">4</span> {
-            <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">rhs</span>.<span class="ident">try_inner_insert</span>(
-                <span class="ident">usize</span>::<span class="ident">from</span>(<span class="ident">i</span>),
+            <span class="macro">assert!</span>(<span class="ident">rhs</span>.<span class="ident">try_inner_insert</span>(
+                <span class="ident">usize::from</span>(<span class="ident">i</span>),
                 (<span class="string">&#39;p&#39;</span> <span class="kw">as</span> <span class="ident">u8</span> <span class="op">+</span> <span class="ident">i</span>) <span class="kw">as</span> <span class="ident">char</span>,
                 <span class="ident">Node</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">u32</span> <span class="op">+</span> <span class="number">12</span>),
             ));
         }
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">rhs</span>.<span class="ident">to_string</span>(),
             <span class="string">&quot;[ node11 p node12 q node13 r node14 s node15 ]&quot;</span>
         );
 
         <span class="comment">// 3+5 elements fit in RHS.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">lhs</span>.<span class="ident">balance</span>(<span class="string">&#39;o&#39;</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rhs</span>), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(<span class="ident">lhs</span>.<span class="ident">balance</span>(<span class="string">&#39;o&#39;</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rhs</span>), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(
             <span class="ident">rhs</span>.<span class="ident">to_string</span>(),
             <span class="string">&quot;[ node1 a node2 b node3 o node11 p node12 q node13 r node14 s node15 ]&quot;</span>
         );
 
         <span class="comment">// 2+8 elements are redistributed.</span>
-        <span class="ident">lhs</span> <span class="op">=</span> <span class="ident">NodeData</span>::<span class="op">&lt;</span><span class="ident">TF</span><span class="op">&gt;</span>::<span class="ident">inner</span>(<span class="ident">Node</span>(<span class="number">20</span>), <span class="string">&#39;x&#39;</span>, <span class="ident">Node</span>(<span class="number">21</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">lhs</span>.<span class="ident">balance</span>(<span class="string">&#39;y&#39;</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rhs</span>), <span class="prelude-val">Some</span>(<span class="string">&#39;o&#39;</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="ident">lhs</span> <span class="op">=</span> <span class="ident">NodeData</span>::<span class="op">&lt;</span><span class="ident">TF</span><span class="op">&gt;</span><span class="ident">::inner</span>(<span class="ident">Node</span>(<span class="number">20</span>), <span class="string">&#39;x&#39;</span>, <span class="ident">Node</span>(<span class="number">21</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">lhs</span>.<span class="ident">balance</span>(<span class="string">&#39;y&#39;</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rhs</span>), <span class="prelude-val">Some</span>(<span class="string">&#39;o&#39;</span>));
+        <span class="macro">assert_eq!</span>(
             <span class="ident">lhs</span>.<span class="ident">to_string</span>(),
             <span class="string">&quot;[ node20 x node21 y node1 a node2 b node3 ]&quot;</span>
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">rhs</span>.<span class="ident">to_string</span>(),
             <span class="string">&quot;[ node11 p node12 q node13 r node14 s node15 ]&quot;</span>
         );
@@ -1587,32 +1587,33 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">leaf_balance</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lhs</span> <span class="op">=</span> <span class="ident">NodeData</span>::<span class="op">&lt;</span><span class="ident">TF</span><span class="op">&gt;</span>::<span class="ident">leaf</span>(<span class="string">&#39;a&#39;</span>, <span class="ident">SetValue</span>());
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lhs</span> <span class="op">=</span> <span class="ident">NodeData</span>::<span class="op">&lt;</span><span class="ident">TF</span><span class="op">&gt;</span><span class="ident">::leaf</span>(<span class="string">&#39;a&#39;</span>, <span class="ident">SetValue</span>());
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">1</span>..<span class="number">6</span> {
-            <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">lhs</span>.<span class="ident">try_leaf_insert</span>(<span class="ident">usize</span>::<span class="ident">from</span>(<span class="ident">i</span>), (<span class="string">&#39;a&#39;</span> <span class="kw">as</span> <span class="ident">u8</span> <span class="op">+</span> <span class="ident">i</span>) <span class="kw">as</span> <span class="ident">char</span>, <span class="ident">SetValue</span>()));
+            <span class="macro">assert!</span>(<span class="ident">lhs</span>.<span class="ident">try_leaf_insert</span>(<span class="ident">usize::from</span>(<span class="ident">i</span>), (<span class="string">&#39;a&#39;</span> <span class="kw">as</span> <span class="ident">u8</span> <span class="op">+</span> <span class="ident">i</span>) <span class="kw">as</span> <span class="ident">char</span>, <span class="ident">SetValue</span>()));
         }
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">lhs</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ a b c d e f ]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">lhs</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ a b c d e f ]&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rhs</span> <span class="op">=</span> <span class="ident">NodeData</span>::<span class="op">&lt;</span><span class="ident">TF</span><span class="op">&gt;</span>::<span class="ident">leaf</span>(<span class="string">&#39;0&#39;</span>, <span class="ident">SetValue</span>());
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rhs</span> <span class="op">=</span> <span class="ident">NodeData</span>::<span class="op">&lt;</span><span class="ident">TF</span><span class="op">&gt;</span><span class="ident">::leaf</span>(<span class="string">&#39;0&#39;</span>, <span class="ident">SetValue</span>());
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">1</span>..<span class="number">8</span> {
-            <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">rhs</span>.<span class="ident">try_leaf_insert</span>(<span class="ident">usize</span>::<span class="ident">from</span>(<span class="ident">i</span>), (<span class="string">&#39;0&#39;</span> <span class="kw">as</span> <span class="ident">u8</span> <span class="op">+</span> <span class="ident">i</span>) <span class="kw">as</span> <span class="ident">char</span>, <span class="ident">SetValue</span>()));
+            <span class="macro">assert!</span>(<span class="ident">rhs</span>.<span class="ident">try_leaf_insert</span>(<span class="ident">usize::from</span>(<span class="ident">i</span>), (<span class="string">&#39;0&#39;</span> <span class="kw">as</span> <span class="ident">u8</span> <span class="op">+</span> <span class="ident">i</span>) <span class="kw">as</span> <span class="ident">char</span>, <span class="ident">SetValue</span>()));
         }
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">rhs</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ 0 1 2 3 4 5 6 7 ]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">rhs</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ 0 1 2 3 4 5 6 7 ]&quot;</span>);
 
         <span class="comment">// 6+8 elements all fits in rhs.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">lhs</span>.<span class="ident">balance</span>(<span class="string">&#39;0&#39;</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rhs</span>), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">rhs</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ a b c d e f 0 1 2 3 4 5 6 7 ]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">lhs</span>.<span class="ident">balance</span>(<span class="string">&#39;0&#39;</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rhs</span>), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">rhs</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ a b c d e f 0 1 2 3 4 5 6 7 ]&quot;</span>);
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">lhs</span>.<span class="ident">try_leaf_insert</span>(<span class="number">0</span>, <span class="string">&#39;x&#39;</span>, <span class="ident">SetValue</span>()));
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">lhs</span>.<span class="ident">try_leaf_insert</span>(<span class="number">1</span>, <span class="string">&#39;y&#39;</span>, <span class="ident">SetValue</span>()));
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">lhs</span>.<span class="ident">try_leaf_insert</span>(<span class="number">2</span>, <span class="string">&#39;z&#39;</span>, <span class="ident">SetValue</span>()));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">lhs</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ x y z ]&quot;</span>);
+        <span class="macro">assert!</span>(<span class="ident">lhs</span>.<span class="ident">try_leaf_insert</span>(<span class="number">0</span>, <span class="string">&#39;x&#39;</span>, <span class="ident">SetValue</span>()));
+        <span class="macro">assert!</span>(<span class="ident">lhs</span>.<span class="ident">try_leaf_insert</span>(<span class="number">1</span>, <span class="string">&#39;y&#39;</span>, <span class="ident">SetValue</span>()));
+        <span class="macro">assert!</span>(<span class="ident">lhs</span>.<span class="ident">try_leaf_insert</span>(<span class="number">2</span>, <span class="string">&#39;z&#39;</span>, <span class="ident">SetValue</span>()));
+        <span class="macro">assert_eq!</span>(<span class="ident">lhs</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ x y z ]&quot;</span>);
 
         <span class="comment">// 3+14 elements need redistribution.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">lhs</span>.<span class="ident">balance</span>(<span class="string">&#39;a&#39;</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rhs</span>), <span class="prelude-val">Some</span>(<span class="string">&#39;0&#39;</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">lhs</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ x y z a b c d e f ]&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">rhs</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ 0 1 2 3 4 5 6 7 ]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">lhs</span>.<span class="ident">balance</span>(<span class="string">&#39;a&#39;</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rhs</span>), <span class="prelude-val">Some</span>(<span class="string">&#39;0&#39;</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">lhs</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ x y z a b c d e f ]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">rhs</span>.<span class="ident">to_string</span>(), <span class="string">&quot;[ 0 1 2 3 4 5 6 7 ]&quot;</span>);
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "cranelift_bforest";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="cranelift_bforest" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

@@ -1,4 +1,3 @@
 (function() {var implementors = {};
-implementors["wasmtime_environ"] = [{"text":"impl RelocSink for RelocSink","synthetic":false,"types":[]}];
-implementors["wasmtime_jit"] = [{"text":"impl RelocSink for TrampolineRelocSink","synthetic":false,"types":[]}];
+implementors["wasmtime_jit"] = [{"text":"impl <a class=\"trait\" href=\"cranelift_codegen/binemit/memorysink/trait.RelocSink.html\" title=\"trait cranelift_codegen::binemit::memorysink::RelocSink\">RelocSink</a> for <a class=\"struct\" href=\"wasmtime_jit/trampoline/struct.TrampolineRelocSink.html\" title=\"struct wasmtime_jit::trampoline::TrampolineRelocSink\">TrampolineRelocSink</a>","synthetic":false,"types":["wasmtime_jit::trampoline::TrampolineRelocSink"]}];
 if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

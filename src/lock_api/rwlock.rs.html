@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lock_api-0.1.5/src/rwlock.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>rwlock.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lock_api-0.4.3/src/rwlock.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>rwlock.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../lock_api/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../lock_api/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1454,6 +1454,329 @@
 <span id="1451">1451</span>
 <span id="1452">1452</span>
 <span id="1453">1453</span>
+<span id="1454">1454</span>
+<span id="1455">1455</span>
+<span id="1456">1456</span>
+<span id="1457">1457</span>
+<span id="1458">1458</span>
+<span id="1459">1459</span>
+<span id="1460">1460</span>
+<span id="1461">1461</span>
+<span id="1462">1462</span>
+<span id="1463">1463</span>
+<span id="1464">1464</span>
+<span id="1465">1465</span>
+<span id="1466">1466</span>
+<span id="1467">1467</span>
+<span id="1468">1468</span>
+<span id="1469">1469</span>
+<span id="1470">1470</span>
+<span id="1471">1471</span>
+<span id="1472">1472</span>
+<span id="1473">1473</span>
+<span id="1474">1474</span>
+<span id="1475">1475</span>
+<span id="1476">1476</span>
+<span id="1477">1477</span>
+<span id="1478">1478</span>
+<span id="1479">1479</span>
+<span id="1480">1480</span>
+<span id="1481">1481</span>
+<span id="1482">1482</span>
+<span id="1483">1483</span>
+<span id="1484">1484</span>
+<span id="1485">1485</span>
+<span id="1486">1486</span>
+<span id="1487">1487</span>
+<span id="1488">1488</span>
+<span id="1489">1489</span>
+<span id="1490">1490</span>
+<span id="1491">1491</span>
+<span id="1492">1492</span>
+<span id="1493">1493</span>
+<span id="1494">1494</span>
+<span id="1495">1495</span>
+<span id="1496">1496</span>
+<span id="1497">1497</span>
+<span id="1498">1498</span>
+<span id="1499">1499</span>
+<span id="1500">1500</span>
+<span id="1501">1501</span>
+<span id="1502">1502</span>
+<span id="1503">1503</span>
+<span id="1504">1504</span>
+<span id="1505">1505</span>
+<span id="1506">1506</span>
+<span id="1507">1507</span>
+<span id="1508">1508</span>
+<span id="1509">1509</span>
+<span id="1510">1510</span>
+<span id="1511">1511</span>
+<span id="1512">1512</span>
+<span id="1513">1513</span>
+<span id="1514">1514</span>
+<span id="1515">1515</span>
+<span id="1516">1516</span>
+<span id="1517">1517</span>
+<span id="1518">1518</span>
+<span id="1519">1519</span>
+<span id="1520">1520</span>
+<span id="1521">1521</span>
+<span id="1522">1522</span>
+<span id="1523">1523</span>
+<span id="1524">1524</span>
+<span id="1525">1525</span>
+<span id="1526">1526</span>
+<span id="1527">1527</span>
+<span id="1528">1528</span>
+<span id="1529">1529</span>
+<span id="1530">1530</span>
+<span id="1531">1531</span>
+<span id="1532">1532</span>
+<span id="1533">1533</span>
+<span id="1534">1534</span>
+<span id="1535">1535</span>
+<span id="1536">1536</span>
+<span id="1537">1537</span>
+<span id="1538">1538</span>
+<span id="1539">1539</span>
+<span id="1540">1540</span>
+<span id="1541">1541</span>
+<span id="1542">1542</span>
+<span id="1543">1543</span>
+<span id="1544">1544</span>
+<span id="1545">1545</span>
+<span id="1546">1546</span>
+<span id="1547">1547</span>
+<span id="1548">1548</span>
+<span id="1549">1549</span>
+<span id="1550">1550</span>
+<span id="1551">1551</span>
+<span id="1552">1552</span>
+<span id="1553">1553</span>
+<span id="1554">1554</span>
+<span id="1555">1555</span>
+<span id="1556">1556</span>
+<span id="1557">1557</span>
+<span id="1558">1558</span>
+<span id="1559">1559</span>
+<span id="1560">1560</span>
+<span id="1561">1561</span>
+<span id="1562">1562</span>
+<span id="1563">1563</span>
+<span id="1564">1564</span>
+<span id="1565">1565</span>
+<span id="1566">1566</span>
+<span id="1567">1567</span>
+<span id="1568">1568</span>
+<span id="1569">1569</span>
+<span id="1570">1570</span>
+<span id="1571">1571</span>
+<span id="1572">1572</span>
+<span id="1573">1573</span>
+<span id="1574">1574</span>
+<span id="1575">1575</span>
+<span id="1576">1576</span>
+<span id="1577">1577</span>
+<span id="1578">1578</span>
+<span id="1579">1579</span>
+<span id="1580">1580</span>
+<span id="1581">1581</span>
+<span id="1582">1582</span>
+<span id="1583">1583</span>
+<span id="1584">1584</span>
+<span id="1585">1585</span>
+<span id="1586">1586</span>
+<span id="1587">1587</span>
+<span id="1588">1588</span>
+<span id="1589">1589</span>
+<span id="1590">1590</span>
+<span id="1591">1591</span>
+<span id="1592">1592</span>
+<span id="1593">1593</span>
+<span id="1594">1594</span>
+<span id="1595">1595</span>
+<span id="1596">1596</span>
+<span id="1597">1597</span>
+<span id="1598">1598</span>
+<span id="1599">1599</span>
+<span id="1600">1600</span>
+<span id="1601">1601</span>
+<span id="1602">1602</span>
+<span id="1603">1603</span>
+<span id="1604">1604</span>
+<span id="1605">1605</span>
+<span id="1606">1606</span>
+<span id="1607">1607</span>
+<span id="1608">1608</span>
+<span id="1609">1609</span>
+<span id="1610">1610</span>
+<span id="1611">1611</span>
+<span id="1612">1612</span>
+<span id="1613">1613</span>
+<span id="1614">1614</span>
+<span id="1615">1615</span>
+<span id="1616">1616</span>
+<span id="1617">1617</span>
+<span id="1618">1618</span>
+<span id="1619">1619</span>
+<span id="1620">1620</span>
+<span id="1621">1621</span>
+<span id="1622">1622</span>
+<span id="1623">1623</span>
+<span id="1624">1624</span>
+<span id="1625">1625</span>
+<span id="1626">1626</span>
+<span id="1627">1627</span>
+<span id="1628">1628</span>
+<span id="1629">1629</span>
+<span id="1630">1630</span>
+<span id="1631">1631</span>
+<span id="1632">1632</span>
+<span id="1633">1633</span>
+<span id="1634">1634</span>
+<span id="1635">1635</span>
+<span id="1636">1636</span>
+<span id="1637">1637</span>
+<span id="1638">1638</span>
+<span id="1639">1639</span>
+<span id="1640">1640</span>
+<span id="1641">1641</span>
+<span id="1642">1642</span>
+<span id="1643">1643</span>
+<span id="1644">1644</span>
+<span id="1645">1645</span>
+<span id="1646">1646</span>
+<span id="1647">1647</span>
+<span id="1648">1648</span>
+<span id="1649">1649</span>
+<span id="1650">1650</span>
+<span id="1651">1651</span>
+<span id="1652">1652</span>
+<span id="1653">1653</span>
+<span id="1654">1654</span>
+<span id="1655">1655</span>
+<span id="1656">1656</span>
+<span id="1657">1657</span>
+<span id="1658">1658</span>
+<span id="1659">1659</span>
+<span id="1660">1660</span>
+<span id="1661">1661</span>
+<span id="1662">1662</span>
+<span id="1663">1663</span>
+<span id="1664">1664</span>
+<span id="1665">1665</span>
+<span id="1666">1666</span>
+<span id="1667">1667</span>
+<span id="1668">1668</span>
+<span id="1669">1669</span>
+<span id="1670">1670</span>
+<span id="1671">1671</span>
+<span id="1672">1672</span>
+<span id="1673">1673</span>
+<span id="1674">1674</span>
+<span id="1675">1675</span>
+<span id="1676">1676</span>
+<span id="1677">1677</span>
+<span id="1678">1678</span>
+<span id="1679">1679</span>
+<span id="1680">1680</span>
+<span id="1681">1681</span>
+<span id="1682">1682</span>
+<span id="1683">1683</span>
+<span id="1684">1684</span>
+<span id="1685">1685</span>
+<span id="1686">1686</span>
+<span id="1687">1687</span>
+<span id="1688">1688</span>
+<span id="1689">1689</span>
+<span id="1690">1690</span>
+<span id="1691">1691</span>
+<span id="1692">1692</span>
+<span id="1693">1693</span>
+<span id="1694">1694</span>
+<span id="1695">1695</span>
+<span id="1696">1696</span>
+<span id="1697">1697</span>
+<span id="1698">1698</span>
+<span id="1699">1699</span>
+<span id="1700">1700</span>
+<span id="1701">1701</span>
+<span id="1702">1702</span>
+<span id="1703">1703</span>
+<span id="1704">1704</span>
+<span id="1705">1705</span>
+<span id="1706">1706</span>
+<span id="1707">1707</span>
+<span id="1708">1708</span>
+<span id="1709">1709</span>
+<span id="1710">1710</span>
+<span id="1711">1711</span>
+<span id="1712">1712</span>
+<span id="1713">1713</span>
+<span id="1714">1714</span>
+<span id="1715">1715</span>
+<span id="1716">1716</span>
+<span id="1717">1717</span>
+<span id="1718">1718</span>
+<span id="1719">1719</span>
+<span id="1720">1720</span>
+<span id="1721">1721</span>
+<span id="1722">1722</span>
+<span id="1723">1723</span>
+<span id="1724">1724</span>
+<span id="1725">1725</span>
+<span id="1726">1726</span>
+<span id="1727">1727</span>
+<span id="1728">1728</span>
+<span id="1729">1729</span>
+<span id="1730">1730</span>
+<span id="1731">1731</span>
+<span id="1732">1732</span>
+<span id="1733">1733</span>
+<span id="1734">1734</span>
+<span id="1735">1735</span>
+<span id="1736">1736</span>
+<span id="1737">1737</span>
+<span id="1738">1738</span>
+<span id="1739">1739</span>
+<span id="1740">1740</span>
+<span id="1741">1741</span>
+<span id="1742">1742</span>
+<span id="1743">1743</span>
+<span id="1744">1744</span>
+<span id="1745">1745</span>
+<span id="1746">1746</span>
+<span id="1747">1747</span>
+<span id="1748">1748</span>
+<span id="1749">1749</span>
+<span id="1750">1750</span>
+<span id="1751">1751</span>
+<span id="1752">1752</span>
+<span id="1753">1753</span>
+<span id="1754">1754</span>
+<span id="1755">1755</span>
+<span id="1756">1756</span>
+<span id="1757">1757</span>
+<span id="1758">1758</span>
+<span id="1759">1759</span>
+<span id="1760">1760</span>
+<span id="1761">1761</span>
+<span id="1762">1762</span>
+<span id="1763">1763</span>
+<span id="1764">1764</span>
+<span id="1765">1765</span>
+<span id="1766">1766</span>
+<span id="1767">1767</span>
+<span id="1768">1768</span>
+<span id="1769">1769</span>
+<span id="1770">1770</span>
+<span id="1771">1771</span>
+<span id="1772">1772</span>
+<span id="1773">1773</span>
+<span id="1774">1774</span>
+<span id="1775">1775</span>
+<span id="1776">1776</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2016 Amanieu d&#39;Antras</span>
 <span class="comment">//</span>
@@ -1462,14 +1785,17 @@
 <span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
 <span class="comment">// copied, modified, or distributed except according to those terms.</span>
 
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">cell</span>::<span class="ident">UnsafeCell</span>;
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">fmt</span>;
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">marker</span>::<span class="ident">PhantomData</span>;
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">mem</span>;
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">ops</span>::{<span class="ident">Deref</span>, <span class="ident">DerefMut</span>};
+<span class="kw">use</span> <span class="ident">core::cell::UnsafeCell</span>;
+<span class="kw">use</span> <span class="ident">core::fmt</span>;
+<span class="kw">use</span> <span class="ident">core::marker::PhantomData</span>;
+<span class="kw">use</span> <span class="ident">core::mem</span>;
+<span class="kw">use</span> <span class="ident">core::ops</span>::{<span class="ident">Deref</span>, <span class="ident">DerefMut</span>};
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;owning_ref&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">owning_ref</span>::<span class="ident">StableAddress</span>;
+<span class="kw">use</span> <span class="ident">owning_ref::StableAddress</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
 
 <span class="doccomment">/// Basic operations for a reader-writer lock.</span>
 <span class="doccomment">///</span>
@@ -1484,6 +1810,9 @@
 <span class="doccomment">/// exists.</span>
 <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">trait</span> <span class="ident">RawRwLock</span> {
     <span class="doccomment">/// Initial value for an unlocked `RwLock`.</span>
+    <span class="comment">// A “non-constant” const item is a legacy way to supply an initialized value to downstream</span>
+    <span class="comment">// static items. Can hopefully be replaced with `const fn new() -&gt; Self` at some point.</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::declare_interior_mutable_const</span>)]</span>
     <span class="kw">const</span> <span class="ident">INIT</span>: <span class="self">Self</span>;
 
     <span class="doccomment">/// Marker type which determines whether a lock guard should be `Send`. Use</span>
@@ -1497,7 +1826,11 @@
     <span class="kw">fn</span> <span class="ident">try_lock_shared</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
 
     <span class="doccomment">/// Releases a shared lock.</span>
-    <span class="kw">fn</span> <span class="ident">unlock_shared</span>(<span class="kw-2">&amp;</span><span class="self">self</span>);
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Safety</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This method may only be called if a shared lock is held in the current context.</span>
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">unlock_shared</span>(<span class="kw-2">&amp;</span><span class="self">self</span>);
 
     <span class="doccomment">/// Acquires an exclusive lock, blocking the current thread until it is able to do so.</span>
     <span class="kw">fn</span> <span class="ident">lock_exclusive</span>(<span class="kw-2">&amp;</span><span class="self">self</span>);
@@ -1506,7 +1839,24 @@
     <span class="kw">fn</span> <span class="ident">try_lock_exclusive</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
 
     <span class="doccomment">/// Releases an exclusive lock.</span>
-    <span class="kw">fn</span> <span class="ident">unlock_exclusive</span>(<span class="kw-2">&amp;</span><span class="self">self</span>);
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Safety</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This method may only be called if an exclusive lock is held in the current context.</span>
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">unlock_exclusive</span>(<span class="kw-2">&amp;</span><span class="self">self</span>);
+
+    <span class="doccomment">/// Checks if this `RwLock` is currently locked in any way.</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">is_locked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">let</span> <span class="ident">acquired_lock</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">try_lock_exclusive</span>();
+        <span class="kw">if</span> <span class="ident">acquired_lock</span> {
+            <span class="comment">// Safety: A lock was successfully acquired above.</span>
+            <span class="kw">unsafe</span> {
+                <span class="self">self</span>.<span class="ident">unlock_exclusive</span>();
+            }
+        }
+        <span class="op">!</span><span class="ident">acquired_lock</span>
+    }
 }
 
 <span class="doccomment">/// Additional methods for RwLocks which support fair unlocking.</span>
@@ -1517,17 +1867,29 @@
 <span class="doccomment">/// unlocking, but may be necessary in certain circumstances.</span>
 <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">trait</span> <span class="ident">RawRwLockFair</span>: <span class="ident">RawRwLock</span> {
     <span class="doccomment">/// Releases a shared lock using a fair unlock protocol.</span>
-    <span class="kw">fn</span> <span class="ident">unlock_shared_fair</span>(<span class="kw-2">&amp;</span><span class="self">self</span>);
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Safety</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This method may only be called if a shared lock is held in the current context.</span>
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">unlock_shared_fair</span>(<span class="kw-2">&amp;</span><span class="self">self</span>);
 
     <span class="doccomment">/// Releases an exclusive lock using a fair unlock protocol.</span>
-    <span class="kw">fn</span> <span class="ident">unlock_exclusive_fair</span>(<span class="kw-2">&amp;</span><span class="self">self</span>);
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Safety</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This method may only be called if an exclusive lock is held in the current context.</span>
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">unlock_exclusive_fair</span>(<span class="kw-2">&amp;</span><span class="self">self</span>);
 
     <span class="doccomment">/// Temporarily yields a shared lock to a waiting thread if there is one.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This method is functionally equivalent to calling `unlock_shared_fair` followed</span>
     <span class="doccomment">/// by `lock_shared`, however it can be much more efficient in the case where there</span>
     <span class="doccomment">/// are no waiting threads.</span>
-    <span class="kw">fn</span> <span class="ident">bump_shared</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Safety</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This method may only be called if a shared lock is held in the current context.</span>
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">bump_shared</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">unlock_shared_fair</span>();
         <span class="self">self</span>.<span class="ident">lock_shared</span>();
     }
@@ -1537,7 +1899,11 @@
     <span class="doccomment">/// This method is functionally equivalent to calling `unlock_exclusive_fair` followed</span>
     <span class="doccomment">/// by `lock_exclusive`, however it can be much more efficient in the case where there</span>
     <span class="doccomment">/// are no waiting threads.</span>
-    <span class="kw">fn</span> <span class="ident">bump_exclusive</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Safety</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This method may only be called if an exclusive lock is held in the current context.</span>
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">bump_exclusive</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">unlock_exclusive_fair</span>();
         <span class="self">self</span>.<span class="ident">lock_exclusive</span>();
     }
@@ -1548,7 +1914,11 @@
 <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">trait</span> <span class="ident">RawRwLockDowngrade</span>: <span class="ident">RawRwLock</span> {
     <span class="doccomment">/// Atomically downgrades an exclusive lock into a shared lock without</span>
     <span class="doccomment">/// allowing any thread to take an exclusive lock in the meantime.</span>
-    <span class="kw">fn</span> <span class="ident">downgrade</span>(<span class="kw-2">&amp;</span><span class="self">self</span>);
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Safety</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This method may only be called if an exclusive lock is held in the current context.</span>
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">downgrade</span>(<span class="kw-2">&amp;</span><span class="self">self</span>);
 }
 
 <span class="doccomment">/// Additional methods for RwLocks which support locking with timeouts.</span>
@@ -1563,16 +1933,16 @@
     <span class="kw">type</span> <span class="ident">Instant</span>;
 
     <span class="doccomment">/// Attempts to acquire a shared lock until a timeout is reached.</span>
-    <span class="kw">fn</span> <span class="ident">try_lock_shared_for</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="self">Self</span>::<span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">try_lock_shared_for</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="self">Self</span><span class="ident">::Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
 
     <span class="doccomment">/// Attempts to acquire a shared lock until a timeout is reached.</span>
-    <span class="kw">fn</span> <span class="ident">try_lock_shared_until</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="self">Self</span>::<span class="ident">Instant</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">try_lock_shared_until</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="self">Self</span><span class="ident">::Instant</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
 
     <span class="doccomment">/// Attempts to acquire an exclusive lock until a timeout is reached.</span>
-    <span class="kw">fn</span> <span class="ident">try_lock_exclusive_for</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="self">Self</span>::<span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">try_lock_exclusive_for</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="self">Self</span><span class="ident">::Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
 
     <span class="doccomment">/// Attempts to acquire an exclusive lock until a timeout is reached.</span>
-    <span class="kw">fn</span> <span class="ident">try_lock_exclusive_until</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="self">Self</span>::<span class="ident">Instant</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">try_lock_exclusive_until</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="self">Self</span><span class="ident">::Instant</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
 }
 
 <span class="doccomment">/// Additional methods for RwLocks which support recursive read locks.</span>
@@ -1594,11 +1964,11 @@
 <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">trait</span> <span class="ident">RawRwLockRecursiveTimed</span>: <span class="ident">RawRwLockRecursive</span> <span class="op">+</span> <span class="ident">RawRwLockTimed</span> {
     <span class="doccomment">/// Attempts to acquire a shared lock until a timeout is reached, without</span>
     <span class="doccomment">/// deadlocking in case of a recursive lock.</span>
-    <span class="kw">fn</span> <span class="ident">try_lock_shared_recursive_for</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="self">Self</span>::<span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">try_lock_shared_recursive_for</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="self">Self</span><span class="ident">::Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
 
     <span class="doccomment">/// Attempts to acquire a shared lock until a timeout is reached, without</span>
     <span class="doccomment">/// deadlocking in case of a recursive lock.</span>
-    <span class="kw">fn</span> <span class="ident">try_lock_shared_recursive_until</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="self">Self</span>::<span class="ident">Instant</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">try_lock_shared_recursive_until</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="self">Self</span><span class="ident">::Instant</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
 }
 
 <span class="doccomment">/// Additional methods for RwLocks which support atomically upgrading a shared</span>
@@ -1615,28 +1985,48 @@
     <span class="kw">fn</span> <span class="ident">try_lock_upgradable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
 
     <span class="doccomment">/// Releases an upgradable lock.</span>
-    <span class="kw">fn</span> <span class="ident">unlock_upgradable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>);
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Safety</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This method may only be called if an upgradable lock is held in the current context.</span>
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">unlock_upgradable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>);
 
     <span class="doccomment">/// Upgrades an upgradable lock to an exclusive lock.</span>
-    <span class="kw">fn</span> <span class="ident">upgrade</span>(<span class="kw-2">&amp;</span><span class="self">self</span>);
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Safety</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This method may only be called if an upgradable lock is held in the current context.</span>
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">upgrade</span>(<span class="kw-2">&amp;</span><span class="self">self</span>);
 
     <span class="doccomment">/// Attempts to upgrade an upgradable lock to an exclusive lock without</span>
     <span class="doccomment">/// blocking.</span>
-    <span class="kw">fn</span> <span class="ident">try_upgrade</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Safety</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This method may only be called if an upgradable lock is held in the current context.</span>
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">try_upgrade</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
 }
 
 <span class="doccomment">/// Additional methods for RwLocks which support upgradable locks and fair</span>
 <span class="doccomment">/// unlocking.</span>
 <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">trait</span> <span class="ident">RawRwLockUpgradeFair</span>: <span class="ident">RawRwLockUpgrade</span> <span class="op">+</span> <span class="ident">RawRwLockFair</span> {
     <span class="doccomment">/// Releases an upgradable lock using a fair unlock protocol.</span>
-    <span class="kw">fn</span> <span class="ident">unlock_upgradable_fair</span>(<span class="kw-2">&amp;</span><span class="self">self</span>);
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Safety</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This method may only be called if an upgradable lock is held in the current context.</span>
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">unlock_upgradable_fair</span>(<span class="kw-2">&amp;</span><span class="self">self</span>);
 
     <span class="doccomment">/// Temporarily yields an upgradable lock to a waiting thread if there is one.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This method is functionally equivalent to calling `unlock_upgradable_fair` followed</span>
     <span class="doccomment">/// by `lock_upgradable`, however it can be much more efficient in the case where there</span>
     <span class="doccomment">/// are no waiting threads.</span>
-    <span class="kw">fn</span> <span class="ident">bump_upgradable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Safety</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This method may only be called if an upgradable lock is held in the current context.</span>
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">bump_upgradable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">unlock_upgradable_fair</span>();
         <span class="self">self</span>.<span class="ident">lock_upgradable</span>();
     }
@@ -1646,28 +2036,44 @@
 <span class="doccomment">/// downgrading.</span>
 <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">trait</span> <span class="ident">RawRwLockUpgradeDowngrade</span>: <span class="ident">RawRwLockUpgrade</span> <span class="op">+</span> <span class="ident">RawRwLockDowngrade</span> {
     <span class="doccomment">/// Downgrades an upgradable lock to a shared lock.</span>
-    <span class="kw">fn</span> <span class="ident">downgrade_upgradable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>);
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Safety</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This method may only be called if an upgradable lock is held in the current context.</span>
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">downgrade_upgradable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>);
 
     <span class="doccomment">/// Downgrades an exclusive lock to an upgradable lock.</span>
-    <span class="kw">fn</span> <span class="ident">downgrade_to_upgradable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>);
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Safety</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This method may only be called if an exclusive lock is held in the current context.</span>
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">downgrade_to_upgradable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>);
 }
 
 <span class="doccomment">/// Additional methods for RwLocks which support upgradable locks and locking</span>
 <span class="doccomment">/// with timeouts.</span>
 <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">trait</span> <span class="ident">RawRwLockUpgradeTimed</span>: <span class="ident">RawRwLockUpgrade</span> <span class="op">+</span> <span class="ident">RawRwLockTimed</span> {
     <span class="doccomment">/// Attempts to acquire an upgradable lock until a timeout is reached.</span>
-    <span class="kw">fn</span> <span class="ident">try_lock_upgradable_for</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="self">Self</span>::<span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">try_lock_upgradable_for</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="self">Self</span><span class="ident">::Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
 
     <span class="doccomment">/// Attempts to acquire an upgradable lock until a timeout is reached.</span>
-    <span class="kw">fn</span> <span class="ident">try_lock_upgradable_until</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="self">Self</span>::<span class="ident">Instant</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">try_lock_upgradable_until</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="self">Self</span><span class="ident">::Instant</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
 
     <span class="doccomment">/// Attempts to upgrade an upgradable lock to an exclusive lock until a</span>
     <span class="doccomment">/// timeout is reached.</span>
-    <span class="kw">fn</span> <span class="ident">try_upgrade_for</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="self">Self</span>::<span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Safety</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This method may only be called if an upgradable lock is held in the current context.</span>
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">try_upgrade_for</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="self">Self</span><span class="ident">::Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
 
     <span class="doccomment">/// Attempts to upgrade an upgradable lock to an exclusive lock until a</span>
     <span class="doccomment">/// timeout is reached.</span>
-    <span class="kw">fn</span> <span class="ident">try_upgrade_until</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="self">Self</span>::<span class="ident">Instant</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Safety</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This method may only be called if an upgradable lock is held in the current context.</span>
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">try_upgrade_until</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="self">Self</span><span class="ident">::Instant</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
 }
 
 <span class="doccomment">/// A reader-writer lock</span>
@@ -1682,9 +2088,38 @@
 <span class="doccomment">/// allow concurrent access through readers. The RAII guards returned from the</span>
 <span class="doccomment">/// locking methods implement `Deref` (and `DerefMut` for the `write` methods)</span>
 <span class="doccomment">/// to allow access to the contained of the lock.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">RawRwLock</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> {
     <span class="ident">raw</span>: <span class="ident">R</span>,
     <span class="ident">data</span>: <span class="ident">UnsafeCell</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+}
+
+<span class="comment">// Copied and modified from serde</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">R</span>: <span class="ident">RawRwLock</span>,
+    <span class="ident">T</span>: <span class="ident">Serialize</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
+{
+    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    {
+        <span class="self">self</span>.<span class="ident">read</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+    }
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">R</span>: <span class="ident">RawRwLock</span>,
+    <span class="ident">T</span>: <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
+{
+    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    {
+        <span class="ident">Deserialize::deserialize</span>(<span class="ident">deserializer</span>).<span class="ident">map</span>(<span class="ident">RwLock::new</span>)
+    }
 }
 
 <span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">RawRwLock</span> <span class="op">+</span> <span class="ident">Send</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {}
@@ -1696,8 +2131,8 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">val</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">RwLock</span> {
-            <span class="ident">data</span>: <span class="ident">UnsafeCell</span>::<span class="ident">new</span>(<span class="ident">val</span>),
-            <span class="ident">raw</span>: <span class="ident">R</span>::<span class="ident">INIT</span>,
+            <span class="ident">data</span>: <span class="ident">UnsafeCell::new</span>(<span class="ident">val</span>),
+            <span class="ident">raw</span>: <span class="ident">R::INIT</span>,
         }
     }
 
@@ -1706,8 +2141,8 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">val</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">RwLock</span> {
-            <span class="ident">data</span>: <span class="ident">UnsafeCell</span>::<span class="ident">new</span>(<span class="ident">val</span>),
-            <span class="ident">raw</span>: <span class="ident">R</span>::<span class="ident">INIT</span>,
+            <span class="ident">data</span>: <span class="ident">UnsafeCell::new</span>(<span class="ident">val</span>),
+            <span class="ident">raw</span>: <span class="ident">R::INIT</span>,
         }
     }
 
@@ -1719,17 +2154,38 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">RawRwLock</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Creates a new new instance of an `RwLock&lt;T&gt;` based on a pre-existing</span>
+    <span class="doccomment">/// `RawRwLock&lt;T&gt;`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This allows creating a `RwLock&lt;T&gt;` in a constant context on stable</span>
+    <span class="doccomment">/// Rust.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">read_guard</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RwLockReadGuard</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">const_new</span>(<span class="ident">raw_rwlock</span>: <span class="ident">R</span>, <span class="ident">val</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+        <span class="ident">RwLock</span> {
+            <span class="ident">data</span>: <span class="ident">UnsafeCell::new</span>(<span class="ident">val</span>),
+            <span class="ident">raw</span>: <span class="ident">raw_rwlock</span>,
+        }
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">RawRwLock</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// # Safety</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The lock must be held when calling this method.</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">read_guard</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">RwLockReadGuard</span> {
             <span class="ident">rwlock</span>: <span class="self">self</span>,
             <span class="ident">marker</span>: <span class="ident">PhantomData</span>,
         }
     }
 
+    <span class="doccomment">/// # Safety</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The lock must be held when calling this method.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">write_guard</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RwLockWriteGuard</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">write_guard</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RwLockWriteGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">RwLockWriteGuard</span> {
             <span class="ident">rwlock</span>: <span class="self">self</span>,
             <span class="ident">marker</span>: <span class="ident">PhantomData</span>,
@@ -1749,9 +2205,10 @@
     <span class="doccomment">/// Returns an RAII guard which will release this thread&#39;s shared access</span>
     <span class="doccomment">/// once it is dropped.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RwLockReadGuard</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">lock_shared</span>();
-        <span class="self">self</span>.<span class="ident">read_guard</span>()
+        <span class="comment">// SAFETY: The lock is held, as required.</span>
+        <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">read_guard</span>() }
     }
 
     <span class="doccomment">/// Attempts to acquire this `RwLock` with shared read access.</span>
@@ -1762,9 +2219,10 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This function does not block.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_read</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RwLockReadGuard</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_read</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">try_lock_shared</span>() {
-            <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">read_guard</span>())
+            <span class="comment">// SAFETY: The lock is held, as required.</span>
+            <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">read_guard</span>() })
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
         }
@@ -1779,9 +2237,10 @@
     <span class="doccomment">/// Returns an RAII guard which will drop the write access of this `RwLock`</span>
     <span class="doccomment">/// when dropped.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RwLockWriteGuard</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RwLockWriteGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">lock_exclusive</span>();
-        <span class="self">self</span>.<span class="ident">write_guard</span>()
+        <span class="comment">// SAFETY: The lock is held, as required.</span>
+        <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">write_guard</span>() }
     }
 
     <span class="doccomment">/// Attempts to lock this `RwLock` with exclusive write access.</span>
@@ -1792,9 +2251,10 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This function does not block.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_write</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RwLockWriteGuard</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_write</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RwLockWriteGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">try_lock_exclusive</span>() {
-            <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">write_guard</span>())
+            <span class="comment">// SAFETY: The lock is held, as required.</span>
+            <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">write_guard</span>() })
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
         }
@@ -1807,6 +2267,12 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span> {
         <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">data</span>.<span class="ident">get</span>() }
+    }
+
+    <span class="doccomment">/// Checks whether this `RwLock` is currently locked in any way.</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_locked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">is_locked</span>()
     }
 
     <span class="doccomment">/// Forcibly unlocks a read lock.</span>
@@ -1854,6 +2320,23 @@
     <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">R</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">raw</span>
     }
+
+    <span class="doccomment">/// Returns a raw pointer to the underlying data.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This is useful when combined with `mem::forget` to hold a lock without</span>
+    <span class="doccomment">/// the need to maintain a `RwLockReadGuard` or `RwLockWriteGuard` object</span>
+    <span class="doccomment">/// alive, for example when dealing with FFI.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Safety</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// You must ensure that there are no data races when dereferencing the</span>
+    <span class="doccomment">/// returned pointer, for example if the current thread logically owns a</span>
+    <span class="doccomment">/// `RwLockReadGuard` or `RwLockWriteGuard` but that guard has been discarded</span>
+    <span class="doccomment">/// using `mem::forget`.</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">data_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span> {
+        <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">get</span>()
+    }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">RawRwLockFair</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
@@ -1898,9 +2381,10 @@
     <span class="doccomment">/// `None` is returned. Otherwise, an RAII guard is returned which will</span>
     <span class="doccomment">/// release the shared access when it is dropped.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_read_for</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="ident">R</span>::<span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RwLockReadGuard</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_read_for</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="ident">R::Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">try_lock_shared_for</span>(<span class="ident">timeout</span>) {
-            <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">read_guard</span>())
+            <span class="comment">// SAFETY: The lock is held, as required.</span>
+            <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">read_guard</span>() })
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
         }
@@ -1913,9 +2397,10 @@
     <span class="doccomment">/// `None` is returned. Otherwise, an RAII guard is returned which will</span>
     <span class="doccomment">/// release the shared access when it is dropped.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_read_until</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="ident">R</span>::<span class="ident">Instant</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RwLockReadGuard</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_read_until</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="ident">R::Instant</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">try_lock_shared_until</span>(<span class="ident">timeout</span>) {
-            <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">read_guard</span>())
+            <span class="comment">// SAFETY: The lock is held, as required.</span>
+            <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">read_guard</span>() })
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
         }
@@ -1928,9 +2413,10 @@
     <span class="doccomment">/// `None` is returned. Otherwise, an RAII guard is returned which will</span>
     <span class="doccomment">/// release the exclusive access when it is dropped.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_write_for</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="ident">R</span>::<span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RwLockWriteGuard</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_write_for</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="ident">R::Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RwLockWriteGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">try_lock_exclusive_for</span>(<span class="ident">timeout</span>) {
-            <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">write_guard</span>())
+            <span class="comment">// SAFETY: The lock is held, as required.</span>
+            <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">write_guard</span>() })
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
         }
@@ -1943,9 +2429,10 @@
     <span class="doccomment">/// `None` is returned. Otherwise, an RAII guard is returned which will</span>
     <span class="doccomment">/// release the exclusive access when it is dropped.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_write_until</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="ident">R</span>::<span class="ident">Instant</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RwLockWriteGuard</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_write_until</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="ident">R::Instant</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RwLockWriteGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">try_lock_exclusive_until</span>(<span class="ident">timeout</span>) {
-            <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">write_guard</span>())
+            <span class="comment">// SAFETY: The lock is held, as required.</span>
+            <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">write_guard</span>() })
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
         }
@@ -1969,9 +2456,10 @@
     <span class="doccomment">/// Returns an RAII guard which will release this thread&#39;s shared access</span>
     <span class="doccomment">/// once it is dropped.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_recursive</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RwLockReadGuard</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_recursive</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">lock_shared_recursive</span>();
-        <span class="self">self</span>.<span class="ident">read_guard</span>()
+        <span class="comment">// SAFETY: The lock is held, as required.</span>
+        <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">read_guard</span>() }
     }
 
     <span class="doccomment">/// Attempts to acquire this `RwLock` with shared read access.</span>
@@ -1985,9 +2473,10 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This function does not block.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_read_recursive</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RwLockReadGuard</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_read_recursive</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">try_lock_shared_recursive</span>() {
-            <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">read_guard</span>())
+            <span class="comment">// SAFETY: The lock is held, as required.</span>
+            <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">read_guard</span>() })
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
         }
@@ -2006,9 +2495,13 @@
     <span class="doccomment">/// lock is held at the time of the call. See the documentation for</span>
     <span class="doccomment">/// `read_recursive` for details.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_read_recursive_for</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="ident">R</span>::<span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RwLockReadGuard</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_read_recursive_for</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">timeout</span>: <span class="ident">R::Duration</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">try_lock_shared_recursive_for</span>(<span class="ident">timeout</span>) {
-            <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">read_guard</span>())
+            <span class="comment">// SAFETY: The lock is held, as required.</span>
+            <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">read_guard</span>() })
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
         }
@@ -2021,9 +2514,13 @@
     <span class="doccomment">/// `None` is returned. Otherwise, an RAII guard is returned which will</span>
     <span class="doccomment">/// release the shared access when it is dropped.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_read_recursive_until</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="ident">R</span>::<span class="ident">Instant</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RwLockReadGuard</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_read_recursive_until</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">timeout</span>: <span class="ident">R::Instant</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">try_lock_shared_recursive_until</span>(<span class="ident">timeout</span>) {
-            <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">read_guard</span>())
+            <span class="comment">// SAFETY: The lock is held, as required.</span>
+            <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">read_guard</span>() })
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
         }
@@ -2031,8 +2528,11 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">RawRwLockUpgrade</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// # Safety</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The lock must be held when calling this method.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">upgradable_guard</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RwLockUpgradableReadGuard</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">upgradable_guard</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RwLockUpgradableReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">RwLockUpgradableReadGuard</span> {
             <span class="ident">rwlock</span>: <span class="self">self</span>,
             <span class="ident">marker</span>: <span class="ident">PhantomData</span>,
@@ -2049,9 +2549,10 @@
     <span class="doccomment">/// Returns an RAII guard which will release this thread&#39;s shared access</span>
     <span class="doccomment">/// once it is dropped.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">upgradable_read</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RwLockUpgradableReadGuard</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">upgradable_read</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RwLockUpgradableReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">lock_upgradable</span>();
-        <span class="self">self</span>.<span class="ident">upgradable_guard</span>()
+        <span class="comment">// SAFETY: The lock is held, as required.</span>
+        <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">upgradable_guard</span>() }
     }
 
     <span class="doccomment">/// Attempts to acquire this `RwLock` with upgradable read access.</span>
@@ -2062,9 +2563,10 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This function does not block.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_upgradable_read</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RwLockUpgradableReadGuard</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_upgradable_read</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RwLockUpgradableReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">try_lock_upgradable</span>() {
-            <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">upgradable_guard</span>())
+            <span class="comment">// SAFETY: The lock is held, as required.</span>
+            <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">upgradable_guard</span>() })
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
         }
@@ -2081,10 +2583,11 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_upgradable_read_for</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">timeout</span>: <span class="ident">R</span>::<span class="ident">Duration</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RwLockUpgradableReadGuard</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="ident">timeout</span>: <span class="ident">R::Duration</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RwLockUpgradableReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">try_lock_upgradable_for</span>(<span class="ident">timeout</span>) {
-            <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">upgradable_guard</span>())
+            <span class="comment">// SAFETY: The lock is held, as required.</span>
+            <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">upgradable_guard</span>() })
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
         }
@@ -2099,10 +2602,11 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_upgradable_read_until</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">timeout</span>: <span class="ident">R</span>::<span class="ident">Instant</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RwLockUpgradableReadGuard</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="ident">timeout</span>: <span class="ident">R::Instant</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RwLockUpgradableReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">try_lock_upgradable_until</span>(<span class="ident">timeout</span>) {
-            <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">upgradable_guard</span>())
+            <span class="comment">// SAFETY: The lock is held, as required.</span>
+            <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">upgradable_guard</span>() })
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
         }
@@ -2112,35 +2616,44 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">RawRwLock</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Default</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">RwLock</span>::<span class="ident">new</span>(<span class="ident">Default</span>::<span class="ident">default</span>())
+        <span class="ident">RwLock::new</span>(<span class="ident">Default::default</span>())
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">RawRwLock</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">t</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">RwLock</span>::<span class="ident">new</span>(<span class="ident">t</span>)
+        <span class="ident">RwLock::new</span>(<span class="ident">t</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">RawRwLock</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">fmt</span>::<span class="ident">Debug</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">RawRwLock</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">fmt::Debug</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">try_read</span>() {
             <span class="prelude-val">Some</span>(<span class="ident">guard</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;RwLock&quot;</span>).<span class="ident">field</span>(<span class="string">&quot;data&quot;</span>, <span class="op">&amp;&amp;</span><span class="kw-2">*</span><span class="ident">guard</span>).<span class="ident">finish</span>(),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;RwLock { &lt;locked&gt; }&quot;</span>),
+            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="kw">struct</span> <span class="ident">LockedPlaceholder</span>;
+                <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">LockedPlaceholder</span> {
+                    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+                        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;&lt;locked&gt;&quot;</span>)
+                    }
+                }
+
+                <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;RwLock&quot;</span>)
+                    .<span class="ident">field</span>(<span class="string">&quot;data&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">LockedPlaceholder</span>)
+                    .<span class="ident">finish</span>()
+            }
         }
     }
 }
 
 <span class="doccomment">/// RAII structure used to release the shared read access of a lock when</span>
 <span class="doccomment">/// dropped.</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLock</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;if unused the RwLock will immediately unlock&quot;</span>]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLock</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> {
     <span class="ident">rwlock</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>, <span class="ident">R</span>::<span class="ident">GuardMarker</span>)<span class="op">&gt;</span>,
+    <span class="ident">marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>, <span class="ident">R::GuardMarker</span>)<span class="op">&gt;</span>,
 }
-
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLock</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">RwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {}
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLock</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">RwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Returns a reference to the original reader-writer lock object.</span>
@@ -2163,7 +2676,7 @@
     {
         <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>;
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">f</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">data</span>.<span class="ident">get</span>() });
-        <span class="ident">mem</span>::<span class="ident">forget</span>(<span class="ident">s</span>);
+        <span class="ident">mem::forget</span>(<span class="ident">s</span>);
         <span class="ident">MappedRwLockReadGuard</span> {
             <span class="ident">raw</span>,
             <span class="ident">data</span>,
@@ -2190,7 +2703,7 @@
             <span class="prelude-val">Some</span>(<span class="ident">data</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">data</span>,
             <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">s</span>),
         };
-        <span class="ident">mem</span>::<span class="ident">forget</span>(<span class="ident">s</span>);
+        <span class="ident">mem::forget</span>(<span class="ident">s</span>);
         <span class="prelude-val">Ok</span>(<span class="ident">MappedRwLockReadGuard</span> {
             <span class="ident">raw</span>,
             <span class="ident">data</span>,
@@ -2209,8 +2722,11 @@
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">U</span>,
     {
-        <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">unlock_shared</span>();
-        <span class="macro">defer</span><span class="macro">!</span>(<span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">lock_shared</span>());
+        <span class="comment">// Safety: An RwLockReadGuard always holds a shared lock.</span>
+        <span class="kw">unsafe</span> {
+            <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">unlock_shared</span>();
+        }
+        <span class="macro">defer!</span>(<span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">lock_shared</span>());
         <span class="ident">f</span>()
     }
 }
@@ -2230,8 +2746,11 @@
     <span class="doccomment">/// using this method instead of dropping the `RwLockReadGuard` normally.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unlock_fair</span>(<span class="ident">s</span>: <span class="self">Self</span>) {
-        <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">unlock_shared_fair</span>();
-        <span class="ident">mem</span>::<span class="ident">forget</span>(<span class="ident">s</span>);
+        <span class="comment">// Safety: An RwLockReadGuard always holds a shared lock.</span>
+        <span class="kw">unsafe</span> {
+            <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">unlock_shared_fair</span>();
+        }
+        <span class="ident">mem::forget</span>(<span class="ident">s</span>);
     }
 
     <span class="doccomment">/// Temporarily unlocks the `RwLock` to execute the given function.</span>
@@ -2245,8 +2764,11 @@
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">U</span>,
     {
-        <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">unlock_shared_fair</span>();
-        <span class="macro">defer</span><span class="macro">!</span>(<span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">lock_shared</span>());
+        <span class="comment">// Safety: An RwLockReadGuard always holds a shared lock.</span>
+        <span class="kw">unsafe</span> {
+            <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">unlock_shared_fair</span>();
+        }
+        <span class="macro">defer!</span>(<span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">lock_shared</span>());
         <span class="ident">f</span>()
     }
 
@@ -2257,7 +2779,10 @@
     <span class="doccomment">/// are no waiting threads.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bump</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>) {
-        <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">bump_shared</span>();
+        <span class="comment">// Safety: An RwLockReadGuard always holds a shared lock.</span>
+        <span class="kw">unsafe</span> {
+            <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">bump_shared</span>();
+        }
     }
 }
 
@@ -2272,7 +2797,24 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLock</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">RwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">unlock_shared</span>();
+        <span class="comment">// Safety: An RwLockReadGuard always holds a shared lock.</span>
+        <span class="kw">unsafe</span> {
+            <span class="self">self</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">unlock_shared</span>();
+        }
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLock</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">fmt::Debug</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">RwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+        <span class="ident">fmt::Debug::fmt</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>, <span class="ident">f</span>)
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLock</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">fmt::Display</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span>
+    <span class="kw">for</span> <span class="ident">RwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span>
+{
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+        (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">fmt</span>(<span class="ident">f</span>)
     }
 }
 
@@ -2281,13 +2823,11 @@
 
 <span class="doccomment">/// RAII structure used to release the exclusive write access of a lock when</span>
 <span class="doccomment">/// dropped.</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RwLockWriteGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLock</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;if unused the RwLock will immediately unlock&quot;</span>]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RwLockWriteGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLock</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> {
     <span class="ident">rwlock</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">R</span>::<span class="ident">GuardMarker</span>)<span class="op">&gt;</span>,
+    <span class="ident">marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">R::GuardMarker</span>)<span class="op">&gt;</span>,
 }
-
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLock</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">RwLockWriteGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {}
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLock</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">RwLockWriteGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Returns a reference to the original reader-writer lock object.</span>
@@ -2310,7 +2850,7 @@
     {
         <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>;
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">f</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">data</span>.<span class="ident">get</span>() });
-        <span class="ident">mem</span>::<span class="ident">forget</span>(<span class="ident">s</span>);
+        <span class="ident">mem::forget</span>(<span class="ident">s</span>);
         <span class="ident">MappedRwLockWriteGuard</span> {
             <span class="ident">raw</span>,
             <span class="ident">data</span>,
@@ -2337,7 +2877,7 @@
             <span class="prelude-val">Some</span>(<span class="ident">data</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">data</span>,
             <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">s</span>),
         };
-        <span class="ident">mem</span>::<span class="ident">forget</span>(<span class="ident">s</span>);
+        <span class="ident">mem::forget</span>(<span class="ident">s</span>);
         <span class="prelude-val">Ok</span>(<span class="ident">MappedRwLockWriteGuard</span> {
             <span class="ident">raw</span>,
             <span class="ident">data</span>,
@@ -2354,8 +2894,11 @@
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">U</span>,
     {
-        <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">unlock_exclusive</span>();
-        <span class="macro">defer</span><span class="macro">!</span>(<span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">lock_exclusive</span>());
+        <span class="comment">// Safety: An RwLockReadGuard always holds a shared lock.</span>
+        <span class="kw">unsafe</span> {
+            <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">unlock_exclusive</span>();
+        }
+        <span class="macro">defer!</span>(<span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">lock_exclusive</span>());
         <span class="ident">f</span>()
     }
 }
@@ -2368,9 +2911,12 @@
     <span class="doccomment">/// then other readers may not be able to acquire the lock even if it was</span>
     <span class="doccomment">/// downgraded.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">downgrade</span>(<span class="ident">s</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">downgrade</span>();
+        <span class="comment">// Safety: An RwLockWriteGuard always holds an exclusive lock.</span>
+        <span class="kw">unsafe</span> {
+            <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">downgrade</span>();
+        }
         <span class="kw">let</span> <span class="ident">rwlock</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">rwlock</span>;
-        <span class="ident">mem</span>::<span class="ident">forget</span>(<span class="ident">s</span>);
+        <span class="ident">mem::forget</span>(<span class="ident">s</span>);
         <span class="ident">RwLockReadGuard</span> {
             <span class="ident">rwlock</span>,
             <span class="ident">marker</span>: <span class="ident">PhantomData</span>,
@@ -2386,9 +2932,12 @@
     <span class="doccomment">/// then other readers may not be able to acquire the lock even if it was</span>
     <span class="doccomment">/// downgraded.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">downgrade_to_upgradable</span>(<span class="ident">s</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RwLockUpgradableReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">downgrade_to_upgradable</span>();
+        <span class="comment">// Safety: An RwLockWriteGuard always holds an exclusive lock.</span>
+        <span class="kw">unsafe</span> {
+            <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">downgrade_to_upgradable</span>();
+        }
         <span class="kw">let</span> <span class="ident">rwlock</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">rwlock</span>;
-        <span class="ident">mem</span>::<span class="ident">forget</span>(<span class="ident">s</span>);
+        <span class="ident">mem::forget</span>(<span class="ident">s</span>);
         <span class="ident">RwLockUpgradableReadGuard</span> {
             <span class="ident">rwlock</span>,
             <span class="ident">marker</span>: <span class="ident">PhantomData</span>,
@@ -2411,8 +2960,11 @@
     <span class="doccomment">/// using this method instead of dropping the `RwLockWriteGuard` normally.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unlock_fair</span>(<span class="ident">s</span>: <span class="self">Self</span>) {
-        <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">unlock_exclusive_fair</span>();
-        <span class="ident">mem</span>::<span class="ident">forget</span>(<span class="ident">s</span>);
+        <span class="comment">// Safety: An RwLockWriteGuard always holds an exclusive lock.</span>
+        <span class="kw">unsafe</span> {
+            <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">unlock_exclusive_fair</span>();
+        }
+        <span class="ident">mem::forget</span>(<span class="ident">s</span>);
     }
 
     <span class="doccomment">/// Temporarily unlocks the `RwLock` to execute the given function.</span>
@@ -2426,8 +2978,11 @@
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">U</span>,
     {
-        <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">unlock_exclusive_fair</span>();
-        <span class="macro">defer</span><span class="macro">!</span>(<span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">lock_exclusive</span>());
+        <span class="comment">// Safety: An RwLockWriteGuard always holds an exclusive lock.</span>
+        <span class="kw">unsafe</span> {
+            <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">unlock_exclusive_fair</span>();
+        }
+        <span class="macro">defer!</span>(<span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">lock_exclusive</span>());
         <span class="ident">f</span>()
     }
 
@@ -2438,7 +2993,10 @@
     <span class="doccomment">/// are no waiting threads.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bump</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>) {
-        <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">bump_exclusive</span>();
+        <span class="comment">// Safety: An RwLockWriteGuard always holds an exclusive lock.</span>
+        <span class="kw">unsafe</span> {
+            <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">bump_exclusive</span>();
+        }
     }
 }
 
@@ -2460,7 +3018,24 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLock</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">RwLockWriteGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">unlock_exclusive</span>();
+        <span class="comment">// Safety: An RwLockWriteGuard always holds an exclusive lock.</span>
+        <span class="kw">unsafe</span> {
+            <span class="self">self</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">unlock_exclusive</span>();
+        }
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLock</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">fmt::Debug</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">RwLockWriteGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+        <span class="ident">fmt::Debug::fmt</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>, <span class="ident">f</span>)
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLock</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">fmt::Display</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span>
+    <span class="kw">for</span> <span class="ident">RwLockWriteGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span>
+{
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+        (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">fmt</span>(<span class="ident">f</span>)
     }
 }
 
@@ -2469,15 +3044,16 @@
 
 <span class="doccomment">/// RAII structure used to release the upgradable read access of a lock when</span>
 <span class="doccomment">/// dropped.</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RwLockUpgradableReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLockUpgrade</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;if unused the RwLock will immediately unlock&quot;</span>]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RwLockUpgradableReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLockUpgrade</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> {
     <span class="ident">rwlock</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>, <span class="ident">R</span>::<span class="ident">GuardMarker</span>)<span class="op">&gt;</span>,
+    <span class="ident">marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>, <span class="ident">R::GuardMarker</span>)<span class="op">&gt;</span>,
 }
 
 <span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLockUpgrade</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Sync</span>
     <span class="kw">for</span> <span class="ident">RwLockUpgradableReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span>
-{}
+{
+}
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLockUpgrade</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">RwLockUpgradableReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Returns a reference to the original reader-writer lock object.</span>
@@ -2494,17 +3070,23 @@
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">U</span>,
     {
-        <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">unlock_upgradable</span>();
-        <span class="macro">defer</span><span class="macro">!</span>(<span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">lock_upgradable</span>());
+        <span class="comment">// Safety: An RwLockUpgradableReadGuard always holds an upgradable lock.</span>
+        <span class="kw">unsafe</span> {
+            <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">unlock_upgradable</span>();
+        }
+        <span class="macro">defer!</span>(<span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">lock_upgradable</span>());
         <span class="ident">f</span>()
     }
 
     <span class="doccomment">/// Atomically upgrades an upgradable read lock lock into a exclusive write lock,</span>
     <span class="doccomment">/// blocking the current thread until it can be acquired.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">upgrade</span>(<span class="ident">s</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RwLockWriteGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">upgrade</span>();
+        <span class="comment">// Safety: An RwLockUpgradableReadGuard always holds an upgradable lock.</span>
+        <span class="kw">unsafe</span> {
+            <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">upgrade</span>();
+        }
         <span class="kw">let</span> <span class="ident">rwlock</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">rwlock</span>;
-        <span class="ident">mem</span>::<span class="ident">forget</span>(<span class="ident">s</span>);
+        <span class="ident">mem::forget</span>(<span class="ident">s</span>);
         <span class="ident">RwLockWriteGuard</span> {
             <span class="ident">rwlock</span>,
             <span class="ident">marker</span>: <span class="ident">PhantomData</span>,
@@ -2515,9 +3097,10 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// If the access could not be granted at this time, then the current guard is returned.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_upgrade</span>(<span class="ident">s</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RwLockWriteGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span>, <span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">try_upgrade</span>() {
+        <span class="comment">// Safety: An RwLockUpgradableReadGuard always holds an upgradable lock.</span>
+        <span class="kw">if</span> <span class="kw">unsafe</span> { <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">try_upgrade</span>() } {
             <span class="kw">let</span> <span class="ident">rwlock</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">rwlock</span>;
-            <span class="ident">mem</span>::<span class="ident">forget</span>(<span class="ident">s</span>);
+            <span class="ident">mem::forget</span>(<span class="ident">s</span>);
             <span class="prelude-val">Ok</span>(<span class="ident">RwLockWriteGuard</span> {
                 <span class="ident">rwlock</span>,
                 <span class="ident">marker</span>: <span class="ident">PhantomData</span>,
@@ -2543,8 +3126,11 @@
     <span class="doccomment">/// using this method instead of dropping the `RwLockUpgradableReadGuard` normally.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unlock_fair</span>(<span class="ident">s</span>: <span class="self">Self</span>) {
-        <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">unlock_upgradable_fair</span>();
-        <span class="ident">mem</span>::<span class="ident">forget</span>(<span class="ident">s</span>);
+        <span class="comment">// Safety: An RwLockUpgradableReadGuard always holds an upgradable lock.</span>
+        <span class="kw">unsafe</span> {
+            <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">unlock_upgradable_fair</span>();
+        }
+        <span class="ident">mem::forget</span>(<span class="ident">s</span>);
     }
 
     <span class="doccomment">/// Temporarily unlocks the `RwLock` to execute the given function.</span>
@@ -2558,8 +3144,11 @@
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">U</span>,
     {
-        <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">unlock_upgradable_fair</span>();
-        <span class="macro">defer</span><span class="macro">!</span>(<span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">lock_upgradable</span>());
+        <span class="comment">// Safety: An RwLockUpgradableReadGuard always holds an upgradable lock.</span>
+        <span class="kw">unsafe</span> {
+            <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">unlock_upgradable_fair</span>();
+        }
+        <span class="macro">defer!</span>(<span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">lock_upgradable</span>());
         <span class="ident">f</span>()
     }
 
@@ -2570,7 +3159,10 @@
     <span class="doccomment">/// are no waiting threads.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bump</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>) {
-        <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">bump_upgradable</span>();
+        <span class="comment">// Safety: An RwLockUpgradableReadGuard always holds an upgradable lock.</span>
+        <span class="kw">unsafe</span> {
+            <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">bump_upgradable</span>();
+        }
     }
 }
 
@@ -2583,9 +3175,12 @@
     <span class="doccomment">/// then other readers may not be able to acquire the lock even if it was</span>
     <span class="doccomment">/// downgraded.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">downgrade</span>(<span class="ident">s</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">downgrade_upgradable</span>();
+        <span class="comment">// Safety: An RwLockUpgradableReadGuard always holds an upgradable lock.</span>
+        <span class="kw">unsafe</span> {
+            <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">downgrade_upgradable</span>();
+        }
         <span class="kw">let</span> <span class="ident">rwlock</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">rwlock</span>;
-        <span class="ident">mem</span>::<span class="ident">forget</span>(<span class="ident">s</span>);
+        <span class="ident">mem::forget</span>(<span class="ident">s</span>);
         <span class="ident">RwLockReadGuard</span> {
             <span class="ident">rwlock</span>,
             <span class="ident">marker</span>: <span class="ident">PhantomData</span>,
@@ -2601,11 +3196,12 @@
     <span class="doccomment">/// the current guard is returned.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_upgrade_for</span>(
         <span class="ident">s</span>: <span class="self">Self</span>,
-        <span class="ident">timeout</span>: <span class="ident">R</span>::<span class="ident">Duration</span>,
+        <span class="ident">timeout</span>: <span class="ident">R::Duration</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RwLockWriteGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span>, <span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">try_upgrade_for</span>(<span class="ident">timeout</span>) {
+        <span class="comment">// Safety: An RwLockUpgradableReadGuard always holds an upgradable lock.</span>
+        <span class="kw">if</span> <span class="kw">unsafe</span> { <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">try_upgrade_for</span>(<span class="ident">timeout</span>) } {
             <span class="kw">let</span> <span class="ident">rwlock</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">rwlock</span>;
-            <span class="ident">mem</span>::<span class="ident">forget</span>(<span class="ident">s</span>);
+            <span class="ident">mem::forget</span>(<span class="ident">s</span>);
             <span class="prelude-val">Ok</span>(<span class="ident">RwLockWriteGuard</span> {
                 <span class="ident">rwlock</span>,
                 <span class="ident">marker</span>: <span class="ident">PhantomData</span>,
@@ -2623,11 +3219,12 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_upgrade_until</span>(
         <span class="ident">s</span>: <span class="self">Self</span>,
-        <span class="ident">timeout</span>: <span class="ident">R</span>::<span class="ident">Instant</span>,
+        <span class="ident">timeout</span>: <span class="ident">R::Instant</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RwLockWriteGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span>, <span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">try_upgrade_until</span>(<span class="ident">timeout</span>) {
+        <span class="comment">// Safety: An RwLockUpgradableReadGuard always holds an upgradable lock.</span>
+        <span class="kw">if</span> <span class="kw">unsafe</span> { <span class="ident">s</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">try_upgrade_until</span>(<span class="ident">timeout</span>) } {
             <span class="kw">let</span> <span class="ident">rwlock</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">rwlock</span>;
-            <span class="ident">mem</span>::<span class="ident">forget</span>(<span class="ident">s</span>);
+            <span class="ident">mem::forget</span>(<span class="ident">s</span>);
             <span class="prelude-val">Ok</span>(<span class="ident">RwLockWriteGuard</span> {
                 <span class="ident">rwlock</span>,
                 <span class="ident">marker</span>: <span class="ident">PhantomData</span>,
@@ -2649,14 +3246,34 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLockUpgrade</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">RwLockUpgradableReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">unlock_upgradable</span>();
+        <span class="comment">// Safety: An RwLockUpgradableReadGuard always holds an upgradable lock.</span>
+        <span class="kw">unsafe</span> {
+            <span class="self">self</span>.<span class="ident">rwlock</span>.<span class="ident">raw</span>.<span class="ident">unlock_upgradable</span>();
+        }
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLockUpgrade</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">fmt::Debug</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span>
+    <span class="kw">for</span> <span class="ident">RwLockUpgradableReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span>
+{
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+        <span class="ident">fmt::Debug::fmt</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>, <span class="ident">f</span>)
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLockUpgrade</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">fmt::Display</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span>
+    <span class="kw">for</span> <span class="ident">RwLockUpgradableReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span>
+{
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+        (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">fmt</span>(<span class="ident">f</span>)
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;owning_ref&quot;</span>)]</span>
 <span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLockUpgrade</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">StableAddress</span>
     <span class="kw">for</span> <span class="ident">RwLockUpgradableReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span>
-{}
+{
+}
 
 <span class="doccomment">/// An RAII read lock guard returned by `RwLockReadGuard::map`, which can point to a</span>
 <span class="doccomment">/// subfield of the protected data.</span>
@@ -2665,17 +3282,18 @@
 <span class="doccomment">/// former doesn&#39;t support temporarily unlocking and re-locking, since that</span>
 <span class="doccomment">/// could introduce soundness issues if the locked object is modified by another</span>
 <span class="doccomment">/// thread.</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MappedRwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLock</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;if unused the RwLock will immediately unlock&quot;</span>]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MappedRwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLock</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> {
     <span class="ident">raw</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">R</span>,
     <span class="ident">data</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T</span>,
     <span class="ident">marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLock</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">MappedRwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {}
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLock</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">MappedRwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="kw">where</span>
-    <span class="ident">R</span>::<span class="ident">GuardMarker</span>: <span class="ident">Send</span>
-{}
+<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLock</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">MappedRwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="kw">where</span>
+    <span class="ident">R::GuardMarker</span>: <span class="ident">Send</span>
+{
+}
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLock</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">MappedRwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Make a new `MappedRwLockReadGuard` for a component of the locked data.</span>
@@ -2693,7 +3311,7 @@
     {
         <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">raw</span>;
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">f</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">s</span>.<span class="ident">data</span> });
-        <span class="ident">mem</span>::<span class="ident">forget</span>(<span class="ident">s</span>);
+        <span class="ident">mem::forget</span>(<span class="ident">s</span>);
         <span class="ident">MappedRwLockReadGuard</span> {
             <span class="ident">raw</span>,
             <span class="ident">data</span>,
@@ -2720,7 +3338,7 @@
             <span class="prelude-val">Some</span>(<span class="ident">data</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">data</span>,
             <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">s</span>),
         };
-        <span class="ident">mem</span>::<span class="ident">forget</span>(<span class="ident">s</span>);
+        <span class="ident">mem::forget</span>(<span class="ident">s</span>);
         <span class="prelude-val">Ok</span>(<span class="ident">MappedRwLockReadGuard</span> {
             <span class="ident">raw</span>,
             <span class="ident">data</span>,
@@ -2744,8 +3362,11 @@
     <span class="doccomment">/// using this method instead of dropping the `MappedRwLockReadGuard` normally.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unlock_fair</span>(<span class="ident">s</span>: <span class="self">Self</span>) {
-        <span class="ident">s</span>.<span class="ident">raw</span>.<span class="ident">unlock_shared_fair</span>();
-        <span class="ident">mem</span>::<span class="ident">forget</span>(<span class="ident">s</span>);
+        <span class="comment">// Safety: A MappedRwLockReadGuard always holds a shared lock.</span>
+        <span class="kw">unsafe</span> {
+            <span class="ident">s</span>.<span class="ident">raw</span>.<span class="ident">unlock_shared_fair</span>();
+        }
+        <span class="ident">mem::forget</span>(<span class="ident">s</span>);
     }
 }
 
@@ -2760,14 +3381,34 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLock</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">MappedRwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">unlock_shared</span>();
+        <span class="comment">// Safety: A MappedRwLockReadGuard always holds a shared lock.</span>
+        <span class="kw">unsafe</span> {
+            <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">unlock_shared</span>();
+        }
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLock</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">fmt::Debug</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span>
+    <span class="kw">for</span> <span class="ident">MappedRwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span>
+{
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+        <span class="ident">fmt::Debug::fmt</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>, <span class="ident">f</span>)
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLock</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">fmt::Display</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span>
+    <span class="kw">for</span> <span class="ident">MappedRwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span>
+{
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+        (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">fmt</span>(<span class="ident">f</span>)
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;owning_ref&quot;</span>)]</span>
 <span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLock</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">StableAddress</span>
     <span class="kw">for</span> <span class="ident">MappedRwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span>
-{}
+{
+}
 
 <span class="doccomment">/// An RAII write lock guard returned by `RwLockWriteGuard::map`, which can point to a</span>
 <span class="doccomment">/// subfield of the protected data.</span>
@@ -2776,8 +3417,8 @@
 <span class="doccomment">/// former doesn&#39;t support temporarily unlocking and re-locking, since that</span>
 <span class="doccomment">/// could introduce soundness issues if the locked object is modified by another</span>
 <span class="doccomment">/// thread.</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MappedRwLockWriteGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLock</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;if unused the RwLock will immediately unlock&quot;</span>]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MappedRwLockWriteGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLock</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> {
     <span class="ident">raw</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">R</span>,
     <span class="ident">data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>,
     <span class="ident">marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">T</span><span class="op">&gt;</span>,
@@ -2785,10 +3426,12 @@
 
 <span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLock</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Sync</span>
     <span class="kw">for</span> <span class="ident">MappedRwLockWriteGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span>
-{}
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLock</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">MappedRwLockWriteGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="kw">where</span>
-    <span class="ident">R</span>::<span class="ident">GuardMarker</span>: <span class="ident">Send</span>
-{}
+{
+}
+<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLock</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">MappedRwLockWriteGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="kw">where</span>
+    <span class="ident">R::GuardMarker</span>: <span class="ident">Send</span>
+{
+}
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLock</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">MappedRwLockWriteGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Make a new `MappedRwLockWriteGuard` for a component of the locked data.</span>
@@ -2806,7 +3449,7 @@
     {
         <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">raw</span>;
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">f</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">s</span>.<span class="ident">data</span> });
-        <span class="ident">mem</span>::<span class="ident">forget</span>(<span class="ident">s</span>);
+        <span class="ident">mem::forget</span>(<span class="ident">s</span>);
         <span class="ident">MappedRwLockWriteGuard</span> {
             <span class="ident">raw</span>,
             <span class="ident">data</span>,
@@ -2833,32 +3476,12 @@
             <span class="prelude-val">Some</span>(<span class="ident">data</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">data</span>,
             <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">s</span>),
         };
-        <span class="ident">mem</span>::<span class="ident">forget</span>(<span class="ident">s</span>);
+        <span class="ident">mem::forget</span>(<span class="ident">s</span>);
         <span class="prelude-val">Ok</span>(<span class="ident">MappedRwLockWriteGuard</span> {
             <span class="ident">raw</span>,
             <span class="ident">data</span>,
             <span class="ident">marker</span>: <span class="ident">PhantomData</span>,
         })
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLockDowngrade</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">MappedRwLockWriteGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Atomically downgrades a write lock into a read lock without allowing any</span>
-    <span class="doccomment">/// writers to take exclusive access of the lock in the meantime.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that if there are any writers currently waiting to take the lock</span>
-    <span class="doccomment">/// then other readers may not be able to acquire the lock even if it was</span>
-    <span class="doccomment">/// downgraded.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">downgrade</span>(<span class="ident">s</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MappedRwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">s</span>.<span class="ident">raw</span>.<span class="ident">downgrade</span>();
-        <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">raw</span>;
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">data</span>;
-        <span class="ident">mem</span>::<span class="ident">forget</span>(<span class="ident">s</span>);
-        <span class="ident">MappedRwLockReadGuard</span> {
-            <span class="ident">raw</span>,
-            <span class="ident">data</span>,
-            <span class="ident">marker</span>: <span class="ident">PhantomData</span>,
-        }
     }
 }
 
@@ -2877,8 +3500,11 @@
     <span class="doccomment">/// using this method instead of dropping the `MappedRwLockWriteGuard` normally.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unlock_fair</span>(<span class="ident">s</span>: <span class="self">Self</span>) {
-        <span class="ident">s</span>.<span class="ident">raw</span>.<span class="ident">unlock_exclusive_fair</span>();
-        <span class="ident">mem</span>::<span class="ident">forget</span>(<span class="ident">s</span>);
+        <span class="comment">// Safety: A MappedRwLockWriteGuard always holds an exclusive lock.</span>
+        <span class="kw">unsafe</span> {
+            <span class="ident">s</span>.<span class="ident">raw</span>.<span class="ident">unlock_exclusive_fair</span>();
+        }
+        <span class="ident">mem::forget</span>(<span class="ident">s</span>);
     }
 }
 
@@ -2900,13 +3526,34 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLock</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">MappedRwLockWriteGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">unlock_exclusive</span>();
+        <span class="comment">// Safety: A MappedRwLockWriteGuard always holds an exclusive lock.</span>
+        <span class="kw">unsafe</span> {
+            <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">unlock_exclusive</span>();
+        }
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLock</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">fmt::Debug</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span>
+    <span class="kw">for</span> <span class="ident">MappedRwLockWriteGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span>
+{
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+        <span class="ident">fmt::Debug::fmt</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>, <span class="ident">f</span>)
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLock</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">fmt::Display</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span>
+    <span class="kw">for</span> <span class="ident">MappedRwLockWriteGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span>
+{
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+        (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">fmt</span>(<span class="ident">f</span>)
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;owning_ref&quot;</span>)]</span>
 <span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">RawRwLock</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">StableAddress</span>
     <span class="kw">for</span> <span class="ident">MappedRwLockWriteGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">T</span><span class="op">&gt;</span>
-{}
+{
+}
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "lock_api";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lock_api" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/cranelift-codegen-0.66.0/src/regalloc/register_set.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>register_set.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/cranelift-codegen-0.69.0/src/regalloc/register_set.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>register_set.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../cranelift_codegen/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../cranelift_codegen/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -400,11 +400,11 @@
 <span class="doccomment">//! &quot;register unit&quot; abstraction. Every register contains one or more register units. Registers that</span>
 <span class="doccomment">//! share a register unit can&#39;t be in use at the same time.</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">isa</span>::<span class="ident">registers</span>::{<span class="ident">RegClass</span>, <span class="ident">RegInfo</span>, <span class="ident">RegUnit</span>, <span class="ident">RegUnitMask</span>};
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">char</span>;
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">fmt</span>;
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">iter</span>::<span class="ident">ExactSizeIterator</span>;
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">mem</span>::<span class="ident">size_of_val</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::isa::registers</span>::{<span class="ident">RegClass</span>, <span class="ident">RegInfo</span>, <span class="ident">RegUnit</span>, <span class="ident">RegUnitMask</span>};
+<span class="kw">use</span> <span class="ident">core::char</span>;
+<span class="kw">use</span> <span class="ident">core::fmt</span>;
+<span class="kw">use</span> <span class="ident">core::iter::ExactSizeIterator</span>;
+<span class="kw">use</span> <span class="ident">core::mem::size_of_val</span>;
 
 <span class="doccomment">/// Set of registers available for allocation.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
@@ -452,7 +452,7 @@
     <span class="doccomment">/// It is an error to take a register that doesn&#39;t have all of its register units available.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rc</span>: <span class="ident">RegClass</span>, <span class="ident">reg</span>: <span class="ident">RegUnit</span>) {
         <span class="kw">let</span> (<span class="ident">idx</span>, <span class="ident">bits</span>) <span class="op">=</span> <span class="ident">bitmask</span>(<span class="ident">rc</span>, <span class="ident">reg</span>);
-        <span class="macro">debug_assert</span><span class="macro">!</span>(
+        <span class="macro">debug_assert!</span>(
             (<span class="self">self</span>.<span class="ident">avail</span>[<span class="ident">idx</span>] <span class="op">&amp;</span> <span class="ident">bits</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">bits</span>,
             <span class="string">&quot;{}:{} not available in {}&quot;</span>,
             <span class="ident">rc</span>,
@@ -465,7 +465,7 @@
     <span class="doccomment">/// Return `reg` and all of its register units to the set of available registers.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">free</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rc</span>: <span class="ident">RegClass</span>, <span class="ident">reg</span>: <span class="ident">RegUnit</span>) {
         <span class="kw">let</span> (<span class="ident">idx</span>, <span class="ident">bits</span>) <span class="op">=</span> <span class="ident">bitmask</span>(<span class="ident">rc</span>, <span class="ident">reg</span>);
-        <span class="macro">debug_assert</span><span class="macro">!</span>(
+        <span class="macro">debug_assert!</span>(
             (<span class="self">self</span>.<span class="ident">avail</span>[<span class="ident">idx</span>] <span class="op">&amp;</span> <span class="ident">bits</span>) <span class="op">=</span><span class="op">=</span> <span class="number">0</span>,
             <span class="string">&quot;{}:{} is already free in {}&quot;</span>,
             <span class="ident">rc</span>,
@@ -587,13 +587,13 @@
 <span class="doccomment">/// Displaying an `RegisterSet` correctly requires the associated `RegInfo` from the target ISA.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DisplayRegisterSet</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">RegisterSet</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RegInfo</span><span class="op">&gt;</span>);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">DisplayRegisterSet</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
-        <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;[&quot;</span>)<span class="question-mark">?</span>;
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">DisplayRegisterSet</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;[&quot;</span>)<span class="question-mark">?</span>;
         <span class="kw">match</span> <span class="self">self</span>.<span class="number">1</span> {
             <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">for</span> <span class="ident">w</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">avail</span> {
-                    <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot; #{:08x}&quot;</span>, <span class="ident">w</span>)<span class="question-mark">?</span>;
+                    <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot; #{:08x}&quot;</span>, <span class="ident">w</span>)<span class="question-mark">?</span>;
                 }
             }
             <span class="prelude-val">Some</span>(<span class="ident">reginfo</span>) <span class="op">=</span><span class="op">&gt;</span> {
@@ -606,27 +606,27 @@
                 <span class="kw">for</span> <span class="ident">rc</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">reginfo</span>.<span class="ident">classes</span>[<span class="number">0</span>..<span class="ident">toprcs</span>] {
                     <span class="kw">if</span> <span class="ident">rc</span>.<span class="ident">width</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
                         <span class="kw">let</span> <span class="ident">bank</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">reginfo</span>.<span class="ident">banks</span>[<span class="ident">rc</span>.<span class="ident">bank</span> <span class="kw">as</span> <span class="ident">usize</span>];
-                        <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot; {}: &quot;</span>, <span class="ident">rc</span>)<span class="question-mark">?</span>;
+                        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot; {}: &quot;</span>, <span class="ident">rc</span>)<span class="question-mark">?</span>;
                         <span class="kw">for</span> <span class="ident">offset</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">bank</span>.<span class="ident">units</span> {
                             <span class="kw">let</span> <span class="ident">reg</span> <span class="op">=</span> <span class="ident">bank</span>.<span class="ident">first_unit</span> <span class="op">+</span> <span class="ident">offset</span>;
                             <span class="kw">if</span> <span class="op">!</span><span class="ident">rc</span>.<span class="ident">contains</span>(<span class="ident">reg</span>) {
                                 <span class="kw">continue</span>;
                             }
                             <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">is_avail</span>(<span class="ident">rc</span>, <span class="ident">reg</span>) {
-                                <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;-&quot;</span>)<span class="question-mark">?</span>;
+                                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;-&quot;</span>)<span class="question-mark">?</span>;
                                 <span class="kw">continue</span>;
                             }
                             <span class="comment">// Display individual registers as either the second letter of their</span>
                             <span class="comment">// name or the last digit of their number.</span>
                             <span class="comment">// This works for x86 (rax, rbx, ...) and for numbered regs.</span>
-                            <span class="macro">write</span><span class="macro">!</span>(
+                            <span class="macro">write!</span>(
                                 <span class="ident">f</span>,
                                 <span class="string">&quot;{}&quot;</span>,
                                 <span class="ident">bank</span>.<span class="ident">names</span>
                                     .<span class="ident">get</span>(<span class="ident">offset</span> <span class="kw">as</span> <span class="ident">usize</span>)
                                     .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> <span class="ident">name</span>.<span class="ident">chars</span>().<span class="ident">nth</span>(<span class="number">1</span>))
-                                    .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">char</span>::<span class="ident">from_digit</span>(
-                                        <span class="ident">u32</span>::<span class="ident">from</span>(<span class="ident">offset</span> <span class="op">%</span> <span class="number">10</span>),
+                                    .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">char::from_digit</span>(
+                                        <span class="ident">u32::from</span>(<span class="ident">offset</span> <span class="op">%</span> <span class="number">10</span>),
                                         <span class="number">10</span>
                                     )
                                     .<span class="ident">unwrap</span>())
@@ -636,12 +636,12 @@
                 }
             }
         }
-        <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot; ]&quot;</span>)
+        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot; ]&quot;</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">RegisterSet</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">RegisterSet</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
         <span class="self">self</span>.<span class="ident">display</span>(<span class="prelude-val">None</span>).<span class="ident">fmt</span>(<span class="ident">f</span>)
     }
 }
@@ -649,8 +649,8 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">isa</span>::<span class="ident">registers</span>::{<span class="ident">RegClass</span>, <span class="ident">RegClassData</span>};
-    <span class="kw">use</span> <span class="ident">alloc</span>::<span class="ident">vec</span>::<span class="ident">Vec</span>;
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::isa::registers</span>::{<span class="ident">RegClass</span>, <span class="ident">RegClassData</span>};
+    <span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
 
     <span class="comment">// Register classes for testing.</span>
     <span class="kw">const</span> <span class="ident">GPR</span>: <span class="ident">RegClass</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">RegClassData</span> {
@@ -702,17 +702,17 @@
         <span class="kw">let</span> <span class="ident">results_f</span> <span class="op">=</span> <span class="ident">rsi_f</span>.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rsi_r</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">rsi</span>).<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">results_r</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">RegUnit</span><span class="op">&gt;</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">results_r</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">RegUnit</span><span class="op">&gt;</span><span class="ident">::new</span>();
         <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">r</span>) <span class="op">=</span> <span class="ident">rsi_r</span>.<span class="ident">rnext</span>() {
             <span class="ident">results_r</span>.<span class="ident">push</span>(<span class="ident">r</span>);
         }
 
         <span class="kw">let</span> <span class="ident">len_f</span> <span class="op">=</span> <span class="ident">results_f</span>.<span class="ident">len</span>();
         <span class="kw">let</span> <span class="ident">len_r</span> <span class="op">=</span> <span class="ident">results_r</span>.<span class="ident">len</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">len_f</span>, <span class="ident">len_r</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">len_f</span>, <span class="ident">len_r</span>);
 
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">len_f</span> {
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">results_f</span>[<span class="ident">i</span>], <span class="ident">results_r</span>[<span class="ident">len_f</span> <span class="op">-</span> <span class="number">1</span> <span class="op">-</span> <span class="ident">i</span>]);
+            <span class="macro">assert_eq!</span>(<span class="ident">results_f</span>[<span class="ident">i</span>], <span class="ident">results_r</span>[<span class="ident">len_f</span> <span class="op">-</span> <span class="number">1</span> <span class="op">-</span> <span class="ident">i</span>]);
         }
     }
 
@@ -725,64 +725,65 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">put_and_take</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">regs</span> <span class="op">=</span> <span class="ident">RegisterSet</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">regs</span> <span class="op">=</span> <span class="ident">RegisterSet::new</span>();
 
         <span class="comment">// `GPR` has units 28-36.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">regs</span>.<span class="ident">iter</span>(<span class="ident">GPR</span>).<span class="ident">len</span>(), <span class="number">8</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">regs</span>.<span class="ident">iter</span>(<span class="ident">GPR</span>).<span class="ident">count</span>(), <span class="number">8</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">regs</span>.<span class="ident">iter</span>(<span class="ident">DPR</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(), [<span class="number">28</span>, <span class="number">30</span>, <span class="number">33</span>, <span class="number">35</span>]);
+        <span class="macro">assert_eq!</span>(<span class="ident">regs</span>.<span class="ident">iter</span>(<span class="ident">GPR</span>).<span class="ident">len</span>(), <span class="number">8</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">regs</span>.<span class="ident">iter</span>(<span class="ident">GPR</span>).<span class="ident">count</span>(), <span class="number">8</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">regs</span>.<span class="ident">iter</span>(<span class="ident">DPR</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(), [<span class="number">28</span>, <span class="number">30</span>, <span class="number">33</span>, <span class="number">35</span>]);
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">regs</span>.<span class="ident">is_avail</span>(<span class="ident">GPR</span>, <span class="number">29</span>));
+        <span class="macro">assert!</span>(<span class="ident">regs</span>.<span class="ident">is_avail</span>(<span class="ident">GPR</span>, <span class="number">29</span>));
         <span class="ident">regs</span>.<span class="ident">take</span>(<span class="kw-2">&amp;</span><span class="ident">GPR</span>, <span class="number">29</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">regs</span>.<span class="ident">is_avail</span>(<span class="ident">GPR</span>, <span class="number">29</span>));
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">regs</span>.<span class="ident">is_avail</span>(<span class="ident">GPR</span>, <span class="number">29</span>));
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">regs</span>.<span class="ident">iter</span>(<span class="ident">GPR</span>).<span class="ident">count</span>(), <span class="number">7</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">regs</span>.<span class="ident">iter</span>(<span class="ident">DPR</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(), [<span class="number">30</span>, <span class="number">33</span>, <span class="number">35</span>]);
+        <span class="macro">assert_eq!</span>(<span class="ident">regs</span>.<span class="ident">iter</span>(<span class="ident">GPR</span>).<span class="ident">count</span>(), <span class="number">7</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">regs</span>.<span class="ident">iter</span>(<span class="ident">DPR</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(), [<span class="number">30</span>, <span class="number">33</span>, <span class="number">35</span>]);
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">regs</span>.<span class="ident">is_avail</span>(<span class="ident">GPR</span>, <span class="number">30</span>));
+        <span class="macro">assert!</span>(<span class="ident">regs</span>.<span class="ident">is_avail</span>(<span class="ident">GPR</span>, <span class="number">30</span>));
         <span class="ident">regs</span>.<span class="ident">take</span>(<span class="kw-2">&amp;</span><span class="ident">GPR</span>, <span class="number">30</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">regs</span>.<span class="ident">is_avail</span>(<span class="ident">GPR</span>, <span class="number">30</span>));
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">regs</span>.<span class="ident">is_avail</span>(<span class="ident">GPR</span>, <span class="number">30</span>));
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">regs</span>.<span class="ident">iter</span>(<span class="ident">GPR</span>).<span class="ident">count</span>(), <span class="number">6</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">regs</span>.<span class="ident">iter</span>(<span class="ident">DPR</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(), [<span class="number">33</span>, <span class="number">35</span>]);
+        <span class="macro">assert_eq!</span>(<span class="ident">regs</span>.<span class="ident">iter</span>(<span class="ident">GPR</span>).<span class="ident">count</span>(), <span class="number">6</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">regs</span>.<span class="ident">iter</span>(<span class="ident">DPR</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(), [<span class="number">33</span>, <span class="number">35</span>]);
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">regs</span>.<span class="ident">is_avail</span>(<span class="ident">GPR</span>, <span class="number">32</span>));
+        <span class="macro">assert!</span>(<span class="ident">regs</span>.<span class="ident">is_avail</span>(<span class="ident">GPR</span>, <span class="number">32</span>));
         <span class="ident">regs</span>.<span class="ident">take</span>(<span class="kw-2">&amp;</span><span class="ident">GPR</span>, <span class="number">32</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">regs</span>.<span class="ident">is_avail</span>(<span class="ident">GPR</span>, <span class="number">32</span>));
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">regs</span>.<span class="ident">is_avail</span>(<span class="ident">GPR</span>, <span class="number">32</span>));
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">regs</span>.<span class="ident">iter</span>(<span class="ident">GPR</span>).<span class="ident">count</span>(), <span class="number">5</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">regs</span>.<span class="ident">iter</span>(<span class="ident">DPR</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(), [<span class="number">33</span>, <span class="number">35</span>]);
+        <span class="macro">assert_eq!</span>(<span class="ident">regs</span>.<span class="ident">iter</span>(<span class="ident">GPR</span>).<span class="ident">count</span>(), <span class="number">5</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">regs</span>.<span class="ident">iter</span>(<span class="ident">DPR</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(), [<span class="number">33</span>, <span class="number">35</span>]);
 
         <span class="ident">regs</span>.<span class="ident">free</span>(<span class="kw-2">&amp;</span><span class="ident">GPR</span>, <span class="number">30</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">regs</span>.<span class="ident">is_avail</span>(<span class="ident">GPR</span>, <span class="number">30</span>));
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">regs</span>.<span class="ident">is_avail</span>(<span class="ident">GPR</span>, <span class="number">29</span>));
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">regs</span>.<span class="ident">is_avail</span>(<span class="ident">GPR</span>, <span class="number">32</span>));
+        <span class="macro">assert!</span>(<span class="ident">regs</span>.<span class="ident">is_avail</span>(<span class="ident">GPR</span>, <span class="number">30</span>));
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">regs</span>.<span class="ident">is_avail</span>(<span class="ident">GPR</span>, <span class="number">29</span>));
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">regs</span>.<span class="ident">is_avail</span>(<span class="ident">GPR</span>, <span class="number">32</span>));
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">regs</span>.<span class="ident">iter</span>(<span class="ident">GPR</span>).<span class="ident">count</span>(), <span class="number">6</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">regs</span>.<span class="ident">iter</span>(<span class="ident">DPR</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(), [<span class="number">30</span>, <span class="number">33</span>, <span class="number">35</span>]);
+        <span class="macro">assert_eq!</span>(<span class="ident">regs</span>.<span class="ident">iter</span>(<span class="ident">GPR</span>).<span class="ident">count</span>(), <span class="number">6</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">regs</span>.<span class="ident">iter</span>(<span class="ident">DPR</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(), [<span class="number">30</span>, <span class="number">33</span>, <span class="number">35</span>]);
 
         <span class="ident">regs</span>.<span class="ident">free</span>(<span class="kw-2">&amp;</span><span class="ident">GPR</span>, <span class="number">32</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">regs</span>.<span class="ident">is_avail</span>(<span class="ident">GPR</span>, <span class="number">31</span>));
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">regs</span>.<span class="ident">is_avail</span>(<span class="ident">GPR</span>, <span class="number">29</span>));
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">regs</span>.<span class="ident">is_avail</span>(<span class="ident">GPR</span>, <span class="number">32</span>));
+        <span class="macro">assert!</span>(<span class="ident">regs</span>.<span class="ident">is_avail</span>(<span class="ident">GPR</span>, <span class="number">31</span>));
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">regs</span>.<span class="ident">is_avail</span>(<span class="ident">GPR</span>, <span class="number">29</span>));
+        <span class="macro">assert!</span>(<span class="ident">regs</span>.<span class="ident">is_avail</span>(<span class="ident">GPR</span>, <span class="number">32</span>));
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">regs</span>.<span class="ident">iter</span>(<span class="ident">GPR</span>).<span class="ident">count</span>(), <span class="number">7</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">regs</span>.<span class="ident">iter</span>(<span class="ident">DPR</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(), [<span class="number">30</span>, <span class="number">33</span>, <span class="number">35</span>]);
+        <span class="macro">assert_eq!</span>(<span class="ident">regs</span>.<span class="ident">iter</span>(<span class="ident">GPR</span>).<span class="ident">count</span>(), <span class="number">7</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">regs</span>.<span class="ident">iter</span>(<span class="ident">DPR</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(), [<span class="number">30</span>, <span class="number">33</span>, <span class="number">35</span>]);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">interference</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">regs1</span> <span class="op">=</span> <span class="ident">RegisterSet</span>::<span class="ident">new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">regs2</span> <span class="op">=</span> <span class="ident">RegisterSet</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">regs1</span> <span class="op">=</span> <span class="ident">RegisterSet::new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">regs2</span> <span class="op">=</span> <span class="ident">RegisterSet::new</span>();
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">regs1</span>.<span class="ident">interferes_with</span>(<span class="kw-2">&amp;</span><span class="ident">regs2</span>));
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">regs1</span>.<span class="ident">interferes_with</span>(<span class="kw-2">&amp;</span><span class="ident">regs2</span>));
         <span class="ident">regs1</span>.<span class="ident">take</span>(<span class="kw-2">&amp;</span><span class="ident">GPR</span>, <span class="number">32</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">regs1</span>.<span class="ident">interferes_with</span>(<span class="kw-2">&amp;</span><span class="ident">regs2</span>));
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">regs1</span>.<span class="ident">interferes_with</span>(<span class="kw-2">&amp;</span><span class="ident">regs2</span>));
         <span class="ident">regs2</span>.<span class="ident">take</span>(<span class="kw-2">&amp;</span><span class="ident">GPR</span>, <span class="number">31</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">regs1</span>.<span class="ident">interferes_with</span>(<span class="kw-2">&amp;</span><span class="ident">regs2</span>));
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">regs1</span>.<span class="ident">interferes_with</span>(<span class="kw-2">&amp;</span><span class="ident">regs2</span>));
         <span class="ident">regs1</span>.<span class="ident">intersect</span>(<span class="kw-2">&amp;</span><span class="ident">regs2</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">regs1</span>.<span class="ident">interferes_with</span>(<span class="kw-2">&amp;</span><span class="ident">regs2</span>));
+        <span class="macro">assert!</span>(<span class="ident">regs1</span>.<span class="ident">interferes_with</span>(<span class="kw-2">&amp;</span><span class="ident">regs2</span>));
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "cranelift_codegen";</script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="cranelift_codegen" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
+    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script></body></html>

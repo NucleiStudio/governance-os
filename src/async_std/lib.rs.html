@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/async-std-1.7.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/async-std-1.9.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../async_std/index.html'><div class='logo-container'><img src='https://async.rs/images/logo--hero.svg' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../async_std/index.html'><div class='logo-container'><img src='https://async.rs/images/logo--hero.svg' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -322,271 +322,306 @@
 <span id="319">319</span>
 <span id="320">320</span>
 <span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="doccomment">//! # Async version of the Rust standard library</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! `async-std` is a foundation of portable Rust software, a set of minimal and battle-tested</span>
-<span class="doccomment">//! shared abstractions for the [broader Rust ecosystem][crates.io]. It offers std types, like</span>
-<span class="doccomment">//! [`Future`] and [`Stream`], library-defined [operations on language primitives](#primitives),</span>
-<span class="doccomment">//! [standard macros](#macros), [I/O] and [multithreading], among [many other things][other].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! `async-std` is available from [crates.io]. Once included, `async-std` can be accessed</span>
-<span class="doccomment">//! in [`use`] statements through the path `async_std`, as in [`use async_std::future`].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [I/O]: io/index.html</span>
-<span class="doccomment">//! [multithreading]: task/index.html</span>
-<span class="doccomment">//! [other]: #what-is-in-the-standard-library-documentation</span>
-<span class="doccomment">//! [`use`]: https://doc.rust-lang.org/book/ch07-02-defining-modules-to-control-scope-and-privacy.html</span>
-<span class="doccomment">//! [`use async_std::future`]: future/index.html</span>
-<span class="doccomment">//! [crates.io]: https://crates.io</span>
-<span class="doccomment">//! [`Future`]: future/trait.Future.html</span>
-<span class="doccomment">//! [`Stream`]: stream/trait.Stream.html</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # How to read this documentation</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! If you already know the name of what you are looking for, the fastest way to</span>
-<span class="doccomment">//! find it is to use the &lt;a href=&quot;#&quot; onclick=&quot;focusSearchBar();&quot;&gt;search</span>
-<span class="doccomment">//! bar&lt;/a&gt; at the top of the page.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Otherwise, you may want to jump to one of these useful sections:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! * [`async_std::*` modules](#modules)</span>
-<span class="doccomment">//! * [Async macros](#macros)</span>
-<span class="doccomment">//! * [The Async Prelude](prelude/index.html)</span>
-<span class="doccomment">//! * [Cargo.toml feature flags](#features)</span>
-<span class="doccomment">//! * [Examples](#examples)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! If this is your first time, the documentation for `async-std` is</span>
-<span class="doccomment">//! written to be casually perused. Clicking on interesting things should</span>
-<span class="doccomment">//! generally lead you to interesting places. Still, there are important bits</span>
-<span class="doccomment">//! you don&#39;t want to miss, so read on for a tour of the `async-std` and</span>
-<span class="doccomment">//! its documentation!</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Once you are familiar with the contents of `async-std` you may</span>
-<span class="doccomment">//! begin to find the verbosity of the prose distracting. At this stage in your</span>
-<span class="doccomment">//! development you may want to press the `[-]` button near the top of the</span>
-<span class="doccomment">//! page to collapse it into a more skimmable view.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! While you are looking at that `[-]` button also notice the `[src]`</span>
-<span class="doccomment">//! button. Rust&#39;s API documentation comes with the source code and you are</span>
-<span class="doccomment">//! encouraged to read it. The `async-std` source is generally high</span>
-<span class="doccomment">//! quality and a peek behind the curtains is often enlightening.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Modules in this crate are organized in the same way as in `std`, except blocking</span>
-<span class="doccomment">//! functions have been replaced with async functions and threads have been replaced with</span>
-<span class="doccomment">//! lightweight tasks.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! You can find more information, reading materials, and other resources here:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! * [The async-std website](https://async.rs/)</span>
-<span class="doccomment">//! * [The async-std book](https://book.async.rs)</span>
-<span class="doccomment">//! * [GitHub repository](https://github.com/async-rs/async-std)</span>
-<span class="doccomment">//! * [List of code examples](https://github.com/async-rs/async-std/tree/master/examples)</span>
-<span class="doccomment">//! * [Discord chat](https://discord.gg/JvZeVNe)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # What is in the `async-std` documentation?</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! First, `async-std` is divided into a number of focused</span>
-<span class="doccomment">//! modules, [all listed further down this page](#modules). These modules are</span>
-<span class="doccomment">//! the bedrock upon which async Rust is forged, and they have mighty names</span>
-<span class="doccomment">//! like [`async_std::os`] and [`async_std::task`]. Modules&#39; documentation</span>
-<span class="doccomment">//! typically includes an overview of the module along with examples, and are</span>
-<span class="doccomment">//! a smart place to start familiarizing yourself with the library.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Second, `async-std` defines [The Async Prelude], a small collection</span>
-<span class="doccomment">//! of items - mostly traits - that should be imported into every module of</span>
-<span class="doccomment">//! every async crate. The traits in the prelude are pervasive, making the</span>
-<span class="doccomment">//! prelude documentation a good entry point to learning about the library.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [The Async Prelude]: prelude/index.html</span>
-<span class="doccomment">//! [`async_std::os`]: os/index.html</span>
-<span class="doccomment">//! [`async_std::task`]: task/index.html</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! And finally, `async-std` exports a number of async macros, and</span>
-<span class="doccomment">//! [lists them on this page](#macros).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Contributing changes to the documentation</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Check out `async-std`&#39;s contribution guidelines [here](https://async.rs/contribute).</span>
-<span class="doccomment">//! The source for this documentation can be found on [GitHub](https://github.com/async-rs).</span>
-<span class="doccomment">//! To contribute changes, make sure you read the guidelines first, then submit</span>
-<span class="doccomment">//! pull requests for your suggested changes.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Contributions are appreciated! If you see a part of the docs that can be</span>
-<span class="doccomment">//! improved, submit a PR, or chat with us first on</span>
-<span class="doccomment">//! [Discord](https://discord.gg/JvZeVNe).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # A tour of `async-std`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The rest of this crate documentation is dedicated to pointing out notable</span>
-<span class="doccomment">//! features of `async-std`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Platform abstractions and I/O</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Besides basic data types, `async-std` is largely concerned with</span>
-<span class="doccomment">//! abstracting over differences in common platforms, most notably Windows and</span>
-<span class="doccomment">//! Unix derivatives.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Common types of I/O, including [files], [TCP], [UDP], are defined in the</span>
-<span class="doccomment">//! [`io`], [`fs`], and [`net`] modules.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The [`task`] module contains `async-std`&#39;s task abstractions. [`sync`]</span>
-<span class="doccomment">//! contains further primitive shared memory types, including [`channel`],</span>
-<span class="doccomment">//! which contains the channel types for message passing.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [files]: fs/struct.File.html</span>
-<span class="doccomment">//! [TCP]: net/struct.TcpStream.html</span>
-<span class="doccomment">//! [UDP]: net/struct.UdpSocket.html</span>
-<span class="doccomment">//! [`io`]: fs/struct.File.html</span>
-<span class="doccomment">//! [`sync`]: sync/index.html</span>
-<span class="doccomment">//! [`channel`]: sync/fn.channel.html</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Timeouts, intervals, and delays</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! `async-std` provides several methods to manipulate time:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! * [`task::sleep`] to wait for a duration to pass without blocking.</span>
-<span class="doccomment">//! * [`stream::interval`] for emitting an event at a set interval.</span>
-<span class="doccomment">//! * [`future::timeout`] to time-out futures if they don&#39;t resolve within a</span>
-<span class="doccomment">//!   set interval.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`task::sleep`]: task/fn.sleep.html</span>
-<span class="doccomment">//! [`stream::interval`]: stream/fn.interval.html</span>
-<span class="doccomment">//! [`future::timeout`]: future/fn.timeout.html</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Examples</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! All examples require the [`&quot;attributes&quot;` feature](#features) to be enabled.</span>
-<span class="doccomment">//! This feature is not enabled by default because it significantly impacts</span>
-<span class="doccomment">//! compile times. See [`task::block_on`] for an alternative way to start</span>
-<span class="doccomment">//! executing tasks.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Call an async function from the main function:</span>
-<span class="doccomment">//!</span>
+<span class="doccomment">//! # Async version of the Rust standard library</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! `async-std` is a foundation of portable Rust software, a set of minimal and battle-tested</span>
+<span class="doccomment">//! shared abstractions for the [broader Rust ecosystem][crates.io]. It offers std types, like</span>
+<span class="doccomment">//! [`Future`] and [`Stream`], library-defined [operations on language primitives](#primitives),</span>
+<span class="doccomment">//! [standard macros](#macros), [I/O] and [multithreading], among [many other things][other].</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! `async-std` is available from [crates.io]. Once included, `async-std` can be accessed</span>
+<span class="doccomment">//! in [`use`] statements through the path `async_std`, as in [`use async_std::future`].</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! [I/O]: io/index.html</span>
+<span class="doccomment">//! [multithreading]: task/index.html</span>
+<span class="doccomment">//! [other]: #what-is-in-the-standard-library-documentation</span>
+<span class="doccomment">//! [`use`]: https://doc.rust-lang.org/book/ch07-02-defining-modules-to-control-scope-and-privacy.html</span>
+<span class="doccomment">//! [`use async_std::future`]: future/index.html</span>
+<span class="doccomment">//! [crates.io]: https://crates.io</span>
+<span class="doccomment">//! [`Future`]: future/trait.Future.html</span>
+<span class="doccomment">//! [`Stream`]: stream/trait.Stream.html</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # How to read this documentation</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! If you already know the name of what you are looking for, the fastest way to</span>
+<span class="doccomment">//! find it is to use the &lt;a href=&quot;#&quot; onclick=&quot;focusSearchBar();&quot;&gt;search</span>
+<span class="doccomment">//! bar&lt;/a&gt; at the top of the page.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Otherwise, you may want to jump to one of these useful sections:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! * [`async_std::*` modules](#modules)</span>
+<span class="doccomment">//! * [Async macros](#macros)</span>
+<span class="doccomment">//! * [The Async Prelude](prelude/index.html)</span>
+<span class="doccomment">//! * [Cargo.toml feature flags](#features)</span>
+<span class="doccomment">//! * [Examples](#examples)</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! If this is your first time, the documentation for `async-std` is</span>
+<span class="doccomment">//! written to be casually perused. Clicking on interesting things should</span>
+<span class="doccomment">//! generally lead you to interesting places. Still, there are important bits</span>
+<span class="doccomment">//! you don&#39;t want to miss, so read on for a tour of the `async-std` and</span>
+<span class="doccomment">//! its documentation!</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Once you are familiar with the contents of `async-std` you may</span>
+<span class="doccomment">//! begin to find the verbosity of the prose distracting. At this stage in your</span>
+<span class="doccomment">//! development you may want to press the `[-]` button near the top of the</span>
+<span class="doccomment">//! page to collapse it into a more skimmable view.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! While you are looking at that `[-]` button also notice the `[src]`</span>
+<span class="doccomment">//! button. Rust&#39;s API documentation comes with the source code and you are</span>
+<span class="doccomment">//! encouraged to read it. The `async-std` source is generally high</span>
+<span class="doccomment">//! quality and a peek behind the curtains is often enlightening.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Modules in this crate are organized in the same way as in `std`, except blocking</span>
+<span class="doccomment">//! functions have been replaced with async functions and threads have been replaced with</span>
+<span class="doccomment">//! lightweight tasks.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! You can find more information, reading materials, and other resources here:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! * [The async-std website](https://async.rs/)</span>
+<span class="doccomment">//! * [The async-std book](https://book.async.rs)</span>
+<span class="doccomment">//! * [GitHub repository](https://github.com/async-rs/async-std)</span>
+<span class="doccomment">//! * [List of code examples](https://github.com/async-rs/async-std/tree/master/examples)</span>
+<span class="doccomment">//! * [Discord chat](https://discord.gg/JvZeVNe)</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # What is in the `async-std` documentation?</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! First, `async-std` is divided into a number of focused</span>
+<span class="doccomment">//! modules, [all listed further down this page](#modules). These modules are</span>
+<span class="doccomment">//! the bedrock upon which async Rust is forged, and they have mighty names</span>
+<span class="doccomment">//! like [`async_std::os`] and [`async_std::task`]. Modules&#39; documentation</span>
+<span class="doccomment">//! typically includes an overview of the module along with examples, and are</span>
+<span class="doccomment">//! a smart place to start familiarizing yourself with the library.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Second, `async-std` defines [The Async Prelude], a small collection</span>
+<span class="doccomment">//! of items - mostly traits - that should be imported into every module of</span>
+<span class="doccomment">//! every async crate. The traits in the prelude are pervasive, making the</span>
+<span class="doccomment">//! prelude documentation a good entry point to learning about the library.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! [The Async Prelude]: prelude/index.html</span>
+<span class="doccomment">//! [`async_std::os`]: os/index.html</span>
+<span class="doccomment">//! [`async_std::task`]: task/index.html</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! And finally, `async-std` exports a number of async macros, and</span>
+<span class="doccomment">//! [lists them on this page](#macros).</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Contributing changes to the documentation</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Check out `async-std`&#39;s contribution guidelines [here](https://async.rs/contribute).</span>
+<span class="doccomment">//! The source for this documentation can be found on [GitHub](https://github.com/async-rs).</span>
+<span class="doccomment">//! To contribute changes, make sure you read the guidelines first, then submit</span>
+<span class="doccomment">//! pull requests for your suggested changes.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Contributions are appreciated! If you see a part of the docs that can be</span>
+<span class="doccomment">//! improved, submit a PR, or chat with us first on</span>
+<span class="doccomment">//! [Discord](https://discord.gg/JvZeVNe).</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # A tour of `async-std`</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The rest of this crate documentation is dedicated to pointing out notable</span>
+<span class="doccomment">//! features of `async-std`.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Platform abstractions and I/O</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Besides basic data types, `async-std` is largely concerned with</span>
+<span class="doccomment">//! abstracting over differences in common platforms, most notably Windows and</span>
+<span class="doccomment">//! Unix derivatives.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Common types of I/O, including [files], [TCP], [UDP], are defined in the</span>
+<span class="doccomment">//! [`io`], [`fs`], and [`net`] modules.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The [`task`] module contains `async-std`&#39;s task abstractions. [`sync`]</span>
+<span class="doccomment">//! contains further primitive shared memory types. [`channel`]  contains the channel types for message passing.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! [files]: fs/struct.File.html</span>
+<span class="doccomment">//! [TCP]: net/struct.TcpStream.html</span>
+<span class="doccomment">//! [UDP]: net/struct.UdpSocket.html</span>
+<span class="doccomment">//! [`io`]: fs/struct.File.html</span>
+<span class="doccomment">//! [`sync`]: sync/index.html</span>
+<span class="doccomment">//! [`channel`]: channel/index.html</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Timeouts, intervals, and delays</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! `async-std` provides several methods to manipulate time:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! * [`task::sleep`] to wait for a duration to pass without blocking.</span>
+<span class="doccomment">//! * [`stream::interval`] for emitting an event at a set interval.</span>
+<span class="doccomment">//! * [`future::timeout`] to time-out futures if they don&#39;t resolve within a</span>
+<span class="doccomment">//!   set interval.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! [`task::sleep`]: task/fn.sleep.html</span>
+<span class="doccomment">//! [`stream::interval`]: stream/fn.interval.html</span>
+<span class="doccomment">//! [`future::timeout`]: future/fn.timeout.html</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Examples</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! All examples require the [`&quot;attributes&quot;` feature](#features) to be enabled.</span>
+<span class="doccomment">//! This feature is not enabled by default because it significantly impacts</span>
+<span class="doccomment">//! compile times. See [`task::block_on`] for an alternative way to start</span>
+<span class="doccomment">//! executing tasks.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Call an async function from the main function:</span>
+<span class="doccomment">//!</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;attributes&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;```&quot;</span>)]</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;attributes&quot;</span>), <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;```ignore&quot;</span>)]</span>
-<span class="doccomment">//! async fn say_hello() {</span>
-<span class="doccomment">//!     println!(&quot;Hello, world!&quot;);</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[async_std::main]</span>
-<span class="doccomment">//! async fn main() {</span>
-<span class="doccomment">//!     say_hello().await;</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Await two futures concurrently, and return a tuple of their output:</span>
-<span class="doccomment">//!</span>
+<span class="doccomment">//! async fn say_hello() {</span>
+<span class="doccomment">//!     println!(&quot;Hello, world!&quot;);</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! #[async_std::main]</span>
+<span class="doccomment">//! async fn main() {</span>
+<span class="doccomment">//!     say_hello().await;</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Await two futures concurrently, and return a tuple of their output:</span>
+<span class="doccomment">//!</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;attributes&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;```&quot;</span>)]</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;attributes&quot;</span>), <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;```ignore&quot;</span>)]</span>
-<span class="doccomment">//! use async_std::prelude::*;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[async_std::main]</span>
-<span class="doccomment">//! async fn main() {</span>
-<span class="doccomment">//!     let a = async { 1u8 };</span>
-<span class="doccomment">//!     let b = async { 2u8 };</span>
-<span class="doccomment">//!     assert_eq!(a.join(b).await, (1u8, 2u8))</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Create a UDP server that echoes back each received message to the sender:</span>
-<span class="doccomment">//!</span>
+<span class="doccomment">//! use async_std::prelude::*;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! #[async_std::main]</span>
+<span class="doccomment">//! async fn main() {</span>
+<span class="doccomment">//!     let a = async { 1u8 };</span>
+<span class="doccomment">//!     let b = async { 2u8 };</span>
+<span class="doccomment">//!     assert_eq!(a.join(b).await, (1u8, 2u8))</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Create a UDP server that echoes back each received message to the sender:</span>
+<span class="doccomment">//!</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;attributes&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;```no_run&quot;</span>)]</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;attributes&quot;</span>), <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;```ignore&quot;</span>)]</span>
-<span class="doccomment">//! use async_std::net::UdpSocket;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[async_std::main]</span>
-<span class="doccomment">//! async fn main() -&gt; std::io::Result&lt;()&gt; {</span>
-<span class="doccomment">//!     let socket = UdpSocket::bind(&quot;127.0.0.1:8080&quot;).await?;</span>
-<span class="doccomment">//!     println!(&quot;Listening on {}&quot;, socket.local_addr()?);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     let mut buf = vec![0u8; 1024];</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     loop {</span>
-<span class="doccomment">//!         let (recv, peer) = socket.recv_from(&amp;mut buf).await?;</span>
-<span class="doccomment">//!         let sent = socket.send_to(&amp;buf[..recv], &amp;peer).await?;</span>
-<span class="doccomment">//!         println!(&quot;Sent {} out of {} bytes to {}&quot;, sent, recv, peer);</span>
-<span class="doccomment">//!     }</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! [`task::block_on`]: task/fn.block_on.html</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Features</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Items marked with</span>
-<span class="doccomment">//! &lt;span</span>
-<span class="doccomment">//!   class=&quot;module-item stab portability&quot;</span>
-<span class="doccomment">//!   style=&quot;display: inline; border-radius: 3px; padding: 2px; font-size: 80%; line-height: 1.2;&quot;</span>
-<span class="doccomment">//! &gt;&lt;code&gt;unstable&lt;/code&gt;&lt;/span&gt;</span>
-<span class="doccomment">//! are available only when the `unstable` Cargo feature is enabled:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```toml</span>
-<span class="doccomment">//! [dependencies.async-std]</span>
-<span class="doccomment">//! version = &quot;1.6.5&quot;</span>
-<span class="doccomment">//! features = [&quot;unstable&quot;]</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Items marked with</span>
-<span class="doccomment">//! &lt;span</span>
-<span class="doccomment">//!   class=&quot;module-item stab portability&quot;</span>
-<span class="doccomment">//!   style=&quot;display: inline; border-radius: 3px; padding: 2px; font-size: 80%; line-height: 1.2;&quot;</span>
-<span class="doccomment">//! &gt;&lt;code&gt;attributes&lt;/code&gt;&lt;/span&gt;</span>
-<span class="doccomment">//! are available only when the `attributes` Cargo feature is enabled:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```toml</span>
-<span class="doccomment">//! [dependencies.async-std]</span>
-<span class="doccomment">//! version = &quot;1.6.5&quot;</span>
-<span class="doccomment">//! features = [&quot;attributes&quot;]</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Compatibility with the `tokio` runtime is possible using the `tokio02`</span>
-<span class="doccomment">//! Cargo feature:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```toml</span>
-<span class="doccomment">//! [dependencies.async-std]</span>
-<span class="doccomment">//! version = &quot;1.6.5&quot;</span>
-<span class="doccomment">//! features = [&quot;tokio02&quot;]</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Additionally it&#39;s possible to only use the core traits and combinators by</span>
-<span class="doccomment">//! only enabling the `std` Cargo feature:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```toml</span>
-<span class="doccomment">//! [dependencies.async-std]</span>
-<span class="doccomment">//! version = &quot;1.6.5&quot;</span>
-<span class="doccomment">//! default-features = false</span>
-<span class="doccomment">//! features = [&quot;std&quot;]</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! And to use async-std on `no_std` targets that only support `alloc` only</span>
-<span class="doccomment">//! enable the `alloc` Cargo feature:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```toml</span>
-<span class="doccomment">//! [dependencies.async-std]</span>
-<span class="doccomment">//! version = &quot;1.6.5&quot;</span>
-<span class="doccomment">//! default-features = false</span>
-<span class="doccomment">//! features = [&quot;alloc&quot;]</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Runtime configuration</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Several environment variables are available to tune the async-std</span>
-<span class="doccomment">//! runtime:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! * `ASYNC_STD_THREAD_COUNT`: The number of threads that the</span>
-<span class="doccomment">//! async-std runtime will start. By default, this is one per logical</span>
-<span class="doccomment">//! cpu as reported by the [num_cpus](num_cpus) crate, which may be</span>
-<span class="doccomment">//! different than the number of physical cpus. Async-std _will panic_</span>
-<span class="doccomment">//! if this is set to any value other than a positive integer.</span>
-<span class="doccomment">//! * `ASYNC_STD_THREAD_NAME`: The name that async-std&#39;s runtime</span>
-<span class="doccomment">//! threads report to the operating system. The default value is</span>
-<span class="doccomment">//! `&quot;async-std/runtime&quot;`.</span>
-<span class="doccomment">//!</span>
+<span class="doccomment">//! use async_std::net::UdpSocket;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! #[async_std::main]</span>
+<span class="doccomment">//! async fn main() -&gt; std::io::Result&lt;()&gt; {</span>
+<span class="doccomment">//!     let socket = UdpSocket::bind(&quot;127.0.0.1:8080&quot;).await?;</span>
+<span class="doccomment">//!     println!(&quot;Listening on {}&quot;, socket.local_addr()?);</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!     let mut buf = vec![0u8; 1024];</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!     loop {</span>
+<span class="doccomment">//!         let (recv, peer) = socket.recv_from(&amp;mut buf).await?;</span>
+<span class="doccomment">//!         let sent = socket.send_to(&amp;buf[..recv], &amp;peer).await?;</span>
+<span class="doccomment">//!         println!(&quot;Sent {} out of {} bytes to {}&quot;, sent, recv, peer);</span>
+<span class="doccomment">//!     }</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! [`task::block_on`]: task/fn.block_on.html</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Features</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Items marked with</span>
+<span class="doccomment">//! &lt;span</span>
+<span class="doccomment">//!   class=&quot;module-item stab portability&quot;</span>
+<span class="doccomment">//!   style=&quot;display: inline; border-radius: 3px; padding: 2px; font-size: 80%; line-height: 1.2;&quot;</span>
+<span class="doccomment">//! &gt;&lt;code&gt;unstable&lt;/code&gt;&lt;/span&gt;</span>
+<span class="doccomment">//! are available only when the `unstable` Cargo feature is enabled:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```toml</span>
+<span class="doccomment">//! [dependencies.async-std]</span>
+<span class="doccomment">//! version = &quot;1.7.0&quot;</span>
+<span class="doccomment">//! features = [&quot;unstable&quot;]</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Items marked with</span>
+<span class="doccomment">//! &lt;span</span>
+<span class="doccomment">//!   class=&quot;module-item stab portability&quot;</span>
+<span class="doccomment">//!   style=&quot;display: inline; border-radius: 3px; padding: 2px; font-size: 80%; line-height: 1.2;&quot;</span>
+<span class="doccomment">//! &gt;&lt;code&gt;attributes&lt;/code&gt;&lt;/span&gt;</span>
+<span class="doccomment">//! are available only when the `attributes` Cargo feature is enabled:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```toml</span>
+<span class="doccomment">//! [dependencies.async-std]</span>
+<span class="doccomment">//! version = &quot;1.7.0&quot;</span>
+<span class="doccomment">//! features = [&quot;attributes&quot;]</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Compatibility with the `tokio` 1.0 runtime is also simultaneously possible</span>
+<span class="doccomment">//! using the `tokio1` Cargo feature:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```toml</span>
+<span class="doccomment">//! [dependencies.async-std]</span>
+<span class="doccomment">//! version = &quot;1.7.0&quot;</span>
+<span class="doccomment">//! features = [&quot;tokio1&quot;]</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Compatibility with the `tokio` 0.2 runtime is possible using the `tokio02`</span>
+<span class="doccomment">//! Cargo feature:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```toml</span>
+<span class="doccomment">//! [dependencies.async-std]</span>
+<span class="doccomment">//! version = &quot;1.7.0&quot;</span>
+<span class="doccomment">//! features = [&quot;tokio02&quot;]</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Compatibility with the `tokio` 0.3 runtime is also simultaneously possible</span>
+<span class="doccomment">//! using the `tokio03` Cargo feature:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```toml</span>
+<span class="doccomment">//! [dependencies.async-std]</span>
+<span class="doccomment">//! version = &quot;1.7.0&quot;</span>
+<span class="doccomment">//! features = [&quot;tokio03&quot;]</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Additionally it&#39;s possible to only use the core traits and combinators by</span>
+<span class="doccomment">//! only enabling the `std` Cargo feature:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```toml</span>
+<span class="doccomment">//! [dependencies.async-std]</span>
+<span class="doccomment">//! version = &quot;1.7.0&quot;</span>
+<span class="doccomment">//! default-features = false</span>
+<span class="doccomment">//! features = [&quot;std&quot;]</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! And to use async-std on `no_std` targets that only support `alloc` only</span>
+<span class="doccomment">//! enable the `alloc` Cargo feature:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```toml</span>
+<span class="doccomment">//! [dependencies.async-std]</span>
+<span class="doccomment">//! version = &quot;1.7.0&quot;</span>
+<span class="doccomment">//! default-features = false</span>
+<span class="doccomment">//! features = [&quot;alloc&quot;]</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Runtime configuration</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Several environment variables are available to tune the async-std</span>
+<span class="doccomment">//! runtime:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! * `ASYNC_STD_THREAD_COUNT`: The number of threads that the</span>
+<span class="doccomment">//! async-std runtime will start. By default, this is one per logical</span>
+<span class="doccomment">//! cpu as reported by the [num_cpus](num_cpus) crate, which may be</span>
+<span class="doccomment">//! different than the number of physical cpus. Async-std _will panic_</span>
+<span class="doccomment">//! if this is set to any value other than a positive integer.</span>
+<span class="doccomment">//! * `ASYNC_STD_THREAD_NAME`: The name that async-std&#39;s runtime</span>
+<span class="doccomment">//! threads report to the operating system. The default value is</span>
+<span class="doccomment">//! `&quot;async-std/runtime&quot;`.</span>
+<span class="doccomment">//!</span>
 
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>), <span class="ident">no_std</span>)]</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">feature</span>(<span class="ident">doc_cfg</span>))]</span>
 <span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>, <span class="ident">missing_debug_implementations</span>, <span class="ident">rust_2018_idioms</span>)]</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">mutex_atomic</span>, <span class="ident">clippy</span>::<span class="ident">module_inception</span>)]</span>
+<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::mutex_atomic</span>, <span class="ident">clippy::module_inception</span>)]</span>
 <span class="attribute">#![<span class="ident">doc</span>(<span class="ident">test</span>(<span class="ident">attr</span>(<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">warnings</span>))))]</span>
 <span class="attribute">#![<span class="ident">doc</span>(<span class="ident">test</span>(<span class="ident">attr</span>(<span class="ident">allow</span>(<span class="ident">unused_extern_crates</span>, <span class="ident">unused_variables</span>))))]</span>
 <span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_logo_url</span> <span class="op">=</span> <span class="string">&quot;https://async.rs/images/logo--hero.svg&quot;</span>)]</span>
@@ -605,20 +640,21 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
 <span class="kw">mod</span> <span class="ident">macros</span>;
 
-<span class="macro">cfg_alloc</span><span class="macro">!</span> {
+<span class="macro">cfg_alloc!</span> {
     <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">task</span>;
     <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">future</span>;
     <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">stream</span>;
 }
 
-<span class="macro">cfg_std</span><span class="macro">!</span> {
+<span class="macro">cfg_std!</span> {
     <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">io</span>;
     <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">os</span>;
     <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">prelude</span>;
     <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">sync</span>;
+    <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">channel</span>;
 }
 
-<span class="macro">cfg_default</span><span class="macro">!</span> {
+<span class="macro">cfg_default!</span> {
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;unknown&quot;</span>))]</span>
     <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">fs</span>;
     <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">path</span>;
@@ -627,9 +663,9 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">rt</span>;
 }
 
-<span class="macro">cfg_unstable</span><span class="macro">!</span> {
+<span class="macro">cfg_unstable!</span> {
     <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">pin</span>;
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;unknown&quot;</span>))]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;unknown&quot;</span>), <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
     <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">process</span>;
 
     <span class="kw">mod</span> <span class="ident">unit</span>;
@@ -640,9 +676,10 @@
     <span class="kw">mod</span> <span class="ident">collections</span>;
 }
 
-<span class="macro">cfg_unstable_default</span><span class="macro">!</span> {
+<span class="macro">cfg_unstable_default!</span> {
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
     <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">write</span>, <span class="ident">writeln</span>};
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "async_std";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="async_std" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

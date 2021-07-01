@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/cranelift-codegen-0.66.0/src/flowgraph.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>flowgraph.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/cranelift-codegen-0.69.0/src/flowgraph.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>flowgraph.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../cranelift_codegen/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../cranelift_codegen/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -377,12 +377,12 @@
 <span class="doccomment">//! Here `Block1` and `Block2` would each have a single predecessor denoted as `(Block0, brz)`</span>
 <span class="doccomment">//! and `(Block0, jmp Block2)` respectively.</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">bforest</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">entity</span>::<span class="ident">SecondaryMap</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">ir</span>::<span class="ident">instructions</span>::<span class="ident">BranchInfo</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">ir</span>::{<span class="ident">Block</span>, <span class="ident">Function</span>, <span class="ident">Inst</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">timing</span>;
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">mem</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::bforest</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::entity::SecondaryMap</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::ir::instructions::BranchInfo</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::ir</span>::{<span class="ident">Block</span>, <span class="ident">Function</span>, <span class="ident">Inst</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::timing</span>;
+<span class="kw">use</span> <span class="ident">core::mem</span>;
 
 <span class="doccomment">/// A basic block denoted by its enclosing Block and last instruction.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
@@ -415,11 +415,11 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The redundant block stored here is always consistent with the CFG successor lists, even after</span>
     <span class="doccomment">/// the IR has been edited.</span>
-    <span class="kw">pub</span> <span class="ident">predecessors</span>: <span class="ident">bforest</span>::<span class="ident">Map</span><span class="op">&lt;</span><span class="ident">Inst</span>, <span class="ident">Block</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">predecessors</span>: <span class="ident">bforest::Map</span><span class="op">&lt;</span><span class="ident">Inst</span>, <span class="ident">Block</span><span class="op">&gt;</span>,
 
     <span class="doccomment">/// Set of blocks that are the targets of branches and jumps in this block.</span>
     <span class="doccomment">/// The set is ordered by block number, indicated by the `()` comparator type.</span>
-    <span class="kw">pub</span> <span class="ident">successors</span>: <span class="ident">bforest</span>::<span class="ident">Set</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">successors</span>: <span class="ident">bforest::Set</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>,
 }
 
 <span class="doccomment">/// The Control Flow Graph maintains a mapping of blocks to their predecessors</span>
@@ -427,8 +427,8 @@
 <span class="doccomment">/// basic blocks.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ControlFlowGraph</span> {
     <span class="ident">data</span>: <span class="ident">SecondaryMap</span><span class="op">&lt;</span><span class="ident">Block</span>, <span class="ident">CFGNode</span><span class="op">&gt;</span>,
-    <span class="ident">pred_forest</span>: <span class="ident">bforest</span>::<span class="ident">MapForest</span><span class="op">&lt;</span><span class="ident">Inst</span>, <span class="ident">Block</span><span class="op">&gt;</span>,
-    <span class="ident">succ_forest</span>: <span class="ident">bforest</span>::<span class="ident">SetForest</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>,
+    <span class="ident">pred_forest</span>: <span class="ident">bforest::MapForest</span><span class="op">&lt;</span><span class="ident">Inst</span>, <span class="ident">Block</span><span class="op">&gt;</span>,
+    <span class="ident">succ_forest</span>: <span class="ident">bforest::SetForest</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>,
     <span class="ident">valid</span>: <span class="ident">bool</span>,
 }
 
@@ -436,10 +436,10 @@
     <span class="doccomment">/// Allocate a new blank control flow graph.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
-            <span class="ident">data</span>: <span class="ident">SecondaryMap</span>::<span class="ident">new</span>(),
+            <span class="ident">data</span>: <span class="ident">SecondaryMap::new</span>(),
             <span class="ident">valid</span>: <span class="bool-val">false</span>,
-            <span class="ident">pred_forest</span>: <span class="ident">bforest</span>::<span class="ident">MapForest</span>::<span class="ident">new</span>(),
-            <span class="ident">succ_forest</span>: <span class="ident">bforest</span>::<span class="ident">SetForest</span>::<span class="ident">new</span>(),
+            <span class="ident">pred_forest</span>: <span class="ident">bforest::MapForest::new</span>(),
+            <span class="ident">succ_forest</span>: <span class="ident">bforest::SetForest::new</span>(),
         }
     }
 
@@ -453,7 +453,7 @@
 
     <span class="doccomment">/// Allocate and compute the control flow graph for `func`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_function</span>(<span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="ident">Function</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cfg</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cfg</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::new</span>();
         <span class="ident">cfg</span>.<span class="ident">compute</span>(<span class="ident">func</span>);
         <span class="ident">cfg</span>
     }
@@ -462,7 +462,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This will clear and overwrite any information already stored in this data structure.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compute</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="ident">Function</span>) {
-        <span class="kw">let</span> <span class="ident">_tt</span> <span class="op">=</span> <span class="ident">timing</span>::<span class="ident">flowgraph</span>();
+        <span class="kw">let</span> <span class="ident">_tt</span> <span class="op">=</span> <span class="ident">timing::flowgraph</span>();
         <span class="self">self</span>.<span class="ident">clear</span>();
         <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">resize</span>(<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">num_blocks</span>());
 
@@ -476,10 +476,10 @@
     <span class="kw">fn</span> <span class="ident">compute_block</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="ident">Function</span>, <span class="ident">block</span>: <span class="ident">Block</span>) {
         <span class="kw">for</span> <span class="ident">inst</span> <span class="kw">in</span> <span class="ident">func</span>.<span class="ident">layout</span>.<span class="ident">block_likely_branches</span>(<span class="ident">block</span>) {
             <span class="kw">match</span> <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">analyze_branch</span>(<span class="ident">inst</span>) {
-                <span class="ident">BranchInfo</span>::<span class="ident">SingleDest</span>(<span class="ident">dest</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">BranchInfo::SingleDest</span>(<span class="ident">dest</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="self">self</span>.<span class="ident">add_edge</span>(<span class="ident">block</span>, <span class="ident">inst</span>, <span class="ident">dest</span>);
                 }
-                <span class="ident">BranchInfo</span>::<span class="ident">Table</span>(<span class="ident">jt</span>, <span class="ident">dest</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">BranchInfo::Table</span>(<span class="ident">jt</span>, <span class="ident">dest</span>) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">dest</span>) <span class="op">=</span> <span class="ident">dest</span> {
                         <span class="self">self</span>.<span class="ident">add_edge</span>(<span class="ident">block</span>, <span class="ident">inst</span>, <span class="ident">dest</span>);
                     }
@@ -487,7 +487,7 @@
                         <span class="self">self</span>.<span class="ident">add_edge</span>(<span class="ident">block</span>, <span class="ident">inst</span>, <span class="kw-2">*</span><span class="ident">dest</span>);
                     }
                 }
-                <span class="ident">BranchInfo</span>::<span class="ident">NotABranch</span> <span class="op">=</span><span class="op">&gt;</span> {}
+                <span class="ident">BranchInfo::NotABranch</span> <span class="op">=</span><span class="op">&gt;</span> {}
             }
         }
     }
@@ -496,7 +496,7 @@
         <span class="comment">// Temporarily take ownership because we need mutable access to self.data inside the loop.</span>
         <span class="comment">// Unfortunately borrowck cannot see that our mut accesses to predecessors don&#39;t alias</span>
         <span class="comment">// our iteration over successors.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">successors</span> <span class="op">=</span> <span class="ident">mem</span>::<span class="ident">replace</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">data</span>[<span class="ident">block</span>].<span class="ident">successors</span>, <span class="ident">Default</span>::<span class="ident">default</span>());
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">successors</span> <span class="op">=</span> <span class="ident">mem::replace</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">data</span>[<span class="ident">block</span>].<span class="ident">successors</span>, <span class="ident">Default::default</span>());
         <span class="kw">for</span> <span class="ident">succ</span> <span class="kw">in</span> <span class="ident">successors</span>.<span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">succ_forest</span>) {
             <span class="self">self</span>.<span class="ident">data</span>[<span class="ident">succ</span>]
                 .<span class="ident">predecessors</span>
@@ -512,7 +512,7 @@
     <span class="doccomment">/// more expensive `compute`, and should be used when we know we don&#39;t need to recompute the CFG</span>
     <span class="doccomment">/// from scratch, but rather that our changes have been restricted to specific blocks.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">recompute_block</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">func</span>: <span class="kw-2">&amp;</span><span class="ident">Function</span>, <span class="ident">block</span>: <span class="ident">Block</span>) {
-        <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">is_valid</span>());
+        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">is_valid</span>());
         <span class="self">self</span>.<span class="ident">invalidate_block_successors</span>(<span class="ident">block</span>);
         <span class="self">self</span>.<span class="ident">compute_block</span>(<span class="ident">func</span>, <span class="ident">block</span>);
     }
@@ -533,7 +533,7 @@
 
     <span class="doccomment">/// Get an iterator over the CFG successors to `block`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">succ_iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">block</span>: <span class="ident">Block</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SuccIter</span> {
-        <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">is_valid</span>());
+        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">is_valid</span>());
         <span class="self">self</span>.<span class="ident">data</span>[<span class="ident">block</span>].<span class="ident">successors</span>.<span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">succ_forest</span>)
     }
 
@@ -550,35 +550,35 @@
 <span class="doccomment">/// An iterator over block predecessors. The iterator type is `BlockPredecessor`.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Each predecessor is an instruction that branches to the block.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PredIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">bforest</span>::<span class="ident">MapIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Inst</span>, <span class="ident">Block</span><span class="op">&gt;</span>);
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PredIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">bforest::MapIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Inst</span>, <span class="ident">Block</span><span class="op">&gt;</span>);
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">PredIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">BlockPredecessor</span>;
 
     <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BlockPredecessor</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">next</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">i</span>, <span class="ident">e</span>)<span class="op">|</span> <span class="ident">BlockPredecessor</span>::<span class="ident">new</span>(<span class="ident">e</span>, <span class="ident">i</span>))
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">next</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">i</span>, <span class="ident">e</span>)<span class="op">|</span> <span class="ident">BlockPredecessor::new</span>(<span class="ident">e</span>, <span class="ident">i</span>))
     }
 }
 
 <span class="doccomment">/// An iterator over block successors. The iterator type is `Block`.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">SuccIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">bforest</span>::<span class="ident">SetIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Block</span><span class="op">&gt;</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">SuccIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">bforest::SetIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Block</span><span class="op">&gt;</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">cursor</span>::{<span class="ident">Cursor</span>, <span class="ident">FuncCursor</span>};
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">ir</span>::{<span class="ident">types</span>, <span class="ident">Function</span>, <span class="ident">InstBuilder</span>};
-    <span class="kw">use</span> <span class="ident">alloc</span>::<span class="ident">vec</span>::<span class="ident">Vec</span>;
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::cursor</span>::{<span class="ident">Cursor</span>, <span class="ident">FuncCursor</span>};
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::ir</span>::{<span class="ident">types</span>, <span class="ident">Function</span>, <span class="ident">InstBuilder</span>};
+    <span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">empty</span>() {
-        <span class="kw">let</span> <span class="ident">func</span> <span class="op">=</span> <span class="ident">Function</span>::<span class="ident">new</span>();
-        <span class="ident">ControlFlowGraph</span>::<span class="ident">with_function</span>(<span class="kw-2">&amp;</span><span class="ident">func</span>);
+        <span class="kw">let</span> <span class="ident">func</span> <span class="op">=</span> <span class="ident">Function::new</span>();
+        <span class="ident">ControlFlowGraph::with_function</span>(<span class="kw-2">&amp;</span><span class="ident">func</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">no_predecessors</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">func</span> <span class="op">=</span> <span class="ident">Function</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">func</span> <span class="op">=</span> <span class="ident">Function::new</span>();
         <span class="kw">let</span> <span class="ident">block0</span> <span class="op">=</span> <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">make_block</span>();
         <span class="kw">let</span> <span class="ident">block1</span> <span class="op">=</span> <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">make_block</span>();
         <span class="kw">let</span> <span class="ident">block2</span> <span class="op">=</span> <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">make_block</span>();
@@ -586,21 +586,21 @@
         <span class="ident">func</span>.<span class="ident">layout</span>.<span class="ident">append_block</span>(<span class="ident">block1</span>);
         <span class="ident">func</span>.<span class="ident">layout</span>.<span class="ident">append_block</span>(<span class="ident">block2</span>);
 
-        <span class="kw">let</span> <span class="ident">cfg</span> <span class="op">=</span> <span class="ident">ControlFlowGraph</span>::<span class="ident">with_function</span>(<span class="kw-2">&amp;</span><span class="ident">func</span>);
+        <span class="kw">let</span> <span class="ident">cfg</span> <span class="op">=</span> <span class="ident">ControlFlowGraph::with_function</span>(<span class="kw-2">&amp;</span><span class="ident">func</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fun_blocks</span> <span class="op">=</span> <span class="ident">func</span>.<span class="ident">layout</span>.<span class="ident">blocks</span>();
         <span class="kw">for</span> <span class="ident">block</span> <span class="kw">in</span> <span class="ident">func</span>.<span class="ident">layout</span>.<span class="ident">blocks</span>() {
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">block</span>, <span class="ident">fun_blocks</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>());
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cfg</span>.<span class="ident">pred_iter</span>(<span class="ident">block</span>).<span class="ident">count</span>(), <span class="number">0</span>);
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cfg</span>.<span class="ident">succ_iter</span>(<span class="ident">block</span>).<span class="ident">count</span>(), <span class="number">0</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">block</span>, <span class="ident">fun_blocks</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>());
+            <span class="macro">assert_eq!</span>(<span class="ident">cfg</span>.<span class="ident">pred_iter</span>(<span class="ident">block</span>).<span class="ident">count</span>(), <span class="number">0</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">cfg</span>.<span class="ident">succ_iter</span>(<span class="ident">block</span>).<span class="ident">count</span>(), <span class="number">0</span>);
         }
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">branches_and_jumps</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">func</span> <span class="op">=</span> <span class="ident">Function</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">func</span> <span class="op">=</span> <span class="ident">Function::new</span>();
         <span class="kw">let</span> <span class="ident">block0</span> <span class="op">=</span> <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">make_block</span>();
-        <span class="kw">let</span> <span class="ident">cond</span> <span class="op">=</span> <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">append_block_param</span>(<span class="ident">block0</span>, <span class="ident">types</span>::<span class="ident">I32</span>);
+        <span class="kw">let</span> <span class="ident">cond</span> <span class="op">=</span> <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">append_block_param</span>(<span class="ident">block0</span>, <span class="ident">types::I32</span>);
         <span class="kw">let</span> <span class="ident">block1</span> <span class="op">=</span> <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">make_block</span>();
         <span class="kw">let</span> <span class="ident">block2</span> <span class="op">=</span> <span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">make_block</span>();
 
@@ -610,7 +610,7 @@
         <span class="kw">let</span> <span class="ident">jmp_block1_block2</span>;
 
         {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cur</span> <span class="op">=</span> <span class="ident">FuncCursor</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">func</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cur</span> <span class="op">=</span> <span class="ident">FuncCursor::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">func</span>);
 
             <span class="ident">cur</span>.<span class="ident">insert_block</span>(<span class="ident">block0</span>);
             <span class="ident">br_block0_block2</span> <span class="op">=</span> <span class="ident">cur</span>.<span class="ident">ins</span>().<span class="ident">brnz</span>(<span class="ident">cond</span>, <span class="ident">block2</span>, <span class="kw-2">&amp;</span>[]);
@@ -623,7 +623,7 @@
             <span class="ident">cur</span>.<span class="ident">insert_block</span>(<span class="ident">block2</span>);
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cfg</span> <span class="op">=</span> <span class="ident">ControlFlowGraph</span>::<span class="ident">with_function</span>(<span class="kw-2">&amp;</span><span class="ident">func</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cfg</span> <span class="op">=</span> <span class="ident">ControlFlowGraph::with_function</span>(<span class="kw-2">&amp;</span><span class="ident">func</span>);
 
         {
             <span class="kw">let</span> <span class="ident">block0_predecessors</span> <span class="op">=</span> <span class="ident">cfg</span>.<span class="ident">pred_iter</span>(<span class="ident">block0</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
@@ -634,30 +634,30 @@
             <span class="kw">let</span> <span class="ident">block1_successors</span> <span class="op">=</span> <span class="ident">cfg</span>.<span class="ident">succ_iter</span>(<span class="ident">block1</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
             <span class="kw">let</span> <span class="ident">block2_successors</span> <span class="op">=</span> <span class="ident">cfg</span>.<span class="ident">succ_iter</span>(<span class="ident">block2</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">block0_predecessors</span>.<span class="ident">len</span>(), <span class="number">0</span>);
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">block1_predecessors</span>.<span class="ident">len</span>(), <span class="number">2</span>);
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">block2_predecessors</span>.<span class="ident">len</span>(), <span class="number">2</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">block0_predecessors</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">block1_predecessors</span>.<span class="ident">len</span>(), <span class="number">2</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">block2_predecessors</span>.<span class="ident">len</span>(), <span class="number">2</span>);
 
-            <span class="macro">assert_eq</span><span class="macro">!</span>(
-                <span class="ident">block1_predecessors</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">BlockPredecessor</span>::<span class="ident">new</span>(<span class="ident">block0</span>, <span class="ident">jmp_block0_block1</span>)),
+            <span class="macro">assert_eq!</span>(
+                <span class="ident">block1_predecessors</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">BlockPredecessor::new</span>(<span class="ident">block0</span>, <span class="ident">jmp_block0_block1</span>)),
                 <span class="bool-val">true</span>
             );
-            <span class="macro">assert_eq</span><span class="macro">!</span>(
-                <span class="ident">block1_predecessors</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">BlockPredecessor</span>::<span class="ident">new</span>(<span class="ident">block1</span>, <span class="ident">br_block1_block1</span>)),
+            <span class="macro">assert_eq!</span>(
+                <span class="ident">block1_predecessors</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">BlockPredecessor::new</span>(<span class="ident">block1</span>, <span class="ident">br_block1_block1</span>)),
                 <span class="bool-val">true</span>
             );
-            <span class="macro">assert_eq</span><span class="macro">!</span>(
-                <span class="ident">block2_predecessors</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">BlockPredecessor</span>::<span class="ident">new</span>(<span class="ident">block0</span>, <span class="ident">br_block0_block2</span>)),
+            <span class="macro">assert_eq!</span>(
+                <span class="ident">block2_predecessors</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">BlockPredecessor::new</span>(<span class="ident">block0</span>, <span class="ident">br_block0_block2</span>)),
                 <span class="bool-val">true</span>
             );
-            <span class="macro">assert_eq</span><span class="macro">!</span>(
-                <span class="ident">block2_predecessors</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">BlockPredecessor</span>::<span class="ident">new</span>(<span class="ident">block1</span>, <span class="ident">jmp_block1_block2</span>)),
+            <span class="macro">assert_eq!</span>(
+                <span class="ident">block2_predecessors</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">BlockPredecessor::new</span>(<span class="ident">block1</span>, <span class="ident">jmp_block1_block2</span>)),
                 <span class="bool-val">true</span>
             );
 
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">block0_successors</span>, [<span class="ident">block1</span>, <span class="ident">block2</span>]);
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">block1_successors</span>, [<span class="ident">block1</span>, <span class="ident">block2</span>]);
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">block2_successors</span>, []);
+            <span class="macro">assert_eq!</span>(<span class="ident">block0_successors</span>, [<span class="ident">block1</span>, <span class="ident">block2</span>]);
+            <span class="macro">assert_eq!</span>(<span class="ident">block1_successors</span>, [<span class="ident">block1</span>, <span class="ident">block2</span>]);
+            <span class="macro">assert_eq!</span>(<span class="ident">block2_successors</span>, []);
         }
 
         <span class="comment">// Change some instructions and recompute block0</span>
@@ -675,32 +675,33 @@
             <span class="kw">let</span> <span class="ident">block1_successors</span> <span class="op">=</span> <span class="ident">cfg</span>.<span class="ident">succ_iter</span>(<span class="ident">block1</span>);
             <span class="kw">let</span> <span class="ident">block2_successors</span> <span class="op">=</span> <span class="ident">cfg</span>.<span class="ident">succ_iter</span>(<span class="ident">block2</span>);
 
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">block0_predecessors</span>.<span class="ident">len</span>(), <span class="number">0</span>);
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">block1_predecessors</span>.<span class="ident">len</span>(), <span class="number">2</span>);
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">block2_predecessors</span>.<span class="ident">len</span>(), <span class="number">1</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">block0_predecessors</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">block1_predecessors</span>.<span class="ident">len</span>(), <span class="number">2</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">block2_predecessors</span>.<span class="ident">len</span>(), <span class="number">1</span>);
 
-            <span class="macro">assert_eq</span><span class="macro">!</span>(
-                <span class="ident">block1_predecessors</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">BlockPredecessor</span>::<span class="ident">new</span>(<span class="ident">block0</span>, <span class="ident">br_block0_block1</span>)),
+            <span class="macro">assert_eq!</span>(
+                <span class="ident">block1_predecessors</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">BlockPredecessor::new</span>(<span class="ident">block0</span>, <span class="ident">br_block0_block1</span>)),
                 <span class="bool-val">true</span>
             );
-            <span class="macro">assert_eq</span><span class="macro">!</span>(
-                <span class="ident">block1_predecessors</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">BlockPredecessor</span>::<span class="ident">new</span>(<span class="ident">block1</span>, <span class="ident">br_block1_block1</span>)),
+            <span class="macro">assert_eq!</span>(
+                <span class="ident">block1_predecessors</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">BlockPredecessor::new</span>(<span class="ident">block1</span>, <span class="ident">br_block1_block1</span>)),
                 <span class="bool-val">true</span>
             );
-            <span class="macro">assert_eq</span><span class="macro">!</span>(
-                <span class="ident">block2_predecessors</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">BlockPredecessor</span>::<span class="ident">new</span>(<span class="ident">block0</span>, <span class="ident">br_block0_block2</span>)),
+            <span class="macro">assert_eq!</span>(
+                <span class="ident">block2_predecessors</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">BlockPredecessor::new</span>(<span class="ident">block0</span>, <span class="ident">br_block0_block2</span>)),
                 <span class="bool-val">false</span>
             );
-            <span class="macro">assert_eq</span><span class="macro">!</span>(
-                <span class="ident">block2_predecessors</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">BlockPredecessor</span>::<span class="ident">new</span>(<span class="ident">block1</span>, <span class="ident">jmp_block1_block2</span>)),
+            <span class="macro">assert_eq!</span>(
+                <span class="ident">block2_predecessors</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">BlockPredecessor::new</span>(<span class="ident">block1</span>, <span class="ident">jmp_block1_block2</span>)),
                 <span class="bool-val">true</span>
             );
 
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">block0_successors</span>.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(), [<span class="ident">block1</span>]);
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">block1_successors</span>.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(), [<span class="ident">block1</span>, <span class="ident">block2</span>]);
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">block2_successors</span>.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(), []);
+            <span class="macro">assert_eq!</span>(<span class="ident">block0_successors</span>.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(), [<span class="ident">block1</span>]);
+            <span class="macro">assert_eq!</span>(<span class="ident">block1_successors</span>.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(), [<span class="ident">block1</span>, <span class="ident">block2</span>]);
+            <span class="macro">assert_eq!</span>(<span class="ident">block2_successors</span>.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(), []);
         }
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "cranelift_codegen";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="cranelift_codegen" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

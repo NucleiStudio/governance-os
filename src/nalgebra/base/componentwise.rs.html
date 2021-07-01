@@ -1,5 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/nalgebra-0.18.1/src/base/componentwise.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>componentwise.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="https://nalgebra.org/img/favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../nalgebra/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/nalgebra-0.21.1/src/base/componentwise.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>componentwise.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="https://nalgebra.org/img/favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../nalgebra/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -236,19 +236,49 @@
 <span id="235">235</span>
 <span id="236">236</span>
 <span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Non-conventional component-wise operators.</span>
 
 <span class="kw">use</span> <span class="ident">num</span>::{<span class="ident">Signed</span>, <span class="ident">Zero</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ops</span>::{<span class="ident">Add</span>, <span class="ident">Mul</span>};
+<span class="kw">use</span> <span class="ident">std::ops</span>::{<span class="ident">Add</span>, <span class="ident">Mul</span>};
 
-<span class="kw">use</span> <span class="ident">alga</span>::<span class="ident">general</span>::{<span class="ident">ClosedDiv</span>, <span class="ident">ClosedMul</span>};
+<span class="kw">use</span> <span class="ident">simba::scalar</span>::{<span class="ident">ClosedDiv</span>, <span class="ident">ClosedMul</span>};
+<span class="kw">use</span> <span class="ident">simba::simd::SimdPartialOrd</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">base</span>::<span class="ident">allocator</span>::{<span class="ident">Allocator</span>, <span class="ident">SameShapeAllocator</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">base</span>::<span class="ident">constraint</span>::{<span class="ident">SameNumberOfColumns</span>, <span class="ident">SameNumberOfRows</span>, <span class="ident">ShapeConstraint</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">base</span>::<span class="ident">dimension</span>::<span class="ident">Dim</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">base</span>::<span class="ident">storage</span>::{<span class="ident">Storage</span>, <span class="ident">StorageMut</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">base</span>::{<span class="ident">DefaultAllocator</span>, <span class="ident">Matrix</span>, <span class="ident">MatrixMN</span>, <span class="ident">MatrixSum</span>, <span class="ident">Scalar</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::base::allocator</span>::{<span class="ident">Allocator</span>, <span class="ident">SameShapeAllocator</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::base::constraint</span>::{<span class="ident">SameNumberOfColumns</span>, <span class="ident">SameNumberOfRows</span>, <span class="ident">ShapeConstraint</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::base::dimension::Dim</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::base::storage</span>::{<span class="ident">Storage</span>, <span class="ident">StorageMut</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::base</span>::{<span class="ident">DefaultAllocator</span>, <span class="ident">Matrix</span>, <span class="ident">MatrixMN</span>, <span class="ident">MatrixSum</span>, <span class="ident">Scalar</span>};
 
 <span class="doccomment">/// The type of the result of a matrix component-wise operation.</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">MatrixComponentOp</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">R1</span>, <span class="ident">C1</span>, <span class="ident">R2</span>, <span class="ident">C2</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">MatrixSum</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">R1</span>, <span class="ident">C1</span>, <span class="ident">R2</span>, <span class="ident">C2</span><span class="op">&gt;</span>;
@@ -282,7 +312,7 @@
     <span class="comment">// FIXME: add other operators like component_ln, component_pow, etc. ?</span>
 }
 
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">component_binop_impl</span>(
+<span class="macro">macro_rules!</span> <span class="ident">component_binop_impl</span>(
     ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">binop</span>: <span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">binop_mut</span>: <span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">binop_assign</span>: <span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">cmpy</span>: <span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">Trait</span>: <span class="ident">ident</span> . <span class="macro-nonterminal">$</span><span class="macro-nonterminal">op</span>: <span class="ident">ident</span> . <span class="macro-nonterminal">$</span><span class="macro-nonterminal">op_assign</span>: <span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">desc</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">desc_cmpy</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">desc_mut</span>:<span class="ident">expr</span>);<span class="op">*</span> $(;)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {$(
         <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">Scalar</span>, <span class="ident">R1</span>: <span class="ident">Dim</span>, <span class="ident">C1</span>: <span class="ident">Dim</span>, <span class="ident">SA</span>: <span class="ident">Storage</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">R1</span>, <span class="ident">C1</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Matrix</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">R1</span>, <span class="ident">C1</span>, <span class="ident">SA</span><span class="op">&gt;</span> {
             <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">desc</span>]</span>
@@ -294,13 +324,13 @@
                       <span class="ident">DefaultAllocator</span>: <span class="ident">SameShapeAllocator</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">R1</span>, <span class="ident">C1</span>, <span class="ident">R2</span>, <span class="ident">C2</span><span class="op">&gt;</span>,
                       <span class="ident">ShapeConstraint</span>:  <span class="ident">SameNumberOfRows</span><span class="op">&lt;</span><span class="ident">R1</span>, <span class="ident">R2</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">SameNumberOfColumns</span><span class="op">&lt;</span><span class="ident">C1</span>, <span class="ident">C2</span><span class="op">&gt;</span> {
 
-                <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">shape</span>(), <span class="ident">rhs</span>.<span class="ident">shape</span>(), <span class="string">&quot;Componentwise mul/div: mismatched matrix dimensions.&quot;</span>);
+                <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="ident">shape</span>(), <span class="ident">rhs</span>.<span class="ident">shape</span>(), <span class="string">&quot;Componentwise mul/div: mismatched matrix dimensions.&quot;</span>);
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone_owned_sum</span>();
 
                 <span class="kw">for</span> <span class="ident">j</span> <span class="kw">in</span> <span class="number">0</span> .. <span class="ident">res</span>.<span class="ident">ncols</span>() {
                     <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span> .. <span class="ident">res</span>.<span class="ident">nrows</span>() {
                         <span class="kw">unsafe</span> {
-                            <span class="ident">res</span>.<span class="ident">get_unchecked_mut</span>((<span class="ident">i</span>, <span class="ident">j</span>)).<span class="macro-nonterminal">$</span><span class="macro-nonterminal">op_assign</span>(<span class="kw-2">*</span><span class="ident">rhs</span>.<span class="ident">get_unchecked</span>((<span class="ident">i</span>, <span class="ident">j</span>)));
+                            <span class="ident">res</span>.<span class="ident">get_unchecked_mut</span>((<span class="ident">i</span>, <span class="ident">j</span>)).<span class="macro-nonterminal">$</span><span class="macro-nonterminal">op_assign</span>(<span class="ident">rhs</span>.<span class="ident">get_unchecked</span>((<span class="ident">i</span>, <span class="ident">j</span>)).<span class="ident">inlined_clone</span>());
                         }
                     }
                 }
@@ -321,14 +351,14 @@
                       <span class="ident">SC</span>: <span class="ident">Storage</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">R3</span>, <span class="ident">C3</span><span class="op">&gt;</span>,
                       <span class="ident">ShapeConstraint</span>: <span class="ident">SameNumberOfRows</span><span class="op">&lt;</span><span class="ident">R1</span>, <span class="ident">R2</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">SameNumberOfColumns</span><span class="op">&lt;</span><span class="ident">C1</span>, <span class="ident">C2</span><span class="op">&gt;</span> <span class="op">+</span>
                                        <span class="ident">SameNumberOfRows</span><span class="op">&lt;</span><span class="ident">R1</span>, <span class="ident">R3</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">SameNumberOfColumns</span><span class="op">&lt;</span><span class="ident">C1</span>, <span class="ident">C3</span><span class="op">&gt;</span> {
-                <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">shape</span>(), <span class="ident">a</span>.<span class="ident">shape</span>(), <span class="string">&quot;Componentwise mul/div: mismatched matrix dimensions.&quot;</span>);
-                <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">shape</span>(), <span class="ident">b</span>.<span class="ident">shape</span>(), <span class="string">&quot;Componentwise mul/div: mismatched matrix dimensions.&quot;</span>);
+                <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="ident">shape</span>(), <span class="ident">a</span>.<span class="ident">shape</span>(), <span class="string">&quot;Componentwise mul/div: mismatched matrix dimensions.&quot;</span>);
+                <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="ident">shape</span>(), <span class="ident">b</span>.<span class="ident">shape</span>(), <span class="string">&quot;Componentwise mul/div: mismatched matrix dimensions.&quot;</span>);
 
                 <span class="kw">if</span> <span class="ident">beta</span>.<span class="ident">is_zero</span>() {
                     <span class="kw">for</span> <span class="ident">j</span> <span class="kw">in</span> <span class="number">0</span> .. <span class="self">self</span>.<span class="ident">ncols</span>() {
                         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span> .. <span class="self">self</span>.<span class="ident">nrows</span>() {
                             <span class="kw">unsafe</span> {
-                                <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">alpha</span> <span class="op">*</span> <span class="ident">a</span>.<span class="ident">get_unchecked</span>((<span class="ident">i</span>, <span class="ident">j</span>)).<span class="macro-nonterminal">$</span><span class="macro-nonterminal">op</span>(<span class="kw-2">*</span><span class="ident">b</span>.<span class="ident">get_unchecked</span>((<span class="ident">i</span>, <span class="ident">j</span>)));
+                                <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">alpha</span>.<span class="ident">inlined_clone</span>() <span class="op">*</span> <span class="ident">a</span>.<span class="ident">get_unchecked</span>((<span class="ident">i</span>, <span class="ident">j</span>)).<span class="ident">inlined_clone</span>().<span class="macro-nonterminal">$</span><span class="macro-nonterminal">op</span>(<span class="ident">b</span>.<span class="ident">get_unchecked</span>((<span class="ident">i</span>, <span class="ident">j</span>)).<span class="ident">inlined_clone</span>());
                                 <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">get_unchecked_mut</span>((<span class="ident">i</span>, <span class="ident">j</span>)) <span class="op">=</span> <span class="ident">res</span>;
                             }
                         }
@@ -338,8 +368,8 @@
                     <span class="kw">for</span> <span class="ident">j</span> <span class="kw">in</span> <span class="number">0</span> .. <span class="self">self</span>.<span class="ident">ncols</span>() {
                         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span> .. <span class="self">self</span>.<span class="ident">nrows</span>() {
                             <span class="kw">unsafe</span> {
-                                <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">alpha</span> <span class="op">*</span> <span class="ident">a</span>.<span class="ident">get_unchecked</span>((<span class="ident">i</span>, <span class="ident">j</span>)).<span class="macro-nonterminal">$</span><span class="macro-nonterminal">op</span>(<span class="kw-2">*</span><span class="ident">b</span>.<span class="ident">get_unchecked</span>((<span class="ident">i</span>, <span class="ident">j</span>)));
-                                <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">get_unchecked_mut</span>((<span class="ident">i</span>, <span class="ident">j</span>)) <span class="op">=</span> <span class="ident">beta</span> <span class="op">*</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">get_unchecked</span>((<span class="ident">i</span>, <span class="ident">j</span>)) <span class="op">+</span> <span class="ident">res</span>;
+                                <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">alpha</span>.<span class="ident">inlined_clone</span>() <span class="op">*</span> <span class="ident">a</span>.<span class="ident">get_unchecked</span>((<span class="ident">i</span>, <span class="ident">j</span>)).<span class="ident">inlined_clone</span>().<span class="macro-nonterminal">$</span><span class="macro-nonterminal">op</span>(<span class="ident">b</span>.<span class="ident">get_unchecked</span>((<span class="ident">i</span>, <span class="ident">j</span>)).<span class="ident">inlined_clone</span>());
+                                <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">get_unchecked_mut</span>((<span class="ident">i</span>, <span class="ident">j</span>)) <span class="op">=</span> <span class="ident">beta</span>.<span class="ident">inlined_clone</span>() <span class="op">*</span> <span class="self">self</span>.<span class="ident">get_unchecked</span>((<span class="ident">i</span>, <span class="ident">j</span>)).<span class="ident">inlined_clone</span>() <span class="op">+</span> <span class="ident">res</span>;
                             }
                         }
                     }
@@ -355,12 +385,12 @@
                       <span class="ident">SB</span>: <span class="ident">Storage</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">R2</span>, <span class="ident">C2</span><span class="op">&gt;</span>,
                       <span class="ident">ShapeConstraint</span>: <span class="ident">SameNumberOfRows</span><span class="op">&lt;</span><span class="ident">R1</span>, <span class="ident">R2</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">SameNumberOfColumns</span><span class="op">&lt;</span><span class="ident">C1</span>, <span class="ident">C2</span><span class="op">&gt;</span> {
 
-                <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">shape</span>(), <span class="ident">rhs</span>.<span class="ident">shape</span>(), <span class="string">&quot;Componentwise mul/div: mismatched matrix dimensions.&quot;</span>);
+                <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="ident">shape</span>(), <span class="ident">rhs</span>.<span class="ident">shape</span>(), <span class="string">&quot;Componentwise mul/div: mismatched matrix dimensions.&quot;</span>);
 
                 <span class="kw">for</span> <span class="ident">j</span> <span class="kw">in</span> <span class="number">0</span> .. <span class="self">self</span>.<span class="ident">ncols</span>() {
                     <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span> .. <span class="self">self</span>.<span class="ident">nrows</span>() {
                         <span class="kw">unsafe</span> {
-                            <span class="self">self</span>.<span class="ident">get_unchecked_mut</span>((<span class="ident">i</span>, <span class="ident">j</span>)).<span class="macro-nonterminal">$</span><span class="macro-nonterminal">op_assign</span>(<span class="kw-2">*</span><span class="ident">rhs</span>.<span class="ident">get_unchecked</span>((<span class="ident">i</span>, <span class="ident">j</span>)));
+                            <span class="self">self</span>.<span class="ident">get_unchecked_mut</span>((<span class="ident">i</span>, <span class="ident">j</span>)).<span class="macro-nonterminal">$</span><span class="macro-nonterminal">op_assign</span>(<span class="ident">rhs</span>.<span class="ident">get_unchecked</span>((<span class="ident">i</span>, <span class="ident">j</span>)).<span class="ident">inlined_clone</span>());
                         }
                     }
                 }
@@ -381,7 +411,7 @@
     )<span class="kw-2">*</span>}
 );
 
-<span class="macro">component_binop_impl</span><span class="macro">!</span>(
+<span class="macro">component_binop_impl!</span>(
     <span class="ident">component_mul</span>, <span class="ident">component_mul_mut</span>, <span class="ident">component_mul_assign</span>, <span class="ident">cmpy</span>, <span class="ident">ClosedMul</span>.<span class="ident">mul</span>.<span class="ident">mul_assign</span>,
     <span class="string">r&quot;
     Componentwise matrix or vector multiplication.
@@ -474,5 +504,34 @@
     &quot;</span>;
     <span class="comment">// FIXME: add other operators like bitshift, etc. ?</span>
 );
+
+<span class="comment">/*
+ * inf/sup
+ */</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">R</span>: <span class="ident">Dim</span>, <span class="ident">C</span>: <span class="ident">Dim</span>, <span class="ident">S</span>: <span class="ident">Storage</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">R</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Matrix</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">R</span>, <span class="ident">C</span>, <span class="ident">S</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">N</span>: <span class="ident">Scalar</span> <span class="op">+</span> <span class="ident">SimdPartialOrd</span>,
+    <span class="ident">DefaultAllocator</span>: <span class="ident">Allocator</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">R</span>, <span class="ident">C</span><span class="op">&gt;</span>,
+{
+    <span class="doccomment">/// Computes the infimum (aka. componentwise min) of two matrices/vectors.</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inf</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MatrixMN</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">R</span>, <span class="ident">C</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">zip_map</span>(<span class="ident">other</span>, <span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">simd_min</span>(<span class="ident">b</span>))
+    }
+
+    <span class="doccomment">/// Computes the supremum (aka. componentwise max) of two matrices/vectors.</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sup</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MatrixMN</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">R</span>, <span class="ident">C</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">zip_map</span>(<span class="ident">other</span>, <span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">simd_max</span>(<span class="ident">b</span>))
+    }
+
+    <span class="doccomment">/// Computes the (infimum, supremum) of two matrices/vectors.</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inf_sup</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">MatrixMN</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">R</span>, <span class="ident">C</span><span class="op">&gt;</span>, <span class="ident">MatrixMN</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">R</span>, <span class="ident">C</span><span class="op">&gt;</span>) {
+        <span class="comment">// FIXME: can this be optimized?</span>
+        (<span class="self">self</span>.<span class="ident">inf</span>(<span class="ident">other</span>), <span class="self">self</span>.<span class="ident">sup</span>(<span class="ident">other</span>))
+    }
+}
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "nalgebra";</script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="nalgebra" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
+    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script></body></html>

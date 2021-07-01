@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sc-finality-grandpa-0.8.0/src/observer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>observer.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sc-finality-grandpa-0.9.0/src/observer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>observer.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../sc_finality_grandpa/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../sc_finality_grandpa/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -458,15 +458,10 @@
 <span id="455">455</span>
 <span id="456">456</span>
 <span id="457">457</span>
-<span id="458">458</span>
-<span id="459">459</span>
-<span id="460">460</span>
-<span id="461">461</span>
-<span id="462">462</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// This file is part of Substrate.</span>
 
-<span class="comment">// Copyright (C) 2018-2020 Parity Technologies (UK) Ltd.</span>
+<span class="comment">// Copyright (C) 2018-2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// SPDX-License-Identifier: GPL-3.0-or-later WITH Classpath-exception-2.0</span>
 
 <span class="comment">// This program is free software: you can redistribute it and/or modify</span>
@@ -482,50 +477,49 @@
 <span class="comment">// You should have received a copy of the GNU General Public License</span>
 <span class="comment">// along with this program. If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">pin</span>::<span class="ident">Pin</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Arc</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
+<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
+<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
 
-<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">futures::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="kw">use</span> <span class="ident">finality_grandpa</span>::{
-	<span class="ident">BlockNumberOps</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">GrandpaError</span>, <span class="ident">voter</span>, <span class="ident">voter_set</span>::<span class="ident">VoterSet</span>
+	<span class="ident">BlockNumberOps</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">GrandpaError</span>, <span class="ident">voter</span>, <span class="ident">voter_set::VoterSet</span>
 };
 <span class="kw">use</span> <span class="ident">log</span>::{<span class="ident">debug</span>, <span class="ident">info</span>, <span class="ident">warn</span>};
-<span class="kw">use</span> <span class="ident">sp_core</span>::<span class="ident">traits</span>::<span class="ident">BareCryptoStorePtr</span>;
-<span class="kw">use</span> <span class="ident">sp_consensus</span>::<span class="ident">SelectChain</span>;
-<span class="kw">use</span> <span class="ident">sc_client_api</span>::<span class="ident">backend</span>::<span class="ident">Backend</span>;
-<span class="kw">use</span> <span class="ident">sp_utils</span>::<span class="ident">mpsc</span>::<span class="ident">TracingUnboundedReceiver</span>;
-<span class="kw">use</span> <span class="ident">sp_runtime</span>::<span class="ident">traits</span>::{<span class="ident">NumberFor</span>, <span class="ident">Block</span> <span class="kw">as</span> <span class="ident">BlockT</span>};
-<span class="kw">use</span> <span class="ident">sp_blockchain</span>::<span class="ident">HeaderMetadata</span>;
+<span class="kw">use</span> <span class="ident">sp_keystore::SyncCryptoStorePtr</span>;
+<span class="kw">use</span> <span class="ident">sp_consensus::SelectChain</span>;
+<span class="kw">use</span> <span class="ident">sc_client_api::backend::Backend</span>;
+<span class="kw">use</span> <span class="ident">sp_utils::mpsc::TracingUnboundedReceiver</span>;
+<span class="kw">use</span> <span class="ident">sp_runtime::traits</span>::{<span class="ident">NumberFor</span>, <span class="ident">Block</span> <span class="kw">as</span> <span class="ident">BlockT</span>};
+<span class="kw">use</span> <span class="ident">sp_blockchain::HeaderMetadata</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
 	<span class="ident">global_communication</span>, <span class="ident">CommandOrError</span>, <span class="ident">CommunicationIn</span>, <span class="ident">Config</span>, <span class="ident">environment</span>,
-	<span class="ident">LinkHalf</span>, <span class="ident">Error</span>, <span class="ident">aux_schema</span>::<span class="ident">PersistentData</span>, <span class="ident">VoterCommand</span>, <span class="ident">VoterSetState</span>,
+	<span class="ident">LinkHalf</span>, <span class="ident">Error</span>, <span class="ident">aux_schema::PersistentData</span>, <span class="ident">VoterCommand</span>, <span class="ident">VoterSetState</span>,
 };
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">authorities</span>::<span class="ident">SharedAuthoritySet</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">communication</span>::{<span class="ident">Network</span> <span class="kw">as</span> <span class="ident">NetworkT</span>, <span class="ident">NetworkBridge</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">consensus_changes</span>::<span class="ident">SharedConsensusChanges</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">notification</span>::<span class="ident">GrandpaJustificationSender</span>;
-<span class="kw">use</span> <span class="ident">sp_finality_grandpa</span>::<span class="ident">AuthorityId</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">marker</span>::{<span class="ident">PhantomData</span>, <span class="ident">Unpin</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::authorities::SharedAuthoritySet</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::communication</span>::{<span class="ident">Network</span> <span class="kw">as</span> <span class="ident">NetworkT</span>, <span class="ident">NetworkBridge</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::notification::GrandpaJustificationSender</span>;
+<span class="kw">use</span> <span class="ident">sp_finality_grandpa::AuthorityId</span>;
+<span class="kw">use</span> <span class="ident">std::marker</span>::{<span class="ident">PhantomData</span>, <span class="ident">Unpin</span>};
 
 <span class="kw">struct</span> <span class="ident">ObserverChain</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Block</span>: <span class="ident">BlockT</span>, <span class="ident">Client</span><span class="op">&gt;</span> {
 	<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Client</span><span class="op">&gt;</span>,
 	<span class="ident">_phantom</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Block</span>, <span class="ident">Client</span><span class="op">&gt;</span> <span class="ident">finality_grandpa</span>::<span class="ident">Chain</span><span class="op">&lt;</span><span class="ident">Block</span>::<span class="ident">Hash</span>, <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Block</span>, <span class="ident">Client</span><span class="op">&gt;</span> <span class="ident">finality_grandpa::Chain</span><span class="op">&lt;</span><span class="ident">Block::Hash</span>, <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="op">&gt;</span>
 	<span class="kw">for</span> <span class="ident">ObserverChain</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Block</span>, <span class="ident">Client</span><span class="op">&gt;</span> <span class="kw">where</span>
 		<span class="ident">Block</span>: <span class="ident">BlockT</span>,
-		<span class="ident">Client</span>: <span class="ident">HeaderMetadata</span><span class="op">&lt;</span><span class="ident">Block</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">sp_blockchain</span>::<span class="ident">Error</span><span class="op">&gt;</span>,
+		<span class="ident">Client</span>: <span class="ident">HeaderMetadata</span><span class="op">&lt;</span><span class="ident">Block</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">sp_blockchain::Error</span><span class="op">&gt;</span>,
 		<span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>: <span class="ident">BlockNumberOps</span>,
 {
-	<span class="kw">fn</span> <span class="ident">ancestry</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">base</span>: <span class="ident">Block</span>::<span class="ident">Hash</span>, <span class="ident">block</span>: <span class="ident">Block</span>::<span class="ident">Hash</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Block</span>::<span class="ident">Hash</span><span class="op">&gt;</span>, <span class="ident">GrandpaError</span><span class="op">&gt;</span> {
-		<span class="ident">environment</span>::<span class="ident">ancestry</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">client</span>, <span class="ident">base</span>, <span class="ident">block</span>)
+	<span class="kw">fn</span> <span class="ident">ancestry</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">base</span>: <span class="ident">Block::Hash</span>, <span class="ident">block</span>: <span class="ident">Block::Hash</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Block::Hash</span><span class="op">&gt;</span>, <span class="ident">GrandpaError</span><span class="op">&gt;</span> {
+		<span class="ident">environment::ancestry</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">client</span>, <span class="ident">base</span>, <span class="ident">block</span>)
 	}
 
-	<span class="kw">fn</span> <span class="ident">best_chain_containing</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_block</span>: <span class="ident">Block</span>::<span class="ident">Hash</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">Block</span>::<span class="ident">Hash</span>, <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">best_chain_containing</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_block</span>: <span class="ident">Block::Hash</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">Block::Hash</span>, <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
 		<span class="comment">// only used by voter</span>
 		<span class="prelude-val">None</span>
 	}
@@ -533,52 +527,50 @@
 
 <span class="kw">fn</span> <span class="ident">grandpa_observer</span><span class="op">&lt;</span><span class="ident">BE</span>, <span class="ident">Block</span>: <span class="ident">BlockT</span>, <span class="ident">Client</span>, <span class="ident">S</span>, <span class="ident">F</span><span class="op">&gt;</span>(
 	<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Client</span><span class="op">&gt;</span>,
-	<span class="ident">authority_set</span>: <span class="kw-2">&amp;</span><span class="ident">SharedAuthoritySet</span><span class="op">&lt;</span><span class="ident">Block</span>::<span class="ident">Hash</span>, <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-	<span class="ident">consensus_changes</span>: <span class="kw-2">&amp;</span><span class="ident">SharedConsensusChanges</span><span class="op">&lt;</span><span class="ident">Block</span>::<span class="ident">Hash</span>, <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+	<span class="ident">authority_set</span>: <span class="kw-2">&amp;</span><span class="ident">SharedAuthoritySet</span><span class="op">&lt;</span><span class="ident">Block::Hash</span>, <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 	<span class="ident">voters</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">VoterSet</span><span class="op">&lt;</span><span class="ident">AuthorityId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 	<span class="ident">justification_sender</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GrandpaJustificationSender</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 	<span class="ident">last_finalized_number</span>: <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>,
 	<span class="ident">commits</span>: <span class="ident">S</span>,
 	<span class="ident">note_round</span>: <span class="ident">F</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">CommandOrError</span><span class="op">&lt;</span><span class="ident">Block</span>::<span class="ident">Hash</span>, <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>
+) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">CommandOrError</span><span class="op">&lt;</span><span class="ident">Block::Hash</span>, <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>: <span class="ident">BlockNumberOps</span>,
-	<span class="ident">S</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommunicationIn</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>, <span class="ident">CommandOrError</span><span class="op">&lt;</span><span class="ident">Block</span>::<span class="ident">Hash</span>, <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+	<span class="ident">S</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommunicationIn</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>, <span class="ident">CommandOrError</span><span class="op">&lt;</span><span class="ident">Block::Hash</span>, <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 	<span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">u64</span>),
 	<span class="ident">BE</span>: <span class="ident">Backend</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>,
-	<span class="ident">Client</span>: <span class="kw">crate</span>::<span class="ident">ClientForGrandpa</span><span class="op">&lt;</span><span class="ident">Block</span>, <span class="ident">BE</span><span class="op">&gt;</span>,
+	<span class="ident">Client</span>: <span class="kw">crate</span><span class="ident">::ClientForGrandpa</span><span class="op">&lt;</span><span class="ident">Block</span>, <span class="ident">BE</span><span class="op">&gt;</span>,
 {
 	<span class="kw">let</span> <span class="ident">authority_set</span> <span class="op">=</span> <span class="ident">authority_set</span>.<span class="ident">clone</span>();
-	<span class="kw">let</span> <span class="ident">consensus_changes</span> <span class="op">=</span> <span class="ident">consensus_changes</span>.<span class="ident">clone</span>();
 	<span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">clone</span>();
 	<span class="kw">let</span> <span class="ident">voters</span> <span class="op">=</span> <span class="ident">voters</span>.<span class="ident">clone</span>();
 	<span class="kw">let</span> <span class="ident">justification_sender</span> <span class="op">=</span> <span class="ident">justification_sender</span>.<span class="ident">clone</span>();
 
 	<span class="kw">let</span> <span class="ident">observer</span> <span class="op">=</span> <span class="ident">commits</span>.<span class="ident">try_fold</span>(<span class="ident">last_finalized_number</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">last_finalized_number</span>, <span class="ident">global</span><span class="op">|</span> {
 		<span class="kw">let</span> (<span class="ident">round</span>, <span class="ident">commit</span>, <span class="ident">callback</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">global</span> {
-			<span class="ident">voter</span>::<span class="ident">CommunicationIn</span>::<span class="ident">Commit</span>(<span class="ident">round</span>, <span class="ident">commit</span>, <span class="ident">callback</span>) <span class="op">=</span><span class="op">&gt;</span> {
-				<span class="kw">let</span> <span class="ident">commit</span> <span class="op">=</span> <span class="ident">finality_grandpa</span>::<span class="ident">Commit</span>::<span class="ident">from</span>(<span class="ident">commit</span>);
+			<span class="ident">voter::CommunicationIn::Commit</span>(<span class="ident">round</span>, <span class="ident">commit</span>, <span class="ident">callback</span>) <span class="op">=</span><span class="op">&gt;</span> {
+				<span class="kw">let</span> <span class="ident">commit</span> <span class="op">=</span> <span class="ident">finality_grandpa::Commit::from</span>(<span class="ident">commit</span>);
 				(<span class="ident">round</span>, <span class="ident">commit</span>, <span class="ident">callback</span>)
 			},
-			<span class="ident">voter</span>::<span class="ident">CommunicationIn</span>::<span class="ident">CatchUp</span>(..) <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="ident">voter::CommunicationIn::CatchUp</span>(..) <span class="op">=</span><span class="op">&gt;</span> {
 				<span class="comment">// ignore catch up messages</span>
-				<span class="kw">return</span> <span class="ident">future</span>::<span class="ident">ok</span>(<span class="ident">last_finalized_number</span>);
+				<span class="kw">return</span> <span class="ident">future::ok</span>(<span class="ident">last_finalized_number</span>);
 			},
 		};
 
 		<span class="comment">// if the commit we&#39;ve received targets a block lower or equal to the last</span>
 		<span class="comment">// finalized, ignore it and continue with the current state</span>
 		<span class="kw">if</span> <span class="ident">commit</span>.<span class="ident">target_number</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">last_finalized_number</span> {
-			<span class="kw">return</span> <span class="ident">future</span>::<span class="ident">ok</span>(<span class="ident">last_finalized_number</span>);
+			<span class="kw">return</span> <span class="ident">future::ok</span>(<span class="ident">last_finalized_number</span>);
 		}
 
-		<span class="kw">let</span> <span class="ident">validation_result</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">finality_grandpa</span>::<span class="ident">validate_commit</span>(
+		<span class="kw">let</span> <span class="ident">validation_result</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">finality_grandpa::validate_commit</span>(
 			<span class="kw-2">&amp;</span><span class="ident">commit</span>,
 			<span class="kw-2">&amp;</span><span class="ident">voters</span>,
 			<span class="kw-2">&amp;</span><span class="ident">ObserverChain</span> { <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">client</span>, <span class="ident">_phantom</span>: <span class="ident">PhantomData</span> },
 		) {
 			<span class="prelude-val">Ok</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
-			<span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">future</span>::<span class="ident">err</span>(<span class="ident">e</span>.<span class="ident">into</span>()),
+			<span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">future::err</span>(<span class="ident">e</span>.<span class="ident">into</span>()),
 		};
 
 		<span class="kw">if</span> <span class="ident">validation_result</span>.<span class="ident">ghost</span>().<span class="ident">is_some</span>() {
@@ -586,10 +578,9 @@
 			<span class="kw">let</span> <span class="ident">finalized_number</span> <span class="op">=</span> <span class="ident">commit</span>.<span class="ident">target_number</span>;
 
 			<span class="comment">// commit is valid, finalize the block it targets</span>
-			<span class="kw">match</span> <span class="ident">environment</span>::<span class="ident">finalize_block</span>(
+			<span class="kw">match</span> <span class="ident">environment::finalize_block</span>(
 				<span class="ident">client</span>.<span class="ident">clone</span>(),
 				<span class="kw-2">&amp;</span><span class="ident">authority_set</span>,
-				<span class="kw-2">&amp;</span><span class="ident">consensus_changes</span>,
 				<span class="prelude-val">None</span>,
 				<span class="ident">finalized_hash</span>,
 				<span class="ident">finalized_number</span>,
@@ -598,24 +589,24 @@
 				<span class="ident">justification_sender</span>.<span class="ident">as_ref</span>(),
 			) {
 				<span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {},
-				<span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">future</span>::<span class="ident">err</span>(<span class="ident">e</span>),
+				<span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">future::err</span>(<span class="ident">e</span>),
 			};
 
 			<span class="comment">// note that we&#39;ve observed completion of this round through the commit,</span>
 			<span class="comment">// and that implies that the next round has started.</span>
 			<span class="ident">note_round</span>(<span class="ident">round</span> <span class="op">+</span> <span class="number">1</span>);
 
-			<span class="ident">finality_grandpa</span>::<span class="ident">process_commit_validation_result</span>(<span class="ident">validation_result</span>, <span class="ident">callback</span>);
+			<span class="ident">finality_grandpa::process_commit_validation_result</span>(<span class="ident">validation_result</span>, <span class="ident">callback</span>);
 
 			<span class="comment">// proceed processing with new finalized block number</span>
-			<span class="ident">future</span>::<span class="ident">ok</span>(<span class="ident">finalized_number</span>)
+			<span class="ident">future::ok</span>(<span class="ident">finalized_number</span>)
 		} <span class="kw">else</span> {
-			<span class="macro">debug</span><span class="macro">!</span>(<span class="ident">target</span>: <span class="string">&quot;afg&quot;</span>, <span class="string">&quot;Received invalid commit: ({:?}, {:?})&quot;</span>, <span class="ident">round</span>, <span class="ident">commit</span>);
+			<span class="macro">debug!</span>(<span class="ident">target</span>: <span class="string">&quot;afg&quot;</span>, <span class="string">&quot;Received invalid commit: ({:?}, {:?})&quot;</span>, <span class="ident">round</span>, <span class="ident">commit</span>);
 
-			<span class="ident">finality_grandpa</span>::<span class="ident">process_commit_validation_result</span>(<span class="ident">validation_result</span>, <span class="ident">callback</span>);
+			<span class="ident">finality_grandpa::process_commit_validation_result</span>(<span class="ident">validation_result</span>, <span class="ident">callback</span>);
 
 			<span class="comment">// commit is invalid, continue processing commits with the current state</span>
-			<span class="ident">future</span>::<span class="ident">ok</span>(<span class="ident">last_finalized_number</span>)
+			<span class="ident">future::ok</span>(<span class="ident">last_finalized_number</span>)
 		}
 	});
 
@@ -633,13 +624,13 @@
 	<span class="ident">config</span>: <span class="ident">Config</span>,
 	<span class="ident">link</span>: <span class="ident">LinkHalf</span><span class="op">&lt;</span><span class="ident">Block</span>, <span class="ident">Client</span>, <span class="ident">SC</span><span class="op">&gt;</span>,
 	<span class="ident">network</span>: <span class="ident">N</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sp_blockchain</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> ()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>
+) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sp_blockchain::Result</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> ()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">BE</span>: <span class="ident">Backend</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 	<span class="ident">N</span>: <span class="ident">NetworkT</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 	<span class="ident">SC</span>: <span class="ident">SelectChain</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 	<span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>: <span class="ident">BlockNumberOps</span>,
-	<span class="ident">Client</span>: <span class="kw">crate</span>::<span class="ident">ClientForGrandpa</span><span class="op">&lt;</span><span class="ident">Block</span>, <span class="ident">BE</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+	<span class="ident">Client</span>: <span class="kw">crate</span><span class="ident">::ClientForGrandpa</span><span class="op">&lt;</span><span class="ident">Block</span>, <span class="ident">BE</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 {
 	<span class="kw">let</span> <span class="ident">LinkHalf</span> {
 		<span class="ident">client</span>,
@@ -650,14 +641,14 @@
 		..
 	} <span class="op">=</span> <span class="ident">link</span>;
 
-	<span class="kw">let</span> <span class="ident">network</span> <span class="op">=</span> <span class="ident">NetworkBridge</span>::<span class="ident">new</span>(
+	<span class="kw">let</span> <span class="ident">network</span> <span class="op">=</span> <span class="ident">NetworkBridge::new</span>(
 		<span class="ident">network</span>,
 		<span class="ident">config</span>.<span class="ident">clone</span>(),
 		<span class="ident">persistent_data</span>.<span class="ident">set_state</span>.<span class="ident">clone</span>(),
 		<span class="prelude-val">None</span>,
 	);
 
-	<span class="kw">let</span> <span class="ident">observer_work</span> <span class="op">=</span> <span class="ident">ObserverWork</span>::<span class="ident">new</span>(
+	<span class="kw">let</span> <span class="ident">observer_work</span> <span class="op">=</span> <span class="ident">ObserverWork::new</span>(
 		<span class="ident">client</span>,
 		<span class="ident">network</span>,
 		<span class="ident">persistent_data</span>,
@@ -669,7 +660,7 @@
 	<span class="kw">let</span> <span class="ident">observer_work</span> <span class="op">=</span> <span class="ident">observer_work</span>
 		.<span class="ident">map_ok</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
 		.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
-			<span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;GRANDPA Observer failed: {:?}&quot;</span>, <span class="ident">e</span>);
+			<span class="macro">warn!</span>(<span class="string">&quot;GRANDPA Observer failed: {:?}&quot;</span>, <span class="ident">e</span>);
 		});
 
 	<span class="prelude-val">Ok</span>(<span class="ident">observer_work</span>.<span class="ident">map</span>(<span class="ident">drop</span>))
@@ -678,12 +669,12 @@
 <span class="doccomment">/// Future that powers the observer.</span>
 <span class="attribute">#[<span class="ident">must_use</span>]</span>
 <span class="kw">struct</span> <span class="ident">ObserverWork</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">BlockT</span>, <span class="ident">BE</span>, <span class="ident">Client</span>, <span class="ident">N</span>: <span class="ident">NetworkT</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-	<span class="ident">observer</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">CommandOrError</span><span class="op">&lt;</span><span class="ident">B</span>::<span class="ident">Hash</span>, <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+	<span class="ident">observer</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">CommandOrError</span><span class="op">&lt;</span><span class="ident">B::Hash</span>, <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 	<span class="ident">client</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Client</span><span class="op">&gt;</span>,
 	<span class="ident">network</span>: <span class="ident">NetworkBridge</span><span class="op">&lt;</span><span class="ident">B</span>, <span class="ident">N</span><span class="op">&gt;</span>,
 	<span class="ident">persistent_data</span>: <span class="ident">PersistentData</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
-	<span class="ident">keystore</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BareCryptoStorePtr</span><span class="op">&gt;</span>,
-	<span class="ident">voter_commands_rx</span>: <span class="ident">TracingUnboundedReceiver</span><span class="op">&lt;</span><span class="ident">VoterCommand</span><span class="op">&lt;</span><span class="ident">B</span>::<span class="ident">Hash</span>, <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+	<span class="ident">keystore</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SyncCryptoStorePtr</span><span class="op">&gt;</span>,
+	<span class="ident">voter_commands_rx</span>: <span class="ident">TracingUnboundedReceiver</span><span class="op">&lt;</span><span class="ident">VoterCommand</span><span class="op">&lt;</span><span class="ident">B::Hash</span>, <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 	<span class="ident">justification_sender</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GrandpaJustificationSender</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 	<span class="ident">_phantom</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">BE</span><span class="op">&gt;</span>,
 }
@@ -692,7 +683,7 @@
 <span class="kw">where</span>
 	<span class="ident">B</span>: <span class="ident">BlockT</span>,
 	<span class="ident">BE</span>: <span class="ident">Backend</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-	<span class="ident">Client</span>: <span class="kw">crate</span>::<span class="ident">ClientForGrandpa</span><span class="op">&lt;</span><span class="ident">B</span>, <span class="ident">BE</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+	<span class="ident">Client</span>: <span class="kw">crate</span><span class="ident">::ClientForGrandpa</span><span class="op">&lt;</span><span class="ident">B</span>, <span class="ident">BE</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 	<span class="ident">Network</span>: <span class="ident">NetworkT</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
 	<span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>: <span class="ident">BlockNumberOps</span>,
 {
@@ -700,15 +691,15 @@
 		<span class="ident">client</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Client</span><span class="op">&gt;</span>,
 		<span class="ident">network</span>: <span class="ident">NetworkBridge</span><span class="op">&lt;</span><span class="ident">B</span>, <span class="ident">Network</span><span class="op">&gt;</span>,
 		<span class="ident">persistent_data</span>: <span class="ident">PersistentData</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
-		<span class="ident">keystore</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BareCryptoStorePtr</span><span class="op">&gt;</span>,
-		<span class="ident">voter_commands_rx</span>: <span class="ident">TracingUnboundedReceiver</span><span class="op">&lt;</span><span class="ident">VoterCommand</span><span class="op">&lt;</span><span class="ident">B</span>::<span class="ident">Hash</span>, <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+		<span class="ident">keystore</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SyncCryptoStorePtr</span><span class="op">&gt;</span>,
+		<span class="ident">voter_commands_rx</span>: <span class="ident">TracingUnboundedReceiver</span><span class="op">&lt;</span><span class="ident">VoterCommand</span><span class="op">&lt;</span><span class="ident">B::Hash</span>, <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 		<span class="ident">justification_sender</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GrandpaJustificationSender</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
 
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">work</span> <span class="op">=</span> <span class="ident">ObserverWork</span> {
 			<span class="comment">// `observer` is set to a temporary value and replaced below when</span>
 			<span class="comment">// calling `rebuild_observer`.</span>
-			<span class="ident">observer</span>: <span class="ident">Box</span>::<span class="ident">pin</span>(<span class="ident">future</span>::<span class="ident">pending</span>()) <span class="kw">as</span> <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+			<span class="ident">observer</span>: <span class="ident">Box::pin</span>(<span class="ident">future::pending</span>()) <span class="kw">as</span> <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 			<span class="ident">client</span>,
 			<span class="ident">network</span>,
 			<span class="ident">persistent_data</span>,
@@ -726,7 +717,7 @@
 	<span class="doccomment">/// has changed (e.g. as signalled by a voter command).</span>
 	<span class="kw">fn</span> <span class="ident">rebuild_observer</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
 		<span class="kw">let</span> <span class="ident">set_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">persistent_data</span>.<span class="ident">authority_set</span>.<span class="ident">set_id</span>();
-		<span class="kw">let</span> <span class="ident">voters</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">persistent_data</span>.<span class="ident">authority_set</span>.<span class="ident">current_authorities</span>());
+		<span class="kw">let</span> <span class="ident">voters</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="self">self</span>.<span class="ident">persistent_data</span>.<span class="ident">authority_set</span>.<span class="ident">current_authorities</span>());
 
 		<span class="comment">// start global communication stream for the current set</span>
 		<span class="kw">let</span> (<span class="ident">global_in</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">global_communication</span>(
@@ -749,8 +740,8 @@
 			<span class="kw">let</span> <span class="ident">voters</span> <span class="op">=</span> <span class="ident">voters</span>.<span class="ident">clone</span>();
 
 			<span class="kw">move</span> <span class="op">|</span><span class="ident">round</span><span class="op">|</span> <span class="ident">network</span>.<span class="ident">note_round</span>(
-				<span class="kw">crate</span>::<span class="ident">communication</span>::<span class="ident">Round</span>(<span class="ident">round</span>),
-				<span class="kw">crate</span>::<span class="ident">communication</span>::<span class="ident">SetId</span>(<span class="ident">set_id</span>),
+				<span class="kw">crate</span><span class="ident">::communication::Round</span>(<span class="ident">round</span>),
+				<span class="kw">crate</span><span class="ident">::communication::SetId</span>(<span class="ident">set_id</span>),
 				<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">voters</span>,
 			)
 		};
@@ -759,7 +750,6 @@
 		<span class="kw">let</span> <span class="ident">observer</span> <span class="op">=</span> <span class="ident">grandpa_observer</span>(
 			<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">client</span>,
 			<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">persistent_data</span>.<span class="ident">authority_set</span>,
-			<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">persistent_data</span>.<span class="ident">consensus_changes</span>,
 			<span class="kw-2">&amp;</span><span class="ident">voters</span>,
 			<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">justification_sender</span>,
 			<span class="ident">last_finalized_number</span>,
@@ -767,36 +757,36 @@
 			<span class="ident">note_round</span>,
 		);
 
-		<span class="self">self</span>.<span class="ident">observer</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="ident">pin</span>(<span class="ident">observer</span>);
+		<span class="self">self</span>.<span class="ident">observer</span> <span class="op">=</span> <span class="ident">Box::pin</span>(<span class="ident">observer</span>);
 	}
 
 	<span class="kw">fn</span> <span class="ident">handle_voter_command</span>(
 		<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-		<span class="ident">command</span>: <span class="ident">VoterCommand</span><span class="op">&lt;</span><span class="ident">B</span>::<span class="ident">Hash</span>, <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+		<span class="ident">command</span>: <span class="ident">VoterCommand</span><span class="op">&lt;</span><span class="ident">B::Hash</span>, <span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
 		<span class="comment">// the observer doesn&#39;t use the voter set state, but we need to</span>
 		<span class="comment">// update it on-disk in case we restart as validator in the future.</span>
 		<span class="self">self</span>.<span class="ident">persistent_data</span>.<span class="ident">set_state</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">command</span> {
-			<span class="ident">VoterCommand</span>::<span class="ident">Pause</span>(<span class="ident">reason</span>) <span class="op">=</span><span class="op">&gt;</span> {
-				<span class="macro">info</span><span class="macro">!</span>(<span class="ident">target</span>: <span class="string">&quot;afg&quot;</span>, <span class="string">&quot;Pausing old validator set: {}&quot;</span>, <span class="ident">reason</span>);
+			<span class="ident">VoterCommand::Pause</span>(<span class="ident">reason</span>) <span class="op">=</span><span class="op">&gt;</span> {
+				<span class="macro">info!</span>(<span class="ident">target</span>: <span class="string">&quot;afg&quot;</span>, <span class="string">&quot;Pausing old validator set: {}&quot;</span>, <span class="ident">reason</span>);
 
 				<span class="kw">let</span> <span class="ident">completed_rounds</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">persistent_data</span>.<span class="ident">set_state</span>.<span class="ident">read</span>().<span class="ident">completed_rounds</span>();
-				<span class="kw">let</span> <span class="ident">set_state</span> <span class="op">=</span> <span class="ident">VoterSetState</span>::<span class="ident">Paused</span> { <span class="ident">completed_rounds</span> };
+				<span class="kw">let</span> <span class="ident">set_state</span> <span class="op">=</span> <span class="ident">VoterSetState::Paused</span> { <span class="ident">completed_rounds</span> };
 
-				<span class="kw">crate</span>::<span class="ident">aux_schema</span>::<span class="ident">write_voter_set_state</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">client</span>, <span class="kw-2">&amp;</span><span class="ident">set_state</span>)<span class="question-mark">?</span>;
+				<span class="kw">crate</span><span class="ident">::aux_schema::write_voter_set_state</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">client</span>, <span class="kw-2">&amp;</span><span class="ident">set_state</span>)<span class="question-mark">?</span>;
 
 				<span class="ident">set_state</span>
 			},
-			<span class="ident">VoterCommand</span>::<span class="ident">ChangeAuthorities</span>(<span class="ident">new</span>) <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="ident">VoterCommand::ChangeAuthorities</span>(<span class="ident">new</span>) <span class="op">=</span><span class="op">&gt;</span> {
 				<span class="comment">// start the new authority set using the block where the</span>
 				<span class="comment">// set changed (not where the signal happened!) as the base.</span>
-				<span class="kw">let</span> <span class="ident">set_state</span> <span class="op">=</span> <span class="ident">VoterSetState</span>::<span class="ident">live</span>(
+				<span class="kw">let</span> <span class="ident">set_state</span> <span class="op">=</span> <span class="ident">VoterSetState::live</span>(
 					<span class="ident">new</span>.<span class="ident">set_id</span>,
 					<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">persistent_data</span>.<span class="ident">authority_set</span>.<span class="ident">inner</span>().<span class="ident">read</span>(),
 					(<span class="ident">new</span>.<span class="ident">canon_hash</span>, <span class="ident">new</span>.<span class="ident">canon_number</span>),
 				);
 
-				<span class="kw">crate</span>::<span class="ident">aux_schema</span>::<span class="ident">write_voter_set_state</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">client</span>, <span class="kw-2">&amp;</span><span class="ident">set_state</span>)<span class="question-mark">?</span>;
+				<span class="kw">crate</span><span class="ident">::aux_schema::write_voter_set_state</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">client</span>, <span class="kw-2">&amp;</span><span class="ident">set_state</span>)<span class="question-mark">?</span>;
 
 				<span class="ident">set_state</span>
 			},
@@ -811,44 +801,44 @@
 <span class="kw">where</span>
 	<span class="ident">B</span>: <span class="ident">BlockT</span>,
 	<span class="ident">BE</span>: <span class="ident">Backend</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-	<span class="ident">C</span>: <span class="kw">crate</span>::<span class="ident">ClientForGrandpa</span><span class="op">&lt;</span><span class="ident">B</span>, <span class="ident">BE</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+	<span class="ident">C</span>: <span class="kw">crate</span><span class="ident">::ClientForGrandpa</span><span class="op">&lt;</span><span class="ident">B</span>, <span class="ident">BE</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 	<span class="ident">N</span>: <span class="ident">NetworkT</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
 	<span class="ident">NumberFor</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>: <span class="ident">BlockNumberOps</span>,
 {
 	<span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>;
 
-	<span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Output</span><span class="op">&gt;</span> {
-		<span class="kw">match</span> <span class="ident">Future</span>::<span class="ident">poll</span>(<span class="ident">Pin</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">observer</span>), <span class="ident">cx</span>) {
-			<span class="ident">Poll</span>::<span class="ident">Pending</span> <span class="op">=</span><span class="op">&gt;</span> {}
-			<span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="prelude-val">Ok</span>(())) <span class="op">=</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span><span class="op">&gt;</span> {
+		<span class="kw">match</span> <span class="ident">Future::poll</span>(<span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">observer</span>), <span class="ident">cx</span>) {
+			<span class="ident">Poll::Pending</span> <span class="op">=</span><span class="op">&gt;</span> {}
+			<span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(())) <span class="op">=</span><span class="op">&gt;</span> {
 				<span class="comment">// observer commit stream doesn&#39;t conclude naturally; this could reasonably be an error.</span>
-				<span class="kw">return</span> <span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="prelude-val">Ok</span>(()))
+				<span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
 			}
-			<span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">CommandOrError</span>::<span class="ident">Error</span>(<span class="ident">e</span>))) <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">CommandOrError::Error</span>(<span class="ident">e</span>))) <span class="op">=</span><span class="op">&gt;</span> {
 				<span class="comment">// return inner observer error</span>
-				<span class="kw">return</span> <span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>))
+				<span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>))
 			}
-			<span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">CommandOrError</span>::<span class="ident">VoterCommand</span>(<span class="ident">command</span>))) <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">CommandOrError::VoterCommand</span>(<span class="ident">command</span>))) <span class="op">=</span><span class="op">&gt;</span> {
 				<span class="comment">// some command issued internally</span>
 				<span class="self">self</span>.<span class="ident">handle_voter_command</span>(<span class="ident">command</span>)<span class="question-mark">?</span>;
 				<span class="ident">cx</span>.<span class="ident">waker</span>().<span class="ident">wake_by_ref</span>();
 			}
 		}
 
-		<span class="kw">match</span> <span class="ident">Stream</span>::<span class="ident">poll_next</span>(<span class="ident">Pin</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">voter_commands_rx</span>), <span class="ident">cx</span>) {
-			<span class="ident">Poll</span>::<span class="ident">Pending</span> <span class="op">=</span><span class="op">&gt;</span> {}
-			<span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> {
+		<span class="kw">match</span> <span class="ident">Stream::poll_next</span>(<span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">voter_commands_rx</span>), <span class="ident">cx</span>) {
+			<span class="ident">Poll::Pending</span> <span class="op">=</span><span class="op">&gt;</span> {}
+			<span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> {
 				<span class="comment">// the `voter_commands_rx` stream should never conclude since it&#39;s never closed.</span>
-				<span class="kw">return</span> <span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="prelude-val">Ok</span>(()))
+				<span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
 			}
-			<span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">command</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">command</span>)) <span class="op">=</span><span class="op">&gt;</span> {
 				<span class="comment">// some command issued externally</span>
 				<span class="self">self</span>.<span class="ident">handle_voter_command</span>(<span class="ident">command</span>)<span class="question-mark">?</span>;
 				<span class="ident">cx</span>.<span class="ident">waker</span>().<span class="ident">wake_by_ref</span>();
 			}
 		}
 
-		<span class="ident">Future</span>::<span class="ident">poll</span>(<span class="ident">Pin</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">network</span>), <span class="ident">cx</span>)
+		<span class="ident">Future::poll</span>(<span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">network</span>), <span class="ident">cx</span>)
 	}
 }
 
@@ -856,14 +846,14 @@
 <span class="kw">mod</span> <span class="ident">tests</span> {
 	<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
-	<span class="kw">use</span> <span class="ident">assert_matches</span>::<span class="ident">assert_matches</span>;
-	<span class="kw">use</span> <span class="ident">sp_utils</span>::<span class="ident">mpsc</span>::<span class="ident">tracing_unbounded</span>;
-	<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">aux_schema</span>,	<span class="ident">communication</span>::<span class="ident">tests</span>::{<span class="ident">Event</span>, <span class="ident">make_test_network</span>}};
+	<span class="kw">use</span> <span class="ident">assert_matches::assert_matches</span>;
+	<span class="kw">use</span> <span class="ident">sp_utils::mpsc::tracing_unbounded</span>;
+	<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">aux_schema</span>,	<span class="ident">communication::tests</span>::{<span class="ident">Event</span>, <span class="ident">make_test_network</span>}};
 	<span class="kw">use</span> <span class="ident">substrate_test_runtime_client</span>::{<span class="ident">TestClientBuilder</span>, <span class="ident">TestClientBuilderExt</span>};
-	<span class="kw">use</span> <span class="ident">sc_network</span>::<span class="ident">PeerId</span>;
-	<span class="kw">use</span> <span class="ident">sp_blockchain</span>::<span class="ident">HeaderBackend</span> <span class="kw">as</span> <span class="kw">_</span>;
+	<span class="kw">use</span> <span class="ident">sc_network::PeerId</span>;
+	<span class="kw">use</span> <span class="ident">sp_blockchain::HeaderBackend</span> <span class="kw">as</span> <span class="kw">_</span>;
 
-	<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">executor</span>;
+	<span class="kw">use</span> <span class="ident">futures::executor</span>;
 
 	<span class="doccomment">/// Ensure `Future` implementation of `ObserverWork` is polling its `NetworkBridge`. Regression</span>
 	<span class="doccomment">/// test for bug introduced in d4fbb897c and fixed in b7af8b339.</span>
@@ -877,19 +867,19 @@
 	<span class="kw">fn</span> <span class="ident">observer_work_polls_underlying_network_bridge</span>() {
 		<span class="comment">// Create a test network.</span>
 		<span class="kw">let</span> (<span class="ident">tester_fut</span>, <span class="ident">_network</span>) <span class="op">=</span> <span class="ident">make_test_network</span>();
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tester</span> <span class="op">=</span> <span class="ident">executor</span>::<span class="ident">block_on</span>(<span class="ident">tester_fut</span>);
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tester</span> <span class="op">=</span> <span class="ident">executor::block_on</span>(<span class="ident">tester_fut</span>);
 
 		<span class="comment">// Create an observer.</span>
 		<span class="kw">let</span> (<span class="ident">client</span>, <span class="ident">backend</span>) <span class="op">=</span> {
-			<span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">TestClientBuilder</span>::<span class="ident">with_default_backend</span>();
+			<span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">TestClientBuilder::with_default_backend</span>();
 			<span class="kw">let</span> <span class="ident">backend</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">backend</span>();
 			<span class="kw">let</span> (<span class="ident">client</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">build_with_longest_chain</span>();
-			(<span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">client</span>), <span class="ident">backend</span>)
+			(<span class="ident">Arc::new</span>(<span class="ident">client</span>), <span class="ident">backend</span>)
 		};
 
-		<span class="kw">let</span> <span class="ident">voters</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[(<span class="ident">sp_keyring</span>::<span class="ident">Ed25519Keyring</span>::<span class="ident">Alice</span>.<span class="ident">public</span>().<span class="ident">into</span>(), <span class="number">1</span>)];
+		<span class="kw">let</span> <span class="ident">voters</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="ident">sp_keyring::Ed25519Keyring::Alice</span>.<span class="ident">public</span>().<span class="ident">into</span>(), <span class="number">1</span>)];
 
-		<span class="kw">let</span> <span class="ident">persistent_data</span> <span class="op">=</span> <span class="ident">aux_schema</span>::<span class="ident">load_persistent</span>(
+		<span class="kw">let</span> <span class="ident">persistent_data</span> <span class="op">=</span> <span class="ident">aux_schema::load_persistent</span>(
 			<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">backend</span>,
 			<span class="ident">client</span>.<span class="ident">info</span>().<span class="ident">genesis_hash</span>,
 			<span class="number">0</span>,
@@ -898,7 +888,7 @@
 
 		<span class="kw">let</span> (<span class="ident">_tx</span>, <span class="ident">voter_command_rx</span>) <span class="op">=</span> <span class="ident">tracing_unbounded</span>(<span class="string">&quot;&quot;</span>);
 
-		<span class="kw">let</span> <span class="ident">observer</span> <span class="op">=</span> <span class="ident">ObserverWork</span>::<span class="ident">new</span>(
+		<span class="kw">let</span> <span class="ident">observer</span> <span class="op">=</span> <span class="ident">ObserverWork::new</span>(
 			<span class="ident">client</span>,
 			<span class="ident">tester</span>.<span class="ident">net_handle</span>.<span class="ident">clone</span>(),
 			<span class="ident">persistent_data</span>,
@@ -908,23 +898,24 @@
 		);
 
 		<span class="comment">// Trigger a reputation change through the gossip validator.</span>
-		<span class="kw">let</span> <span class="ident">peer_id</span> <span class="op">=</span> <span class="ident">PeerId</span>::<span class="ident">random</span>();
+		<span class="kw">let</span> <span class="ident">peer_id</span> <span class="op">=</span> <span class="ident">PeerId::random</span>();
 		<span class="ident">tester</span>.<span class="ident">trigger_gossip_validator_reputation_change</span>(<span class="kw-2">&amp;</span><span class="ident">peer_id</span>);
 
-		<span class="ident">executor</span>::<span class="ident">block_on</span>(<span class="ident">async</span> <span class="kw">move</span> {
+		<span class="ident">executor::block_on</span>(<span class="kw">async</span> <span class="kw">move</span> {
 			<span class="comment">// Poll the observer once and have it forward the reputation change from the gossip</span>
 			<span class="comment">// validator to the test network.</span>
-			<span class="macro">assert</span><span class="macro">!</span>(<span class="ident">observer</span>.<span class="ident">now_or_never</span>().<span class="ident">is_none</span>());
+			<span class="macro">assert!</span>(<span class="ident">observer</span>.<span class="ident">now_or_never</span>().<span class="ident">is_none</span>());
 
 			<span class="comment">// Ignore initial event stream request by gossip engine.</span>
 			<span class="kw">match</span> <span class="ident">tester</span>.<span class="ident">events</span>.<span class="ident">next</span>().<span class="ident">now_or_never</span>() {
-				<span class="prelude-val">Some</span>(<span class="prelude-val">Some</span>(<span class="ident">Event</span>::<span class="ident">EventStream</span>(<span class="kw">_</span>))) <span class="op">=</span><span class="op">&gt;</span> {},
-				<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;expected event stream request&quot;</span>),
+				<span class="prelude-val">Some</span>(<span class="prelude-val">Some</span>(<span class="ident">Event::EventStream</span>(<span class="kw">_</span>))) <span class="op">=</span><span class="op">&gt;</span> {},
+				<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;expected event stream request&quot;</span>),
 			};
 
-			<span class="macro">assert_matches</span><span class="macro">!</span>(<span class="ident">tester</span>.<span class="ident">events</span>.<span class="ident">next</span>().<span class="ident">now_or_never</span>(), <span class="prelude-val">Some</span>(<span class="prelude-val">Some</span>(<span class="ident">Event</span>::<span class="ident">Report</span>(<span class="kw">_</span>, <span class="kw">_</span>))));
+			<span class="macro">assert_matches!</span>(<span class="ident">tester</span>.<span class="ident">events</span>.<span class="ident">next</span>().<span class="ident">now_or_never</span>(), <span class="prelude-val">Some</span>(<span class="prelude-val">Some</span>(<span class="ident">Event::Report</span>(<span class="kw">_</span>, <span class="kw">_</span>))));
 		});
 	}
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "sc_finality_grandpa";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sc_finality_grandpa" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

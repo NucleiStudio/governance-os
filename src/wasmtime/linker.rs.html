@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/wasmtime-0.19.0/src/linker.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>linker.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/wasmtime-0.22.0/src/linker.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>linker.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../wasmtime/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../wasmtime/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -768,15 +768,26 @@
 <span id="765">765</span>
 <span id="766">766</span>
 <span id="767">767</span>
+<span id="768">768</span>
+<span id="769">769</span>
+<span id="770">770</span>
+<span id="771">771</span>
+<span id="772">772</span>
+<span id="773">773</span>
+<span id="774">774</span>
+<span id="775">775</span>
+<span id="776">776</span>
+<span id="777">777</span>
+<span id="778">778</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">Extern</span>, <span class="ident">ExternType</span>, <span class="ident">Func</span>, <span class="ident">FuncType</span>, <span class="ident">GlobalType</span>, <span class="ident">ImportType</span>, <span class="ident">Instance</span>, <span class="ident">IntoFunc</span>, <span class="ident">Module</span>, <span class="ident">Store</span>,
     <span class="ident">Trap</span>,
 };
 <span class="kw">use</span> <span class="ident">anyhow</span>::{<span class="ident">anyhow</span>, <span class="ident">bail</span>, <span class="ident">Context</span>, <span class="ident">Error</span>, <span class="prelude-ty">Result</span>};
-<span class="kw">use</span> <span class="ident">log</span>::<span class="ident">warn</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">hash_map</span>::{<span class="ident">Entry</span>, <span class="ident">HashMap</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">rc</span>::<span class="ident">Rc</span>;
+<span class="kw">use</span> <span class="ident">log::warn</span>;
+<span class="kw">use</span> <span class="ident">std::collections::hash_map</span>::{<span class="ident">Entry</span>, <span class="ident">HashMap</span>};
+<span class="kw">use</span> <span class="ident">std::rc::Rc</span>;
 
 <span class="doccomment">/// Structure used to link wasm modules/instances together.</span>
 <span class="doccomment">///</span>
@@ -829,6 +840,8 @@
     <span class="ident">Global</span>(<span class="ident">GlobalType</span>),
     <span class="ident">Memory</span>,
     <span class="ident">Table</span>,
+    <span class="ident">Module</span>,
+    <span class="ident">Instance</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Linker</span> {
@@ -851,9 +864,9 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">store</span>: <span class="kw-2">&amp;</span><span class="ident">Store</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Linker</span> {
         <span class="ident">Linker</span> {
             <span class="ident">store</span>: <span class="ident">store</span>.<span class="ident">clone</span>(),
-            <span class="ident">map</span>: <span class="ident">HashMap</span>::<span class="ident">new</span>(),
-            <span class="ident">string2idx</span>: <span class="ident">HashMap</span>::<span class="ident">new</span>(),
-            <span class="ident">strings</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
+            <span class="ident">map</span>: <span class="ident">HashMap::new</span>(),
+            <span class="ident">string2idx</span>: <span class="ident">HashMap::new</span>(),
+            <span class="ident">strings</span>: <span class="ident">Vec::new</span>(),
             <span class="ident">allow_shadowing</span>: <span class="bool-val">false</span>,
         }
     }
@@ -937,7 +950,7 @@
 
     <span class="kw">fn</span> <span class="ident">_define</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">module</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">item</span>: <span class="ident">Extern</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="ident">item</span>.<span class="ident">comes_from_same_store</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">store</span>) {
-            <span class="macro">bail</span><span class="macro">!</span>(<span class="string">&quot;all linker items must be from the same store&quot;</span>);
+            <span class="macro">bail!</span>(<span class="string">&quot;all linker items must be from the same store&quot;</span>);
         }
         <span class="self">self</span>.<span class="ident">insert</span>(<span class="ident">module</span>, <span class="ident">name</span>, <span class="ident">item</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
@@ -985,7 +998,7 @@
         <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">IntoFunc</span><span class="op">&lt;</span><span class="ident">Params</span>, <span class="ident">Args</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">_define</span>(<span class="ident">module</span>, <span class="ident">name</span>, <span class="ident">Func</span>::<span class="ident">wrap</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">store</span>, <span class="ident">func</span>).<span class="ident">into</span>())
+        <span class="self">self</span>.<span class="ident">_define</span>(<span class="ident">module</span>, <span class="ident">name</span>, <span class="ident">Func::wrap</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">store</span>, <span class="ident">func</span>).<span class="ident">into</span>())
     }
 
     <span class="doccomment">/// Convenience wrapper to define an entire [`Instance`] in this linker.</span>
@@ -1034,8 +1047,8 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">instance</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">module_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">instance</span>: <span class="kw-2">&amp;</span><span class="ident">Instance</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">Store</span>::<span class="ident">same</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">store</span>, <span class="ident">instance</span>.<span class="ident">store</span>()) {
-            <span class="macro">bail</span><span class="macro">!</span>(<span class="string">&quot;all linker items must be from the same store&quot;</span>);
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">Store::same</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">store</span>, <span class="ident">instance</span>.<span class="ident">store</span>()) {
+            <span class="macro">bail!</span>(<span class="string">&quot;all linker items must be from the same store&quot;</span>);
         }
         <span class="kw">for</span> <span class="ident">export</span> <span class="kw">in</span> <span class="ident">instance</span>.<span class="ident">exports</span>() {
             <span class="self">self</span>.<span class="ident">insert</span>(<span class="ident">module_name</span>, <span class="ident">export</span>.<span class="ident">name</span>(), <span class="ident">export</span>.<span class="ident">into_extern</span>())<span class="question-mark">?</span>;
@@ -1142,22 +1155,22 @@
     <span class="doccomment">/// &quot;#;</span>
     <span class="doccomment">/// let module = Module::new(store.engine(), wat)?;</span>
     <span class="doccomment">/// linker.module(&quot;&quot;, &amp;module)?;</span>
-    <span class="doccomment">/// let count = linker.get_one_by_name(&quot;&quot;, &quot;run&quot;)?.into_func().unwrap().get0::&lt;i32&gt;()?()?;</span>
+    <span class="doccomment">/// let count = linker.get_one_by_name(&quot;&quot;, Some(&quot;run&quot;))?.into_func().unwrap().get0::&lt;i32&gt;()?()?;</span>
     <span class="doccomment">/// assert_eq!(count, 0, &quot;a Command should get a fresh instance on each invocation&quot;);</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">module</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">module_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">module</span>: <span class="kw-2">&amp;</span><span class="ident">Module</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">ModuleKind</span>::<span class="ident">categorize</span>(<span class="ident">module</span>)<span class="question-mark">?</span> {
-            <span class="ident">ModuleKind</span>::<span class="ident">Command</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">command</span>(<span class="ident">module_name</span>, <span class="ident">module</span>),
-            <span class="ident">ModuleKind</span>::<span class="ident">Reactor</span> <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="ident">ModuleKind::categorize</span>(<span class="ident">module</span>)<span class="question-mark">?</span> {
+            <span class="ident">ModuleKind::Command</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">command</span>(<span class="ident">module_name</span>, <span class="ident">module</span>),
+            <span class="ident">ModuleKind::Reactor</span> <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="ident">instance</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">instantiate</span>(<span class="kw-2">&amp;</span><span class="ident">module</span>)<span class="question-mark">?</span>;
 
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">export</span>) <span class="op">=</span> <span class="ident">instance</span>.<span class="ident">get_export</span>(<span class="string">&quot;_initialize&quot;</span>) {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Extern</span>::<span class="ident">Func</span>(<span class="ident">func</span>) <span class="op">=</span> <span class="ident">export</span> {
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Extern::Func</span>(<span class="ident">func</span>) <span class="op">=</span> <span class="ident">export</span> {
                         <span class="ident">func</span>.<span class="ident">get0</span>::<span class="op">&lt;</span>()<span class="op">&gt;</span>()
-                            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>().<span class="ident">map_err</span>(<span class="ident">Into</span>::<span class="ident">into</span>))
+                            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>().<span class="ident">map_err</span>(<span class="ident">Into::into</span>))
                             .<span class="ident">context</span>(<span class="string">&quot;calling the Reactor initialization function&quot;</span>)<span class="question-mark">?</span>;
                     }
                 }
@@ -1174,9 +1187,9 @@
                 <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">clone</span>();
                 <span class="kw">let</span> <span class="ident">module</span> <span class="op">=</span> <span class="ident">module</span>.<span class="ident">clone</span>();
                 <span class="kw">let</span> <span class="ident">export_name</span> <span class="op">=</span> <span class="ident">export</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>();
-                <span class="kw">let</span> <span class="ident">func</span> <span class="op">=</span> <span class="ident">Func</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">store</span>, <span class="ident">func_ty</span>.<span class="ident">clone</span>(), <span class="kw">move</span> <span class="op">|</span><span class="kw">_</span>, <span class="ident">params</span>, <span class="ident">results</span><span class="op">|</span> {
+                <span class="kw">let</span> <span class="ident">func</span> <span class="op">=</span> <span class="ident">Func::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">store</span>, <span class="ident">func_ty</span>.<span class="ident">clone</span>(), <span class="kw">move</span> <span class="op">|</span><span class="kw">_</span>, <span class="ident">params</span>, <span class="ident">results</span><span class="op">|</span> {
                     <span class="comment">// Create a new instance for this command execution.</span>
-                    <span class="kw">let</span> <span class="ident">instance</span> <span class="op">=</span> <span class="ident">Instance</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">store</span>, <span class="kw-2">&amp;</span><span class="ident">module</span>, <span class="kw-2">&amp;</span><span class="ident">imports</span>)<span class="question-mark">?</span>;
+                    <span class="kw">let</span> <span class="ident">instance</span> <span class="op">=</span> <span class="ident">Instance::new</span>(<span class="kw-2">&amp;</span><span class="ident">store</span>, <span class="kw-2">&amp;</span><span class="ident">module</span>, <span class="kw-2">&amp;</span><span class="ident">imports</span>)<span class="question-mark">?</span>;
 
                     <span class="comment">// `unwrap()` everything here because we know the instance contains a</span>
                     <span class="comment">// function export with the given name and signature because we&#39;re</span>
@@ -1210,23 +1223,23 @@
                 <span class="comment">// Allow an exported &quot;__data_end&quot; memory for compatibility with toolchains</span>
                 <span class="comment">// which use --export-dynamic, which unfortunately doesn&#39;t work the way</span>
                 <span class="comment">// we want it to.</span>
-                <span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;command module exporting &#39;__data_end&#39; is deprecated&quot;</span>);
+                <span class="macro">warn!</span>(<span class="string">&quot;command module exporting &#39;__data_end&#39; is deprecated&quot;</span>);
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">export</span>.<span class="ident">name</span>() <span class="op">=</span><span class="op">=</span> <span class="string">&quot;__heap_base&quot;</span> <span class="op">&amp;&amp;</span> <span class="ident">export</span>.<span class="ident">ty</span>().<span class="ident">global</span>().<span class="ident">is_some</span>() {
                 <span class="comment">// Allow an exported &quot;__data_end&quot; memory for compatibility with toolchains</span>
                 <span class="comment">// which use --export-dynamic, which unfortunately doesn&#39;t work the way</span>
                 <span class="comment">// we want it to.</span>
-                <span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;command module exporting &#39;__heap_base&#39; is deprecated&quot;</span>);
+                <span class="macro">warn!</span>(<span class="string">&quot;command module exporting &#39;__heap_base&#39; is deprecated&quot;</span>);
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">export</span>.<span class="ident">name</span>() <span class="op">=</span><span class="op">=</span> <span class="string">&quot;__dso_handle&quot;</span> <span class="op">&amp;&amp;</span> <span class="ident">export</span>.<span class="ident">ty</span>().<span class="ident">global</span>().<span class="ident">is_some</span>() {
                 <span class="comment">// Allow an exported &quot;__dso_handle&quot; memory for compatibility with toolchains</span>
                 <span class="comment">// which use --export-dynamic, which unfortunately doesn&#39;t work the way</span>
                 <span class="comment">// we want it to.</span>
-                <span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;command module exporting &#39;__dso_handle&#39; is deprecated&quot;</span>)
+                <span class="macro">warn!</span>(<span class="string">&quot;command module exporting &#39;__dso_handle&#39; is deprecated&quot;</span>)
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">export</span>.<span class="ident">name</span>() <span class="op">=</span><span class="op">=</span> <span class="string">&quot;__rtti_base&quot;</span> <span class="op">&amp;&amp;</span> <span class="ident">export</span>.<span class="ident">ty</span>().<span class="ident">global</span>().<span class="ident">is_some</span>() {
                 <span class="comment">// Allow an exported &quot;__rtti_base&quot; memory for compatibility with</span>
                 <span class="comment">// AssemblyScript.</span>
-                <span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;command module exporting &#39;__rtti_base&#39; is deprecated; pass `--runtime half` to the AssemblyScript compiler&quot;</span>);
+                <span class="macro">warn!</span>(<span class="string">&quot;command module exporting &#39;__rtti_base&#39; is deprecated; pass `--runtime half` to the AssemblyScript compiler&quot;</span>);
             } <span class="kw">else</span> {
-                <span class="macro">bail</span><span class="macro">!</span>(<span class="string">&quot;command export &#39;{}&#39; is not a function&quot;</span>, <span class="ident">export</span>.<span class="ident">name</span>());
+                <span class="macro">bail!</span>(<span class="string">&quot;command export &#39;{}&#39; is not a function&quot;</span>, <span class="ident">export</span>.<span class="ident">name</span>());
             }
         }
 
@@ -1257,16 +1270,16 @@
     <span class="kw">fn</span> <span class="ident">insert</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">module</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">item</span>: <span class="ident">Extern</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">import_key</span>(<span class="ident">module</span>, <span class="ident">name</span>, <span class="ident">item</span>.<span class="ident">ty</span>());
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">entry</span>(<span class="ident">key</span>) {
-            <span class="ident">Entry</span>::<span class="ident">Occupied</span>(<span class="ident">o</span>) <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">allow_shadowing</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">bail</span><span class="macro">!</span>(
+            <span class="ident">Entry::Occupied</span>(<span class="ident">o</span>) <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">allow_shadowing</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">bail!</span>(
                 <span class="string">&quot;import of `{}::{}` with kind {:?} defined twice&quot;</span>,
                 <span class="ident">module</span>,
                 <span class="ident">name</span>,
                 <span class="ident">o</span>.<span class="ident">key</span>().<span class="ident">kind</span>,
             ),
-            <span class="ident">Entry</span>::<span class="ident">Occupied</span>(<span class="kw-2">mut</span> <span class="ident">o</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Entry::Occupied</span>(<span class="kw-2">mut</span> <span class="ident">o</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">o</span>.<span class="ident">insert</span>(<span class="ident">item</span>);
             }
-            <span class="ident">Entry</span>::<span class="ident">Vacant</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Entry::Vacant</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">v</span>.<span class="ident">insert</span>(<span class="ident">item</span>);
             }
         }
@@ -1283,10 +1296,12 @@
 
     <span class="kw">fn</span> <span class="ident">import_kind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ty</span>: <span class="ident">ExternType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ImportKind</span> {
         <span class="kw">match</span> <span class="ident">ty</span> {
-            <span class="ident">ExternType</span>::<span class="ident">Func</span>(<span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ImportKind</span>::<span class="ident">Func</span>(<span class="ident">f</span>),
-            <span class="ident">ExternType</span>::<span class="ident">Global</span>(<span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ImportKind</span>::<span class="ident">Global</span>(<span class="ident">f</span>),
-            <span class="ident">ExternType</span>::<span class="ident">Memory</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ImportKind</span>::<span class="ident">Memory</span>,
-            <span class="ident">ExternType</span>::<span class="ident">Table</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ImportKind</span>::<span class="ident">Table</span>,
+            <span class="ident">ExternType::Func</span>(<span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ImportKind::Func</span>(<span class="ident">f</span>),
+            <span class="ident">ExternType::Global</span>(<span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ImportKind::Global</span>(<span class="ident">f</span>),
+            <span class="ident">ExternType::Memory</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ImportKind::Memory</span>,
+            <span class="ident">ExternType::Table</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ImportKind::Table</span>,
+            <span class="ident">ExternType::Module</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ImportKind::Module</span>,
+            <span class="ident">ExternType::Instance</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ImportKind::Instance</span>,
         }
     }
 
@@ -1345,7 +1360,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">instantiate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">module</span>: <span class="kw-2">&amp;</span><span class="ident">Module</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Instance</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">imports</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">compute_imports</span>(<span class="ident">module</span>)<span class="question-mark">?</span>;
 
-        <span class="ident">Instance</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">store</span>, <span class="ident">module</span>, <span class="kw-2">&amp;</span><span class="ident">imports</span>)
+        <span class="ident">Instance::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">store</span>, <span class="ident">module</span>, <span class="kw-2">&amp;</span><span class="ident">imports</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">compute_imports</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">module</span>: <span class="kw-2">&amp;</span><span class="ident">Module</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Extern</span><span class="op">&gt;</span><span class="op">&gt;</span> {
@@ -1356,31 +1371,30 @@
     }
 
     <span class="kw">fn</span> <span class="ident">link_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">import</span>: <span class="kw-2">&amp;</span><span class="ident">ImportType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">keys</span>() {
             <span class="kw">if</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">strings</span>[<span class="ident">i</span>.<span class="ident">module</span>] <span class="op">!</span><span class="op">=</span> <span class="ident">import</span>.<span class="ident">module</span>()
-                <span class="op">|</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">strings</span>[<span class="ident">i</span>.<span class="ident">name</span>] <span class="op">!</span><span class="op">=</span> <span class="ident">import</span>.<span class="ident">name</span>()
+                <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">strings</span>.<span class="ident">get</span>(<span class="ident">i</span>.<span class="ident">name</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">s</span>) <span class="op">!</span><span class="op">=</span> <span class="ident">import</span>.<span class="ident">name</span>()
             {
                 <span class="kw">continue</span>;
             }
-            <span class="ident">options</span>.<span class="ident">push</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;  * {:?}\n&quot;</span>, <span class="ident">i</span>.<span class="ident">kind</span>));
+            <span class="ident">options</span>.<span class="ident">push</span>(<span class="macro">format!</span>(<span class="string">&quot;  * {:?}\n&quot;</span>, <span class="ident">i</span>.<span class="ident">kind</span>));
         }
+        <span class="kw">let</span> <span class="ident">desc</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">import</span>.<span class="ident">name</span>() {
+            <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;{}::{}&quot;</span>, <span class="ident">import</span>.<span class="ident">module</span>(), <span class="ident">name</span>),
+            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">import</span>.<span class="ident">module</span>().<span class="ident">to_string</span>(),
+        };
         <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="macro">anyhow</span><span class="macro">!</span>(
-                <span class="string">&quot;unknown import: `{}::{}` has not been defined&quot;</span>,
-                <span class="ident">import</span>.<span class="ident">module</span>(),
-                <span class="ident">import</span>.<span class="ident">name</span>()
-            );
+            <span class="kw">return</span> <span class="macro">anyhow!</span>(<span class="string">&quot;unknown import: `{}` has not been defined&quot;</span>, <span class="ident">desc</span>);
         }
 
         <span class="ident">options</span>.<span class="ident">sort</span>();
 
-        <span class="macro">anyhow</span><span class="macro">!</span>(
-            <span class="string">&quot;incompatible import type for `{}::{}` specified\n\
-                 desired signature was: {:?}\n\
-                 signatures available:\n\n{}&quot;</span>,
-            <span class="ident">import</span>.<span class="ident">module</span>(),
-            <span class="ident">import</span>.<span class="ident">name</span>(),
+        <span class="macro">anyhow!</span>(
+            <span class="string">&quot;incompatible import type for `{}` specified\n\
+             desired signature was: {:?}\n\
+             signatures available:\n\n{}&quot;</span>,
+            <span class="ident">desc</span>,
             <span class="ident">import</span>.<span class="ident">ty</span>(),
             <span class="ident">options</span>.<span class="ident">concat</span>(),
         )
@@ -1416,7 +1430,10 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">import</span>: <span class="kw-2">&amp;</span><span class="ident">ImportType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Extern</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">ImportKey</span> {
             <span class="ident">module</span>: <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">string2idx</span>.<span class="ident">get</span>(<span class="ident">import</span>.<span class="ident">module</span>())<span class="question-mark">?</span>,
-            <span class="ident">name</span>: <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">string2idx</span>.<span class="ident">get</span>(<span class="ident">import</span>.<span class="ident">name</span>())<span class="question-mark">?</span>,
+            <span class="ident">name</span>: <span class="kw">match</span> <span class="ident">import</span>.<span class="ident">name</span>() {
+                <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">string2idx</span>.<span class="ident">get</span>(<span class="ident">name</span>)<span class="question-mark">?</span>,
+                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">usize::max_value</span>(),
+            },
             <span class="ident">kind</span>: <span class="self">self</span>.<span class="ident">import_kind</span>(<span class="ident">import</span>.<span class="ident">ty</span>()),
         };
         <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>).<span class="ident">cloned</span>()
@@ -1429,12 +1446,13 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_by_name</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;p</span>, <span class="lifetime">&#39;p</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
         <span class="ident">module</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;p</span> <span class="ident">str</span>,
-        <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;p</span> <span class="ident">str</span>,
+        <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;p</span> <span class="ident">str</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Extern</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;p</span> {
         <span class="self">self</span>.<span class="ident">map</span>
             .<span class="ident">iter</span>()
             .<span class="ident">filter</span>(<span class="kw">move</span> <span class="op">|</span>(<span class="ident">key</span>, <span class="ident">_item</span>)<span class="op">|</span> {
-                <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">strings</span>[<span class="ident">key</span>.<span class="ident">module</span>] <span class="op">=</span><span class="op">=</span> <span class="ident">module</span> <span class="op">&amp;&amp;</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">strings</span>[<span class="ident">key</span>.<span class="ident">name</span>] <span class="op">=</span><span class="op">=</span> <span class="ident">name</span>
+                <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">strings</span>[<span class="ident">key</span>.<span class="ident">module</span>] <span class="op">=</span><span class="op">=</span> <span class="ident">module</span>
+                    <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">strings</span>.<span class="ident">get</span>(<span class="ident">key</span>.<span class="ident">name</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">s</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">name</span>
             })
             .<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">item</span>)<span class="op">|</span> <span class="ident">item</span>)
     }
@@ -1445,13 +1463,17 @@
     <span class="doccomment">/// a single `Extern` item. If the `module` and `name` pair isn&#39;t defined</span>
     <span class="doccomment">/// in this linker then an error is returned. If more than one value exists</span>
     <span class="doccomment">/// for the `module` and `name` pairs, then an error is returned as well.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_one_by_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">module</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Extern</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_one_by_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">module</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Extern</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">err_msg</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">name</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;named `{}` in `{}`&quot;</span>, <span class="ident">name</span>, <span class="ident">module</span>),
+            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;named `{}`&quot;</span>, <span class="ident">module</span>),
+        };
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">items</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_by_name</span>(<span class="ident">module</span>, <span class="ident">name</span>);
         <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">items</span>
             .<span class="ident">next</span>()
-            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">anyhow</span><span class="macro">!</span>(<span class="string">&quot;no item named `{}` in `{}`&quot;</span>, <span class="ident">name</span>, <span class="ident">module</span>))<span class="question-mark">?</span>;
+            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">anyhow!</span>(<span class="string">&quot;no item {}&quot;</span>, <span class="ident">err_msg</span>()))<span class="question-mark">?</span>;
         <span class="kw">if</span> <span class="ident">items</span>.<span class="ident">next</span>().<span class="ident">is_some</span>() {
-            <span class="macro">bail</span><span class="macro">!</span>(<span class="string">&quot;too many items named `{}` in `{}`&quot;</span>, <span class="ident">name</span>, <span class="ident">module</span>);
+            <span class="macro">bail!</span>(<span class="string">&quot;too many items {}&quot;</span>, <span class="ident">err_msg</span>());
         }
         <span class="prelude-val">Ok</span>(<span class="ident">ret</span>.<span class="ident">clone</span>())
     }
@@ -1461,33 +1483,33 @@
     <span class="doccomment">/// An export with an empty string is considered to be a &quot;default export&quot;.</span>
     <span class="doccomment">/// &quot;_start&quot; is also recognized for compatibility.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_default</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">module</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Func</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">items</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_by_name</span>(<span class="ident">module</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">items</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_by_name</span>(<span class="ident">module</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>));
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">external</span>) <span class="op">=</span> <span class="ident">items</span>.<span class="ident">next</span>() {
             <span class="kw">if</span> <span class="ident">items</span>.<span class="ident">next</span>().<span class="ident">is_some</span>() {
-                <span class="macro">bail</span><span class="macro">!</span>(<span class="string">&quot;too many items named `` in `{}`&quot;</span>, <span class="ident">module</span>);
+                <span class="macro">bail!</span>(<span class="string">&quot;too many items named `` in `{}`&quot;</span>, <span class="ident">module</span>);
             }
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Extern</span>::<span class="ident">Func</span>(<span class="ident">func</span>) <span class="op">=</span> <span class="ident">external</span> {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Extern::Func</span>(<span class="ident">func</span>) <span class="op">=</span> <span class="ident">external</span> {
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">func</span>.<span class="ident">clone</span>());
             }
-            <span class="macro">bail</span><span class="macro">!</span>(<span class="string">&quot;default export in &#39;{}&#39; is not a function&quot;</span>, <span class="ident">module</span>);
+            <span class="macro">bail!</span>(<span class="string">&quot;default export in &#39;{}&#39; is not a function&quot;</span>, <span class="ident">module</span>);
         }
 
         <span class="comment">// For compatibility, also recognize &quot;_start&quot;.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">items</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_by_name</span>(<span class="ident">module</span>, <span class="string">&quot;_start&quot;</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">items</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_by_name</span>(<span class="ident">module</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;_start&quot;</span>));
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">external</span>) <span class="op">=</span> <span class="ident">items</span>.<span class="ident">next</span>() {
             <span class="kw">if</span> <span class="ident">items</span>.<span class="ident">next</span>().<span class="ident">is_some</span>() {
-                <span class="macro">bail</span><span class="macro">!</span>(<span class="string">&quot;too many items named `_start` in `{}`&quot;</span>, <span class="ident">module</span>);
+                <span class="macro">bail!</span>(<span class="string">&quot;too many items named `_start` in `{}`&quot;</span>, <span class="ident">module</span>);
             }
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Extern</span>::<span class="ident">Func</span>(<span class="ident">func</span>) <span class="op">=</span> <span class="ident">external</span> {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Extern::Func</span>(<span class="ident">func</span>) <span class="op">=</span> <span class="ident">external</span> {
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">func</span>.<span class="ident">clone</span>());
             }
-            <span class="macro">bail</span><span class="macro">!</span>(<span class="string">&quot;`_start` in &#39;{}&#39; is not a function&quot;</span>, <span class="ident">module</span>);
+            <span class="macro">bail!</span>(<span class="string">&quot;`_start` in &#39;{}&#39; is not a function&quot;</span>, <span class="ident">module</span>);
         }
 
         <span class="comment">// Otherwise return a no-op function.</span>
-        <span class="prelude-val">Ok</span>(<span class="ident">Func</span>::<span class="ident">new</span>(
+        <span class="prelude-val">Ok</span>(<span class="ident">Func::new</span>(
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">store</span>,
-            <span class="ident">FuncType</span>::<span class="ident">new</span>(<span class="ident">Vec</span>::<span class="ident">new</span>().<span class="ident">into_boxed_slice</span>(), <span class="ident">Vec</span>::<span class="ident">new</span>().<span class="ident">into_boxed_slice</span>()),
+            <span class="ident">FuncType::new</span>(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
             <span class="kw">move</span> <span class="op">|</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">|</span> <span class="prelude-val">Ok</span>(()),
         ))
     }
@@ -1512,29 +1534,30 @@
         <span class="kw">match</span> (<span class="ident">command_start</span>, <span class="ident">reactor_start</span>) {
             (<span class="prelude-val">Some</span>(<span class="ident">command_start</span>), <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="ident">command_start</span>.<span class="ident">func</span>() {
-                    <span class="prelude-val">Ok</span>(<span class="ident">ModuleKind</span>::<span class="ident">Command</span>)
+                    <span class="prelude-val">Ok</span>(<span class="ident">ModuleKind::Command</span>)
                 } <span class="kw">else</span> {
-                    <span class="macro">bail</span><span class="macro">!</span>(<span class="string">&quot;`_start` must be a function&quot;</span>)
+                    <span class="macro">bail!</span>(<span class="string">&quot;`_start` must be a function&quot;</span>)
                 }
             }
             (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">reactor_start</span>)) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="ident">reactor_start</span>.<span class="ident">func</span>() {
-                    <span class="prelude-val">Ok</span>(<span class="ident">ModuleKind</span>::<span class="ident">Reactor</span>)
+                    <span class="prelude-val">Ok</span>(<span class="ident">ModuleKind::Reactor</span>)
                 } <span class="kw">else</span> {
-                    <span class="macro">bail</span><span class="macro">!</span>(<span class="string">&quot;`_initialize` must be a function&quot;</span>)
+                    <span class="macro">bail!</span>(<span class="string">&quot;`_initialize` must be a function&quot;</span>)
                 }
             }
             (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="comment">// Module declares neither of the recognized functions, so treat</span>
                 <span class="comment">// it as a reactor with no initialization function.</span>
-                <span class="prelude-val">Ok</span>(<span class="ident">ModuleKind</span>::<span class="ident">Reactor</span>)
+                <span class="prelude-val">Ok</span>(<span class="ident">ModuleKind::Reactor</span>)
             }
             (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">Some</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="comment">// Module declares itself to be both a Command and a Reactor.</span>
-                <span class="macro">bail</span><span class="macro">!</span>(<span class="string">&quot;Program cannot be both a Command and a Reactor&quot;</span>)
+                <span class="macro">bail!</span>(<span class="string">&quot;Program cannot be both a Command and a Reactor&quot;</span>)
             }
         }
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "wasmtime";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="wasmtime" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

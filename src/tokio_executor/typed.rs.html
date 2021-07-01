@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-executor-0.2.0-alpha.6/src/typed.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>typed.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-executor-0.1.10/src/typed.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>typed.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../tokio_executor/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../tokio_executor/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -179,8 +179,11 @@
 <span id="176">176</span>
 <span id="177">177</span>
 <span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">SpawnError</span>;
+<span class="kw">use</span> <span class="ident">SpawnError</span>;
 
 <span class="doccomment">/// A value that spawns futures of a specific type.</span>
 <span class="doccomment">///</span>
@@ -202,19 +205,19 @@
 <span class="doccomment">/// such, the function takes a stream and an executor on which the background</span>
 <span class="doccomment">/// task is spawned.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`spawn`]: TypedExecutor::spawn</span>
-<span class="doccomment">/// ```</span>
+<span class="doccomment">/// ```rust</span>
+<span class="doccomment">/// #[macro_use]</span>
+<span class="doccomment">/// extern crate futures;</span>
+<span class="doccomment">/// extern crate tokio;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// use futures::{Future, Stream, Poll};</span>
 <span class="doccomment">/// use tokio::executor::TypedExecutor;</span>
 <span class="doccomment">/// use tokio::sync::oneshot;</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// use futures_core::{ready, Stream};</span>
-<span class="doccomment">/// use std::future::Future;</span>
-<span class="doccomment">/// use std::pin::Pin;</span>
-<span class="doccomment">/// use std::task::{Context, Poll};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// async fn drain&lt;T, E&gt;(stream: T, executor: &amp;mut E)</span>
+<span class="doccomment">/// pub fn drain&lt;T, E&gt;(stream: T, executor: &amp;mut E)</span>
+<span class="doccomment">///     -&gt; impl Future&lt;Item = (), Error = ()&gt;</span>
 <span class="doccomment">/// where</span>
-<span class="doccomment">///     T: Stream + Unpin,</span>
+<span class="doccomment">///     T: Stream,</span>
 <span class="doccomment">///     E: TypedExecutor&lt;Drain&lt;T&gt;&gt;</span>
 <span class="doccomment">/// {</span>
 <span class="doccomment">///     let (tx, rx) = oneshot::channel();</span>
@@ -224,31 +227,34 @@
 <span class="doccomment">///         tx: Some(tx),</span>
 <span class="doccomment">///     }).unwrap();</span>
 <span class="doccomment">///</span>
-<span class="doccomment">///     rx.await.unwrap()</span>
+<span class="doccomment">///     rx.map_err(|_| ())</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// // The background task</span>
-<span class="doccomment">/// pub struct Drain&lt;T&gt; {</span>
+<span class="doccomment">/// pub struct Drain&lt;T: Stream&gt; {</span>
 <span class="doccomment">///     stream: T,</span>
 <span class="doccomment">///     tx: Option&lt;oneshot::Sender&lt;()&gt;&gt;,</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// impl&lt;T: Stream + Unpin&gt; Future for Drain&lt;T&gt; {</span>
-<span class="doccomment">///     type Output = ();</span>
+<span class="doccomment">/// impl&lt;T: Stream&gt; Future for Drain&lt;T&gt; {</span>
+<span class="doccomment">///     type Item = ();</span>
+<span class="doccomment">///     type Error = ();</span>
 <span class="doccomment">///</span>
-<span class="doccomment">///     fn poll(mut self: Pin&lt;&amp;mut Self&gt;, cx: &amp;mut Context&lt;&#39;_&gt;) -&gt; Poll&lt;()&gt; {</span>
+<span class="doccomment">///     fn poll(&amp;mut self) -&gt; Poll&lt;Self::Item, Self::Error&gt; {</span>
 <span class="doccomment">///         loop {</span>
-<span class="doccomment">///             let item = ready!(</span>
-<span class="doccomment">///                 Pin::new(&amp;mut self.stream).poll_next(cx)</span>
+<span class="doccomment">///             let item = try_ready!(</span>
+<span class="doccomment">///                 self.stream.poll()</span>
+<span class="doccomment">///                     .map_err(|_| ())</span>
 <span class="doccomment">///             );</span>
 <span class="doccomment">///</span>
 <span class="doccomment">///             if item.is_none() { break; }</span>
 <span class="doccomment">///         }</span>
 <span class="doccomment">///</span>
-<span class="doccomment">///         let _ = self.tx.take().unwrap().send(()).map_err(|_| ());</span>
-<span class="doccomment">///         Poll::Ready(())</span>
+<span class="doccomment">///         self.tx.take().unwrap().send(()).map_err(|_| ());</span>
+<span class="doccomment">///         Ok(().into())</span>
 <span class="doccomment">///     }</span>
 <span class="doccomment">/// }</span>
+<span class="doccomment">/// # pub fn main() {}</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// By doing this, the `drain` fn can accept a stream that is `!Send` as long as</span>
@@ -269,12 +275,10 @@
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use tokio_executor::TypedExecutor;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// use std::future::Future;</span>
-    <span class="doccomment">/// use std::pin::Pin;</span>
-    <span class="doccomment">/// use std::task::{Context, Poll};</span>
-    <span class="doccomment">///</span>
+    <span class="doccomment">/// # extern crate futures;</span>
+    <span class="doccomment">/// # extern crate tokio_executor;</span>
+    <span class="doccomment">/// # use tokio_executor::TypedExecutor;</span>
+    <span class="doccomment">/// # use futures::{Future, Poll};</span>
     <span class="doccomment">/// fn example&lt;T&gt;(my_executor: &amp;mut T)</span>
     <span class="doccomment">/// where</span>
     <span class="doccomment">///     T: TypedExecutor&lt;MyFuture&gt;,</span>
@@ -285,13 +289,15 @@
     <span class="doccomment">/// struct MyFuture;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// impl Future for MyFuture {</span>
-    <span class="doccomment">///     type Output = ();</span>
+    <span class="doccomment">///     type Item = ();</span>
+    <span class="doccomment">///     type Error = ();</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///     fn poll(self: Pin&lt;&amp;mut Self&gt;, _cx: &amp;mut Context&lt;&#39;_&gt;) -&gt; Poll&lt;()&gt; {</span>
+    <span class="doccomment">///     fn poll(&amp;mut self) -&gt; Poll&lt;(), ()&gt; {</span>
     <span class="doccomment">///         println!(&quot;running on the executor&quot;);</span>
-    <span class="doccomment">///         Poll::Ready(())</span>
+    <span class="doccomment">///         Ok(().into())</span>
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// }</span>
+    <span class="doccomment">/// # fn main() {}</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class="ident">spawn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">future</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SpawnError</span><span class="op">&gt;</span>;
 
@@ -313,12 +319,10 @@
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use tokio_executor::TypedExecutor;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// use std::future::Future;</span>
-    <span class="doccomment">/// use std::pin::Pin;</span>
-    <span class="doccomment">/// use std::task::{Context, Poll};</span>
-    <span class="doccomment">///</span>
+    <span class="doccomment">/// # extern crate futures;</span>
+    <span class="doccomment">/// # extern crate tokio_executor;</span>
+    <span class="doccomment">/// # use tokio_executor::TypedExecutor;</span>
+    <span class="doccomment">/// # use futures::{Future, Poll};</span>
     <span class="doccomment">/// fn example&lt;T&gt;(my_executor: &amp;mut T)</span>
     <span class="doccomment">/// where</span>
     <span class="doccomment">///     T: TypedExecutor&lt;MyFuture&gt;,</span>
@@ -333,13 +337,15 @@
     <span class="doccomment">/// struct MyFuture;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// impl Future for MyFuture {</span>
-    <span class="doccomment">///     type Output = ();</span>
+    <span class="doccomment">///     type Item = ();</span>
+    <span class="doccomment">///     type Error = ();</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///     fn poll(self: Pin&lt;&amp;mut Self&gt;, _cx: &amp;mut Context&lt;&#39;_&gt;) -&gt; Poll&lt;()&gt; {</span>
+    <span class="doccomment">///     fn poll(&amp;mut self) -&gt; Poll&lt;(), ()&gt; {</span>
     <span class="doccomment">///         println!(&quot;running on the executor&quot;);</span>
-    <span class="doccomment">///         Poll::Ready(())</span>
+    <span class="doccomment">///         Ok(().into())</span>
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// }</span>
+    <span class="doccomment">/// # fn main() {}</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class="ident">status</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SpawnError</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(())
@@ -359,4 +365,5 @@
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "tokio_executor";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio_executor" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/cranelift-bforest-0.66.0/src/map.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>map.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/cranelift-bforest-0.69.0/src/map.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>map.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../cranelift_bforest/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../cranelift_bforest/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -928,12 +928,12 @@
 <span class="doccomment">//! Forest of maps.</span>
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Comparator</span>, <span class="ident">Forest</span>, <span class="ident">Node</span>, <span class="ident">NodeData</span>, <span class="ident">NodePool</span>, <span class="ident">Path</span>, <span class="ident">INNER_SIZE</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">packed_option</span>::<span class="ident">PackedOption</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::packed_option::PackedOption</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">use</span> <span class="ident">alloc</span>::<span class="ident">string</span>::<span class="ident">String</span>;
+<span class="kw">use</span> <span class="ident">alloc::string::String</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">fmt</span>;
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">marker</span>::<span class="ident">PhantomData</span>;
+<span class="kw">use</span> <span class="ident">core::fmt</span>;
+<span class="kw">use</span> <span class="ident">core::marker::PhantomData</span>;
 
 <span class="doccomment">/// Tag type defining forest types for a map.</span>
 <span class="kw">struct</span> <span class="ident">MapTypes</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>(<span class="ident">PhantomData</span><span class="op">&lt;</span>(<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span>);
@@ -948,11 +948,11 @@
     <span class="kw">type</span> <span class="ident">LeafKeys</span> <span class="op">=</span> [<span class="ident">K</span>; <span class="ident">INNER_SIZE</span> <span class="op">-</span> <span class="number">1</span>];
     <span class="kw">type</span> <span class="ident">LeafValues</span> <span class="op">=</span> [<span class="ident">V</span>; <span class="ident">INNER_SIZE</span> <span class="op">-</span> <span class="number">1</span>];
 
-    <span class="kw">fn</span> <span class="ident">splat_key</span>(<span class="ident">key</span>: <span class="self">Self</span>::<span class="ident">Key</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">LeafKeys</span> {
+    <span class="kw">fn</span> <span class="ident">splat_key</span>(<span class="ident">key</span>: <span class="self">Self</span><span class="ident">::Key</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::LeafKeys</span> {
         [<span class="ident">key</span>; <span class="ident">INNER_SIZE</span> <span class="op">-</span> <span class="number">1</span>]
     }
 
-    <span class="kw">fn</span> <span class="ident">splat_value</span>(<span class="ident">value</span>: <span class="self">Self</span>::<span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">LeafValues</span> {
+    <span class="kw">fn</span> <span class="ident">splat_value</span>(<span class="ident">value</span>: <span class="self">Self</span><span class="ident">::Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::LeafValues</span> {
         [<span class="ident">value</span>; <span class="ident">INNER_SIZE</span> <span class="op">-</span> <span class="number">1</span>]
     }
 }
@@ -974,7 +974,7 @@
     <span class="doccomment">/// Create a new empty forest.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
-            <span class="ident">nodes</span>: <span class="ident">NodePool</span>::<span class="ident">new</span>(),
+            <span class="ident">nodes</span>: <span class="ident">NodePool::new</span>(),
         }
     }
 
@@ -1026,7 +1026,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Comparator</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="ident">K</span>, <span class="ident">forest</span>: <span class="kw-2">&amp;</span><span class="ident">MapForest</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>, <span class="ident">comp</span>: <span class="kw-2">&amp;</span><span class="ident">C</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">root</span>
             .<span class="ident">expand</span>()
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">root</span><span class="op">|</span> <span class="ident">Path</span>::<span class="ident">default</span>().<span class="ident">find</span>(<span class="ident">key</span>, <span class="ident">root</span>, <span class="kw-2">&amp;</span><span class="ident">forest</span>.<span class="ident">nodes</span>, <span class="ident">comp</span>))
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">root</span><span class="op">|</span> <span class="ident">Path::default</span>().<span class="ident">find</span>(<span class="ident">key</span>, <span class="ident">root</span>, <span class="kw-2">&amp;</span><span class="ident">forest</span>.<span class="ident">nodes</span>, <span class="ident">comp</span>))
     }
 
     <span class="doccomment">/// Look up the value stored for `key`.</span>
@@ -1043,7 +1043,7 @@
         <span class="ident">comp</span>: <span class="kw-2">&amp;</span><span class="ident">C</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">expand</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">root</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">Path</span>::<span class="ident">default</span>();
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">Path::default</span>();
             <span class="kw">match</span> <span class="ident">path</span>.<span class="ident">find</span>(<span class="ident">key</span>, <span class="ident">root</span>, <span class="kw-2">&amp;</span><span class="ident">forest</span>.<span class="ident">nodes</span>, <span class="ident">comp</span>) {
                 <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>((<span class="ident">key</span>, <span class="ident">v</span>)),
                 <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">path</span>.<span class="ident">prev</span>(<span class="ident">root</span>, <span class="kw-2">&amp;</span><span class="ident">forest</span>.<span class="ident">nodes</span>),
@@ -1093,7 +1093,7 @@
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">V</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">Path</span>::<span class="ident">default</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">Path::default</span>();
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">root</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">expand</span>() {
             <span class="ident">path</span>.<span class="ident">first</span>(<span class="ident">root</span>, <span class="kw-2">&amp;</span><span class="ident">forest</span>.<span class="ident">nodes</span>);
         }
@@ -1117,7 +1117,7 @@
         <span class="ident">forest</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">MapForest</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>,
         <span class="ident">comp</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">C</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MapCursor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-        <span class="ident">MapCursor</span>::<span class="ident">new</span>(<span class="self">self</span>, <span class="ident">forest</span>, <span class="ident">comp</span>)
+        <span class="ident">MapCursor::new</span>(<span class="self">self</span>, <span class="ident">forest</span>, <span class="ident">comp</span>)
     }
 
     <span class="doccomment">/// Create an iterator traversing this map. The iterator type is `(K, V)`.</span>
@@ -1125,7 +1125,7 @@
         <span class="ident">MapIter</span> {
             <span class="ident">root</span>: <span class="self">self</span>.<span class="ident">root</span>,
             <span class="ident">pool</span>: <span class="kw-2">&amp;</span><span class="ident">forest</span>.<span class="ident">nodes</span>,
-            <span class="ident">path</span>: <span class="ident">Path</span>::<span class="ident">default</span>(),
+            <span class="ident">path</span>: <span class="ident">Path::default</span>(),
         }
     }
 }
@@ -1136,20 +1136,20 @@
     <span class="ident">V</span>: <span class="ident">Copy</span>,
 {
     <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span>::<span class="ident">new</span>()
+        <span class="self">Self</span><span class="ident">::new</span>()
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">Map</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">K</span>: <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">fmt</span>::<span class="ident">Display</span>,
+    <span class="ident">K</span>: <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">fmt::Display</span>,
     <span class="ident">V</span>: <span class="ident">Copy</span>,
 {
     <span class="doccomment">/// Verify consistency.</span>
     <span class="kw">fn</span> <span class="ident">verify</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Comparator</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">forest</span>: <span class="kw-2">&amp;</span><span class="ident">MapForest</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>, <span class="ident">comp</span>: <span class="kw-2">&amp;</span><span class="ident">C</span>)
     <span class="kw">where</span>
-        <span class="ident">NodeData</span><span class="op">&lt;</span><span class="ident">MapTypes</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span><span class="op">&gt;</span>: <span class="ident">fmt</span>::<span class="ident">Display</span>,
+        <span class="ident">NodeData</span><span class="op">&lt;</span><span class="ident">MapTypes</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span><span class="op">&gt;</span>: <span class="ident">fmt::Display</span>,
     {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">root</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">expand</span>() {
             <span class="ident">forest</span>.<span class="ident">nodes</span>.<span class="ident">verify_tree</span>(<span class="ident">root</span>, <span class="ident">comp</span>);
@@ -1158,11 +1158,11 @@
 
     <span class="doccomment">/// Get a text version of the path to `key`.</span>
     <span class="kw">fn</span> <span class="ident">tpath</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Comparator</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="ident">K</span>, <span class="ident">forest</span>: <span class="kw-2">&amp;</span><span class="ident">MapForest</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>, <span class="ident">comp</span>: <span class="kw-2">&amp;</span><span class="ident">C</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
-        <span class="kw">use</span> <span class="ident">alloc</span>::<span class="ident">string</span>::<span class="ident">ToString</span>;
+        <span class="kw">use</span> <span class="ident">alloc::string::ToString</span>;
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">expand</span>() {
             <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;map(empty)&quot;</span>.<span class="ident">to_string</span>(),
             <span class="prelude-val">Some</span>(<span class="ident">root</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">Path</span>::<span class="ident">default</span>();
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">Path::default</span>();
                 <span class="ident">path</span>.<span class="ident">find</span>(<span class="ident">key</span>, <span class="ident">root</span>, <span class="kw-2">&amp;</span><span class="ident">forest</span>.<span class="ident">nodes</span>, <span class="ident">comp</span>);
                 <span class="ident">path</span>.<span class="ident">to_string</span>()
             }
@@ -1198,7 +1198,7 @@
             <span class="ident">root</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">container</span>.<span class="ident">root</span>,
             <span class="ident">pool</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">forest</span>.<span class="ident">nodes</span>,
             <span class="ident">comp</span>,
-            <span class="ident">path</span>: <span class="ident">Path</span>::<span class="ident">default</span>(),
+            <span class="ident">path</span>: <span class="ident">Path::default</span>(),
         }
     }
 
@@ -1211,7 +1211,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// If the cursor reaches the end, return `None` and leave the cursor at the off-the-end</span>
     <span class="doccomment">/// position.</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cargo-clippy&quot;</span>, <span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">should_implement_trait</span>))]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cargo-clippy&quot;</span>, <span class="ident">allow</span>(<span class="ident">clippy::should_implement_trait</span>))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">next</span>(<span class="self">self</span>.<span class="ident">pool</span>)
     }
@@ -1275,7 +1275,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="ident">K</span>, <span class="ident">value</span>: <span class="ident">V</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">expand</span>() {
             <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pool</span>.<span class="ident">alloc_node</span>(<span class="ident">NodeData</span>::<span class="ident">leaf</span>(<span class="ident">key</span>, <span class="ident">value</span>));
+                <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pool</span>.<span class="ident">alloc_node</span>(<span class="ident">NodeData::leaf</span>(<span class="ident">key</span>, <span class="ident">value</span>));
                 <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">root</span> <span class="op">=</span> <span class="ident">root</span>.<span class="ident">into</span>();
                 <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">set_root_node</span>(<span class="ident">root</span>);
                 <span class="prelude-val">None</span>
@@ -1322,7 +1322,7 @@
 {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="ident">K</span>, <span class="ident">V</span>);
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Item</span><span class="op">&gt;</span> {
         <span class="comment">// We use `self.root` to indicate if we need to go to the first element. Reset to `None`</span>
         <span class="comment">// once we&#39;ve returned the first element. This also works for an empty tree since the</span>
         <span class="comment">// `path.next()` call returns `None` when the path is empty. This also fuses the iterator.</span>
@@ -1336,8 +1336,8 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">MapCursor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">C</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">K</span>: <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">fmt</span>::<span class="ident">Display</span>,
-    <span class="ident">V</span>: <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">fmt</span>::<span class="ident">Display</span>,
+    <span class="ident">K</span>: <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">fmt::Display</span>,
+    <span class="ident">V</span>: <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">fmt::Display</span>,
     <span class="ident">C</span>: <span class="ident">Comparator</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>,
 {
     <span class="kw">fn</span> <span class="ident">verify</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
@@ -1347,69 +1347,69 @@
 
     <span class="doccomment">/// Get a text version of the path to the current position.</span>
     <span class="kw">fn</span> <span class="ident">tpath</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
-        <span class="kw">use</span> <span class="ident">alloc</span>::<span class="ident">string</span>::<span class="ident">ToString</span>;
+        <span class="kw">use</span> <span class="ident">alloc::string::ToString</span>;
         <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">to_string</span>()
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">NodeData</span>;
+    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw">super</span><span class="ident">::NodeData</span>;
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">alloc</span>::<span class="ident">vec</span>::<span class="ident">Vec</span>;
-    <span class="kw">use</span> <span class="ident">core</span>::<span class="ident">mem</span>;
+    <span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
+    <span class="kw">use</span> <span class="ident">core::mem</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">node_size</span>() {
         <span class="comment">// check that nodes are cache line sized when keys and values are 32 bits.</span>
         <span class="kw">type</span> <span class="ident">F</span> <span class="op">=</span> <span class="ident">MapTypes</span><span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">u32</span><span class="op">&gt;</span>;
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">mem</span>::<span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">NodeData</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span>(), <span class="number">64</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">NodeData</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span>(), <span class="number">64</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">empty</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">MapForest</span>::<span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">f32</span><span class="op">&gt;</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">MapForest</span>::<span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">f32</span><span class="op">&gt;</span><span class="ident">::new</span>();
         <span class="ident">f</span>.<span class="ident">clear</span>();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">Map</span>::<span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">f32</span><span class="op">&gt;</span>::<span class="ident">new</span>();
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">is_empty</span>());
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">Map</span>::<span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">f32</span><span class="op">&gt;</span><span class="ident">::new</span>();
+        <span class="macro">assert!</span>(<span class="ident">m</span>.<span class="ident">is_empty</span>());
         <span class="ident">m</span>.<span class="ident">clear</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">f</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">7</span>, <span class="kw-2">&amp;</span><span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="ident">f</span>).<span class="ident">next</span>(), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">get_or_less</span>(<span class="number">7</span>, <span class="kw-2">&amp;</span><span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
-        <span class="ident">m</span>.<span class="ident">retain</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">f</span>, <span class="op">|</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">|</span> <span class="macro">unreachable</span><span class="macro">!</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">7</span>, <span class="kw-2">&amp;</span><span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="ident">f</span>).<span class="ident">next</span>(), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">get_or_less</span>(<span class="number">7</span>, <span class="kw-2">&amp;</span><span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
+        <span class="ident">m</span>.<span class="ident">retain</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">f</span>, <span class="op">|</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">|</span> <span class="macro">unreachable!</span>());
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">m</span>.<span class="ident">cursor</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">f</span>, <span class="kw-2">&amp;</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">c</span>.<span class="ident">is_empty</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">c</span>.<span class="ident">key</span>(), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">c</span>.<span class="ident">value</span>(), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">c</span>.<span class="ident">next</span>(), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">c</span>.<span class="ident">prev</span>(), <span class="prelude-val">None</span>);
+        <span class="macro">assert!</span>(<span class="ident">c</span>.<span class="ident">is_empty</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">key</span>(), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">value</span>(), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">next</span>(), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">prev</span>(), <span class="prelude-val">None</span>);
         <span class="ident">c</span>.<span class="ident">verify</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">c</span>.<span class="ident">tpath</span>(), <span class="string">&quot;&lt;empty path&gt;&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">c</span>.<span class="ident">goto_first</span>(), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">c</span>.<span class="ident">tpath</span>(), <span class="string">&quot;&lt;empty path&gt;&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">tpath</span>(), <span class="string">&quot;&lt;empty path&gt;&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">goto_first</span>(), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">tpath</span>(), <span class="string">&quot;&lt;empty path&gt;&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">inserting</span>() {
-        <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">MapForest</span>::<span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">f32</span><span class="op">&gt;</span>::<span class="ident">new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">Map</span>::<span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">f32</span><span class="op">&gt;</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">MapForest</span>::<span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">f32</span><span class="op">&gt;</span><span class="ident">::new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">Map</span>::<span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">f32</span><span class="op">&gt;</span><span class="ident">::new</span>();
 
         <span class="comment">// The first seven values stay in a single leaf node.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">50</span>, <span class="number">5.0</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">50</span>, <span class="number">5.5</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">5.0</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">20</span>, <span class="number">2.0</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">80</span>, <span class="number">8.0</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">40</span>, <span class="number">4.0</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">60</span>, <span class="number">6.0</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">90</span>, <span class="number">9.0</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">200</span>, <span class="number">20.0</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">50</span>, <span class="number">5.0</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">50</span>, <span class="number">5.5</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">5.0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">20</span>, <span class="number">2.0</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">80</span>, <span class="number">8.0</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">40</span>, <span class="number">4.0</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">60</span>, <span class="number">6.0</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">90</span>, <span class="number">9.0</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">200</span>, <span class="number">20.0</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
 
         <span class="ident">m</span>.<span class="ident">verify</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">m</span>.<span class="ident">iter</span>(<span class="ident">f</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
             [
                 (<span class="number">20</span>, <span class="number">2.0</span>),
@@ -1422,89 +1422,89 @@
             ]
         );
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">0</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">20</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">2.0</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">30</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">40</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">4.0</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">50</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">5.5</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">60</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">6.0</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">70</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">80</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">8.0</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">100</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">0</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">20</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">2.0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">30</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">40</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">4.0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">50</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">5.5</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">60</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">6.0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">70</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">80</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">8.0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">100</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">get_or_less</span>(<span class="number">0</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">get_or_less</span>(<span class="number">20</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>((<span class="number">20</span>, <span class="number">2.0</span>)));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">get_or_less</span>(<span class="number">30</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>((<span class="number">20</span>, <span class="number">2.0</span>)));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">get_or_less</span>(<span class="number">40</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>((<span class="number">40</span>, <span class="number">4.0</span>)));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">get_or_less</span>(<span class="number">200</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>((<span class="number">200</span>, <span class="number">20.0</span>)));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">get_or_less</span>(<span class="number">201</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>((<span class="number">200</span>, <span class="number">20.0</span>)));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">get_or_less</span>(<span class="number">0</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">get_or_less</span>(<span class="number">20</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>((<span class="number">20</span>, <span class="number">2.0</span>)));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">get_or_less</span>(<span class="number">30</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>((<span class="number">20</span>, <span class="number">2.0</span>)));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">get_or_less</span>(<span class="number">40</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>((<span class="number">40</span>, <span class="number">4.0</span>)));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">get_or_less</span>(<span class="number">200</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>((<span class="number">200</span>, <span class="number">20.0</span>)));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">get_or_less</span>(<span class="number">201</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>((<span class="number">200</span>, <span class="number">20.0</span>)));
 
         {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">m</span>.<span class="ident">cursor</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">c</span>.<span class="ident">prev</span>(), <span class="prelude-val">Some</span>((<span class="number">200</span>, <span class="number">20.0</span>)));
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">c</span>.<span class="ident">prev</span>(), <span class="prelude-val">Some</span>((<span class="number">90</span>, <span class="number">9.0</span>)));
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">c</span>.<span class="ident">prev</span>(), <span class="prelude-val">Some</span>((<span class="number">80</span>, <span class="number">8.0</span>)));
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">c</span>.<span class="ident">prev</span>(), <span class="prelude-val">Some</span>((<span class="number">60</span>, <span class="number">6.0</span>)));
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">c</span>.<span class="ident">prev</span>(), <span class="prelude-val">Some</span>((<span class="number">50</span>, <span class="number">5.5</span>)));
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">c</span>.<span class="ident">prev</span>(), <span class="prelude-val">Some</span>((<span class="number">40</span>, <span class="number">4.0</span>)));
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">c</span>.<span class="ident">prev</span>(), <span class="prelude-val">Some</span>((<span class="number">20</span>, <span class="number">2.0</span>)));
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">c</span>.<span class="ident">prev</span>(), <span class="prelude-val">None</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">prev</span>(), <span class="prelude-val">Some</span>((<span class="number">200</span>, <span class="number">20.0</span>)));
+            <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">prev</span>(), <span class="prelude-val">Some</span>((<span class="number">90</span>, <span class="number">9.0</span>)));
+            <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">prev</span>(), <span class="prelude-val">Some</span>((<span class="number">80</span>, <span class="number">8.0</span>)));
+            <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">prev</span>(), <span class="prelude-val">Some</span>((<span class="number">60</span>, <span class="number">6.0</span>)));
+            <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">prev</span>(), <span class="prelude-val">Some</span>((<span class="number">50</span>, <span class="number">5.5</span>)));
+            <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">prev</span>(), <span class="prelude-val">Some</span>((<span class="number">40</span>, <span class="number">4.0</span>)));
+            <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">prev</span>(), <span class="prelude-val">Some</span>((<span class="number">20</span>, <span class="number">2.0</span>)));
+            <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">prev</span>(), <span class="prelude-val">None</span>);
         }
 
         <span class="comment">// Test some removals where the node stays healthy.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">50</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node0[2]&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">80</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node0[4]&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">200</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node0[6]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">50</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node0[2]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">80</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node0[4]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">200</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node0[6]&quot;</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">80</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">8.0</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">50</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node0[2]&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">80</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node0[4]&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">200</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node0[5]&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">80</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">80</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">8.0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">50</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node0[2]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">80</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node0[4]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">200</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node0[5]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">80</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
         <span class="ident">m</span>.<span class="ident">verify</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">20</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">2.0</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">50</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node0[1]&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">80</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node0[3]&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">200</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node0[4]&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">20</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">20</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">2.0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">50</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node0[1]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">80</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node0[3]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">200</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node0[4]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">20</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
         <span class="ident">m</span>.<span class="ident">verify</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
 
         <span class="comment">// [ 40 50 60 90 200 ]</span>
 
         {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">m</span>.<span class="ident">cursor</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">c</span>.<span class="ident">goto_first</span>(), <span class="prelude-val">Some</span>(<span class="number">4.0</span>));
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">c</span>.<span class="ident">key</span>(), <span class="prelude-val">Some</span>(<span class="number">40</span>));
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">c</span>.<span class="ident">value</span>(), <span class="prelude-val">Some</span>(<span class="number">4.0</span>));
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">c</span>.<span class="ident">next</span>(), <span class="prelude-val">Some</span>((<span class="number">50</span>, <span class="number">5.5</span>)));
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">c</span>.<span class="ident">next</span>(), <span class="prelude-val">Some</span>((<span class="number">60</span>, <span class="number">6.0</span>)));
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">c</span>.<span class="ident">next</span>(), <span class="prelude-val">Some</span>((<span class="number">90</span>, <span class="number">9.0</span>)));
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">c</span>.<span class="ident">next</span>(), <span class="prelude-val">Some</span>((<span class="number">200</span>, <span class="number">20.0</span>)));
+            <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">goto_first</span>(), <span class="prelude-val">Some</span>(<span class="number">4.0</span>));
+            <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">key</span>(), <span class="prelude-val">Some</span>(<span class="number">40</span>));
+            <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">value</span>(), <span class="prelude-val">Some</span>(<span class="number">4.0</span>));
+            <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">next</span>(), <span class="prelude-val">Some</span>((<span class="number">50</span>, <span class="number">5.5</span>)));
+            <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">next</span>(), <span class="prelude-val">Some</span>((<span class="number">60</span>, <span class="number">6.0</span>)));
+            <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">next</span>(), <span class="prelude-val">Some</span>((<span class="number">90</span>, <span class="number">9.0</span>)));
+            <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">next</span>(), <span class="prelude-val">Some</span>((<span class="number">200</span>, <span class="number">20.0</span>)));
             <span class="ident">c</span>.<span class="ident">verify</span>();
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">c</span>.<span class="ident">next</span>(), <span class="prelude-val">None</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">next</span>(), <span class="prelude-val">None</span>);
             <span class="ident">c</span>.<span class="ident">verify</span>();
         }
 
         <span class="comment">// Removals from the root leaf node beyond underflow.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">200</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">20.0</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">40</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">4.0</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">60</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">6.0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">200</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">20.0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">40</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">4.0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">60</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">6.0</span>));
         <span class="ident">m</span>.<span class="ident">verify</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">50</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">5.5</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">50</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">5.5</span>));
         <span class="ident">m</span>.<span class="ident">verify</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">90</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">9.0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">90</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">9.0</span>));
         <span class="ident">m</span>.<span class="ident">verify</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">is_empty</span>());
+        <span class="macro">assert!</span>(<span class="ident">m</span>.<span class="ident">is_empty</span>());
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">split_level0_leaf</span>() {
         <span class="comment">// Various ways of splitting a full leaf node at level 0.</span>
-        <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">MapForest</span>::<span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">f32</span><span class="op">&gt;</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">MapForest</span>::<span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">f32</span><span class="op">&gt;</span><span class="ident">::new</span>();
 
         <span class="kw">fn</span> <span class="ident">full_leaf</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">MapForest</span><span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">f32</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Map</span><span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">f32</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">Map</span>::<span class="ident">new</span>();
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">Map::new</span>();
             <span class="kw">for</span> <span class="ident">n</span> <span class="kw">in</span> <span class="number">1</span>..<span class="number">8</span> {
                 <span class="ident">m</span>.<span class="ident">insert</span>(<span class="ident">n</span> <span class="op">*</span> <span class="number">10</span>, <span class="ident">n</span> <span class="kw">as</span> <span class="ident">f32</span> <span class="op">*</span> <span class="number">1.1</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>());
             }
@@ -1515,14 +1515,14 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">full_leaf</span>(<span class="ident">f</span>);
         <span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">5</span>, <span class="number">4.2</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>());
         <span class="ident">m</span>.<span class="ident">verify</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">5</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">4.2</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">5</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">4.2</span>));
 
         <span class="comment">// Retain even entries, with altered values.</span>
         <span class="ident">m</span>.<span class="ident">retain</span>(<span class="ident">f</span>, <span class="op">|</span><span class="ident">k</span>, <span class="ident">v</span><span class="op">|</span> {
             <span class="kw-2">*</span><span class="ident">v</span> <span class="op">=</span> (<span class="ident">k</span> <span class="op">/</span> <span class="number">10</span>) <span class="kw">as</span> <span class="ident">f32</span>;
             (<span class="ident">k</span> <span class="op">%</span> <span class="number">20</span>) <span class="op">=</span><span class="op">=</span> <span class="number">0</span>
         });
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">m</span>.<span class="ident">iter</span>(<span class="ident">f</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
             [(<span class="number">20</span>, <span class="number">2.0</span>), (<span class="number">40</span>, <span class="number">4.0</span>), (<span class="number">60</span>, <span class="number">6.0</span>)]
         );
@@ -1531,28 +1531,28 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">full_leaf</span>(<span class="ident">f</span>);
         <span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">80</span>, <span class="number">4.2</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>());
         <span class="ident">m</span>.<span class="ident">verify</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">80</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">4.2</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">80</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">4.2</span>));
 
         <span class="comment">// Insert before middle (40).</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">full_leaf</span>(<span class="ident">f</span>);
         <span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">35</span>, <span class="number">4.2</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>());
         <span class="ident">m</span>.<span class="ident">verify</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">35</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">4.2</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">35</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">4.2</span>));
 
         <span class="comment">// Insert after middle (40).</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">full_leaf</span>(<span class="ident">f</span>);
         <span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">45</span>, <span class="number">4.2</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>());
         <span class="ident">m</span>.<span class="ident">verify</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">45</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">4.2</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">45</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">4.2</span>));
 
         <span class="ident">m</span>.<span class="ident">clear</span>(<span class="ident">f</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">is_empty</span>());
+        <span class="macro">assert!</span>(<span class="ident">m</span>.<span class="ident">is_empty</span>());
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">split_level1_leaf</span>() {
         <span class="comment">// Various ways of splitting a full leaf node at level 1.</span>
-        <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">MapForest</span>::<span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">f32</span><span class="op">&gt;</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">MapForest</span>::<span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">f32</span><span class="op">&gt;</span><span class="ident">::new</span>();
 
         <span class="comment">// Return a map whose root node is a full inner node, and the leaf nodes are all full</span>
         <span class="comment">// containing:</span>
@@ -1562,7 +1562,7 @@
         <span class="comment">// ...</span>
         <span class="comment">// 810, 820, ..., 870</span>
         <span class="kw">fn</span> <span class="ident">full</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">MapForest</span><span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">f32</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Map</span><span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">f32</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">Map</span>::<span class="ident">new</span>();
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">Map::new</span>();
 
             <span class="comment">// Start by inserting elements in order.</span>
             <span class="comment">// This should leave 8 leaf nodes with 4 elements in each.</span>
@@ -1585,94 +1585,94 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">full</span>(<span class="ident">f</span>);
         <span class="comment">// Verify geometry. Get get node2 as the root and leaves node0, 1, 3, ...</span>
         <span class="ident">m</span>.<span class="ident">verify</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">110</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[0]--node0[0]&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">140</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[0]--node0[3]&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">210</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[1]--node1[0]&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">270</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[1]--node1[6]&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">310</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[2]--node3[0]&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">810</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[7]--node8[0]&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">870</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[7]--node8[6]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">110</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[0]--node0[0]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">140</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[0]--node0[3]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">210</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[1]--node1[0]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">270</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[1]--node1[6]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">310</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[2]--node3[0]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">810</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[7]--node8[0]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">870</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[7]--node8[6]&quot;</span>);
 
         {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">m</span>.<span class="ident">cursor</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">c</span>.<span class="ident">goto_first</span>(), <span class="prelude-val">Some</span>(<span class="number">1.1</span>));
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">c</span>.<span class="ident">key</span>(), <span class="prelude-val">Some</span>(<span class="number">110</span>));
+            <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">goto_first</span>(), <span class="prelude-val">Some</span>(<span class="number">1.1</span>));
+            <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">key</span>(), <span class="prelude-val">Some</span>(<span class="number">110</span>));
         }
 
         <span class="comment">// Front of first leaf.</span>
         <span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">0</span>, <span class="number">4.2</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>());
         <span class="ident">m</span>.<span class="ident">verify</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">0</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">4.2</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">0</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">4.2</span>));
 
         <span class="comment">// First leaf split 4-4 after appending to LHS.</span>
         <span class="ident">f</span>.<span class="ident">clear</span>();
         <span class="ident">m</span> <span class="op">=</span> <span class="ident">full</span>(<span class="ident">f</span>);
         <span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">135</span>, <span class="number">4.2</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>());
         <span class="ident">m</span>.<span class="ident">verify</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">135</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">4.2</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">135</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">4.2</span>));
 
         <span class="comment">// First leaf split 4-4 after prepending to RHS.</span>
         <span class="ident">f</span>.<span class="ident">clear</span>();
         <span class="ident">m</span> <span class="op">=</span> <span class="ident">full</span>(<span class="ident">f</span>);
         <span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">145</span>, <span class="number">4.2</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>());
         <span class="ident">m</span>.<span class="ident">verify</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">145</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">4.2</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">145</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">4.2</span>));
 
         <span class="comment">// First leaf split 4-4 after appending to RHS.</span>
         <span class="ident">f</span>.<span class="ident">clear</span>();
         <span class="ident">m</span> <span class="op">=</span> <span class="ident">full</span>(<span class="ident">f</span>);
         <span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">175</span>, <span class="number">4.2</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>());
         <span class="ident">m</span>.<span class="ident">verify</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">175</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">4.2</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">175</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">4.2</span>));
 
         <span class="comment">// Left-middle leaf split, ins LHS.</span>
         <span class="ident">f</span>.<span class="ident">clear</span>();
         <span class="ident">m</span> <span class="op">=</span> <span class="ident">full</span>(<span class="ident">f</span>);
         <span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">435</span>, <span class="number">4.2</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>());
         <span class="ident">m</span>.<span class="ident">verify</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">435</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">4.2</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">435</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">4.2</span>));
 
         <span class="comment">// Left-middle leaf split, ins RHS.</span>
         <span class="ident">f</span>.<span class="ident">clear</span>();
         <span class="ident">m</span> <span class="op">=</span> <span class="ident">full</span>(<span class="ident">f</span>);
         <span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">445</span>, <span class="number">4.2</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>());
         <span class="ident">m</span>.<span class="ident">verify</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">445</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">4.2</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">445</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">4.2</span>));
 
         <span class="comment">// Right-middle leaf split, ins LHS.</span>
         <span class="ident">f</span>.<span class="ident">clear</span>();
         <span class="ident">m</span> <span class="op">=</span> <span class="ident">full</span>(<span class="ident">f</span>);
         <span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">535</span>, <span class="number">4.2</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>());
         <span class="ident">m</span>.<span class="ident">verify</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">535</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">4.2</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">535</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">4.2</span>));
 
         <span class="comment">// Right-middle leaf split, ins RHS.</span>
         <span class="ident">f</span>.<span class="ident">clear</span>();
         <span class="ident">m</span> <span class="op">=</span> <span class="ident">full</span>(<span class="ident">f</span>);
         <span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">545</span>, <span class="number">4.2</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>());
         <span class="ident">m</span>.<span class="ident">verify</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">545</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">4.2</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">545</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">4.2</span>));
 
         <span class="comment">// Last leaf split, ins LHS.</span>
         <span class="ident">f</span>.<span class="ident">clear</span>();
         <span class="ident">m</span> <span class="op">=</span> <span class="ident">full</span>(<span class="ident">f</span>);
         <span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">835</span>, <span class="number">4.2</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>());
         <span class="ident">m</span>.<span class="ident">verify</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">835</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">4.2</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">835</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">4.2</span>));
 
         <span class="comment">// Last leaf split, ins RHS.</span>
         <span class="ident">f</span>.<span class="ident">clear</span>();
         <span class="ident">m</span> <span class="op">=</span> <span class="ident">full</span>(<span class="ident">f</span>);
         <span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">845</span>, <span class="number">4.2</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>());
         <span class="ident">m</span>.<span class="ident">verify</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">845</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">4.2</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">845</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">4.2</span>));
 
         <span class="comment">// Front of last leaf.</span>
         <span class="ident">f</span>.<span class="ident">clear</span>();
         <span class="ident">m</span> <span class="op">=</span> <span class="ident">full</span>(<span class="ident">f</span>);
         <span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">805</span>, <span class="number">4.2</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>());
         <span class="ident">m</span>.<span class="ident">verify</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">805</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">4.2</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="number">805</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">4.2</span>));
 
         <span class="ident">m</span>.<span class="ident">clear</span>(<span class="ident">f</span>);
         <span class="ident">m</span>.<span class="ident">verify</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
@@ -1682,7 +1682,7 @@
     <span class="comment">// [ 10 20 30 40 ] [ 50 60 70 80 ]</span>
     <span class="kw">fn</span> <span class="ident">two_leaf</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">MapForest</span><span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">f32</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Map</span><span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">f32</span><span class="op">&gt;</span> {
         <span class="ident">f</span>.<span class="ident">clear</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">Map</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">Map::new</span>();
         <span class="kw">for</span> <span class="ident">n</span> <span class="kw">in</span> <span class="number">1</span>..<span class="number">9</span> {
             <span class="ident">m</span>.<span class="ident">insert</span>(<span class="ident">n</span> <span class="op">*</span> <span class="number">10</span>, <span class="ident">n</span> <span class="kw">as</span> <span class="ident">f32</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>());
         }
@@ -1691,86 +1691,86 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">remove_level1</span>() {
-        <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">MapForest</span>::<span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">f32</span><span class="op">&gt;</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">MapForest</span>::<span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">f32</span><span class="op">&gt;</span><span class="ident">::new</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">two_leaf</span>(<span class="ident">f</span>);
 
         <span class="comment">// Verify geometry.</span>
         <span class="ident">m</span>.<span class="ident">verify</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">10</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[0]--node0[0]&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">40</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[0]--node0[3]&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">49</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[0]--node0[4]&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">50</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[1]--node1[0]&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">80</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[1]--node1[3]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">10</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[0]--node0[0]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">40</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[0]--node0[3]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">49</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[0]--node0[4]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">50</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[1]--node1[0]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">80</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[1]--node1[3]&quot;</span>);
 
         <span class="comment">// Remove the front entry from a node that stays healthy.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">55</span>, <span class="number">5.5</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">50</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">5.0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">55</span>, <span class="number">5.5</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">50</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">5.0</span>));
         <span class="ident">m</span>.<span class="ident">verify</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">49</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[0]--node0[4]&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">50</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[0]--node0[4]&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">55</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[1]--node1[0]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">49</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[0]--node0[4]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">50</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[0]--node0[4]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">55</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[1]--node1[0]&quot;</span>);
 
         <span class="comment">// Remove the front entry from the first leaf node: No critical key to update.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">15</span>, <span class="number">1.5</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">10</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">1.0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">15</span>, <span class="number">1.5</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">10</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">1.0</span>));
         <span class="ident">m</span>.<span class="ident">verify</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
 
         <span class="comment">// [ 15 20 30 40 ] [ 55 60 70 80 ]</span>
 
         <span class="comment">// Remove the front entry from a right-most node that underflows.</span>
         <span class="comment">// No rebalancing for the right-most node. Still need critical key update.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">55</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">5.5</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">55</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">5.5</span>));
         <span class="ident">m</span>.<span class="ident">verify</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">55</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[0]--node0[4]&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">60</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[1]--node1[0]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">55</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[0]--node0[4]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">60</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[1]--node1[0]&quot;</span>);
 
         <span class="comment">// [ 15 20 30 40 ] [ 60 70 80 ]</span>
 
         <span class="comment">// Replenish the right leaf.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">90</span>, <span class="number">9.0</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">100</span>, <span class="number">10.0</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">90</span>, <span class="number">9.0</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">insert</span>(<span class="number">100</span>, <span class="number">10.0</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
         <span class="ident">m</span>.<span class="ident">verify</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">55</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[0]--node0[4]&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">60</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[1]--node1[0]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">55</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[0]--node0[4]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">60</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[1]--node1[0]&quot;</span>);
 
         <span class="comment">// [ 15 20 30 40 ] [ 60 70 80 90 100 ]</span>
 
         <span class="comment">// Removing one entry from the left leaf should trigger a rebalancing from the right</span>
         <span class="comment">// sibling.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">20</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">2.0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">20</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">2.0</span>));
         <span class="ident">m</span>.<span class="ident">verify</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
 
         <span class="comment">// [ 15 30 40 60 ] [ 70 80 90 100 ]</span>
         <span class="comment">// Check that the critical key was updated correctly.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">50</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[0]--node0[3]&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">60</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[0]--node0[3]&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">70</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[1]--node1[0]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">50</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[0]--node0[3]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">60</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[0]--node0[3]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">70</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[1]--node1[0]&quot;</span>);
 
         <span class="comment">// Remove front entry from the left-most leaf node, underflowing.</span>
         <span class="comment">// This should cause two leaf nodes to be merged and the root node to go away.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">15</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">1.5</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">15</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">1.5</span>));
         <span class="ident">m</span>.<span class="ident">verify</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">remove_level1_rightmost</span>() {
-        <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">MapForest</span>::<span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">f32</span><span class="op">&gt;</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">MapForest</span>::<span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">f32</span><span class="op">&gt;</span><span class="ident">::new</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">two_leaf</span>(<span class="ident">f</span>);
 
         <span class="comment">// [ 10 20 30 40 ] [ 50 60 70 80 ]</span>
 
         <span class="comment">// Remove entries from the right leaf. This doesn&#39;t trigger a rebalancing.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">60</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">6.0</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">80</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">8.0</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">50</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">5.0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">60</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">6.0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">80</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">8.0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">50</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">5.0</span>));
         <span class="ident">m</span>.<span class="ident">verify</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
 
         <span class="comment">// [ 10 20 30 40 ] [ 70 ]</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">50</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[0]--node0[4]&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">70</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[1]--node1[0]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">50</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[0]--node0[4]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">70</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node2[1]--node1[0]&quot;</span>);
 
         <span class="comment">// Removing the last entry from the right leaf should cause a collapse.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">70</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">7.0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">70</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">7.0</span>));
         <span class="ident">m</span>.<span class="ident">verify</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
     }
 
@@ -1778,7 +1778,7 @@
     <span class="comment">// 1 root, 8 inner nodes, 7*4+5=33 leaf nodes, 4 entries each.</span>
     <span class="kw">fn</span> <span class="ident">level3_sparse</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">MapForest</span><span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">f32</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Map</span><span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">f32</span><span class="op">&gt;</span> {
         <span class="ident">f</span>.<span class="ident">clear</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">Map</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">Map::new</span>();
         <span class="kw">for</span> <span class="ident">n</span> <span class="kw">in</span> <span class="number">1</span>..<span class="number">133</span> {
             <span class="ident">m</span>.<span class="ident">insert</span>(<span class="ident">n</span> <span class="op">*</span> <span class="number">10</span>, <span class="ident">n</span> <span class="kw">as</span> <span class="ident">f32</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>());
         }
@@ -1787,7 +1787,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">level3_removes</span>() {
-        <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">MapForest</span>::<span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">f32</span><span class="op">&gt;</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">MapForest</span>::<span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">f32</span><span class="op">&gt;</span><span class="ident">::new</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">level3_sparse</span>(<span class="ident">f</span>);
         <span class="ident">m</span>.<span class="ident">verify</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
 
@@ -1795,37 +1795,37 @@
         <span class="comment">// Root: node11</span>
         <span class="comment">// [ node2 170 node10 330 node16 490 node21 650 node26 810 node31 970 node36 1130 node41 ]</span>
         <span class="comment">// L1: node11</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">0</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node11[0]--node2[0]--node0[0]&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">10000</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node11[7]--node41[4]--node40[4]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">0</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node11[0]--node2[0]--node0[0]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">10000</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node11[7]--node41[4]--node40[4]&quot;</span>);
 
         <span class="comment">// 650 is a critical key in the middle of the root.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">640</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node11[3]--node21[3]--node19[3]&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">650</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node11[4]--node26[0]--node20[0]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">640</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node11[3]--node21[3]--node19[3]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">650</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node11[4]--node26[0]--node20[0]&quot;</span>);
 
         <span class="comment">// Deleting 640 triggers a rebalance from node19 to node 20, cascading to n21 -&gt; n26.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">640</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">64.0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">640</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">64.0</span>));
         <span class="ident">m</span>.<span class="ident">verify</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">650</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node11[3]--node26[3]--node20[3]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">650</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node11[3]--node26[3]--node20[3]&quot;</span>);
 
         <span class="comment">// 1130 is in the first leaf of the last L1 node. Deleting it triggers a rebalance node35</span>
         <span class="comment">// -&gt; node37, but no rebalance above where there is no right sibling.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">1130</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node11[6]--node41[0]--node35[0]&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">1140</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node11[6]--node41[0]--node35[1]&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">1130</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">113.0</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">1130</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node11[6]--node41[0]--node35[0]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">1140</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node11[6]--node41[0]--node35[1]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="number">1130</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="number">113.0</span>));
         <span class="ident">m</span>.<span class="ident">verify</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">1140</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node11[6]--node41[0]--node37[0]&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">tpath</span>(<span class="number">1140</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="string">&quot;node11[6]--node41[0]--node37[0]&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">insert_many</span>() {
-        <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">MapForest</span>::<span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">f32</span><span class="op">&gt;</span>::<span class="ident">new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">Map</span>::<span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">f32</span><span class="op">&gt;</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">MapForest</span>::<span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">f32</span><span class="op">&gt;</span><span class="ident">::new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">Map</span>::<span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">f32</span><span class="op">&gt;</span><span class="ident">::new</span>();
 
         <span class="kw">let</span> <span class="ident">mm</span> <span class="op">=</span> <span class="number">4096</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">x</span> <span class="op">=</span> <span class="number">0</span>;
 
         <span class="kw">for</span> <span class="ident">n</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">mm</span> {
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">insert</span>(<span class="ident">x</span>, <span class="ident">n</span> <span class="kw">as</span> <span class="ident">f32</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">insert</span>(<span class="ident">x</span>, <span class="ident">n</span> <span class="kw">as</span> <span class="ident">f32</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">None</span>);
             <span class="ident">m</span>.<span class="ident">verify</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
 
             <span class="ident">x</span> <span class="op">=</span> (<span class="ident">x</span> <span class="op">+</span> <span class="ident">n</span> <span class="op">+</span> <span class="number">1</span>) <span class="op">%</span> <span class="ident">mm</span>;
@@ -1833,20 +1833,21 @@
 
         <span class="ident">x</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="kw">for</span> <span class="ident">n</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">mm</span> {
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="ident">x</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="ident">n</span> <span class="kw">as</span> <span class="ident">f32</span>));
+            <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">get</span>(<span class="ident">x</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="ident">n</span> <span class="kw">as</span> <span class="ident">f32</span>));
             <span class="ident">x</span> <span class="op">=</span> (<span class="ident">x</span> <span class="op">+</span> <span class="ident">n</span> <span class="op">+</span> <span class="number">1</span>) <span class="op">%</span> <span class="ident">mm</span>;
         }
 
         <span class="ident">x</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="kw">for</span> <span class="ident">n</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">mm</span> {
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="ident">x</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="ident">n</span> <span class="kw">as</span> <span class="ident">f32</span>));
+            <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">remove</span>(<span class="ident">x</span>, <span class="ident">f</span>, <span class="kw-2">&amp;</span>()), <span class="prelude-val">Some</span>(<span class="ident">n</span> <span class="kw">as</span> <span class="ident">f32</span>));
             <span class="ident">m</span>.<span class="ident">verify</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span>());
 
             <span class="ident">x</span> <span class="op">=</span> (<span class="ident">x</span> <span class="op">+</span> <span class="ident">n</span> <span class="op">+</span> <span class="number">1</span>) <span class="op">%</span> <span class="ident">mm</span>;
         }
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">is_empty</span>());
+        <span class="macro">assert!</span>(<span class="ident">m</span>.<span class="ident">is_empty</span>());
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "cranelift_bforest";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="cranelift_bforest" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

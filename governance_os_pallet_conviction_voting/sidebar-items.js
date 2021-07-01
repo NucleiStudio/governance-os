@@ -1,1 +1,1 @@
-initSidebarItems({"constant":[["CONVICTION_VOTING_LOCK_ID",""]],"enum":[["Call","Dispatchable calls."],["Error",""]],"struct":[["Conviction",""],["Locks",""],["Module",""],["ProposalState",""],["Proposals",""],["VotingParameters",""]],"trait":[["Trait",""]]});
+initSidebarItems({"constant":[["CONVICTION_VOTING_LOCK_ID",""]],"enum":[["Call","Dispatchable calls."],["Error",""]],"struct":[["Conviction",""],["Locks",""],["Module",""],["ProposalState",""],["Proposals",""],["VotingParameters",""]],"trait":[["Config",""]]});

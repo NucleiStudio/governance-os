@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sc-cli-0.8.0/src/params/node_key_params.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>node_key_params.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sc-cli-0.9.0/src/params/node_key_params.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>node_key_params.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../sc_cli/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../sc_cli/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -237,7 +237,7 @@
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// This file is part of Substrate.</span>
 
-<span class="comment">// Copyright (C) 2017-2020 Parity Technologies (UK) Ltd.</span>
+<span class="comment">// Copyright (C) 2017-2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// SPDX-License-Identifier: GPL-3.0-or-later WITH Classpath-exception-2.0</span>
 
 <span class="comment">// This program is free software: you can redistribute it and/or modify</span>
@@ -253,13 +253,13 @@
 <span class="comment">// You should have received a copy of the GNU General Public License</span>
 <span class="comment">// along with this program. If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kw">use</span> <span class="ident">sc_network</span>::{<span class="ident">config</span>::<span class="ident">identity</span>::<span class="ident">ed25519</span>, <span class="ident">config</span>::<span class="ident">NodeKeyConfig</span>};
-<span class="kw">use</span> <span class="ident">sp_core</span>::<span class="ident">H256</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">path</span>::<span class="ident">PathBuf</span>, <span class="ident">str</span>::<span class="ident">FromStr</span>};
-<span class="kw">use</span> <span class="ident">structopt</span>::<span class="ident">StructOpt</span>;
+<span class="kw">use</span> <span class="ident">sc_network</span>::{<span class="ident">config::identity::ed25519</span>, <span class="ident">config::NodeKeyConfig</span>};
+<span class="kw">use</span> <span class="ident">sp_core::H256</span>;
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">path::PathBuf</span>, <span class="ident">str::FromStr</span>};
+<span class="kw">use</span> <span class="ident">structopt::StructOpt</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">arg_enums</span>::<span class="ident">NodeKeyType</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">error</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::arg_enums::NodeKeyType</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::error</span>;
 
 <span class="doccomment">/// The file name of the node&#39;s Ed25519 secret key inside the chain-specific</span>
 <span class="doccomment">/// network config directory, if neither `--node-key` nor `--node-key-file`</span>
@@ -308,7 +308,7 @@
 	<span class="attribute">#[<span class="ident">structopt</span>(
 		<span class="ident">long</span> <span class="op">=</span> <span class="string">&quot;node-key-type&quot;</span>,
 		<span class="ident">value_name</span> <span class="op">=</span> <span class="string">&quot;TYPE&quot;</span>,
-		<span class="ident">possible_values</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">NodeKeyType</span>::<span class="ident">variants</span>(),
+		<span class="ident">possible_values</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">NodeKeyType::variants</span>(),
 		<span class="ident">case_insensitive</span> <span class="op">=</span> <span class="bool-val">true</span>,
 		<span class="ident">default_value</span> <span class="op">=</span> <span class="string">&quot;Ed25519&quot;</span>
 	)]</span>
@@ -331,37 +331,37 @@
 <span class="kw">impl</span> <span class="ident">NodeKeyParams</span> {
 	<span class="doccomment">/// Create a `NodeKeyConfig` from the given `NodeKeyParams` in the context</span>
 	<span class="doccomment">/// of an optional network config storage directory.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">node_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">net_config_dir</span>: <span class="kw-2">&amp;</span><span class="ident">PathBuf</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">error</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NodeKeyConfig</span><span class="op">&gt;</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">node_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">net_config_dir</span>: <span class="kw-2">&amp;</span><span class="ident">PathBuf</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">error::Result</span><span class="op">&lt;</span><span class="ident">NodeKeyConfig</span><span class="op">&gt;</span> {
 		<span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="self">self</span>.<span class="ident">node_key_type</span> {
-			<span class="ident">NodeKeyType</span>::<span class="ident">Ed25519</span> <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="ident">NodeKeyType::Ed25519</span> <span class="op">=</span><span class="op">&gt;</span> {
 				<span class="kw">let</span> <span class="ident">secret</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">node_key</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">node_key</span>.<span class="ident">as_ref</span>() {
 					<span class="ident">parse_ed25519_secret</span>(<span class="ident">node_key</span>)<span class="question-mark">?</span>
 				} <span class="kw">else</span> {
-					<span class="ident">sc_network</span>::<span class="ident">config</span>::<span class="ident">Secret</span>::<span class="ident">File</span>(
+					<span class="ident">sc_network::config::Secret::File</span>(
 						<span class="self">self</span>.<span class="ident">node_key_file</span>
 							.<span class="ident">clone</span>()
 							.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">net_config_dir</span>.<span class="ident">join</span>(<span class="ident">NODE_KEY_ED25519_FILE</span>))
 					)
 				};
 
-				<span class="ident">NodeKeyConfig</span>::<span class="ident">Ed25519</span>(<span class="ident">secret</span>)
+				<span class="ident">NodeKeyConfig::Ed25519</span>(<span class="ident">secret</span>)
 			}
 		})
 	}
 }
 
 <span class="doccomment">/// Create an error caused by an invalid node key argument.</span>
-<span class="kw">fn</span> <span class="ident">invalid_node_key</span>(<span class="ident">e</span>: <span class="kw">impl</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Display</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">error</span>::<span class="ident">Error</span> {
-	<span class="ident">error</span>::<span class="ident">Error</span>::<span class="ident">Input</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Invalid node key: {}&quot;</span>, <span class="ident">e</span>))
+<span class="kw">fn</span> <span class="ident">invalid_node_key</span>(<span class="ident">e</span>: <span class="kw">impl</span> <span class="ident">std::fmt::Display</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">error::Error</span> {
+	<span class="ident">error::Error::Input</span>(<span class="macro">format!</span>(<span class="string">&quot;Invalid node key: {}&quot;</span>, <span class="ident">e</span>))
 }
 
 <span class="doccomment">/// Parse a Ed25519 secret key from a hex string into a `sc_network::Secret`.</span>
-<span class="kw">fn</span> <span class="ident">parse_ed25519_secret</span>(<span class="ident">hex</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">error</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">sc_network</span>::<span class="ident">config</span>::<span class="ident">Ed25519Secret</span><span class="op">&gt;</span> {
-	<span class="ident">H256</span>::<span class="ident">from_str</span>(<span class="kw-2">&amp;</span><span class="ident">hex</span>)
+<span class="kw">fn</span> <span class="ident">parse_ed25519_secret</span>(<span class="ident">hex</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">error::Result</span><span class="op">&lt;</span><span class="ident">sc_network::config::Ed25519Secret</span><span class="op">&gt;</span> {
+	<span class="ident">H256::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">hex</span>)
 		.<span class="ident">map_err</span>(<span class="ident">invalid_node_key</span>)
 		.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">bytes</span><span class="op">|</span> {
-			<span class="ident">ed25519</span>::<span class="ident">SecretKey</span>::<span class="ident">from_bytes</span>(<span class="ident">bytes</span>)
-				.<span class="ident">map</span>(<span class="ident">sc_network</span>::<span class="ident">config</span>::<span class="ident">Secret</span>::<span class="ident">Input</span>)
+			<span class="ident">ed25519::SecretKey::from_bytes</span>(<span class="ident">bytes</span>)
+				.<span class="ident">map</span>(<span class="ident">sc_network::config::Secret::Input</span>)
 				.<span class="ident">map_err</span>(<span class="ident">invalid_node_key</span>)
 		})
 }
@@ -369,76 +369,76 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
 	<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-	<span class="kw">use</span> <span class="ident">sc_network</span>::<span class="ident">config</span>::<span class="ident">identity</span>::{<span class="ident">ed25519</span>, <span class="ident">Keypair</span>};
-	<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fs</span>;
+	<span class="kw">use</span> <span class="ident">sc_network::config::identity</span>::{<span class="ident">ed25519</span>, <span class="ident">Keypair</span>};
+	<span class="kw">use</span> <span class="ident">std::fs</span>;
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">test_node_key_config_input</span>() {
-		<span class="kw">fn</span> <span class="ident">secret_input</span>(<span class="ident">net_config_dir</span>: <span class="kw-2">&amp;</span><span class="ident">PathBuf</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">error</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-			<span class="ident">NodeKeyType</span>::<span class="ident">variants</span>().<span class="ident">iter</span>().<span class="ident">try_for_each</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> {
-				<span class="kw">let</span> <span class="ident">node_key_type</span> <span class="op">=</span> <span class="ident">NodeKeyType</span>::<span class="ident">from_str</span>(<span class="ident">t</span>).<span class="ident">unwrap</span>();
+		<span class="kw">fn</span> <span class="ident">secret_input</span>(<span class="ident">net_config_dir</span>: <span class="kw-2">&amp;</span><span class="ident">PathBuf</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">error::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+			<span class="ident">NodeKeyType::variants</span>().<span class="ident">iter</span>().<span class="ident">try_for_each</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> {
+				<span class="kw">let</span> <span class="ident">node_key_type</span> <span class="op">=</span> <span class="ident">NodeKeyType::from_str</span>(<span class="ident">t</span>).<span class="ident">unwrap</span>();
 				<span class="kw">let</span> <span class="ident">sk</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">node_key_type</span> {
-					<span class="ident">NodeKeyType</span>::<span class="ident">Ed25519</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ed25519</span>::<span class="ident">SecretKey</span>::<span class="ident">generate</span>().<span class="ident">as_ref</span>().<span class="ident">to_vec</span>(),
+					<span class="ident">NodeKeyType::Ed25519</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ed25519::SecretKey::generate</span>().<span class="ident">as_ref</span>().<span class="ident">to_vec</span>(),
 				};
 				<span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">NodeKeyParams</span> {
 					<span class="ident">node_key_type</span>,
-					<span class="ident">node_key</span>: <span class="prelude-val">Some</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{:x}&quot;</span>, <span class="ident">H256</span>::<span class="ident">from_slice</span>(<span class="ident">sk</span>.<span class="ident">as_ref</span>()))),
+					<span class="ident">node_key</span>: <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;{:x}&quot;</span>, <span class="ident">H256::from_slice</span>(<span class="ident">sk</span>.<span class="ident">as_ref</span>()))),
 					<span class="ident">node_key_file</span>: <span class="prelude-val">None</span>,
 				};
 				<span class="ident">params</span>.<span class="ident">node_key</span>(<span class="ident">net_config_dir</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">c</span> {
-					<span class="ident">NodeKeyConfig</span>::<span class="ident">Ed25519</span>(<span class="ident">sc_network</span>::<span class="ident">config</span>::<span class="ident">Secret</span>::<span class="ident">Input</span>(<span class="kw-2">ref</span> <span class="ident">ski</span>))
-						<span class="kw">if</span> <span class="ident">node_key_type</span> <span class="op">=</span><span class="op">=</span> <span class="ident">NodeKeyType</span>::<span class="ident">Ed25519</span> <span class="op">&amp;&amp;</span> <span class="kw-2">&amp;</span><span class="ident">sk</span>[..] <span class="op">=</span><span class="op">=</span> <span class="ident">ski</span>.<span class="ident">as_ref</span>() <span class="op">=</span><span class="op">&gt;</span>
+					<span class="ident">NodeKeyConfig::Ed25519</span>(<span class="ident">sc_network::config::Secret::Input</span>(<span class="kw-2">ref</span> <span class="ident">ski</span>))
+						<span class="kw">if</span> <span class="ident">node_key_type</span> <span class="op">=</span><span class="op">=</span> <span class="ident">NodeKeyType::Ed25519</span> <span class="op">&amp;&amp;</span> <span class="kw-2">&amp;</span><span class="ident">sk</span>[..] <span class="op">=</span><span class="op">=</span> <span class="ident">ski</span>.<span class="ident">as_ref</span>() <span class="op">=</span><span class="op">&gt;</span>
 					{
 						<span class="prelude-val">Ok</span>(())
 					}
-					<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">error</span>::<span class="ident">Error</span>::<span class="ident">Input</span>(<span class="string">&quot;Unexpected node key config&quot;</span>.<span class="ident">into</span>())),
+					<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">error::Error::Input</span>(<span class="string">&quot;Unexpected node key config&quot;</span>.<span class="ident">into</span>())),
 				})
 			})
 		}
 
-		<span class="macro">assert</span><span class="macro">!</span>(<span class="ident">secret_input</span>(<span class="kw-2">&amp;</span><span class="ident">PathBuf</span>::<span class="ident">from_str</span>(<span class="string">&quot;x&quot;</span>).<span class="ident">unwrap</span>()).<span class="ident">is_ok</span>());
+		<span class="macro">assert!</span>(<span class="ident">secret_input</span>(<span class="kw-2">&amp;</span><span class="ident">PathBuf::from_str</span>(<span class="string">&quot;x&quot;</span>).<span class="ident">unwrap</span>()).<span class="ident">is_ok</span>());
 	}
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">test_node_key_config_file</span>() {
-		<span class="kw">fn</span> <span class="ident">check_key</span>(<span class="ident">file</span>: <span class="ident">PathBuf</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">ed25519</span>::<span class="ident">SecretKey</span>) {
+		<span class="kw">fn</span> <span class="ident">check_key</span>(<span class="ident">file</span>: <span class="ident">PathBuf</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">ed25519::SecretKey</span>) {
 			<span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">NodeKeyParams</span> {
-				<span class="ident">node_key_type</span>: <span class="ident">NodeKeyType</span>::<span class="ident">Ed25519</span>,
+				<span class="ident">node_key_type</span>: <span class="ident">NodeKeyType::Ed25519</span>,
 				<span class="ident">node_key</span>: <span class="prelude-val">None</span>,
 				<span class="ident">node_key_file</span>: <span class="prelude-val">Some</span>(<span class="ident">file</span>),
 			};
 
-			<span class="kw">let</span> <span class="ident">node_key</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">node_key</span>(<span class="kw-2">&amp;</span><span class="ident">PathBuf</span>::<span class="ident">from</span>(<span class="string">&quot;not-used&quot;</span>))
+			<span class="kw">let</span> <span class="ident">node_key</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">node_key</span>(<span class="kw-2">&amp;</span><span class="ident">PathBuf::from</span>(<span class="string">&quot;not-used&quot;</span>))
 				.<span class="ident">expect</span>(<span class="string">&quot;Creates node key config&quot;</span>)
 				.<span class="ident">into_keypair</span>()
 				.<span class="ident">expect</span>(<span class="string">&quot;Creates node key pair&quot;</span>);
 
 			<span class="kw">match</span> <span class="ident">node_key</span> {
-				<span class="ident">Keypair</span>::<span class="ident">Ed25519</span>(<span class="kw-2">ref</span> <span class="ident">pair</span>)
+				<span class="ident">Keypair::Ed25519</span>(<span class="kw-2">ref</span> <span class="ident">pair</span>)
 					<span class="kw">if</span> <span class="ident">pair</span>.<span class="ident">secret</span>().<span class="ident">as_ref</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">key</span>.<span class="ident">as_ref</span>() <span class="op">=</span><span class="op">&gt;</span> {}
-				<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Invalid key&quot;</span>),
+				<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Invalid key&quot;</span>),
 			}
 		}
 
-		<span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="ident">tempfile</span>::<span class="ident">Builder</span>::<span class="ident">new</span>().<span class="ident">prefix</span>(<span class="string">&quot;alice&quot;</span>).<span class="ident">tempdir</span>().<span class="ident">expect</span>(<span class="string">&quot;Creates tempfile&quot;</span>);
+		<span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="ident">tempfile::Builder::new</span>().<span class="ident">prefix</span>(<span class="string">&quot;alice&quot;</span>).<span class="ident">tempdir</span>().<span class="ident">expect</span>(<span class="string">&quot;Creates tempfile&quot;</span>);
 		<span class="kw">let</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">tmp</span>.<span class="ident">path</span>().<span class="ident">join</span>(<span class="string">&quot;mysecret&quot;</span>).<span class="ident">to_path_buf</span>();
-		<span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">ed25519</span>::<span class="ident">SecretKey</span>::<span class="ident">generate</span>();
+		<span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">ed25519::SecretKey::generate</span>();
 
-		<span class="ident">fs</span>::<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="ident">file</span>, <span class="ident">hex</span>::<span class="ident">encode</span>(<span class="ident">key</span>.<span class="ident">as_ref</span>())).<span class="ident">expect</span>(<span class="string">&quot;Writes secret key&quot;</span>);
+		<span class="ident">fs::write</span>(<span class="kw-2">&amp;</span><span class="ident">file</span>, <span class="ident">hex::encode</span>(<span class="ident">key</span>.<span class="ident">as_ref</span>())).<span class="ident">expect</span>(<span class="string">&quot;Writes secret key&quot;</span>);
 		<span class="ident">check_key</span>(<span class="ident">file</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="ident">key</span>);
 
-		<span class="ident">fs</span>::<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="ident">file</span>, <span class="kw-2">&amp;</span><span class="ident">key</span>).<span class="ident">expect</span>(<span class="string">&quot;Writes secret key&quot;</span>);
+		<span class="ident">fs::write</span>(<span class="kw-2">&amp;</span><span class="ident">file</span>, <span class="kw-2">&amp;</span><span class="ident">key</span>).<span class="ident">expect</span>(<span class="string">&quot;Writes secret key&quot;</span>);
 		<span class="ident">check_key</span>(<span class="ident">file</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="ident">key</span>);
 	}
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">test_node_key_config_default</span>() {
-		<span class="kw">fn</span> <span class="ident">with_def_params</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">error</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+		<span class="kw">fn</span> <span class="ident">with_def_params</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">error::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
 		<span class="kw">where</span>
-			<span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">NodeKeyParams</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">error</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
+			<span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">NodeKeyParams</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">error::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
 		{
-			<span class="ident">NodeKeyType</span>::<span class="ident">variants</span>().<span class="ident">iter</span>().<span class="ident">try_for_each</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> {
-				<span class="kw">let</span> <span class="ident">node_key_type</span> <span class="op">=</span> <span class="ident">NodeKeyType</span>::<span class="ident">from_str</span>(<span class="ident">t</span>).<span class="ident">unwrap</span>();
+			<span class="ident">NodeKeyType::variants</span>().<span class="ident">iter</span>().<span class="ident">try_for_each</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> {
+				<span class="kw">let</span> <span class="ident">node_key_type</span> <span class="op">=</span> <span class="ident">NodeKeyType::from_str</span>(<span class="ident">t</span>).<span class="ident">unwrap</span>();
 				<span class="ident">f</span>(<span class="ident">NodeKeyParams</span> {
 					<span class="ident">node_key_type</span>,
 					<span class="ident">node_key</span>: <span class="prelude-val">None</span>,
@@ -447,26 +447,27 @@
 			})
 		}
 
-		<span class="kw">fn</span> <span class="ident">some_config_dir</span>(<span class="ident">net_config_dir</span>: <span class="kw-2">&amp;</span><span class="ident">PathBuf</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">error</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+		<span class="kw">fn</span> <span class="ident">some_config_dir</span>(<span class="ident">net_config_dir</span>: <span class="kw-2">&amp;</span><span class="ident">PathBuf</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">error::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
 			<span class="ident">with_def_params</span>(<span class="op">|</span><span class="ident">params</span><span class="op">|</span> {
-				<span class="kw">let</span> <span class="ident">dir</span> <span class="op">=</span> <span class="ident">PathBuf</span>::<span class="ident">from</span>(<span class="ident">net_config_dir</span>.<span class="ident">clone</span>());
+				<span class="kw">let</span> <span class="ident">dir</span> <span class="op">=</span> <span class="ident">PathBuf::from</span>(<span class="ident">net_config_dir</span>.<span class="ident">clone</span>());
 				<span class="kw">let</span> <span class="ident">typ</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">node_key_type</span>;
 				<span class="ident">params</span>
 					.<span class="ident">node_key</span>(<span class="ident">net_config_dir</span>)
 					.<span class="ident">and_then</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">c</span> {
-						<span class="ident">NodeKeyConfig</span>::<span class="ident">Ed25519</span>(<span class="ident">sc_network</span>::<span class="ident">config</span>::<span class="ident">Secret</span>::<span class="ident">File</span>(<span class="kw-2">ref</span> <span class="ident">f</span>))
-						<span class="kw">if</span> <span class="ident">typ</span> <span class="op">=</span><span class="op">=</span> <span class="ident">NodeKeyType</span>::<span class="ident">Ed25519</span>
+						<span class="ident">NodeKeyConfig::Ed25519</span>(<span class="ident">sc_network::config::Secret::File</span>(<span class="kw-2">ref</span> <span class="ident">f</span>))
+						<span class="kw">if</span> <span class="ident">typ</span> <span class="op">=</span><span class="op">=</span> <span class="ident">NodeKeyType::Ed25519</span>
 								<span class="op">&amp;&amp;</span> <span class="ident">f</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">dir</span>.<span class="ident">join</span>(<span class="ident">NODE_KEY_ED25519_FILE</span>) <span class="op">=</span><span class="op">&gt;</span>
 						{
 							<span class="prelude-val">Ok</span>(())
 						}
-						<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">error</span>::<span class="ident">Error</span>::<span class="ident">Input</span>(<span class="string">&quot;Unexpected node key config&quot;</span>.<span class="ident">into</span>())),
+						<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">error::Error::Input</span>(<span class="string">&quot;Unexpected node key config&quot;</span>.<span class="ident">into</span>())),
 					})
 			})
 		}
 
-		<span class="macro">assert</span><span class="macro">!</span>(<span class="ident">some_config_dir</span>(<span class="kw-2">&amp;</span><span class="ident">PathBuf</span>::<span class="ident">from_str</span>(<span class="string">&quot;x&quot;</span>).<span class="ident">unwrap</span>()).<span class="ident">is_ok</span>());
+		<span class="macro">assert!</span>(<span class="ident">some_config_dir</span>(<span class="kw-2">&amp;</span><span class="ident">PathBuf::from_str</span>(<span class="string">&quot;x&quot;</span>).<span class="ident">unwrap</span>()).<span class="ident">is_ok</span>());
 	}
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "sc_cli";</script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sc_cli" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
+    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script></body></html>

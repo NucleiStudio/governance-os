@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["PublishError","Error associated with publishing a gossipsub message."]]});
+initSidebarItems({"enum":[["GossipsubHandlerError","Errors that can occur in the protocols handler."],["PublishError","Error associated with publishing a gossipsub message."],["SubscriptionError","Error associated with subscribing to a topic."],["ValidationError",""]]});

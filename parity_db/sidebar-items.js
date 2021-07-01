@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["Error",""]],"struct":[["Db",""],["Options","Database configuration."]],"type":[["Result",""]]});
+initSidebarItems({"enum":[["Error",""]],"struct":[["ColumnOptions",""],["Db",""],["Options","Database configuration."]],"type":[["Result",""]]});

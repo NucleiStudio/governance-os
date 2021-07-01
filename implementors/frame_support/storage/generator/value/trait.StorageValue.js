@@ -1,7 +1,4 @@
 (function() {var implementors = {};
-implementors["frame_system"] = [{"text":"impl StorageValue&lt;LastRuntimeUpgradeInfo&gt; for LastRuntimeUpgrade","synthetic":false,"types":[]}];
-implementors["governance_os_pallet_organizations"] = [{"text":"impl StorageValue&lt;u32&gt; for Counter","synthetic":false,"types":[]}];
-implementors["pallet_aura"] = [{"text":"impl&lt;T:&nbsp;Trait&gt; StorageValue&lt;Vec&lt;&lt;T as Trait&gt;::AuthorityId&gt;&gt; for Authorities&lt;T&gt;","synthetic":false,"types":[]}];
-implementors["pallet_timestamp"] = [{"text":"impl&lt;T:&nbsp;Trait&gt; StorageValue&lt;&lt;T as Trait&gt;::Moment&gt; for Now&lt;T&gt;","synthetic":false,"types":[]}];
-implementors["pallet_transaction_payment"] = [{"text":"impl StorageValue&lt;FixedU128&gt; for NextFeeMultiplier","synthetic":false,"types":[]}];
+implementors["governance_os_pallet_organizations"] = [{"text":"impl StorageValue&lt;<a class=\"primitive\" href=\"https://doc.rust-lang.org/nightly/std/primitive.u32.html\">u32</a>&gt; for <a class=\"struct\" href=\"governance_os_pallet_organizations/struct.Counter.html\" title=\"struct governance_os_pallet_organizations::Counter\">Counter</a>","synthetic":false,"types":["governance_os_pallet_organizations::Counter"]}];
+implementors["pallet_transaction_payment"] = [{"text":"impl StorageValue&lt;<a class=\"struct\" href=\"sp_arithmetic/fixed_point/struct.FixedU128.html\" title=\"struct sp_arithmetic::fixed_point::FixedU128\">FixedU128</a>&gt; for <a class=\"struct\" href=\"pallet_transaction_payment/struct.NextFeeMultiplier.html\" title=\"struct pallet_transaction_payment::NextFeeMultiplier\">NextFeeMultiplier</a>","synthetic":false,"types":["pallet_transaction_payment::NextFeeMultiplier"]}];
 if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

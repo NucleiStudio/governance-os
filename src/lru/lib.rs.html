@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lru-0.4.3/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lru-0.6.5/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../lru/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../lru/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1506,6 +1506,135 @@
 <span id="1503">1503</span>
 <span id="1504">1504</span>
 <span id="1505">1505</span>
+<span id="1506">1506</span>
+<span id="1507">1507</span>
+<span id="1508">1508</span>
+<span id="1509">1509</span>
+<span id="1510">1510</span>
+<span id="1511">1511</span>
+<span id="1512">1512</span>
+<span id="1513">1513</span>
+<span id="1514">1514</span>
+<span id="1515">1515</span>
+<span id="1516">1516</span>
+<span id="1517">1517</span>
+<span id="1518">1518</span>
+<span id="1519">1519</span>
+<span id="1520">1520</span>
+<span id="1521">1521</span>
+<span id="1522">1522</span>
+<span id="1523">1523</span>
+<span id="1524">1524</span>
+<span id="1525">1525</span>
+<span id="1526">1526</span>
+<span id="1527">1527</span>
+<span id="1528">1528</span>
+<span id="1529">1529</span>
+<span id="1530">1530</span>
+<span id="1531">1531</span>
+<span id="1532">1532</span>
+<span id="1533">1533</span>
+<span id="1534">1534</span>
+<span id="1535">1535</span>
+<span id="1536">1536</span>
+<span id="1537">1537</span>
+<span id="1538">1538</span>
+<span id="1539">1539</span>
+<span id="1540">1540</span>
+<span id="1541">1541</span>
+<span id="1542">1542</span>
+<span id="1543">1543</span>
+<span id="1544">1544</span>
+<span id="1545">1545</span>
+<span id="1546">1546</span>
+<span id="1547">1547</span>
+<span id="1548">1548</span>
+<span id="1549">1549</span>
+<span id="1550">1550</span>
+<span id="1551">1551</span>
+<span id="1552">1552</span>
+<span id="1553">1553</span>
+<span id="1554">1554</span>
+<span id="1555">1555</span>
+<span id="1556">1556</span>
+<span id="1557">1557</span>
+<span id="1558">1558</span>
+<span id="1559">1559</span>
+<span id="1560">1560</span>
+<span id="1561">1561</span>
+<span id="1562">1562</span>
+<span id="1563">1563</span>
+<span id="1564">1564</span>
+<span id="1565">1565</span>
+<span id="1566">1566</span>
+<span id="1567">1567</span>
+<span id="1568">1568</span>
+<span id="1569">1569</span>
+<span id="1570">1570</span>
+<span id="1571">1571</span>
+<span id="1572">1572</span>
+<span id="1573">1573</span>
+<span id="1574">1574</span>
+<span id="1575">1575</span>
+<span id="1576">1576</span>
+<span id="1577">1577</span>
+<span id="1578">1578</span>
+<span id="1579">1579</span>
+<span id="1580">1580</span>
+<span id="1581">1581</span>
+<span id="1582">1582</span>
+<span id="1583">1583</span>
+<span id="1584">1584</span>
+<span id="1585">1585</span>
+<span id="1586">1586</span>
+<span id="1587">1587</span>
+<span id="1588">1588</span>
+<span id="1589">1589</span>
+<span id="1590">1590</span>
+<span id="1591">1591</span>
+<span id="1592">1592</span>
+<span id="1593">1593</span>
+<span id="1594">1594</span>
+<span id="1595">1595</span>
+<span id="1596">1596</span>
+<span id="1597">1597</span>
+<span id="1598">1598</span>
+<span id="1599">1599</span>
+<span id="1600">1600</span>
+<span id="1601">1601</span>
+<span id="1602">1602</span>
+<span id="1603">1603</span>
+<span id="1604">1604</span>
+<span id="1605">1605</span>
+<span id="1606">1606</span>
+<span id="1607">1607</span>
+<span id="1608">1608</span>
+<span id="1609">1609</span>
+<span id="1610">1610</span>
+<span id="1611">1611</span>
+<span id="1612">1612</span>
+<span id="1613">1613</span>
+<span id="1614">1614</span>
+<span id="1615">1615</span>
+<span id="1616">1616</span>
+<span id="1617">1617</span>
+<span id="1618">1618</span>
+<span id="1619">1619</span>
+<span id="1620">1620</span>
+<span id="1621">1621</span>
+<span id="1622">1622</span>
+<span id="1623">1623</span>
+<span id="1624">1624</span>
+<span id="1625">1625</span>
+<span id="1626">1626</span>
+<span id="1627">1627</span>
+<span id="1628">1628</span>
+<span id="1629">1629</span>
+<span id="1630">1630</span>
+<span id="1631">1631</span>
+<span id="1632">1632</span>
+<span id="1633">1633</span>
+<span id="1634">1634</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// MIT License</span>
 
@@ -1523,7 +1652,7 @@
 
 <span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
 <span class="comment">// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
-<span class="comment">// FITNpubESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
+<span class="comment">// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
 <span class="comment">// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
 <span class="comment">// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
 <span class="comment">// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
@@ -1566,7 +1695,7 @@
 <span class="doccomment">//! ```</span>
 
 <span class="attribute">#![<span class="ident">no_std</span>]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>, <span class="ident">feature</span>(<span class="ident">alloc</span>, <span class="ident">optin_builtin_traits</span>))]</span>
+<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>, <span class="ident">feature</span>(<span class="ident">negative_impls</span>, <span class="ident">auto_traits</span>))]</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;hashbrown&quot;</span>)]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">hashbrown</span>;
@@ -1574,29 +1703,24 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">scoped_threadpool</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>))]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">std</span> <span class="kw">as</span> <span class="ident">alloc</span>;
+<span class="kw">use</span> <span class="ident">alloc::borrow::Borrow</span>;
+<span class="kw">use</span> <span class="ident">alloc::boxed::Box</span>;
+<span class="kw">use</span> <span class="ident">core::fmt</span>;
+<span class="kw">use</span> <span class="ident">core::hash</span>::{<span class="ident">BuildHasher</span>, <span class="ident">Hash</span>, <span class="ident">Hasher</span>};
+<span class="kw">use</span> <span class="ident">core::iter::FusedIterator</span>;
+<span class="kw">use</span> <span class="ident">core::marker::PhantomData</span>;
+<span class="kw">use</span> <span class="ident">core::mem</span>;
+<span class="kw">use</span> <span class="ident">core::ptr</span>;
+<span class="kw">use</span> <span class="ident">core::usize</span>;
 
-<span class="kw">use</span> <span class="ident">alloc</span>::<span class="ident">borrow</span>::<span class="ident">Borrow</span>;
-<span class="kw">use</span> <span class="ident">alloc</span>::<span class="ident">boxed</span>::<span class="ident">Box</span>;
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">fmt</span>;
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">hash</span>::{<span class="ident">BuildHasher</span>, <span class="ident">Hash</span>, <span class="ident">Hasher</span>};
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">iter</span>::<span class="ident">FusedIterator</span>;
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">marker</span>::<span class="ident">PhantomData</span>;
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">mem</span>;
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">ptr</span>;
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">usize</span>;
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;hashbrown&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">alloc</span>::<span class="ident">collections</span>::<span class="ident">HashMap</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;hashbrown&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">hashbrown</span>::<span class="ident">HashMap</span>;
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;hashbrown&quot;</span>)))]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">std</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;hashbrown&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">hashbrown::HashMap</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;hashbrown&quot;</span>))]</span>
+<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">alloc</span>;
 
 <span class="comment">// Struct used to hold a reference to a key</span>
@@ -1633,22 +1757,22 @@
     <span class="ident">D</span>: <span class="ident">NotKeyRef</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
 {
     <span class="kw">fn</span> <span class="ident">borrow</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">D</span> {
-        <span class="kw">unsafe</span> { (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">k</span>) }.<span class="ident">borrow</span>()
+        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">k</span> }.<span class="ident">borrow</span>()
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>))]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span> <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">KeyRef</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">borrow</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">K</span> {
-        <span class="kw">unsafe</span> { (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">k</span>) }
+        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">k</span> }
     }
 }
 
 <span class="comment">// Struct used to hold a key value pair. Also contains references to previous and next entries</span>
 <span class="comment">// so we can maintain the entries in a linked list ordered by their use.</span>
 <span class="kw">struct</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
-    <span class="ident">key</span>: <span class="ident">K</span>,
-    <span class="ident">val</span>: <span class="ident">V</span>,
+    <span class="ident">key</span>: <span class="ident">mem::MaybeUninit</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>,
+    <span class="ident">val</span>: <span class="ident">mem::MaybeUninit</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>,
     <span class="ident">prev</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>,
     <span class="ident">next</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>,
 }
@@ -1656,18 +1780,27 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: <span class="ident">K</span>, <span class="ident">val</span>: <span class="ident">V</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="ident">LruEntry</span> {
-            <span class="ident">key</span>,
-            <span class="ident">val</span>,
-            <span class="ident">prev</span>: <span class="ident">ptr</span>::<span class="ident">null_mut</span>(),
-            <span class="ident">next</span>: <span class="ident">ptr</span>::<span class="ident">null_mut</span>(),
+            <span class="ident">key</span>: <span class="ident">mem::MaybeUninit::new</span>(<span class="ident">key</span>),
+            <span class="ident">val</span>: <span class="ident">mem::MaybeUninit::new</span>(<span class="ident">val</span>),
+            <span class="ident">prev</span>: <span class="ident">ptr::null_mut</span>(),
+            <span class="ident">next</span>: <span class="ident">ptr::null_mut</span>(),
+        }
+    }
+
+    <span class="kw">fn</span> <span class="ident">new_sigil</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="ident">LruEntry</span> {
+            <span class="ident">key</span>: <span class="ident">mem::MaybeUninit::uninit</span>(),
+            <span class="ident">val</span>: <span class="ident">mem::MaybeUninit::uninit</span>(),
+            <span class="ident">prev</span>: <span class="ident">ptr::null_mut</span>(),
+            <span class="ident">next</span>: <span class="ident">ptr::null_mut</span>(),
         }
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;hashbrown&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">DefaultHasher</span> <span class="op">=</span> <span class="ident">hashbrown</span>::<span class="ident">hash_map</span>::<span class="ident">DefaultHashBuilder</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">DefaultHasher</span> <span class="op">=</span> <span class="ident">hashbrown::hash_map::DefaultHashBuilder</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;hashbrown&quot;</span>))]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">DefaultHasher</span> <span class="op">=</span> <span class="ident">alloc</span>::<span class="ident">collections</span>::<span class="ident">hash_map</span>::<span class="ident">RandomState</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">DefaultHasher</span> <span class="op">=</span> <span class="ident">std::collections::hash_map::RandomState</span>;
 
 <span class="doccomment">/// An LRU Cache</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LruCache</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span> <span class="op">=</span> <span class="ident">DefaultHasher</span><span class="op">&gt;</span> {
@@ -1689,7 +1822,7 @@
     <span class="doccomment">/// let mut cache: LruCache&lt;isize, &amp;str&gt; = LruCache::new(10);</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">cap</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">LruCache</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
-        <span class="ident">LruCache</span>::<span class="ident">construct</span>(<span class="ident">cap</span>, <span class="ident">HashMap</span>::<span class="ident">with_capacity</span>(<span class="ident">cap</span>))
+        <span class="ident">LruCache::construct</span>(<span class="ident">cap</span>, <span class="ident">HashMap::with_capacity</span>(<span class="ident">cap</span>))
     }
 
     <span class="doccomment">/// Creates a new LRU Cache that never automatically evicts items.</span>
@@ -1701,13 +1834,13 @@
     <span class="doccomment">/// let mut cache: LruCache&lt;isize, &amp;str&gt; = LruCache::unbounded();</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unbounded</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">LruCache</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
-        <span class="ident">LruCache</span>::<span class="ident">construct</span>(<span class="ident">usize</span>::<span class="ident">MAX</span>, <span class="ident">HashMap</span>::<span class="ident">default</span>())
+        <span class="ident">LruCache::construct</span>(<span class="ident">usize::MAX</span>, <span class="ident">HashMap::default</span>())
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span>, <span class="ident">V</span>, <span class="ident">S</span>: <span class="ident">BuildHasher</span><span class="op">&gt;</span> <span class="ident">LruCache</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Creates a new LRU Cache that holds at most `cap` items and</span>
-    <span class="doccomment">/// uses the providedash builder to hash keys.</span>
+    <span class="doccomment">/// uses the provided hash builder to hash keys.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Example</span>
     <span class="doccomment">///</span>
@@ -1718,7 +1851,22 @@
     <span class="doccomment">/// let mut cache: LruCache&lt;isize, &amp;str&gt; = LruCache::with_hasher(10, s);</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_hasher</span>(<span class="ident">cap</span>: <span class="ident">usize</span>, <span class="ident">hash_builder</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">LruCache</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-        <span class="ident">LruCache</span>::<span class="ident">construct</span>(<span class="ident">cap</span>, <span class="ident">HashMap</span>::<span class="ident">with_capacity_and_hasher</span>(<span class="ident">cap</span>, <span class="ident">hash_builder</span>))
+        <span class="ident">LruCache::construct</span>(<span class="ident">cap</span>, <span class="ident">HashMap::with_capacity_and_hasher</span>(<span class="ident">cap</span>, <span class="ident">hash_builder</span>))
+    }
+
+    <span class="doccomment">/// Creates a new LRU Cache that never automatically evicts items and</span>
+    <span class="doccomment">/// uses the provided hash builder to hash keys.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Example</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use lru::{LruCache, DefaultHasher};</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let s = DefaultHasher::default();</span>
+    <span class="doccomment">/// let mut cache: LruCache&lt;isize, &amp;str&gt; = LruCache::unbounded_with_hasher(s);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unbounded_with_hasher</span>(<span class="ident">hash_builder</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">LruCache</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span> {
+        <span class="ident">LruCache::construct</span>(<span class="ident">usize::MAX</span>, <span class="ident">HashMap::with_hasher</span>(<span class="ident">hash_builder</span>))
     }
 
     <span class="doccomment">/// Creates a new LRU Cache with the given capacity.</span>
@@ -1728,8 +1876,8 @@
         <span class="kw">let</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache</span> {
             <span class="ident">map</span>,
             <span class="ident">cap</span>,
-            <span class="ident">head</span>: <span class="kw">unsafe</span> { <span class="ident">Box</span>::<span class="ident">into_raw</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">mem</span>::<span class="ident">MaybeUninit</span>::<span class="ident">uninit</span>().<span class="ident">assume_init</span>())) },
-            <span class="ident">tail</span>: <span class="kw">unsafe</span> { <span class="ident">Box</span>::<span class="ident">into_raw</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">mem</span>::<span class="ident">MaybeUninit</span>::<span class="ident">uninit</span>().<span class="ident">assume_init</span>())) },
+            <span class="ident">head</span>: <span class="ident">Box::into_raw</span>(<span class="ident">Box::new</span>(<span class="ident">LruEntry::new_sigil</span>())),
+            <span class="ident">tail</span>: <span class="ident">Box::into_raw</span>(<span class="ident">Box::new</span>(<span class="ident">LruEntry::new_sigil</span>())),
         };
 
         <span class="kw">unsafe</span> {
@@ -1766,21 +1914,32 @@
             <span class="prelude-val">Some</span>(<span class="ident">node_ptr</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="comment">// if the key is already in the cache just update its value and move it to the</span>
                 <span class="comment">// front of the list</span>
-                <span class="kw">unsafe</span> { <span class="ident">mem</span>::<span class="ident">swap</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">v</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> (<span class="kw-2">*</span><span class="ident">node_ptr</span>).<span class="ident">val</span>) }
+                <span class="kw">unsafe</span> { <span class="ident">mem::swap</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">v</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> (<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="ident">node_ptr</span>).<span class="ident">val</span>.<span class="ident">as_mut_ptr</span>()) <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">V</span>) }
                 <span class="self">self</span>.<span class="ident">detach</span>(<span class="ident">node_ptr</span>);
                 <span class="self">self</span>.<span class="ident">attach</span>(<span class="ident">node_ptr</span>);
                 <span class="prelude-val">Some</span>(<span class="ident">v</span>)
             }
             <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="comment">// if the capacity is zero, do nothing</span>
+                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">cap</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                    <span class="kw">return</span> <span class="prelude-val">None</span>;
+                }
+
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">node</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">cap</span>() {
                     <span class="comment">// if the cache is full, remove the last entry so we can use it for the new key</span>
                     <span class="kw">let</span> <span class="ident">old_key</span> <span class="op">=</span> <span class="ident">KeyRef</span> {
-                        <span class="ident">k</span>: <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">tail</span>).<span class="ident">prev</span>).<span class="ident">key</span> },
+                        <span class="ident">k</span>: <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">tail</span>).<span class="ident">prev</span>).<span class="ident">key</span>.<span class="ident">as_ptr</span>()) },
                     };
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">old_node</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">old_key</span>).<span class="ident">unwrap</span>();
 
-                    <span class="ident">old_node</span>.<span class="ident">key</span> <span class="op">=</span> <span class="ident">k</span>;
-                    <span class="ident">old_node</span>.<span class="ident">val</span> <span class="op">=</span> <span class="ident">v</span>;
+                    <span class="comment">// drop the node&#39;s current key and val so we can overwrite them</span>
+                    <span class="kw">unsafe</span> {
+                        <span class="ident">ptr::drop_in_place</span>(<span class="ident">old_node</span>.<span class="ident">key</span>.<span class="ident">as_mut_ptr</span>());
+                        <span class="ident">ptr::drop_in_place</span>(<span class="ident">old_node</span>.<span class="ident">val</span>.<span class="ident">as_mut_ptr</span>());
+                    }
+
+                    <span class="ident">old_node</span>.<span class="ident">key</span> <span class="op">=</span> <span class="ident">mem::MaybeUninit::new</span>(<span class="ident">k</span>);
+                    <span class="ident">old_node</span>.<span class="ident">val</span> <span class="op">=</span> <span class="ident">mem::MaybeUninit::new</span>(<span class="ident">v</span>);
 
                     <span class="kw">let</span> <span class="ident">node_ptr</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">old_node</span>;
                     <span class="self">self</span>.<span class="ident">detach</span>(<span class="ident">node_ptr</span>);
@@ -1788,13 +1947,13 @@
                     <span class="ident">old_node</span>
                 } <span class="kw">else</span> {
                     <span class="comment">// if the cache is not full allocate a new LruEntry</span>
-                    <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">LruEntry</span>::<span class="ident">new</span>(<span class="ident">k</span>, <span class="ident">v</span>))
+                    <span class="ident">Box::new</span>(<span class="ident">LruEntry::new</span>(<span class="ident">k</span>, <span class="ident">v</span>))
                 };
 
                 <span class="kw">let</span> <span class="ident">node_ptr</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">node</span>;
                 <span class="self">self</span>.<span class="ident">attach</span>(<span class="ident">node_ptr</span>);
 
-                <span class="kw">let</span> <span class="ident">keyref</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span><span class="ident">node_ptr</span>).<span class="ident">key</span> };
+                <span class="kw">let</span> <span class="ident">keyref</span> <span class="op">=</span> <span class="kw">unsafe</span> { (<span class="kw-2">*</span><span class="ident">node_ptr</span>).<span class="ident">key</span>.<span class="ident">as_ptr</span>() };
                 <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">insert</span>(<span class="ident">KeyRef</span> { <span class="ident">k</span>: <span class="ident">keyref</span> }, <span class="ident">node</span>);
                 <span class="prelude-val">None</span>
             }
@@ -1830,7 +1989,7 @@
             <span class="self">self</span>.<span class="ident">detach</span>(<span class="ident">node_ptr</span>);
             <span class="self">self</span>.<span class="ident">attach</span>(<span class="ident">node_ptr</span>);
 
-            <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span><span class="ident">node_ptr</span>).<span class="ident">val</span> })
+            <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="ident">node_ptr</span>).<span class="ident">val</span>.<span class="ident">as_ptr</span>()) <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="ident">V</span> })
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
         }
@@ -1865,7 +2024,7 @@
             <span class="self">self</span>.<span class="ident">detach</span>(<span class="ident">node_ptr</span>);
             <span class="self">self</span>.<span class="ident">attach</span>(<span class="ident">node_ptr</span>);
 
-            <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> (<span class="kw-2">*</span><span class="ident">node_ptr</span>).<span class="ident">val</span> })
+            <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> (<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="ident">node_ptr</span>).<span class="ident">val</span>.<span class="ident">as_mut_ptr</span>()) <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">V</span> })
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
         }
@@ -1894,7 +2053,7 @@
     {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">get</span>(<span class="ident">k</span>) {
             <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">node</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">node</span>.<span class="ident">val</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">node</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="ident">node</span>).<span class="ident">val</span>.<span class="ident">as_ptr</span>()) <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="ident">V</span> }),
         }
     }
 
@@ -1921,7 +2080,7 @@
     {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">get_mut</span>(<span class="ident">k</span>) {
             <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">node</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">node</span>.<span class="ident">val</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">node</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> (<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="ident">node</span>).<span class="ident">val</span>.<span class="ident">as_mut_ptr</span>()) <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">V</span> }),
         }
     }
 
@@ -1948,8 +2107,8 @@
         <span class="kw">let</span> (<span class="ident">key</span>, <span class="ident">val</span>);
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">node</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">tail</span>).<span class="ident">prev</span>;
-            <span class="ident">key</span> <span class="op">=</span> <span class="kw-2">&amp;</span>(<span class="kw-2">*</span><span class="ident">node</span>).<span class="ident">key</span>;
-            <span class="ident">val</span> <span class="op">=</span> <span class="kw-2">&amp;</span>(<span class="kw-2">*</span><span class="ident">node</span>).<span class="ident">val</span>;
+            <span class="ident">key</span> <span class="op">=</span> <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="ident">node</span>).<span class="ident">key</span>.<span class="ident">as_ptr</span>()) <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="ident">K</span>;
+            <span class="ident">val</span> <span class="op">=</span> <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="ident">node</span>).<span class="ident">val</span>.<span class="ident">as_ptr</span>()) <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="ident">V</span>;
         }
 
         <span class="prelude-val">Some</span>((<span class="ident">key</span>, <span class="ident">val</span>))
@@ -2004,9 +2163,12 @@
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">k</span>) {
             <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
             <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">old_node</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="kw">unsafe</span> {
+                    <span class="ident">ptr::drop_in_place</span>(<span class="ident">old_node</span>.<span class="ident">key</span>.<span class="ident">as_mut_ptr</span>());
+                }
                 <span class="kw">let</span> <span class="ident">node_ptr</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">old_node</span>;
                 <span class="self">self</span>.<span class="ident">detach</span>(<span class="ident">node_ptr</span>);
-                <span class="prelude-val">Some</span>(<span class="ident">old_node</span>.<span class="ident">val</span>)
+                <span class="kw">unsafe</span> { <span class="prelude-val">Some</span>(<span class="ident">old_node</span>.<span class="ident">val</span>.<span class="ident">assume_init</span>()) }
             }
         }
     }
@@ -2035,7 +2197,7 @@
         <span class="comment">// N.B.: Can&#39;t destructure directly because of https://github.com/rust-lang/rust/issues/28536</span>
         <span class="kw">let</span> <span class="ident">node</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">node</span>;
         <span class="kw">let</span> <span class="ident">LruEntry</span> { <span class="ident">key</span>, <span class="ident">val</span>, .. } <span class="op">=</span> <span class="ident">node</span>;
-        <span class="prelude-val">Some</span>((<span class="ident">key</span>, <span class="ident">val</span>))
+        <span class="kw">unsafe</span> { <span class="prelude-val">Some</span>((<span class="ident">key</span>.<span class="ident">assume_init</span>(), <span class="ident">val</span>.<span class="ident">assume_init</span>())) }
     }
 
     <span class="doccomment">/// Returns the number of key-value pairs that are currently in the the cache.</span>
@@ -2117,7 +2279,7 @@
         }
 
         <span class="kw">while</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">cap</span> {
-            <span class="self">self</span>.<span class="ident">remove_last</span>();
+            <span class="self">self</span>.<span class="ident">pop_lru</span>();
         }
         <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">shrink_to_fit</span>();
 
@@ -2144,14 +2306,15 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
         <span class="kw">loop</span> {
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">remove_last</span>() {
+            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">pop_lru</span>() {
                 <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> (),
                 <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
             }
         }
     }
 
-    <span class="doccomment">/// An iterator visiting all entries in order. The iterator element type is `(&amp;&#39;a K, &amp;&#39;a V)`.</span>
+    <span class="doccomment">/// An iterator visiting all entries in most-recently used order. The iterator element type is</span>
+    <span class="doccomment">/// `(&amp;&#39;a K, &amp;&#39;a V)`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -2176,8 +2339,8 @@
         }
     }
 
-    <span class="doccomment">/// An iterator visiting all entries in order, giving a mutable reference on V.</span>
-    <span class="doccomment">/// The iterator element type is `(&amp;&#39;a K, &amp;&#39;a mut V)`.</span>
+    <span class="doccomment">/// An iterator visiting all entries in most-recently-used order, giving a mutable reference on</span>
+    <span class="doccomment">/// V.  The iterator element type is `(&amp;&#39;a K, &amp;&#39;a mut V)`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -2216,7 +2379,7 @@
         <span class="kw">unsafe</span> { <span class="ident">prev</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">tail</span>).<span class="ident">prev</span> }
         <span class="kw">if</span> <span class="ident">prev</span> <span class="op">!</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span> {
             <span class="kw">let</span> <span class="ident">old_key</span> <span class="op">=</span> <span class="ident">KeyRef</span> {
-                <span class="ident">k</span>: <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">tail</span>).<span class="ident">prev</span>).<span class="ident">key</span> },
+                <span class="ident">k</span>: <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">tail</span>).<span class="ident">prev</span>).<span class="ident">key</span>.<span class="ident">as_ptr</span>()) },
             };
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">old_node</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">old_key</span>).<span class="ident">unwrap</span>();
             <span class="kw">let</span> <span class="ident">node_ptr</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">old_node</span>;
@@ -2246,27 +2409,15 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">LruCache</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="comment">// Prevent compiler from trying to drop the un-initialized fields key and val in head</span>
-        <span class="comment">// and tail</span>
+        <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">values_mut</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw">unsafe</span> {
+            <span class="ident">ptr::drop_in_place</span>(<span class="ident">e</span>.<span class="ident">key</span>.<span class="ident">as_mut_ptr</span>());
+            <span class="ident">ptr::drop_in_place</span>(<span class="ident">e</span>.<span class="ident">val</span>.<span class="ident">as_mut_ptr</span>());
+        });
+        <span class="comment">// We rebox the head/tail, and because these are maybe-uninit</span>
+        <span class="comment">// they do not have the absent k/v dropped.</span>
         <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">Box</span>::<span class="ident">from_raw</span>(<span class="self">self</span>.<span class="ident">head</span>);
-            <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">Box</span>::<span class="ident">from_raw</span>(<span class="self">self</span>.<span class="ident">tail</span>);
-
-            <span class="kw">let</span> <span class="ident">LruEntry</span> {
-                <span class="ident">key</span>: <span class="ident">head_key</span>,
-                <span class="ident">val</span>: <span class="ident">head_val</span>,
-                ..
-            } <span class="op">=</span> <span class="ident">head</span>;
-            <span class="kw">let</span> <span class="ident">LruEntry</span> {
-                <span class="ident">key</span>: <span class="ident">tail_key</span>,
-                <span class="ident">val</span>: <span class="ident">tail_val</span>,
-                ..
-            } <span class="op">=</span> <span class="ident">tail</span>;
-
-            <span class="ident">mem</span>::<span class="ident">forget</span>(<span class="ident">head_key</span>);
-            <span class="ident">mem</span>::<span class="ident">forget</span>(<span class="ident">head_val</span>);
-            <span class="ident">mem</span>::<span class="ident">forget</span>(<span class="ident">tail_key</span>);
-            <span class="ident">mem</span>::<span class="ident">forget</span>(<span class="ident">tail_val</span>);
+            <span class="kw">let</span> <span class="ident">_head</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">Box::from_raw</span>(<span class="self">self</span>.<span class="ident">head</span>);
+            <span class="kw">let</span> <span class="ident">_tail</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">Box::from_raw</span>(<span class="self">self</span>.<span class="ident">tail</span>);
         }
     }
 }
@@ -2292,11 +2443,11 @@
 <span class="comment">// The compiler does not automatically derive Send and Sync for LruCache because it contains</span>
 <span class="comment">// raw pointers. The raw pointers are safely encapsulated by LruCache though so we can</span>
 <span class="comment">// implement Send and Sync for it below.</span>
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>: <span class="ident">Send</span>, <span class="ident">V</span>: <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">LruCache</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {}
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>: <span class="ident">Sync</span>, <span class="ident">V</span>: <span class="ident">Sync</span><span class="op">&gt;</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">LruCache</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {}
+<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>: <span class="ident">Send</span>, <span class="ident">V</span>: <span class="ident">Send</span>, <span class="ident">S</span>: <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">LruCache</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span> {}
+<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>: <span class="ident">Sync</span>, <span class="ident">V</span>: <span class="ident">Sync</span>, <span class="ident">S</span>: <span class="ident">Sync</span><span class="op">&gt;</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">LruCache</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span> {}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">LruCache</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">LruCache</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;LruCache&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;len&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">len</span>())
             .<span class="ident">field</span>(<span class="string">&quot;cap&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cap</span>())
@@ -2328,8 +2479,8 @@
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">ptr</span>).<span class="ident">key</span> };
-        <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">ptr</span>).<span class="ident">val</span> };
+        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">ptr</span>).<span class="ident">key</span>.<span class="ident">as_ptr</span>()) <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="ident">K</span> };
+        <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">ptr</span>).<span class="ident">val</span>.<span class="ident">as_ptr</span>()) <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="ident">V</span> };
 
         <span class="self">self</span>.<span class="ident">len</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
         <span class="self">self</span>.<span class="ident">ptr</span> <span class="op">=</span> <span class="kw">unsafe</span> { (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">ptr</span>).<span class="ident">next</span> };
@@ -2352,8 +2503,8 @@
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">end</span>).<span class="ident">key</span> };
-        <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">end</span>).<span class="ident">val</span> };
+        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">end</span>).<span class="ident">key</span>.<span class="ident">as_ptr</span>()) <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="ident">K</span> };
+        <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">end</span>).<span class="ident">val</span>.<span class="ident">as_ptr</span>()) <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="ident">V</span> };
 
         <span class="self">self</span>.<span class="ident">len</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
         <span class="self">self</span>.<span class="ident">end</span> <span class="op">=</span> <span class="kw">unsafe</span> { (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">end</span>).<span class="ident">prev</span> };
@@ -2405,8 +2556,8 @@
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">ptr</span>).<span class="ident">key</span> };
-        <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">ptr</span>).<span class="ident">val</span> };
+        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> (<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">ptr</span>).<span class="ident">key</span>.<span class="ident">as_mut_ptr</span>()) <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">K</span> };
+        <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> (<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">ptr</span>).<span class="ident">val</span>.<span class="ident">as_mut_ptr</span>()) <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">V</span> };
 
         <span class="self">self</span>.<span class="ident">len</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
         <span class="self">self</span>.<span class="ident">ptr</span> <span class="op">=</span> <span class="kw">unsafe</span> { (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">ptr</span>).<span class="ident">next</span> };
@@ -2429,8 +2580,8 @@
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">end</span>).<span class="ident">key</span> };
-        <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">end</span>).<span class="ident">val</span> };
+        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> (<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">end</span>).<span class="ident">key</span>.<span class="ident">as_mut_ptr</span>()) <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">K</span> };
+        <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> (<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">end</span>).<span class="ident">val</span>.<span class="ident">as_mut_ptr</span>()) <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">V</span> };
 
         <span class="self">self</span>.<span class="ident">len</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
         <span class="self">self</span>.<span class="ident">end</span> <span class="op">=</span> <span class="kw">unsafe</span> { (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">end</span>).<span class="ident">prev</span> };
@@ -2449,94 +2600,95 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">LruCache</span>;
-    <span class="kw">use</span> <span class="ident">core</span>::<span class="ident">fmt</span>::<span class="ident">Debug</span>;
-    <span class="kw">use</span> <span class="ident">scoped_threadpool</span>::<span class="ident">Pool</span>;
+    <span class="kw">use</span> <span class="kw">super</span><span class="ident">::LruCache</span>;
+    <span class="kw">use</span> <span class="ident">core::fmt::Debug</span>;
+    <span class="kw">use</span> <span class="ident">scoped_threadpool::Pool</span>;
+    <span class="kw">use</span> <span class="ident">std::sync::atomic</span>::{<span class="ident">AtomicUsize</span>, <span class="ident">Ordering</span>};
 
     <span class="kw">fn</span> <span class="ident">assert_opt_eq</span><span class="op">&lt;</span><span class="ident">V</span>: <span class="ident">PartialEq</span> <span class="op">+</span> <span class="ident">Debug</span><span class="op">&gt;</span>(<span class="ident">opt</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">V</span><span class="op">&gt;</span>, <span class="ident">v</span>: <span class="ident">V</span>) {
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">opt</span>.<span class="ident">is_some</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">opt</span>.<span class="ident">unwrap</span>(), <span class="kw-2">&amp;</span><span class="ident">v</span>);
+        <span class="macro">assert!</span>(<span class="ident">opt</span>.<span class="ident">is_some</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">opt</span>.<span class="ident">unwrap</span>(), <span class="kw-2">&amp;</span><span class="ident">v</span>);
     }
 
     <span class="kw">fn</span> <span class="ident">assert_opt_eq_mut</span><span class="op">&lt;</span><span class="ident">V</span>: <span class="ident">PartialEq</span> <span class="op">+</span> <span class="ident">Debug</span><span class="op">&gt;</span>(<span class="ident">opt</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">V</span><span class="op">&gt;</span>, <span class="ident">v</span>: <span class="ident">V</span>) {
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">opt</span>.<span class="ident">is_some</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">opt</span>.<span class="ident">unwrap</span>(), <span class="kw-2">&amp;</span><span class="ident">v</span>);
+        <span class="macro">assert!</span>(<span class="ident">opt</span>.<span class="ident">is_some</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">opt</span>.<span class="ident">unwrap</span>(), <span class="kw-2">&amp;</span><span class="ident">v</span>);
     }
 
     <span class="kw">fn</span> <span class="ident">assert_opt_eq_tuple</span><span class="op">&lt;</span><span class="ident">K</span>: <span class="ident">PartialEq</span> <span class="op">+</span> <span class="ident">Debug</span>, <span class="ident">V</span>: <span class="ident">PartialEq</span> <span class="op">+</span> <span class="ident">Debug</span><span class="op">&gt;</span>(
         <span class="ident">opt</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="ident">V</span>)<span class="op">&gt;</span>,
         <span class="ident">kv</span>: (<span class="ident">K</span>, <span class="ident">V</span>),
     ) {
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">opt</span>.<span class="ident">is_some</span>());
+        <span class="macro">assert!</span>(<span class="ident">opt</span>.<span class="ident">is_some</span>());
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">opt</span>.<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">res</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">kv</span>.<span class="number">0</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">res</span>.<span class="number">1</span>, <span class="kw-2">&amp;</span><span class="ident">kv</span>.<span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">res</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">kv</span>.<span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">res</span>.<span class="number">1</span>, <span class="kw-2">&amp;</span><span class="ident">kv</span>.<span class="number">1</span>);
     }
 
     <span class="kw">fn</span> <span class="ident">assert_opt_eq_mut_tuple</span><span class="op">&lt;</span><span class="ident">K</span>: <span class="ident">PartialEq</span> <span class="op">+</span> <span class="ident">Debug</span>, <span class="ident">V</span>: <span class="ident">PartialEq</span> <span class="op">+</span> <span class="ident">Debug</span><span class="op">&gt;</span>(
         <span class="ident">opt</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">V</span>)<span class="op">&gt;</span>,
         <span class="ident">kv</span>: (<span class="ident">K</span>, <span class="ident">V</span>),
     ) {
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">opt</span>.<span class="ident">is_some</span>());
+        <span class="macro">assert!</span>(<span class="ident">opt</span>.<span class="ident">is_some</span>());
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">opt</span>.<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">res</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">kv</span>.<span class="number">0</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">res</span>.<span class="number">1</span>, <span class="kw-2">&amp;</span><span class="ident">kv</span>.<span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">res</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">kv</span>.<span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">res</span>.<span class="number">1</span>, <span class="kw-2">&amp;</span><span class="ident">kv</span>.<span class="number">1</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_unbounded</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache</span>::<span class="ident">unbounded</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache::unbounded</span>();
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">13370</span> {
             <span class="ident">cache</span>.<span class="ident">put</span>(<span class="ident">i</span>, ());
         }
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">len</span>(), <span class="number">13370</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">len</span>(), <span class="number">13370</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;hashbrown&quot;</span>)]</span>
     <span class="kw">fn</span> <span class="ident">test_with_hasher</span>() {
-        <span class="kw">use</span> <span class="ident">hashbrown</span>::<span class="ident">hash_map</span>::<span class="ident">DefaultHashBuilder</span>;
+        <span class="kw">use</span> <span class="ident">hashbrown::hash_map::DefaultHashBuilder</span>;
 
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">DefaultHashBuilder</span>::<span class="ident">default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache</span>::<span class="ident">with_hasher</span>(<span class="number">16</span>, <span class="ident">s</span>);
+        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">DefaultHashBuilder::default</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache::with_hasher</span>(<span class="number">16</span>, <span class="ident">s</span>);
 
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">13370</span> {
             <span class="ident">cache</span>.<span class="ident">put</span>(<span class="ident">i</span>, ());
         }
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">len</span>(), <span class="number">16</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">len</span>(), <span class="number">16</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_put_and_get</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache</span>::<span class="ident">new</span>(<span class="number">2</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">is_empty</span>());
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache::new</span>(<span class="number">2</span>);
+        <span class="macro">assert!</span>(<span class="ident">cache</span>.<span class="ident">is_empty</span>());
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;apple&quot;</span>, <span class="string">&quot;red&quot;</span>), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;banana&quot;</span>, <span class="string">&quot;yellow&quot;</span>), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;apple&quot;</span>, <span class="string">&quot;red&quot;</span>), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;banana&quot;</span>, <span class="string">&quot;yellow&quot;</span>), <span class="prelude-val">None</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">cap</span>(), <span class="number">2</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">len</span>(), <span class="number">2</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">cache</span>.<span class="ident">is_empty</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">cap</span>(), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">len</span>(), <span class="number">2</span>);
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">cache</span>.<span class="ident">is_empty</span>());
         <span class="ident">assert_opt_eq</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="string">&quot;apple&quot;</span>), <span class="string">&quot;red&quot;</span>);
         <span class="ident">assert_opt_eq</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="string">&quot;banana&quot;</span>), <span class="string">&quot;yellow&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_put_and_get_mut</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache</span>::<span class="ident">new</span>(<span class="number">2</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache::new</span>(<span class="number">2</span>);
 
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;apple&quot;</span>, <span class="string">&quot;red&quot;</span>);
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;banana&quot;</span>, <span class="string">&quot;yellow&quot;</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">cap</span>(), <span class="number">2</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">len</span>(), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">cap</span>(), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">len</span>(), <span class="number">2</span>);
         <span class="ident">assert_opt_eq_mut</span>(<span class="ident">cache</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="string">&quot;apple&quot;</span>), <span class="string">&quot;red&quot;</span>);
         <span class="ident">assert_opt_eq_mut</span>(<span class="ident">cache</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="string">&quot;banana&quot;</span>), <span class="string">&quot;yellow&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_get_mut_and_update</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache</span>::<span class="ident">new</span>(<span class="number">2</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache::new</span>(<span class="number">2</span>);
 
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;apple&quot;</span>, <span class="number">1</span>);
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;banana&quot;</span>, <span class="number">3</span>);
@@ -2546,48 +2698,48 @@
             <span class="kw-2">*</span><span class="ident">v</span> <span class="op">=</span> <span class="number">4</span>;
         }
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">cap</span>(), <span class="number">2</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">len</span>(), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">cap</span>(), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">len</span>(), <span class="number">2</span>);
         <span class="ident">assert_opt_eq_mut</span>(<span class="ident">cache</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="string">&quot;apple&quot;</span>), <span class="number">4</span>);
         <span class="ident">assert_opt_eq_mut</span>(<span class="ident">cache</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="string">&quot;banana&quot;</span>), <span class="number">3</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_put_update</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache</span>::<span class="ident">new</span>(<span class="number">1</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache::new</span>(<span class="number">1</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;apple&quot;</span>, <span class="string">&quot;red&quot;</span>), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;apple&quot;</span>, <span class="string">&quot;green&quot;</span>), <span class="prelude-val">Some</span>(<span class="string">&quot;red&quot;</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;apple&quot;</span>, <span class="string">&quot;red&quot;</span>), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;apple&quot;</span>, <span class="string">&quot;green&quot;</span>), <span class="prelude-val">Some</span>(<span class="string">&quot;red&quot;</span>));
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">len</span>(), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">len</span>(), <span class="number">1</span>);
         <span class="ident">assert_opt_eq</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="string">&quot;apple&quot;</span>), <span class="string">&quot;green&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_put_removes_oldest</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache</span>::<span class="ident">new</span>(<span class="number">2</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache::new</span>(<span class="number">2</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;apple&quot;</span>, <span class="string">&quot;red&quot;</span>), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;banana&quot;</span>, <span class="string">&quot;yellow&quot;</span>), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;pear&quot;</span>, <span class="string">&quot;green&quot;</span>), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;apple&quot;</span>, <span class="string">&quot;red&quot;</span>), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;banana&quot;</span>, <span class="string">&quot;yellow&quot;</span>), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;pear&quot;</span>, <span class="string">&quot;green&quot;</span>), <span class="prelude-val">None</span>);
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="string">&quot;apple&quot;</span>).<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="string">&quot;apple&quot;</span>).<span class="ident">is_none</span>());
         <span class="ident">assert_opt_eq</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="string">&quot;banana&quot;</span>), <span class="string">&quot;yellow&quot;</span>);
         <span class="ident">assert_opt_eq</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="string">&quot;pear&quot;</span>), <span class="string">&quot;green&quot;</span>);
 
         <span class="comment">// Even though we inserted &quot;apple&quot; into the cache earlier it has since been removed from</span>
         <span class="comment">// the cache so there is no current value for `put` to return.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;apple&quot;</span>, <span class="string">&quot;green&quot;</span>), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;tomato&quot;</span>, <span class="string">&quot;red&quot;</span>), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;apple&quot;</span>, <span class="string">&quot;green&quot;</span>), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;tomato&quot;</span>, <span class="string">&quot;red&quot;</span>), <span class="prelude-val">None</span>);
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="string">&quot;pear&quot;</span>).<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="string">&quot;pear&quot;</span>).<span class="ident">is_none</span>());
         <span class="ident">assert_opt_eq</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="string">&quot;apple&quot;</span>), <span class="string">&quot;green&quot;</span>);
         <span class="ident">assert_opt_eq</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="string">&quot;tomato&quot;</span>), <span class="string">&quot;red&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_peek</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache</span>::<span class="ident">new</span>(<span class="number">2</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache::new</span>(<span class="number">2</span>);
 
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;apple&quot;</span>, <span class="string">&quot;red&quot;</span>);
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;banana&quot;</span>, <span class="string">&quot;yellow&quot;</span>);
@@ -2597,25 +2749,25 @@
 
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;pear&quot;</span>, <span class="string">&quot;green&quot;</span>);
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">peek</span>(<span class="kw-2">&amp;</span><span class="string">&quot;apple&quot;</span>).<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="ident">cache</span>.<span class="ident">peek</span>(<span class="kw-2">&amp;</span><span class="string">&quot;apple&quot;</span>).<span class="ident">is_none</span>());
         <span class="ident">assert_opt_eq</span>(<span class="ident">cache</span>.<span class="ident">peek</span>(<span class="kw-2">&amp;</span><span class="string">&quot;banana&quot;</span>), <span class="string">&quot;yellow&quot;</span>);
         <span class="ident">assert_opt_eq</span>(<span class="ident">cache</span>.<span class="ident">peek</span>(<span class="kw-2">&amp;</span><span class="string">&quot;pear&quot;</span>), <span class="string">&quot;green&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_peek_mut</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache</span>::<span class="ident">new</span>(<span class="number">2</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache::new</span>(<span class="number">2</span>);
 
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;apple&quot;</span>, <span class="string">&quot;red&quot;</span>);
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;banana&quot;</span>, <span class="string">&quot;yellow&quot;</span>);
 
         <span class="ident">assert_opt_eq_mut</span>(<span class="ident">cache</span>.<span class="ident">peek_mut</span>(<span class="kw-2">&amp;</span><span class="string">&quot;banana&quot;</span>), <span class="string">&quot;yellow&quot;</span>);
         <span class="ident">assert_opt_eq_mut</span>(<span class="ident">cache</span>.<span class="ident">peek_mut</span>(<span class="kw-2">&amp;</span><span class="string">&quot;apple&quot;</span>), <span class="string">&quot;red&quot;</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">peek_mut</span>(<span class="kw-2">&amp;</span><span class="string">&quot;pear&quot;</span>).<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="ident">cache</span>.<span class="ident">peek_mut</span>(<span class="kw-2">&amp;</span><span class="string">&quot;pear&quot;</span>).<span class="ident">is_none</span>());
 
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;pear&quot;</span>, <span class="string">&quot;green&quot;</span>);
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">peek_mut</span>(<span class="kw-2">&amp;</span><span class="string">&quot;apple&quot;</span>).<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="ident">cache</span>.<span class="ident">peek_mut</span>(<span class="kw-2">&amp;</span><span class="string">&quot;apple&quot;</span>).<span class="ident">is_none</span>());
         <span class="ident">assert_opt_eq_mut</span>(<span class="ident">cache</span>.<span class="ident">peek_mut</span>(<span class="kw-2">&amp;</span><span class="string">&quot;banana&quot;</span>), <span class="string">&quot;yellow&quot;</span>);
         <span class="ident">assert_opt_eq_mut</span>(<span class="ident">cache</span>.<span class="ident">peek_mut</span>(<span class="kw-2">&amp;</span><span class="string">&quot;pear&quot;</span>), <span class="string">&quot;green&quot;</span>);
 
@@ -2629,9 +2781,9 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_peek_lru</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache</span>::<span class="ident">new</span>(<span class="number">2</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache::new</span>(<span class="number">2</span>);
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">peek_lru</span>().<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="ident">cache</span>.<span class="ident">peek_lru</span>().<span class="ident">is_none</span>());
 
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;apple&quot;</span>, <span class="string">&quot;red&quot;</span>);
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;banana&quot;</span>, <span class="string">&quot;yellow&quot;</span>);
@@ -2641,44 +2793,44 @@
         <span class="ident">assert_opt_eq_tuple</span>(<span class="ident">cache</span>.<span class="ident">peek_lru</span>(), (<span class="string">&quot;banana&quot;</span>, <span class="string">&quot;yellow&quot;</span>));
 
         <span class="ident">cache</span>.<span class="ident">clear</span>();
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">peek_lru</span>().<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="ident">cache</span>.<span class="ident">peek_lru</span>().<span class="ident">is_none</span>());
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_contains</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache</span>::<span class="ident">new</span>(<span class="number">2</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache::new</span>(<span class="number">2</span>);
 
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;apple&quot;</span>, <span class="string">&quot;red&quot;</span>);
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;banana&quot;</span>, <span class="string">&quot;yellow&quot;</span>);
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;pear&quot;</span>, <span class="string">&quot;green&quot;</span>);
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">cache</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="string">&quot;apple&quot;</span>));
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="string">&quot;banana&quot;</span>));
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="string">&quot;pear&quot;</span>));
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">cache</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="string">&quot;apple&quot;</span>));
+        <span class="macro">assert!</span>(<span class="ident">cache</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="string">&quot;banana&quot;</span>));
+        <span class="macro">assert!</span>(<span class="ident">cache</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="string">&quot;pear&quot;</span>));
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_pop</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache</span>::<span class="ident">new</span>(<span class="number">2</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache::new</span>(<span class="number">2</span>);
 
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;apple&quot;</span>, <span class="string">&quot;red&quot;</span>);
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;banana&quot;</span>, <span class="string">&quot;yellow&quot;</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">len</span>(), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">len</span>(), <span class="number">2</span>);
         <span class="ident">assert_opt_eq</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="string">&quot;apple&quot;</span>), <span class="string">&quot;red&quot;</span>);
         <span class="ident">assert_opt_eq</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="string">&quot;banana&quot;</span>), <span class="string">&quot;yellow&quot;</span>);
 
         <span class="kw">let</span> <span class="ident">popped</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">pop</span>(<span class="kw-2">&amp;</span><span class="string">&quot;apple&quot;</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">popped</span>.<span class="ident">is_some</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">popped</span>.<span class="ident">unwrap</span>(), <span class="string">&quot;red&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">len</span>(), <span class="number">1</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="string">&quot;apple&quot;</span>).<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="ident">popped</span>.<span class="ident">is_some</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">popped</span>.<span class="ident">unwrap</span>(), <span class="string">&quot;red&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">len</span>(), <span class="number">1</span>);
+        <span class="macro">assert!</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="string">&quot;apple&quot;</span>).<span class="ident">is_none</span>());
         <span class="ident">assert_opt_eq</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="string">&quot;banana&quot;</span>), <span class="string">&quot;yellow&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_pop_lru</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache</span>::<span class="ident">new</span>(<span class="number">200</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache::new</span>(<span class="number">200</span>);
 
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">75</span> {
             <span class="ident">cache</span>.<span class="ident">put</span>(<span class="ident">i</span>, <span class="string">&quot;A&quot;</span>);
@@ -2689,7 +2841,7 @@
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">75</span> {
             <span class="ident">cache</span>.<span class="ident">put</span>(<span class="ident">i</span> <span class="op">+</span> <span class="number">200</span>, <span class="string">&quot;C&quot;</span>);
         }
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">len</span>(), <span class="number">200</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">len</span>(), <span class="number">200</span>);
 
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">75</span> {
             <span class="ident">assert_opt_eq</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span>(<span class="number">74</span> <span class="op">-</span> <span class="ident">i</span> <span class="op">+</span> <span class="number">100</span>)), <span class="string">&quot;B&quot;</span>);
@@ -2697,38 +2849,38 @@
         <span class="ident">assert_opt_eq</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="number">25</span>), <span class="string">&quot;A&quot;</span>);
 
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">26</span>..<span class="number">75</span> {
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">pop_lru</span>(), <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="string">&quot;A&quot;</span>)));
+            <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">pop_lru</span>(), <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="string">&quot;A&quot;</span>)));
         }
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">75</span> {
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">pop_lru</span>(), <span class="prelude-val">Some</span>((<span class="ident">i</span> <span class="op">+</span> <span class="number">200</span>, <span class="string">&quot;C&quot;</span>)));
+            <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">pop_lru</span>(), <span class="prelude-val">Some</span>((<span class="ident">i</span> <span class="op">+</span> <span class="number">200</span>, <span class="string">&quot;C&quot;</span>)));
         }
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">75</span> {
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">pop_lru</span>(), <span class="prelude-val">Some</span>((<span class="number">74</span> <span class="op">-</span> <span class="ident">i</span> <span class="op">+</span> <span class="number">100</span>, <span class="string">&quot;B&quot;</span>)));
+            <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">pop_lru</span>(), <span class="prelude-val">Some</span>((<span class="number">74</span> <span class="op">-</span> <span class="ident">i</span> <span class="op">+</span> <span class="number">100</span>, <span class="string">&quot;B&quot;</span>)));
         }
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">pop_lru</span>(), <span class="prelude-val">Some</span>((<span class="number">25</span>, <span class="string">&quot;A&quot;</span>)));
+        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">pop_lru</span>(), <span class="prelude-val">Some</span>((<span class="number">25</span>, <span class="string">&quot;A&quot;</span>)));
         <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">50</span> {
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">pop_lru</span>(), <span class="prelude-val">None</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">pop_lru</span>(), <span class="prelude-val">None</span>);
         }
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_clear</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache</span>::<span class="ident">new</span>(<span class="number">2</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache::new</span>(<span class="number">2</span>);
 
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;apple&quot;</span>, <span class="string">&quot;red&quot;</span>);
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;banana&quot;</span>, <span class="string">&quot;yellow&quot;</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">len</span>(), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">len</span>(), <span class="number">2</span>);
         <span class="ident">assert_opt_eq</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="string">&quot;apple&quot;</span>), <span class="string">&quot;red&quot;</span>);
         <span class="ident">assert_opt_eq</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="string">&quot;banana&quot;</span>), <span class="string">&quot;yellow&quot;</span>);
 
         <span class="ident">cache</span>.<span class="ident">clear</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">len</span>(), <span class="number">0</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_resize_larger</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache</span>::<span class="ident">new</span>(<span class="number">2</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache::new</span>(<span class="number">2</span>);
 
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="number">1</span>, <span class="string">&quot;a&quot;</span>);
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="number">2</span>, <span class="string">&quot;b&quot;</span>);
@@ -2736,16 +2888,16 @@
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="number">3</span>, <span class="string">&quot;c&quot;</span>);
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="number">4</span>, <span class="string">&quot;d&quot;</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">len</span>(), <span class="number">4</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="number">1</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">&quot;a&quot;</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="number">2</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">&quot;b&quot;</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="number">3</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">&quot;c&quot;</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="number">4</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">&quot;d&quot;</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">len</span>(), <span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="number">1</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">&quot;a&quot;</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="number">2</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">&quot;b&quot;</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="number">3</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">&quot;c&quot;</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="number">4</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">&quot;d&quot;</span>));
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_resize_smaller</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache</span>::<span class="ident">new</span>(<span class="number">4</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache::new</span>(<span class="number">4</span>);
 
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="number">1</span>, <span class="string">&quot;a&quot;</span>);
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="number">2</span>, <span class="string">&quot;b&quot;</span>);
@@ -2754,46 +2906,46 @@
 
         <span class="ident">cache</span>.<span class="ident">resize</span>(<span class="number">2</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">len</span>(), <span class="number">2</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="number">1</span>).<span class="ident">is_none</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="number">2</span>).<span class="ident">is_none</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="number">3</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">&quot;c&quot;</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="number">4</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">&quot;d&quot;</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">len</span>(), <span class="number">2</span>);
+        <span class="macro">assert!</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="number">1</span>).<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="number">2</span>).<span class="ident">is_none</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="number">3</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">&quot;c&quot;</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="number">4</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">&quot;d&quot;</span>));
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_send</span>() {
-        <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">thread</span>;
+        <span class="kw">use</span> <span class="ident">std::thread</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache</span>::<span class="ident">new</span>(<span class="number">4</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache::new</span>(<span class="number">4</span>);
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="number">1</span>, <span class="string">&quot;a&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">thread</span>::<span class="ident">spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="number">1</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">&quot;a&quot;</span>));
+        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
+            <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="number">1</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">&quot;a&quot;</span>));
         });
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">handle</span>.<span class="ident">join</span>().<span class="ident">is_ok</span>());
+        <span class="macro">assert!</span>(<span class="ident">handle</span>.<span class="ident">join</span>().<span class="ident">is_ok</span>());
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_multiple_threads</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pool</span> <span class="op">=</span> <span class="ident">Pool</span>::<span class="ident">new</span>(<span class="number">1</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache</span>::<span class="ident">new</span>(<span class="number">4</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pool</span> <span class="op">=</span> <span class="ident">Pool::new</span>(<span class="number">1</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache::new</span>(<span class="number">4</span>);
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="number">1</span>, <span class="string">&quot;a&quot;</span>);
 
         <span class="kw">let</span> <span class="ident">cache_ref</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">cache</span>;
         <span class="ident">pool</span>.<span class="ident">scoped</span>(<span class="op">|</span><span class="ident">scoped</span><span class="op">|</span> {
             <span class="ident">scoped</span>.<span class="ident">execute</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-                <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache_ref</span>.<span class="ident">peek</span>(<span class="kw-2">&amp;</span><span class="number">1</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">&quot;a&quot;</span>));
+                <span class="macro">assert_eq!</span>(<span class="ident">cache_ref</span>.<span class="ident">peek</span>(<span class="kw-2">&amp;</span><span class="number">1</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">&quot;a&quot;</span>));
             });
         });
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>((<span class="ident">cache_ref</span>).<span class="ident">peek</span>(<span class="kw-2">&amp;</span><span class="number">1</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">&quot;a&quot;</span>));
+        <span class="macro">assert_eq!</span>((<span class="ident">cache_ref</span>).<span class="ident">peek</span>(<span class="kw-2">&amp;</span><span class="number">1</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">&quot;a&quot;</span>));
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_iter_forwards</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache</span>::<span class="ident">new</span>(<span class="number">3</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache::new</span>(<span class="number">3</span>);
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;a&quot;</span>, <span class="number">1</span>);
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;b&quot;</span>, <span class="number">2</span>);
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;c&quot;</span>, <span class="number">3</span>);
@@ -2801,38 +2953,38 @@
         {
             <span class="comment">// iter const</span>
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">iter</span>();
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">3</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">3</span>);
             <span class="ident">assert_opt_eq_tuple</span>(<span class="ident">iter</span>.<span class="ident">next</span>(), (<span class="string">&quot;c&quot;</span>, <span class="number">3</span>));
 
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">2</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">2</span>);
             <span class="ident">assert_opt_eq_tuple</span>(<span class="ident">iter</span>.<span class="ident">next</span>(), (<span class="string">&quot;b&quot;</span>, <span class="number">2</span>));
 
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">1</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">1</span>);
             <span class="ident">assert_opt_eq_tuple</span>(<span class="ident">iter</span>.<span class="ident">next</span>(), (<span class="string">&quot;a&quot;</span>, <span class="number">1</span>));
 
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">0</span>);
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">next</span>(), <span class="prelude-val">None</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">next</span>(), <span class="prelude-val">None</span>);
         }
         {
             <span class="comment">// iter mut</span>
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">iter_mut</span>();
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">3</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">3</span>);
             <span class="ident">assert_opt_eq_mut_tuple</span>(<span class="ident">iter</span>.<span class="ident">next</span>(), (<span class="string">&quot;c&quot;</span>, <span class="number">3</span>));
 
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">2</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">2</span>);
             <span class="ident">assert_opt_eq_mut_tuple</span>(<span class="ident">iter</span>.<span class="ident">next</span>(), (<span class="string">&quot;b&quot;</span>, <span class="number">2</span>));
 
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">1</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">1</span>);
             <span class="ident">assert_opt_eq_mut_tuple</span>(<span class="ident">iter</span>.<span class="ident">next</span>(), (<span class="string">&quot;a&quot;</span>, <span class="number">1</span>));
 
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">0</span>);
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">next</span>(), <span class="prelude-val">None</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">next</span>(), <span class="prelude-val">None</span>);
         }
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_iter_backwards</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache</span>::<span class="ident">new</span>(<span class="number">3</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache::new</span>(<span class="number">3</span>);
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;a&quot;</span>, <span class="number">1</span>);
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;b&quot;</span>, <span class="number">2</span>);
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;c&quot;</span>, <span class="number">3</span>);
@@ -2840,39 +2992,39 @@
         {
             <span class="comment">// iter const</span>
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">iter</span>();
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">3</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">3</span>);
             <span class="ident">assert_opt_eq_tuple</span>(<span class="ident">iter</span>.<span class="ident">next_back</span>(), (<span class="string">&quot;a&quot;</span>, <span class="number">1</span>));
 
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">2</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">2</span>);
             <span class="ident">assert_opt_eq_tuple</span>(<span class="ident">iter</span>.<span class="ident">next_back</span>(), (<span class="string">&quot;b&quot;</span>, <span class="number">2</span>));
 
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">1</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">1</span>);
             <span class="ident">assert_opt_eq_tuple</span>(<span class="ident">iter</span>.<span class="ident">next_back</span>(), (<span class="string">&quot;c&quot;</span>, <span class="number">3</span>));
 
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">0</span>);
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">next_back</span>(), <span class="prelude-val">None</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">next_back</span>(), <span class="prelude-val">None</span>);
         }
 
         {
             <span class="comment">// iter mut</span>
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">iter_mut</span>();
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">3</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">3</span>);
             <span class="ident">assert_opt_eq_mut_tuple</span>(<span class="ident">iter</span>.<span class="ident">next_back</span>(), (<span class="string">&quot;a&quot;</span>, <span class="number">1</span>));
 
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">2</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">2</span>);
             <span class="ident">assert_opt_eq_mut_tuple</span>(<span class="ident">iter</span>.<span class="ident">next_back</span>(), (<span class="string">&quot;b&quot;</span>, <span class="number">2</span>));
 
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">1</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">1</span>);
             <span class="ident">assert_opt_eq_mut_tuple</span>(<span class="ident">iter</span>.<span class="ident">next_back</span>(), (<span class="string">&quot;c&quot;</span>, <span class="number">3</span>));
 
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">0</span>);
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">next_back</span>(), <span class="prelude-val">None</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">next_back</span>(), <span class="prelude-val">None</span>);
         }
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_iter_forwards_and_backwards</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache</span>::<span class="ident">new</span>(<span class="number">3</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache::new</span>(<span class="number">3</span>);
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;a&quot;</span>, <span class="number">1</span>);
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;b&quot;</span>, <span class="number">2</span>);
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;c&quot;</span>, <span class="number">3</span>);
@@ -2880,92 +3032,92 @@
         {
             <span class="comment">// iter const</span>
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">iter</span>();
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">3</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">3</span>);
             <span class="ident">assert_opt_eq_tuple</span>(<span class="ident">iter</span>.<span class="ident">next</span>(), (<span class="string">&quot;c&quot;</span>, <span class="number">3</span>));
 
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">2</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">2</span>);
             <span class="ident">assert_opt_eq_tuple</span>(<span class="ident">iter</span>.<span class="ident">next_back</span>(), (<span class="string">&quot;a&quot;</span>, <span class="number">1</span>));
 
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">1</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">1</span>);
             <span class="ident">assert_opt_eq_tuple</span>(<span class="ident">iter</span>.<span class="ident">next</span>(), (<span class="string">&quot;b&quot;</span>, <span class="number">2</span>));
 
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">0</span>);
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">next_back</span>(), <span class="prelude-val">None</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">next_back</span>(), <span class="prelude-val">None</span>);
         }
         {
             <span class="comment">// iter mut</span>
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">iter_mut</span>();
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">3</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">3</span>);
             <span class="ident">assert_opt_eq_mut_tuple</span>(<span class="ident">iter</span>.<span class="ident">next</span>(), (<span class="string">&quot;c&quot;</span>, <span class="number">3</span>));
 
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">2</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">2</span>);
             <span class="ident">assert_opt_eq_mut_tuple</span>(<span class="ident">iter</span>.<span class="ident">next_back</span>(), (<span class="string">&quot;a&quot;</span>, <span class="number">1</span>));
 
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">1</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">1</span>);
             <span class="ident">assert_opt_eq_mut_tuple</span>(<span class="ident">iter</span>.<span class="ident">next</span>(), (<span class="string">&quot;b&quot;</span>, <span class="number">2</span>));
 
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">0</span>);
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">next_back</span>(), <span class="prelude-val">None</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">next_back</span>(), <span class="prelude-val">None</span>);
         }
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_iter_multiple_threads</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pool</span> <span class="op">=</span> <span class="ident">Pool</span>::<span class="ident">new</span>(<span class="number">1</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache</span>::<span class="ident">new</span>(<span class="number">3</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pool</span> <span class="op">=</span> <span class="ident">Pool::new</span>(<span class="number">1</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache::new</span>(<span class="number">3</span>);
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;a&quot;</span>, <span class="number">1</span>);
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;b&quot;</span>, <span class="number">2</span>);
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;c&quot;</span>, <span class="number">3</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">iter</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">3</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">3</span>);
         <span class="ident">assert_opt_eq_tuple</span>(<span class="ident">iter</span>.<span class="ident">next</span>(), (<span class="string">&quot;c&quot;</span>, <span class="number">3</span>));
 
         {
             <span class="kw">let</span> <span class="ident">iter_ref</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">iter</span>;
             <span class="ident">pool</span>.<span class="ident">scoped</span>(<span class="op">|</span><span class="ident">scoped</span><span class="op">|</span> {
                 <span class="ident">scoped</span>.<span class="ident">execute</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-                    <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter_ref</span>.<span class="ident">len</span>(), <span class="number">2</span>);
+                    <span class="macro">assert_eq!</span>(<span class="ident">iter_ref</span>.<span class="ident">len</span>(), <span class="number">2</span>);
                     <span class="ident">assert_opt_eq_tuple</span>(<span class="ident">iter_ref</span>.<span class="ident">next</span>(), (<span class="string">&quot;b&quot;</span>, <span class="number">2</span>));
                 });
             });
         }
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">1</span>);
         <span class="ident">assert_opt_eq_tuple</span>(<span class="ident">iter</span>.<span class="ident">next</span>(), (<span class="string">&quot;a&quot;</span>, <span class="number">1</span>));
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">0</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">next</span>(), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">next</span>(), <span class="prelude-val">None</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_iter_clone</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache</span>::<span class="ident">new</span>(<span class="number">3</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache::new</span>(<span class="number">3</span>);
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;a&quot;</span>, <span class="number">1</span>);
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;b&quot;</span>, <span class="number">2</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">iter</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter_clone</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">clone</span>();
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">2</span>);
         <span class="ident">assert_opt_eq_tuple</span>(<span class="ident">iter</span>.<span class="ident">next</span>(), (<span class="string">&quot;b&quot;</span>, <span class="number">2</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter_clone</span>.<span class="ident">len</span>(), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">iter_clone</span>.<span class="ident">len</span>(), <span class="number">2</span>);
         <span class="ident">assert_opt_eq_tuple</span>(<span class="ident">iter_clone</span>.<span class="ident">next</span>(), (<span class="string">&quot;b&quot;</span>, <span class="number">2</span>));
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">1</span>);
         <span class="ident">assert_opt_eq_tuple</span>(<span class="ident">iter</span>.<span class="ident">next</span>(), (<span class="string">&quot;a&quot;</span>, <span class="number">1</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter_clone</span>.<span class="ident">len</span>(), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">iter_clone</span>.<span class="ident">len</span>(), <span class="number">1</span>);
         <span class="ident">assert_opt_eq_tuple</span>(<span class="ident">iter_clone</span>.<span class="ident">next</span>(), (<span class="string">&quot;a&quot;</span>, <span class="number">1</span>));
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">0</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">next</span>(), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter_clone</span>.<span class="ident">len</span>(), <span class="number">0</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">iter_clone</span>.<span class="ident">next</span>(), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">iter</span>.<span class="ident">next</span>(), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">iter_clone</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">iter_clone</span>.<span class="ident">next</span>(), <span class="prelude-val">None</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_that_pop_actually_detaches_node</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache</span>::<span class="ident">new</span>(<span class="number">5</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache::new</span>(<span class="number">5</span>);
 
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;a&quot;</span>, <span class="number">1</span>);
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;b&quot;</span>, <span class="number">2</span>);
@@ -2973,7 +3125,7 @@
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;d&quot;</span>, <span class="number">4</span>);
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;e&quot;</span>, <span class="number">5</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">pop</span>(<span class="kw-2">&amp;</span><span class="string">&quot;c&quot;</span>), <span class="prelude-val">Some</span>(<span class="number">3</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">pop</span>(<span class="kw-2">&amp;</span><span class="string">&quot;c&quot;</span>), <span class="prelude-val">Some</span>(<span class="number">3</span>));
 
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;f&quot;</span>, <span class="number">6</span>);
 
@@ -2983,17 +3135,17 @@
         <span class="ident">assert_opt_eq_tuple</span>(<span class="ident">iter</span>.<span class="ident">next</span>(), (<span class="string">&quot;d&quot;</span>, <span class="number">4</span>));
         <span class="ident">assert_opt_eq_tuple</span>(<span class="ident">iter</span>.<span class="ident">next</span>(), (<span class="string">&quot;b&quot;</span>, <span class="number">2</span>));
         <span class="ident">assert_opt_eq_tuple</span>(<span class="ident">iter</span>.<span class="ident">next</span>(), (<span class="string">&quot;a&quot;</span>, <span class="number">1</span>));
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">is_none</span>());
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>)]</span>
     <span class="kw">fn</span> <span class="ident">test_get_with_borrow</span>() {
-        <span class="kw">use</span> <span class="ident">alloc</span>::<span class="ident">string</span>::<span class="ident">String</span>;
+        <span class="kw">use</span> <span class="ident">alloc::string::String</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache</span>::<span class="ident">new</span>(<span class="number">2</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache::new</span>(<span class="number">2</span>);
 
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">String</span>::<span class="ident">from</span>(<span class="string">&quot;apple&quot;</span>);
+        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">String::from</span>(<span class="string">&quot;apple&quot;</span>);
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="ident">key</span>, <span class="string">&quot;red&quot;</span>);
 
         <span class="ident">assert_opt_eq</span>(<span class="ident">cache</span>.<span class="ident">get</span>(<span class="string">&quot;apple&quot;</span>), <span class="string">&quot;red&quot;</span>);
@@ -3002,15 +3154,122 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>)]</span>
     <span class="kw">fn</span> <span class="ident">test_get_mut_with_borrow</span>() {
-        <span class="kw">use</span> <span class="ident">alloc</span>::<span class="ident">string</span>::<span class="ident">String</span>;
+        <span class="kw">use</span> <span class="ident">alloc::string::String</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache</span>::<span class="ident">new</span>(<span class="number">2</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache::new</span>(<span class="number">2</span>);
 
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">String</span>::<span class="ident">from</span>(<span class="string">&quot;apple&quot;</span>);
+        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">String::from</span>(<span class="string">&quot;apple&quot;</span>);
         <span class="ident">cache</span>.<span class="ident">put</span>(<span class="ident">key</span>, <span class="string">&quot;red&quot;</span>);
 
-        <span class="ident">assert_opt_eq</span>(<span class="ident">cache</span>.<span class="ident">get_mut</span>(<span class="string">&quot;apple&quot;</span>), <span class="string">&quot;red&quot;</span>);
+        <span class="ident">assert_opt_eq_mut</span>(<span class="ident">cache</span>.<span class="ident">get_mut</span>(<span class="string">&quot;apple&quot;</span>), <span class="string">&quot;red&quot;</span>);
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_no_memory_leaks</span>() {
+        <span class="kw">static</span> <span class="ident">DROP_COUNT</span>: <span class="ident">AtomicUsize</span> <span class="op">=</span> <span class="ident">AtomicUsize::new</span>(<span class="number">0</span>);
+
+        <span class="kw">struct</span> <span class="ident">DropCounter</span>;
+
+        <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">DropCounter</span> {
+            <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+                <span class="ident">DROP_COUNT</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::SeqCst</span>);
+            }
+        }
+
+        <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="number">100</span>;
+        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">n</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache::new</span>(<span class="number">1</span>);
+            <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">n</span> {
+                <span class="ident">cache</span>.<span class="ident">put</span>(<span class="ident">i</span>, <span class="ident">DropCounter</span> {});
+            }
+        }
+        <span class="macro">assert_eq!</span>(<span class="ident">DROP_COUNT</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>), <span class="ident">n</span> <span class="op">*</span> <span class="ident">n</span>);
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_no_memory_leaks_with_clear</span>() {
+        <span class="kw">static</span> <span class="ident">DROP_COUNT</span>: <span class="ident">AtomicUsize</span> <span class="op">=</span> <span class="ident">AtomicUsize::new</span>(<span class="number">0</span>);
+
+        <span class="kw">struct</span> <span class="ident">DropCounter</span>;
+
+        <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">DropCounter</span> {
+            <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+                <span class="ident">DROP_COUNT</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::SeqCst</span>);
+            }
+        }
+
+        <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="number">100</span>;
+        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">n</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache::new</span>(<span class="number">1</span>);
+            <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">n</span> {
+                <span class="ident">cache</span>.<span class="ident">put</span>(<span class="ident">i</span>, <span class="ident">DropCounter</span> {});
+            }
+            <span class="ident">cache</span>.<span class="ident">clear</span>();
+        }
+        <span class="macro">assert_eq!</span>(<span class="ident">DROP_COUNT</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>), <span class="ident">n</span> <span class="op">*</span> <span class="ident">n</span>);
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_no_memory_leaks_with_resize</span>() {
+        <span class="kw">static</span> <span class="ident">DROP_COUNT</span>: <span class="ident">AtomicUsize</span> <span class="op">=</span> <span class="ident">AtomicUsize::new</span>(<span class="number">0</span>);
+
+        <span class="kw">struct</span> <span class="ident">DropCounter</span>;
+
+        <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">DropCounter</span> {
+            <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+                <span class="ident">DROP_COUNT</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::SeqCst</span>);
+            }
+        }
+
+        <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="number">100</span>;
+        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">n</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache::new</span>(<span class="number">1</span>);
+            <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">n</span> {
+                <span class="ident">cache</span>.<span class="ident">put</span>(<span class="ident">i</span>, <span class="ident">DropCounter</span> {});
+            }
+            <span class="ident">cache</span>.<span class="ident">resize</span>(<span class="number">0</span>);
+        }
+        <span class="macro">assert_eq!</span>(<span class="ident">DROP_COUNT</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>), <span class="ident">n</span> <span class="op">*</span> <span class="ident">n</span>);
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_no_memory_leaks_with_pop</span>() {
+        <span class="kw">static</span> <span class="ident">DROP_COUNT</span>: <span class="ident">AtomicUsize</span> <span class="op">=</span> <span class="ident">AtomicUsize::new</span>(<span class="number">0</span>);
+
+        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Hash</span>, <span class="ident">Eq</span>)]</span>
+        <span class="kw">struct</span> <span class="ident">KeyDropCounter</span>(<span class="ident">usize</span>);
+
+        <span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">KeyDropCounter</span> {
+            <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+                <span class="self">self</span>.<span class="number">0</span>.<span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="number">0</span>)
+            }
+        }
+
+        <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">KeyDropCounter</span> {
+            <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+                <span class="ident">DROP_COUNT</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::SeqCst</span>);
+            }
+        }
+
+        <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="number">100</span>;
+        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">n</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache::new</span>(<span class="number">1</span>);
+
+            <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">100</span> {
+                <span class="ident">cache</span>.<span class="ident">put</span>(<span class="ident">KeyDropCounter</span>(<span class="ident">i</span>), <span class="ident">i</span>);
+                <span class="ident">cache</span>.<span class="ident">pop</span>(<span class="kw-2">&amp;</span><span class="ident">KeyDropCounter</span>(<span class="ident">i</span>));
+            }
+        }
+
+        <span class="macro">assert_eq!</span>(<span class="ident">DROP_COUNT</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>), <span class="ident">n</span> <span class="op">*</span> <span class="ident">n</span> <span class="op">*</span> <span class="number">2</span>);
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_zero_cap_no_crash</span>() {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">LruCache::new</span>(<span class="number">0</span>);
+        <span class="ident">cache</span>.<span class="ident">put</span>(<span class="string">&quot;reizeiin&quot;</span>, <span class="string">&quot;tohka&quot;</span>);
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "lru";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lru" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

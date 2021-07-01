@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bitvec-0.17.4/src/boxed.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>boxed.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bitvec-0.20.2/src/boxed.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>boxed.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../bitvec/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../bitvec/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -384,389 +384,600 @@
 <span id="381">381</span>
 <span id="382">382</span>
 <span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="doccomment">/*! `BitBox` structure
+<span class="doccomment">/*! A dynamically-allocated, fixed-size, buffer containing a [`BitSlice`]
+region.
 
-This module holds the type for an owned but ungrowable bit sequence. `BitVec` is
-the more appropriate and useful type for most collections.
+You can read the standard library’s [`alloc::boxed` module documentation][std]
+here.
+
+This module defines the [`BitBox`] buffer, and all of its associated support
+code.
+
+[`BitBox`] is equivalent to `Box&lt;[bool]&gt;`, in its operation and in its
+relationship to the [`BitSlice`] and [`BitVec`] types. Most of the interesting
+work to be done on a bit-sequence is implemented in `BitSlice`, to which
+`BitBox` dereferences, and the box container itself only exists to maintain
+wonership and provide some specializations that cannot safely be done on
+`BitSlice` alone.
+
+There is almost never a reason to use this type, as it is a mixture of
+[`BitArray`]’s fixed width and [`BitVec`]’s heap allocation. You should only use
+it when you have a bit-sequence whose width is either unknowable at compile-time
+or inexpressable in `BitArray`, and are constructing the sequence in a `BitVec`
+before freezing it.
+
+[`BitArray`]: crate::array::BitArray
+[`BitBox`]: crate::boxed::BitBox
+[`BitSlice`]: crate::slice::BitSlice
+[`BitVec`]: crate::vec::BitVec
+[std]: alloc::boxed
 !*/</span>
 
 <span class="attribute">#![<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
+	<span class="ident">index::BitIdx</span>,
+	<span class="ident">mem::BitMemory</span>,
+	<span class="ident">mutability::Mut</span>,
 	<span class="ident">order</span>::{
 		<span class="ident">BitOrder</span>,
-		<span class="ident">Local</span>,
+		<span class="ident">Lsb0</span>,
 	},
-	<span class="ident">pointer</span>::<span class="ident">BitPtr</span>,
-	<span class="ident">slice</span>::<span class="ident">BitSlice</span>,
-	<span class="ident">store</span>::<span class="ident">BitStore</span>,
-	<span class="ident">vec</span>::<span class="ident">BitVec</span>,
+	<span class="ident">ptr</span>::{
+		<span class="ident">BitPtr</span>,
+		<span class="ident">BitSpan</span>,
+	},
+	<span class="ident">slice::BitSlice</span>,
+	<span class="ident">store::BitStore</span>,
+	<span class="ident">vec::BitVec</span>,
 };
 
-<span class="kw">use</span> <span class="ident">alloc</span>::{
-	<span class="ident">boxed</span>::<span class="ident">Box</span>,
-	<span class="ident">vec</span>::<span class="ident">Vec</span>,
-};
+<span class="kw">use</span> <span class="ident">alloc::boxed::Box</span>;
 
 <span class="kw">use</span> <span class="ident">core</span>::{
-	<span class="ident">marker</span>::<span class="ident">PhantomData</span>,
-	<span class="ident">mem</span>,
+	<span class="ident">mem::ManuallyDrop</span>,
+	<span class="ident">slice</span>,
 };
 
-<span class="doccomment">/** A pointer type for owned bit sequences.
+<span class="kw">use</span> <span class="ident">tap::pipe::Pipe</span>;
 
-This type is essentially a `&amp;BitSlice` that owns its own memory. It can change
-the contents of its domain, but it cannot change its own domain like `BitVec`
-can. It is useful for fixed-size collections without lifetime tracking.
+<span class="doccomment">/** A frozen heap-allocated buffer of individual bits.
+
+This is essentially a [`BitVec`] that has frozen its allocation, and given up
+the ability to change size. It is analagous to `Box&lt;[bool]&gt;`. You should prefer
+[`BitArray`] over `BitBox` where possible, and may freely box it if you need the
+indirection.
+
+# Documentation
+
+All APIs that mirror something in the standard library will have an `Original`
+section linking to the corresponding item. All APIs that have a different
+signature or behavior than the original will have an `API Differences` section
+explaining what has changed, and how to adapt your existing code to the change.
+
+These sections look like this:
+
+# Original
+
+[`Box&lt;[T]&gt;`](alloc::boxed::Box)
+
+# API Differences
+
+The buffer type `Box&lt;[bool]&gt;` has no type parameters. `BitBox&lt;O, T&gt;` has the
+same two type parameters as `BitSlice&lt;O, T&gt;`. Otherwise, `BitBox` is able to
+implement the full API surface of `Box&lt;[bool]&gt;`.
+
+# Behavior
+
+Because `BitBox` is a fully-owned buffer, it is able to operate on its memory
+without concern for any other views that may alias. This enables it to
+specialize some [`BitSlice`] behavior to be faster or more efficient.
 
 # Type Parameters
 
-- `O: BitOrder`: An implementor of the [`BitOrder`] trait. This type is used to
-  convert semantic indices into concrete bit positions in elements, and store or
-  retrieve bit values from the storage type.
-- `T: BitStore`: An implementor of the [`BitStore`] trait: `u8`, `u16`, `u32`,
-  or `u64` (64-bit systems only). This is the actual type in memory that the box
-  will use to store data.
+This takes the same [`BitOrder`] and [`BitStore`] parameters as [`BitSlice`].
+Unlike `BitSlice`, it is restricted to only accept the fundamental integers as
+its `BitStore` arguments; `BitBox` buffers can never be aliased by other
+`BitBox`es, and do not need to share memory access.
 
 # Safety
 
-The `BitBox` handle has the same *size* as standard Rust `Box&lt;[T]&gt;` handles, but
-it is ***extremely binary incompatible*** with them. Attempting to treat
-`BitBox&lt;_, T&gt;` as `Box&lt;[T]&gt;` in any manner except through the provided APIs is
-***catastrophically*** unsafe and unsound.
+`BitBox` is a wrapper over a `NonNull&lt;BitSlice&lt;O, T&gt;&gt;` pointer; this allows it
+to remain exactly two words in size, and means that it is subject to the same
+representational incompatibility restrictions as [`BitSlice`] references. You
+must never attempt to type-cast between `Box&lt;[bool]&gt;` and `BitBox` in any way,
+nor may you attempt to modify the memory value of a `BitBox` handle. Doing so
+will cause allocator and memory errors in your program, likely inducing a panic.
 
-# Trait Implementations
+Everything in the `BitBox` public API, even the `unsafe` parts, are guaranteed
+to have no more unsafety or potential for incorrectness than their equivalent
+items in the standard library. All `unsafe` APIs will have documentation
+explicitly detailing what the API requires you to uphold in order for it to
+function safely and correctly. All safe APIs will do so themselves.
 
-`BitBox&lt;O, T&gt;` implements all the traits that `BitSlice&lt;O, T&gt;` does, by
-deferring to the `BitSlice` implementation. It also implements conversion traits
-to and from `BitSlice`, and to/from `BitVec`.
+# Macro Construction
+
+Heap allocation can only occur at runtime, but the [`bitbox!`] macro will
+construct an appropriate [`BitSlice`] buffer at compile-time, and at run-time,
+only copy the buffer into a heap allocation.
+
+[`BitArray`]: crate::array::BitArray
+[`BitOrder`]: crate::order::BitOrder
+[`BitSlice`]: crate::slice::BitSlice
+[`BitStore`]: crate::store::BitStore
+[`BitVec`]: crate::vec::BitVec
+[`bitbox!`]: macro@crate::bitbox
 **/</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BitBox</span><span class="op">&lt;</span><span class="ident">O</span> <span class="op">=</span> <span class="ident">Local</span>, <span class="ident">T</span> <span class="op">=</span> <span class="ident">usize</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">O</span>: <span class="ident">BitOrder</span>, <span class="ident">T</span>: <span class="ident">BitStore</span> {
-	<span class="ident">_order</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
-	<span class="ident">pointer</span>: <span class="ident">BitPtr</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BitBox</span><span class="op">&lt;</span><span class="ident">O</span> <span class="op">=</span> <span class="ident">Lsb0</span>, <span class="ident">T</span> <span class="op">=</span> <span class="ident">usize</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+	<span class="ident">T</span>: <span class="ident">BitStore</span>,
+{
+	<span class="ident">bitspan</span>: <span class="ident">BitSpan</span><span class="op">&lt;</span><span class="ident">Mut</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>,
 }
 
+<span class="doccomment">/// General-purpose functions not present on `Box&lt;[T]&gt;`.</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">BitBox</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">O</span>: <span class="ident">BitOrder</span>, <span class="ident">T</span>: <span class="ident">BitStore</span> {
-	<span class="doccomment">/// Constructs an empty boxed bitslice.</span>
+<span class="kw">where</span>
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+	<span class="ident">T</span>: <span class="ident">BitStore</span>,
+{
+	<span class="doccomment">/// Copies a [`BitSlice`] region into a new `BitBox` allocation.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Returns</span>
+	<span class="doccomment">/// # Effects</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// An empty `BitBox` at an arbitrary location.</span>
+	<span class="doccomment">/// This delegates to [`BitVec::from_bitslice`], then discards the excess</span>
+	<span class="doccomment">/// capacity.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Examples</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// ```rust</span>
 	<span class="doccomment">/// use bitvec::prelude::*;</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// let bb: BitBox = BitBox::empty();</span>
-	<span class="doccomment">/// assert!(bb.is_empty());</span>
+	<span class="doccomment">/// let bits = bits![0, 1, 0, 1, 1, 0, 1, 1];</span>
+	<span class="doccomment">/// let bb = BitBox::from_bitslice(&amp;bits[2 ..]);</span>
+	<span class="doccomment">/// assert_eq!(bb, bits[2 ..]);</span>
+	<span class="doccomment">/// assert_eq!(bb.as_slice(), bits.as_slice());</span>
 	<span class="doccomment">/// ```</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-		<span class="self">Self</span> {
-			<span class="ident">_order</span>: <span class="ident">PhantomData</span>,
-			<span class="ident">pointer</span>: <span class="ident">BitPtr</span>::<span class="ident">empty</span>(),
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// [`BitVec::from_bitslice`]: crate::vec::BitVec::from_bitslice</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_bitslice</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+		<span class="ident">BitVec::from_bitslice</span>(<span class="ident">slice</span>).<span class="ident">into_boxed_bitslice</span>()
+	}
+
+	<span class="doccomment">/// Converts a `Box&lt;[T]&gt;` into a `BitBox`&lt;O, T&gt;` without copying its buffer.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// # Parameters</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// - `boxed`: A boxed slice to view as bits.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// # Returns</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// A `BitBox` over the `boxed` buffer.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// # Panics</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// This panics if `boxed` is too long to convert into a `BitBox`. See</span>
+	<span class="doccomment">/// [`BitSlice::MAX_ELTS`].</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// # Examples</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// ```rust</span>
+	<span class="doccomment">/// use bitvec::prelude::*;</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// let boxed: Box&lt;[u8]&gt; = Box::new([0; 4]);</span>
+	<span class="doccomment">/// let addr = boxed.as_ptr();</span>
+	<span class="doccomment">/// let bb = BitBox::&lt;LocalBits, _&gt;::from_boxed_slice(boxed);</span>
+	<span class="doccomment">/// assert_eq!(bb, bits![0; 32]);</span>
+	<span class="doccomment">/// assert_eq!(addr, bb.as_slice().as_ptr());</span>
+	<span class="doccomment">/// ```</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// [`BitSlice::MAX_ELTS`]: crate::slice::BitSlice::MAX_ELTS</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_boxed_slice</span>(<span class="ident">boxed</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+		<span class="self">Self</span><span class="ident">::try_from_boxed_slice</span>(<span class="ident">boxed</span>)
+			.<span class="ident">expect</span>(<span class="string">&quot;Slice was too long to be converted into a `BitBox`&quot;</span>)
+	}
+
+	<span class="doccomment">/// Converts a `Box&lt;[T]&gt;` into a `BitBox&lt;O, T&gt;` without copying its buffer.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// This method takes ownership of a memory buffer and enables it to be used</span>
+	<span class="doccomment">/// as a bit-box. Because `Box&lt;[T]&gt;` can be longer than `BitBox`es, this is</span>
+	<span class="doccomment">/// a fallible method, and the original box will be returned if it cannot be</span>
+	<span class="doccomment">/// converted.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// # Parameters</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// - `boxed`: Some boxed slice of memory, to be viewed as bits.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// # Returns</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// If `boxed` is short enough to be viewed as a `BitBox`, then this returns</span>
+	<span class="doccomment">/// a `BitBox` over the `boxed` buffer. If `boxed` is too long, then this</span>
+	<span class="doccomment">/// returns `boxed` unmodified.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// # Examples</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// ```rust</span>
+	<span class="doccomment">/// use bitvec::prelude::*;</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// let boxed: Box&lt;[u8]&gt; = Box::new([0; 4]);</span>
+	<span class="doccomment">/// let addr = boxed.as_ptr();</span>
+	<span class="doccomment">/// let bb = BitBox::&lt;LocalBits, _&gt;::try_from_boxed_slice(boxed).unwrap();</span>
+	<span class="doccomment">/// assert_eq!(bb[..], bits![0; 32]);</span>
+	<span class="doccomment">/// assert_eq!(addr, bb.as_slice().as_ptr());</span>
+	<span class="doccomment">/// ```</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_from_boxed_slice</span>(<span class="ident">boxed</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">boxed</span> <span class="op">=</span> <span class="ident">ManuallyDrop::new</span>(<span class="ident">boxed</span>);
+
+		<span class="ident">BitPtr::from_mut_slice</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">boxed</span>[..])
+			.<span class="ident">span</span>(<span class="ident">boxed</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="ident">T::Mem::BITS</span> <span class="kw">as</span> <span class="ident">usize</span>)
+			.<span class="ident">map</span>(<span class="op">|</span><span class="ident">bitspan</span><span class="op">|</span> <span class="self">Self</span> { <span class="ident">bitspan</span> })
+			.<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">ManuallyDrop::into_inner</span>(<span class="ident">boxed</span>))
+	}
+
+	<span class="doccomment">/// Converts the slice back into an ordinary slice of memory elements.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// This does not affect the slice’s buffer, only the handle used to control</span>
+	<span class="doccomment">/// it.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// # Parameters</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// - `self`</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// # Returns</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// An ordinary boxed slice containing all of the bit-slice’s memory buffer.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// # Examples</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// ```rust</span>
+	<span class="doccomment">/// use bitvec::prelude::*;</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// let bb = bitbox![0; 5];</span>
+	<span class="doccomment">/// let addr = bb.as_slice().as_ptr();</span>
+	<span class="doccomment">/// let boxed = bb.into_boxed_slice();</span>
+	<span class="doccomment">/// assert_eq!(boxed[..], [0][..]);</span>
+	<span class="doccomment">/// assert_eq!(addr, boxed.as_ptr());</span>
+	<span class="doccomment">/// ```</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_boxed_slice</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span> {
+		<span class="self">self</span>.<span class="ident">pipe</span>(<span class="ident">ManuallyDrop::new</span>)
+			.<span class="ident">as_mut_slice</span>()
+			.<span class="ident">pipe</span>(<span class="op">|</span><span class="ident">slice</span><span class="op">|</span> <span class="kw">unsafe</span> { <span class="ident">Box::from_raw</span>(<span class="ident">slice</span>) })
+	}
+
+	<span class="doccomment">/// Converts `self` into a vector without clones or allocation.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// The resulting vector can be converted back into a box via [`BitVec&lt;O,</span>
+	<span class="doccomment">/// T&gt;`]’s [`.into_boxed_bitslice()`] method.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// # Original</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// [`slice::into_vec`](https://doc.rust-lang.org/stable/std/primitive.slice.html#method.into_vec)</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// # API Differences</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// Despite taking a `Box&lt;[T]&gt;` receiver, this function is written in an</span>
+	<span class="doccomment">/// `impl&lt;T&gt; [T]` block.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// Rust does not allow the text</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// ```rust,ignore</span>
+	<span class="doccomment">/// impl&lt;O, T&gt; BitSlice&lt;O, T&gt; {</span>
+	<span class="doccomment">///   fn into_bitvec(self: BitBox&lt;O, T&gt;);</span>
+	<span class="doccomment">/// }</span>
+	<span class="doccomment">/// ```</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// to be written, and `BitBox` exists specifically because</span>
+	<span class="doccomment">/// `Box&lt;BitSlice&lt;&gt;&gt;` cannot be written either, so this function must be</span>
+	<span class="doccomment">/// implemented directly on `BitBox` rather than on `BitSlice` with a boxed</span>
+	<span class="doccomment">/// receiver.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// # Examples</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// ```rust</span>
+	<span class="doccomment">/// use bitvec::prelude::*;</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// let bb = bitbox![0, 1, 0, 1];</span>
+	<span class="doccomment">/// let bv = bb.into_bitvec();</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// assert_eq!(bv, bitvec![0, 1, 0, 1]);</span>
+	<span class="doccomment">/// ```</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// [`BitVec&lt;O, T&gt;`]: crate::vec::BitVec</span>
+	<span class="doccomment">/// [`.into_boxed_bitslice()`]: crate::vec::BitVec::into_boxed_bitslice</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_bitvec</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BitVec</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bitspan</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bitspan</span>;
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">raw</span> <span class="op">=</span> <span class="self">self</span>
+			<span class="comment">//  Disarm the `self` destructor</span>
+			.<span class="ident">pipe</span>(<span class="ident">ManuallyDrop::new</span>)
+			<span class="comment">//  Extract the `Box&lt;[T]&gt;` handle, invalidating `self`</span>
+			.<span class="ident">with_box</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="kw">unsafe</span> { <span class="ident">ManuallyDrop::take</span>(<span class="ident">b</span>) })
+			<span class="comment">//  The distribution guarantees this to be correct and in-place.</span>
+			.<span class="ident">into_vec</span>()
+			<span class="comment">//  Disarm the `Vec&lt;T&gt;` destructor *also*.</span>
+			.<span class="ident">pipe</span>(<span class="ident">ManuallyDrop::new</span>);
+		<span class="comment">/* The distribution claims that `[T]::into_vec(Box&lt;[T]&gt;) -&gt; Vec&lt;T&gt;` does
+		not alter the address of the heap allocation, and only modifies the
+		buffer handle. Nevertheless, update the bit-pointer with the address of
+		the vector as returned by this transformation Just In Case.
+
+		Inspection of the distribution’s implementation shows that the
+		conversion from `(buf, len)` to `(buf, cap, len)` is done by using the
+		slice length as the buffer capacity. However, this is *not* a behavior
+		guaranteed by the distribution, and so the pipeline above must remain in
+		place in the event that this behavior ever changes. It should compile
+		away to nothing, as it is almost entirely typesystem manipulation.
+		*/</span>
+		<span class="kw">unsafe</span> {
+			<span class="ident">bitspan</span>.<span class="ident">set_address</span>(<span class="ident">raw</span>.<span class="ident">as_mut_ptr</span>());
+			<span class="ident">BitVec::from_fields</span>(<span class="ident">bitspan</span>, <span class="ident">raw</span>.<span class="ident">capacity</span>())
 		}
 	}
 
-	<span class="doccomment">/// Produces a `BitBox` from a single element.</span>
+	<span class="doccomment">/// Views the buffer’s contents as a `BitSlice`.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Parameters</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// - `elt`: The source element from which to make the `BitBox`.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Returns</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// A `BitBox` containing the provided element.</span>
+	<span class="doccomment">/// This is equivalent to `&amp;bb[..]`.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Examples</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// ```rust</span>
 	<span class="doccomment">/// use bitvec::prelude::*;</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// let bb: BitBox&lt;Msb0, u16&gt; = BitBox::from_element(!0);</span>
-	<span class="doccomment">/// assert!(bb.all());</span>
+	<span class="doccomment">/// let bb = bitbox![0, 1, 1, 0];</span>
+	<span class="doccomment">/// let bits = bb.as_bitslice();</span>
 	<span class="doccomment">/// ```</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_element</span>(<span class="ident">elt</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-		<span class="ident">BitSlice</span>::<span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">from_element</span>(<span class="kw-2">&amp;</span><span class="ident">elt</span>).<span class="ident">into</span>()
-	}
-
-	<span class="doccomment">/// Builds a `BitBox` from a borrowed slice of elements.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Parameters</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// - `slice`: The source slice from which to make the `BitBox`.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Returns</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// A `BitBox` containing the (cloned) provided slice.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Panics</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// This function may panic if the provided slice is longer than the</span>
-	<span class="doccomment">/// `BitBox` can support.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// use bitvec::prelude::*;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let src = [5, 10];</span>
-	<span class="doccomment">/// let bb: BitBox&lt;Msb0, u8&gt; = BitBox::from_slice(&amp;src[..]);</span>
-	<span class="doccomment">/// assert!(bb[5]);</span>
-	<span class="doccomment">/// assert!(bb[7]);</span>
-	<span class="doccomment">/// assert!(bb[12]);</span>
-	<span class="doccomment">/// assert!(bb[14]);</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_slice</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span>[<span class="ident">T</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-		<span class="ident">BitVec</span>::<span class="ident">from_slice</span>(<span class="ident">slice</span>).<span class="ident">into_boxed_bitslice</span>()
-	}
-
-	<span class="doccomment">/// Clones a `&amp;BitSlice` into a `BitBox`.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Parameters</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// - `slice`: The bit slice to clone into a bit box.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Returns</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// A `BitBox` containing the same bits as the source slice.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// use bitvec::prelude::*;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let src = [0u8, !0];</span>
-	<span class="doccomment">/// let bb = BitBox::&lt;Msb0, _&gt;::from_bitslice(src.bits());</span>
-	<span class="doccomment">/// assert_eq!(bb.len(), 16);</span>
-	<span class="doccomment">/// assert!(bb.some());</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_bitslice</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-		<span class="ident">BitVec</span>::<span class="ident">from_bitslice</span>(<span class="ident">slice</span>).<span class="ident">into_boxed_bitslice</span>()
-	}
-
-	<span class="doccomment">/// Produces a `BitBox` from an owned slice of elements.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Parameters</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// - `slice`: The source boxed slice from which to make the `BitBox`.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Returns</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// A `BitBox` governing the same slice that was passed in. This function</span>
-	<span class="doccomment">/// does not reallocate.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Panics</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// This function may panic if the provided slice is longer than the</span>
-	<span class="doccomment">/// `BitBox` can support.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// use bitvec::prelude::*;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let slice: Box&lt;[u16]&gt; = vec![0, !0].into_boxed_slice();</span>
-	<span class="doccomment">/// let bb = BitBox::&lt;Lsb0, _&gt;::from_boxed_slice(slice);</span>
-	<span class="doccomment">/// assert!(bb.some());</span>
-	<span class="doccomment">/// assert_eq!(bb.len(), 32);</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_boxed_slice</span>(<span class="ident">boxed</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-		<span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">boxed</span>.<span class="ident">len</span>();
-		<span class="macro">assert</span><span class="macro">!</span>(
-			<span class="ident">len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">BitPtr</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">MAX_ELTS</span>,
-			<span class="string">&quot;BitBox cannot address {} elements&quot;</span>,
-			<span class="ident">len</span>,
-		);
-
-		<span class="kw">let</span> <span class="ident">bs</span> <span class="op">=</span> <span class="ident">BitSlice</span>::<span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>::<span class="ident">from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">boxed</span>[..]);
-		<span class="kw">let</span> <span class="ident">pointer</span> <span class="op">=</span> <span class="ident">bs</span>.<span class="ident">bitptr</span>();
-		<span class="kw">let</span> <span class="ident">out</span> <span class="op">=</span> <span class="self">Self</span> {
-			<span class="ident">_order</span>: <span class="ident">PhantomData</span>,
-			<span class="ident">pointer</span>,
-		};
-		<span class="ident">mem</span>::<span class="ident">forget</span>(<span class="ident">boxed</span>);
-		<span class="ident">out</span>
-	}
-
-	<span class="doccomment">/// Removes the `BitBox` wrapper from a `Box&lt;[T]&gt;`.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Parameters</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// - `self`</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Returns</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// The `Box&lt;[T]&gt;` underneath `self`.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// use bitvec::prelude::*;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let slice: Box&lt;[u16]&gt; = vec![0, !0].into_boxed_slice();</span>
-	<span class="doccomment">/// let bb = BitBox::&lt;Lsb0, _&gt;::from_boxed_slice(slice);</span>
-	<span class="doccomment">/// assert_eq!(bb.len(), 32);</span>
-	<span class="doccomment">/// let slice = bb.into_boxed_slice();</span>
-	<span class="doccomment">/// assert_eq!(slice.len(), 2);</span>
-	<span class="doccomment">/// ```</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_boxed_slice</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="ident">slice</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pointer</span>.<span class="ident">as_mut_slice</span>();
-		<span class="kw">let</span> (<span class="ident">data</span>, <span class="ident">elts</span>) <span class="op">=</span> (<span class="ident">slice</span>.<span class="ident">as_mut_ptr</span>(), <span class="ident">slice</span>.<span class="ident">len</span>());
-		<span class="kw">let</span> <span class="ident">out</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">Vec</span>::<span class="ident">from_raw_parts</span>(<span class="ident">data</span>, <span class="ident">elts</span>, <span class="ident">elts</span>) }
-			.<span class="ident">into_boxed_slice</span>();
-		<span class="ident">mem</span>::<span class="ident">forget</span>(<span class="self">self</span>);
-		<span class="ident">out</span>
-	}
-
-	<span class="doccomment">/// Performs “reverse” addition (left to right instead of right to left).</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// This delegates to `BitSlice::add_assign_reverse`.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Parameters</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// - `self`</span>
-	<span class="doccomment">/// - `addend: impl IntoIterator&lt;Item=bool&gt;`: A bitstream to add to `self`.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Returns</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// The sum of `self` and `addend`.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_reverse</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">addend</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
-	<span class="kw">where</span> <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">bool</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">add_assign_reverse</span>(<span class="ident">addend</span>);
-		<span class="self">self</span>
-	}
-
-	<span class="doccomment">/// Changes the order on a box handle, without changing the data it</span>
-	<span class="doccomment">/// governs.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Parameters</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// - `self`</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Returns</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// An equivalent handle to the same data, with a new order parameter.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">change_order</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BitBox</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">T</span><span class="op">&gt;</span>
-	<span class="kw">where</span> <span class="ident">P</span>: <span class="ident">BitOrder</span> {
-		<span class="kw">let</span> <span class="ident">bp</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bitptr</span>();
-		<span class="ident">mem</span>::<span class="ident">forget</span>(<span class="self">self</span>);
-		<span class="kw">unsafe</span> { <span class="ident">BitBox</span>::<span class="ident">from_raw</span>(<span class="ident">bp</span>.<span class="ident">as_mut_ptr</span>()) }
-	}
-
-	<span class="doccomment">/// Accesses the `BitSlice&lt;O, T&gt;` to which the `BitBox` refers.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Parameters</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// - `&amp;self`</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Returns</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// The slice of bits behind the box.</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_bitslice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">pointer</span>.<span class="ident">into_bitslice</span>()
+		<span class="self">self</span>.<span class="ident">bitspan</span>.<span class="ident">to_bitslice_ref</span>()
 	}
 
-	<span class="doccomment">/// Accesses the `BitSlice&lt;O, T&gt;` to which the `BitBox` refers.</span>
+	<span class="doccomment">/// Extracts a mutable bit-slice of the entire vector.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Parameters</span>
+	<span class="doccomment">/// Equivalent to `&amp;mut bv[..]`.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// - `&amp;mut self`</span>
+	<span class="doccomment">/// # Examples</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Returns</span>
+	<span class="doccomment">/// ```rust</span>
+	<span class="doccomment">/// use bitvec::prelude::*;</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// The slice of bits behind the box.</span>
+	<span class="doccomment">/// let mut bv = bitvec![0, 1, 0, 1];</span>
+	<span class="doccomment">/// let bits = bv.as_mut_bitslice();</span>
+	<span class="doccomment">/// bits.set(0, true);</span>
+	<span class="doccomment">/// ```</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_mut_bitslice</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">pointer</span>.<span class="ident">into_bitslice_mut</span>()
+		<span class="self">self</span>.<span class="ident">bitspan</span>.<span class="ident">to_bitslice_mut</span>()
 	}
 
-	<span class="doccomment">/// Accesses the vector’s backing store as an element slice.</span>
+	<span class="doccomment">/// Extracts an element slice containing the entire box.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// Unlike `BitSlice`’s method of the same name, this includes the partial</span>
-	<span class="doccomment">/// edges, as `BitBox` forbids fragmentation that leads to contention.</span>
+	<span class="doccomment">/// # Analogue</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Parameters</span>
+	<span class="doccomment">/// See [`.as_bitslice()`] for a `&amp;BitBox -&gt; &amp;BitSlice` transform.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// - `&amp;self`</span>
+	<span class="doccomment">/// # Examples</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Returns</span>
+	<span class="doccomment">/// ```rust</span>
+	<span class="doccomment">/// # #[cfg(feature = &quot;std&quot;)] {</span>
+	<span class="doccomment">/// use bitvec::prelude::*;</span>
+	<span class="doccomment">/// use std::io::{self, Write};</span>
+	<span class="doccomment">/// let buffer = bitbox![Msb0, u8; 0, 1, 0, 1, 1, 0, 0, 0];</span>
+	<span class="doccomment">/// io::sink().write(buffer.as_slice()).unwrap();</span>
+	<span class="doccomment">/// # }</span>
+	<span class="doccomment">/// ```</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// The slice of all live elements in the backing storage, including the</span>
-	<span class="doccomment">/// partial edges if present.</span>
+	<span class="doccomment">/// [`.as_bitslice()`]: Self::as_bitslice</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">T</span>] {
-		<span class="self">self</span>.<span class="ident">bitptr</span>().<span class="ident">as_slice</span>()
+		<span class="kw">let</span> (<span class="ident">data</span>, <span class="ident">len</span>) <span class="op">=</span>
+			(<span class="self">self</span>.<span class="ident">bitspan</span>.<span class="ident">address</span>().<span class="ident">to_const</span>(), <span class="self">self</span>.<span class="ident">bitspan</span>.<span class="ident">elements</span>());
+		<span class="kw">unsafe</span> { <span class="ident">slice::from_raw_parts</span>(<span class="ident">data</span>, <span class="ident">len</span>) }
 	}
 
-	<span class="doccomment">/// Accesses the vector’s backing store as an element slice.</span>
+	<span class="doccomment">/// Extracts a mutable slice of the entire box.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// Unlike `BitSlice`’s method of the same name, this includes the partial</span>
-	<span class="doccomment">/// edges, as `BitBox` forbids fragmentation that leads to contention.</span>
+	<span class="doccomment">/// # Analogue</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Parameters</span>
+	<span class="doccomment">/// See [`.as_mut_bitslice()`] for a `&amp;mut BitBox -&gt; &amp;mut BitSlice`</span>
+	<span class="doccomment">/// transform.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// - `&amp;mut self`</span>
+	<span class="doccomment">/// # Examples</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Returns</span>
+	<span class="doccomment">/// ```rust</span>
+	<span class="doccomment">/// # #[cfg(feature = &quot;std&quot;)] {</span>
+	<span class="doccomment">/// use bitvec::prelude::*;</span>
+	<span class="doccomment">/// use std::io::{self, Read};</span>
+	<span class="doccomment">/// let mut buffer = bitbox![Msb0, u8; 0; 24];</span>
+	<span class="doccomment">/// io::repeat(0b101).read_exact(buffer.as_mut_slice()).unwrap();</span>
+	<span class="doccomment">/// # }</span>
+	<span class="doccomment">/// ```</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// The slice of all live elements in the backing storage, including the</span>
-	<span class="doccomment">/// partial edges if present.</span>
+	<span class="doccomment">/// [`.as_mut_bitslice()`]: Self::as_mut_bitslice</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_mut_slice</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">T</span>] {
-		<span class="self">self</span>.<span class="ident">bitptr</span>().<span class="ident">as_mut_slice</span>()
+		<span class="kw">let</span> (<span class="ident">data</span>, <span class="ident">len</span>) <span class="op">=</span>
+			(<span class="self">self</span>.<span class="ident">bitspan</span>.<span class="ident">address</span>().<span class="ident">to_mut</span>(), <span class="self">self</span>.<span class="ident">bitspan</span>.<span class="ident">elements</span>());
+		<span class="kw">unsafe</span> { <span class="ident">slice::from_raw_parts_mut</span>(<span class="ident">data</span>, <span class="ident">len</span>) }
 	}
 
-	<span class="doccomment">/// Gives read access to the `BitPtr&lt;T&gt;` structure powering the box.</span>
+	<span class="doccomment">/// Sets the uninitialized bits of the vector to a fixed value.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Parameters</span>
+	<span class="doccomment">/// This method modifies all bits in the allocated buffer that are outside</span>
+	<span class="doccomment">/// the `self.as_bitslice()` view so that they have a consistent value. This</span>
+	<span class="doccomment">/// can be used to zero the uninitialized memory so that when viewed as a</span>
+	<span class="doccomment">/// raw memory slice, bits outside the live region have a predictable value.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// - `&amp;self`</span>
+	<span class="doccomment">/// # Examples</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Returns</span>
+	<span class="doccomment">/// ```rust</span>
+	<span class="doccomment">/// use bitvec::prelude::*;</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// A copy of the interior `BitPtr&lt;T&gt;`.</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">bitptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BitPtr</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">pointer</span>
+	<span class="doccomment">/// let mut bb = BitBox::new(&amp;220u8.view_bits::&lt;Lsb0&gt;()[.. 4]);</span>
+	<span class="doccomment">/// assert_eq!(bb.count_ones(), 2);</span>
+	<span class="doccomment">/// assert_eq!(bb.as_slice(), &amp;[220u8]);</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// bb.set_uninitialized(false);</span>
+	<span class="doccomment">/// assert_eq!(bb.as_slice(), &amp;[12u8]);</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// bb.set_uninitialized(true);</span>
+	<span class="doccomment">/// assert_eq!(bb.as_slice(), &amp;[!3u8]);</span>
+	<span class="doccomment">/// ```</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_uninitialized</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">bool</span>) {
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bp</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bitspan</span>;
+		<span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">head</span>, <span class="ident">bits</span>) <span class="op">=</span> <span class="ident">bp</span>.<span class="ident">raw_parts</span>();
+		<span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="ident">head</span>.<span class="ident">value</span>() <span class="kw">as</span> <span class="ident">usize</span>;
+		<span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="ident">head</span> <span class="op">+</span> <span class="ident">bits</span>;
+		<span class="kw">let</span> <span class="ident">full</span> <span class="op">=</span> <span class="kw">crate</span><span class="ident">::mem::elts</span>::<span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>(<span class="ident">tail</span>) <span class="op">*</span> <span class="ident">T::Mem::BITS</span> <span class="kw">as</span> <span class="ident">usize</span>;
+		<span class="kw">unsafe</span> {
+			<span class="ident">bp</span>.<span class="ident">set_head</span>(<span class="ident">BitIdx::ZERO</span>);
+			<span class="ident">bp</span>.<span class="ident">set_len</span>(<span class="ident">full</span>);
+			<span class="kw">let</span> <span class="ident">bits</span> <span class="op">=</span> <span class="ident">bp</span>.<span class="ident">to_bitslice_mut</span>();
+			<span class="ident">bits</span>.<span class="ident">get_unchecked_mut</span>(.. <span class="ident">head</span>).<span class="ident">set_all</span>(<span class="ident">value</span>);
+			<span class="ident">bits</span>.<span class="ident">get_unchecked_mut</span>(<span class="ident">tail</span> ..).<span class="ident">set_all</span>(<span class="ident">value</span>);
+		}
 	}
 
-	<span class="doccomment">/// Allows a function to access the `Box&lt;[T]&gt;` that the `BitBox` is using</span>
-	<span class="doccomment">/// under the hood.</span>
+	<span class="doccomment">/// Permits a function to modify the `Box&lt;[T]&gt;` backing storage of a</span>
+	<span class="doccomment">/// `BitBox&lt;_, T&gt;`.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Parameters</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// - `&amp;self`</span>
-	<span class="doccomment">/// - `func`: A function which works with a borrowed `Box&lt;[T]&gt;` representing</span>
-	<span class="doccomment">///   the actual memory held by the `BitBox`.</span>
+	<span class="doccomment">/// This produces a temporary `Box&lt;[T]&gt;` structure governing the `BitBox`’s</span>
+	<span class="doccomment">/// buffer and allows a function to view it mutably. After the</span>
+	<span class="doccomment">/// callback returns, the `Box` is written back into `self` and forgotten.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Type Parameters</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// - `F: FnOnce(&amp;Box&lt;[T]&gt;) -&gt; R`: A function which borrows a box.</span>
-	<span class="doccomment">/// - `R`: The return value of the function.</span>
+	<span class="doccomment">/// - `F`: A function which operates on a mutable borrow of a `Box&lt;[T]&gt;`</span>
+	<span class="doccomment">///   buffer controller.</span>
+	<span class="doccomment">/// - `R`: The return type of the `F` function.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// # Parameters</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// - `&amp;mut self`</span>
+	<span class="doccomment">/// - `func`: A function which receives a mutable borrow of a `Box&lt;[T]&gt;`</span>
+	<span class="doccomment">///   controlling `self`’s buffer.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Returns</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// The return value of the provided function.</span>
-	<span class="kw">fn</span> <span class="ident">do_with_box</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>
-	<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span> {
-		<span class="kw">let</span> <span class="ident">slice</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pointer</span>.<span class="ident">as_mut_slice</span>();
-		<span class="kw">let</span> (<span class="ident">data</span>, <span class="ident">elts</span>) <span class="op">=</span> (<span class="ident">slice</span>.<span class="ident">as_mut_ptr</span>(), <span class="ident">slice</span>.<span class="ident">len</span>());
-		<span class="kw">let</span> <span class="ident">b</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-			<span class="ident">Vec</span>::<span class="ident">from_raw_parts</span>(<span class="ident">data</span>, <span class="ident">elts</span>, <span class="ident">elts</span>)
-		}.<span class="ident">into_boxed_slice</span>();
-		<span class="kw">let</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">func</span>(<span class="kw-2">&amp;</span><span class="ident">b</span>);
-		<span class="ident">mem</span>::<span class="ident">forget</span>(<span class="ident">b</span>);
-		<span class="ident">out</span>
+	<span class="doccomment">/// The return value of `func`. `func` is forbidden from borrowing any part</span>
+	<span class="doccomment">/// of the `Box&lt;[T]&gt;` temporary view.</span>
+	<span class="kw">fn</span> <span class="ident">with_box</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>
+	<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ManuallyDrop</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span> {
+		<span class="self">self</span>.<span class="ident">as_mut_slice</span>()
+			.<span class="ident">pipe</span>(<span class="op">|</span><span class="ident">raw</span><span class="op">|</span> <span class="kw">unsafe</span> { <span class="ident">Box::from_raw</span>(<span class="ident">raw</span>) })
+			.<span class="ident">pipe</span>(<span class="ident">ManuallyDrop::new</span>)
+			.<span class="ident">pipe_ref_mut</span>(<span class="ident">func</span>)
 	}
 }
 
 <span class="kw">mod</span> <span class="ident">api</span>;
-<span class="kw">mod</span> <span class="ident">iter</span>;
 <span class="kw">mod</span> <span class="ident">ops</span>;
 <span class="kw">mod</span> <span class="ident">traits</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">api</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">iter</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">tests</span>;
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "bitvec";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="bitvec" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

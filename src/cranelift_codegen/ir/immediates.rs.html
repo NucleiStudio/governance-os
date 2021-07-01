@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/cranelift-codegen-0.66.0/src/ir/immediates.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>immediates.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/cranelift-codegen-0.69.0/src/ir/immediates.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>immediates.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../cranelift_codegen/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
+<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../cranelift_codegen/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1287,6 +1287,32 @@
 <span id="1284">1284</span>
 <span id="1285">1285</span>
 <span id="1286">1286</span>
+<span id="1287">1287</span>
+<span id="1288">1288</span>
+<span id="1289">1289</span>
+<span id="1290">1290</span>
+<span id="1291">1291</span>
+<span id="1292">1292</span>
+<span id="1293">1293</span>
+<span id="1294">1294</span>
+<span id="1295">1295</span>
+<span id="1296">1296</span>
+<span id="1297">1297</span>
+<span id="1298">1298</span>
+<span id="1299">1299</span>
+<span id="1300">1300</span>
+<span id="1301">1301</span>
+<span id="1302">1302</span>
+<span id="1303">1303</span>
+<span id="1304">1304</span>
+<span id="1305">1305</span>
+<span id="1306">1306</span>
+<span id="1307">1307</span>
+<span id="1308">1308</span>
+<span id="1309">1309</span>
+<span id="1310">1310</span>
+<span id="1311">1311</span>
+<span id="1312">1312</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Immediate operands for Cranelift instructions</span>
 <span class="doccomment">//!</span>
@@ -1294,9 +1320,10 @@
 <span class="doccomment">//! Each type here should have a corresponding definition in the</span>
 <span class="doccomment">//! `cranelift-codegen/meta/src/shared/immediates` crate in the meta language.</span>
 
-<span class="kw">use</span> <span class="ident">alloc</span>::<span class="ident">vec</span>::<span class="ident">Vec</span>;
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Display</span>, <span class="ident">Formatter</span>};
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">str</span>::<span class="ident">FromStr</span>;
+<span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
+<span class="kw">use</span> <span class="ident">core::cmp::Ordering</span>;
+<span class="kw">use</span> <span class="ident">core::fmt</span>::{<span class="self">self</span>, <span class="ident">Display</span>, <span class="ident">Formatter</span>};
+<span class="kw">use</span> <span class="ident">core::str::FromStr</span>;
 <span class="kw">use</span> <span class="ident">core</span>::{<span class="ident">i32</span>, <span class="ident">u32</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;enable-serde&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
@@ -1310,7 +1337,7 @@
 
 <span class="kw">impl</span> <span class="ident">IntoBytes</span> <span class="kw">for</span> <span class="ident">u8</span> {
     <span class="kw">fn</span> <span class="ident">into_bytes</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="macro">vec</span><span class="macro">!</span>[<span class="self">self</span>]
+        <span class="macro">vec!</span>[<span class="self">self</span>]
     }
 }
 
@@ -1358,7 +1385,7 @@
     <span class="doccomment">/// Sign extend this immediate as if it were a signed integer of the given</span>
     <span class="doccomment">/// power-of-two width.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sign_extend_from_width</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">bit_width</span>: <span class="ident">u16</span>) {
-        <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">bit_width</span>.<span class="ident">is_power_of_two</span>());
+        <span class="macro">debug_assert!</span>(<span class="ident">bit_width</span>.<span class="ident">is_power_of_two</span>());
 
         <span class="kw">if</span> <span class="ident">bit_width</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">64</span> {
             <span class="kw">return</span>;
@@ -1390,11 +1417,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Imm64</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>;
         <span class="kw">if</span> <span class="op">-</span><span class="number">10_000</span> <span class="op">&lt;</span> <span class="ident">x</span> <span class="op">&amp;&amp;</span> <span class="ident">x</span> <span class="op">&lt;</span> <span class="number">10_000</span> {
             <span class="comment">// Use decimal for small numbers.</span>
-            <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">x</span>)
+            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">x</span>)
         } <span class="kw">else</span> {
             <span class="ident">write_hex</span>(<span class="ident">x</span> <span class="kw">as</span> <span class="ident">u64</span>, <span class="ident">f</span>)
         }
@@ -1428,7 +1455,7 @@
 
     <span class="comment">// Parse a decimal or hexadecimal `Imm64`, formatted as above.</span>
     <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="ident">parse_i64</span>(<span class="ident">s</span>).<span class="ident">map</span>(<span class="self">Self</span>::<span class="ident">new</span>)
+        <span class="ident">parse_i64</span>(<span class="ident">s</span>).<span class="ident">map</span>(<span class="self">Self</span><span class="ident">::new</span>)
     }
 }
 
@@ -1469,22 +1496,22 @@
 <span class="doccomment">///   0x0001_ffff</span>
 <span class="doccomment">///   0xffff_ffff_fff8_4400</span>
 <span class="doccomment">///</span>
-<span class="kw">fn</span> <span class="ident">write_hex</span>(<span class="ident">x</span>: <span class="ident">u64</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+<span class="kw">fn</span> <span class="ident">write_hex</span>(<span class="ident">x</span>: <span class="ident">u64</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> (<span class="number">64</span> <span class="op">-</span> <span class="ident">x</span>.<span class="ident">leading_zeros</span>() <span class="op">-</span> <span class="number">1</span>) <span class="op">&amp;</span> <span class="number">0xf0</span>;
-    <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;0x{:04x}&quot;</span>, (<span class="ident">x</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">pos</span>) <span class="op">&amp;</span> <span class="number">0xffff</span>)<span class="question-mark">?</span>;
+    <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;0x{:04x}&quot;</span>, (<span class="ident">x</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">pos</span>) <span class="op">&amp;</span> <span class="number">0xffff</span>)<span class="question-mark">?</span>;
     <span class="kw">while</span> <span class="ident">pos</span> <span class="op">&gt;</span> <span class="number">0</span> {
         <span class="ident">pos</span> <span class="op">-</span><span class="op">=</span> <span class="number">16</span>;
-        <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;_{:04x}&quot;</span>, (<span class="ident">x</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">pos</span>) <span class="op">&amp;</span> <span class="number">0xffff</span>)<span class="question-mark">?</span>;
+        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;_{:04x}&quot;</span>, (<span class="ident">x</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">pos</span>) <span class="op">&amp;</span> <span class="number">0xffff</span>)<span class="question-mark">?</span>;
     }
     <span class="prelude-val">Ok</span>(())
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Uimm64</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>;
         <span class="kw">if</span> <span class="ident">x</span> <span class="op">&lt;</span> <span class="number">10_000</span> {
             <span class="comment">// Use decimal for small numbers.</span>
-            <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">x</span>)
+            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">x</span>)
         } <span class="kw">else</span> {
             <span class="ident">write_hex</span>(<span class="ident">x</span>, <span class="ident">f</span>)
         }
@@ -1508,7 +1535,7 @@
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Too many hexadecimal digits&quot;</span>);
                     }
                     <span class="comment">// This can&#39;t overflow given the digit limit.</span>
-                    <span class="ident">value</span> <span class="op">=</span> (<span class="ident">value</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>) <span class="op">|</span> <span class="ident">u64</span>::<span class="ident">from</span>(<span class="ident">digit</span>);
+                    <span class="ident">value</span> <span class="op">=</span> (<span class="ident">value</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>) <span class="op">|</span> <span class="ident">u64::from</span>(<span class="ident">digit</span>);
                 }
                 <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="comment">// Allow embedded underscores, but fail on anything else.</span>
@@ -1528,7 +1555,7 @@
                         <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Too large decimal number&quot;</span>),
                         <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">v</span>,
                     }
-                    <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">checked_add</span>(<span class="ident">u64</span>::<span class="ident">from</span>(<span class="ident">digit</span>)) {
+                    <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">checked_add</span>(<span class="ident">u64::from</span>(<span class="ident">digit</span>)) {
                         <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Too large decimal number&quot;</span>),
                         <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">v</span>,
                     }
@@ -1555,7 +1582,7 @@
 
     <span class="comment">// Parse a decimal or hexadecimal `Uimm64`, formatted as above.</span>
     <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="ident">parse_u64</span>(<span class="ident">s</span>).<span class="ident">map</span>(<span class="self">Self</span>::<span class="ident">new</span>)
+        <span class="ident">parse_u64</span>(<span class="ident">s</span>).<span class="ident">map</span>(<span class="self">Self</span><span class="ident">::new</span>)
     }
 }
 
@@ -1578,7 +1605,7 @@
 
 <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Uimm32</span> {
     <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i64</span> {
-        <span class="ident">i64</span>::<span class="ident">from</span>(<span class="self">self</span>.<span class="number">0</span>)
+        <span class="ident">i64::from</span>(<span class="self">self</span>.<span class="number">0</span>)
     }
 }
 
@@ -1589,11 +1616,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Uimm32</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span> <span class="op">&lt;</span> <span class="number">10_000</span> {
-            <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
+            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
         } <span class="kw">else</span> {
-            <span class="ident">write_hex</span>(<span class="ident">u64</span>::<span class="ident">from</span>(<span class="self">self</span>.<span class="number">0</span>), <span class="ident">f</span>)
+            <span class="ident">write_hex</span>(<span class="ident">u64::from</span>(<span class="self">self</span>.<span class="number">0</span>), <span class="ident">f</span>)
         }
     }
 }
@@ -1604,7 +1631,7 @@
     <span class="comment">// Parse a decimal or hexadecimal `Uimm32`, formatted as above.</span>
     <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="ident">parse_i64</span>(<span class="ident">s</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="number">0</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">x</span> <span class="op">&amp;&amp;</span> <span class="ident">x</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">i64</span>::<span class="ident">from</span>(<span class="ident">u32</span>::<span class="ident">MAX</span>) {
+            <span class="kw">if</span> <span class="number">0</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">x</span> <span class="op">&amp;&amp;</span> <span class="ident">x</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">i64::from</span>(<span class="ident">u32::MAX</span>) {
                 <span class="prelude-val">Ok</span>(<span class="self">Self</span>(<span class="ident">x</span> <span class="kw">as</span> <span class="ident">u32</span>))
             } <span class="kw">else</span> {
                 <span class="prelude-val">Err</span>(<span class="string">&quot;Uimm32 out of range&quot;</span>)
@@ -1639,7 +1666,7 @@
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">V128Imm</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">slice</span>.<span class="ident">len</span>(), <span class="number">16</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">slice</span>.<span class="ident">len</span>(), <span class="number">16</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">16</span>];
         <span class="ident">buffer</span>.<span class="ident">copy_from_slice</span>(<span class="ident">slice</span>);
         <span class="self">Self</span>(<span class="ident">buffer</span>)
@@ -1663,7 +1690,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_from_i64</span>(<span class="ident">x</span>: <span class="ident">i64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">casted</span> <span class="op">=</span> <span class="ident">x</span> <span class="kw">as</span> <span class="ident">i32</span>;
         <span class="kw">if</span> <span class="ident">casted</span> <span class="kw">as</span> <span class="ident">i64</span> <span class="op">=</span><span class="op">=</span> <span class="ident">x</span> {
-            <span class="prelude-val">Some</span>(<span class="self">Self</span>::<span class="ident">new</span>(<span class="ident">casted</span>))
+            <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::new</span>(<span class="ident">casted</span>))
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
         }
@@ -1673,7 +1700,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_add_i64</span>(<span class="self">self</span>, <span class="ident">x</span>: <span class="ident">i64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">casted</span> <span class="op">=</span> <span class="ident">x</span> <span class="kw">as</span> <span class="ident">i32</span>;
         <span class="kw">if</span> <span class="ident">casted</span> <span class="kw">as</span> <span class="ident">i64</span> <span class="op">=</span><span class="op">=</span> <span class="ident">x</span> {
-            <span class="self">self</span>.<span class="number">0</span>.<span class="ident">checked_add</span>(<span class="ident">casted</span>).<span class="ident">map</span>(<span class="self">Self</span>::<span class="ident">new</span>)
+            <span class="self">self</span>.<span class="number">0</span>.<span class="ident">checked_add</span>(<span class="ident">casted</span>).<span class="ident">map</span>(<span class="self">Self</span><span class="ident">::new</span>)
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
         }
@@ -1688,7 +1715,7 @@
 
 <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Offset32</span> {
     <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i64</span> {
-        <span class="ident">i64</span>::<span class="ident">from</span>(<span class="self">self</span>.<span class="number">0</span>)
+        <span class="ident">i64::from</span>(<span class="self">self</span>.<span class="number">0</span>)
     }
 }
 
@@ -1699,18 +1726,18 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Offset32</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
         <span class="comment">// 0 displays as an empty offset.</span>
         <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
         }
 
         <span class="comment">// Always include a sign.</span>
-        <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span> <span class="op">&lt;</span> <span class="number">0</span> { <span class="string">&#39;-&#39;</span> } <span class="kw">else</span> { <span class="string">&#39;+&#39;</span> })<span class="question-mark">?</span>;
+        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span> <span class="op">&lt;</span> <span class="number">0</span> { <span class="string">&#39;-&#39;</span> } <span class="kw">else</span> { <span class="string">&#39;+&#39;</span> })<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">i64</span>::<span class="ident">from</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="ident">abs</span>();
+        <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">i64::from</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="ident">abs</span>();
         <span class="kw">if</span> <span class="ident">val</span> <span class="op">&lt;</span> <span class="number">10_000</span> {
-            <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">val</span>)
+            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">val</span>)
         } <span class="kw">else</span> {
             <span class="ident">write_hex</span>(<span class="ident">val</span> <span class="kw">as</span> <span class="ident">u64</span>, <span class="ident">f</span>)
         }
@@ -1726,8 +1753,8 @@
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Offset must begin with sign&quot;</span>);
         }
         <span class="ident">parse_i64</span>(<span class="ident">s</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="ident">i64</span>::<span class="ident">from</span>(<span class="ident">i32</span>::<span class="ident">MIN</span>) <span class="op">&lt;</span><span class="op">=</span> <span class="ident">x</span> <span class="op">&amp;&amp;</span> <span class="ident">x</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">i64</span>::<span class="ident">from</span>(<span class="ident">i32</span>::<span class="ident">MAX</span>) {
-                <span class="prelude-val">Ok</span>(<span class="self">Self</span>::<span class="ident">new</span>(<span class="ident">x</span> <span class="kw">as</span> <span class="ident">i32</span>))
+            <span class="kw">if</span> <span class="ident">i64::from</span>(<span class="ident">i32::MIN</span>) <span class="op">&lt;</span><span class="op">=</span> <span class="ident">x</span> <span class="op">&amp;&amp;</span> <span class="ident">x</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">i64::from</span>(<span class="ident">i32::MAX</span>) {
+                <span class="prelude-val">Ok</span>(<span class="self">Self</span><span class="ident">::new</span>(<span class="ident">x</span> <span class="kw">as</span> <span class="ident">i32</span>))
             } <span class="kw">else</span> {
                 <span class="prelude-val">Err</span>(<span class="string">&quot;Offset out of range&quot;</span>)
             }
@@ -1740,6 +1767,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// All bit patterns are allowed.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
+<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Ieee32</span>(<span class="ident">u32</span>);
 
 <span class="doccomment">/// An IEEE binary64 immediate floating point value, represented as a u64</span>
@@ -1747,6 +1775,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// All bit patterns are allowed.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
+<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Ieee64</span>(<span class="ident">u64</span>);
 
 <span class="doccomment">/// Format a floating point number in a way that is reasonably human-readable, and that can be</span>
@@ -1759,10 +1788,10 @@
 <span class="doccomment">/// w - exponent field width in bits</span>
 <span class="doccomment">/// t - trailing significand field width in bits</span>
 <span class="doccomment">///</span>
-<span class="kw">fn</span> <span class="ident">format_float</span>(<span class="ident">bits</span>: <span class="ident">u64</span>, <span class="ident">w</span>: <span class="ident">u8</span>, <span class="ident">t</span>: <span class="ident">u8</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
-    <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">w</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">w</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">16</span>, <span class="string">&quot;Invalid exponent range&quot;</span>);
-    <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="number">1</span> <span class="op">+</span> <span class="ident">w</span> <span class="op">+</span> <span class="ident">t</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">64</span>, <span class="string">&quot;Too large IEEE format for u64&quot;</span>);
-    <span class="macro">debug_assert</span><span class="macro">!</span>((<span class="ident">t</span> <span class="op">+</span> <span class="ident">w</span> <span class="op">+</span> <span class="number">1</span>).<span class="ident">is_power_of_two</span>(), <span class="string">&quot;Unexpected IEEE format size&quot;</span>);
+<span class="kw">fn</span> <span class="ident">format_float</span>(<span class="ident">bits</span>: <span class="ident">u64</span>, <span class="ident">w</span>: <span class="ident">u8</span>, <span class="ident">t</span>: <span class="ident">u8</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="macro">debug_assert!</span>(<span class="ident">w</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">w</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">16</span>, <span class="string">&quot;Invalid exponent range&quot;</span>);
+    <span class="macro">debug_assert!</span>(<span class="number">1</span> <span class="op">+</span> <span class="ident">w</span> <span class="op">+</span> <span class="ident">t</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">64</span>, <span class="string">&quot;Too large IEEE format for u64&quot;</span>);
+    <span class="macro">debug_assert!</span>((<span class="ident">t</span> <span class="op">+</span> <span class="ident">w</span> <span class="op">+</span> <span class="number">1</span>).<span class="ident">is_power_of_two</span>(), <span class="string">&quot;Unexpected IEEE format size&quot;</span>);
 
     <span class="kw">let</span> <span class="ident">max_e_bits</span> <span class="op">=</span> (<span class="number">1u64</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">w</span>) <span class="op">-</span> <span class="number">1</span>;
     <span class="kw">let</span> <span class="ident">t_bits</span> <span class="op">=</span> <span class="ident">bits</span> <span class="op">&amp;</span> ((<span class="number">1u64</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">t</span>) <span class="op">-</span> <span class="number">1</span>); <span class="comment">// Trailing significand.</span>
@@ -1780,20 +1809,20 @@
 
     <span class="comment">// All formats share the leading sign.</span>
     <span class="kw">if</span> <span class="ident">sign_bit</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-        <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;-&quot;</span>)<span class="question-mark">?</span>;
+        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;-&quot;</span>)<span class="question-mark">?</span>;
     }
 
     <span class="kw">if</span> <span class="ident">e_bits</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
         <span class="kw">if</span> <span class="ident">t_bits</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
             <span class="comment">// Zero.</span>
-            <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;0.0&quot;</span>)
+            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;0.0&quot;</span>)
         } <span class="kw">else</span> {
             <span class="comment">// Subnormal.</span>
-            <span class="macro">write</span><span class="macro">!</span>(
+            <span class="macro">write!</span>(
                 <span class="ident">f</span>,
                 <span class="string">&quot;0x0.{0:01$x}p{2}&quot;</span>,
                 <span class="ident">left_t_bits</span>,
-                <span class="ident">usize</span>::<span class="ident">from</span>(<span class="ident">digits</span>),
+                <span class="ident">usize::from</span>(<span class="ident">digits</span>),
                 <span class="ident">emin</span>
             )
         }
@@ -1801,29 +1830,29 @@
         <span class="comment">// Always print a `+` or `-` sign for these special values.</span>
         <span class="comment">// This makes them easier to parse as they can&#39;t be confused as identifiers.</span>
         <span class="kw">if</span> <span class="ident">sign_bit</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;+&quot;</span>)<span class="question-mark">?</span>;
+            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;+&quot;</span>)<span class="question-mark">?</span>;
         }
         <span class="kw">if</span> <span class="ident">t_bits</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
             <span class="comment">// Infinity.</span>
-            <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;Inf&quot;</span>)
+            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Inf&quot;</span>)
         } <span class="kw">else</span> {
             <span class="comment">// NaN.</span>
             <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> <span class="ident">t_bits</span> <span class="op">&amp;</span> ((<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="ident">t</span> <span class="op">-</span> <span class="number">1</span>)) <span class="op">-</span> <span class="number">1</span>);
             <span class="kw">if</span> <span class="ident">t_bits</span> <span class="op">&amp;</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="ident">t</span> <span class="op">-</span> <span class="number">1</span>)) <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
                 <span class="comment">// Quiet NaN.</span>
                 <span class="kw">if</span> <span class="ident">payload</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                    <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;NaN:0x{:x}&quot;</span>, <span class="ident">payload</span>)
+                    <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;NaN:0x{:x}&quot;</span>, <span class="ident">payload</span>)
                 } <span class="kw">else</span> {
-                    <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;NaN&quot;</span>)
+                    <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;NaN&quot;</span>)
                 }
             } <span class="kw">else</span> {
                 <span class="comment">// Signaling NaN.</span>
-                <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;sNaN:0x{:x}&quot;</span>, <span class="ident">payload</span>)
+                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;sNaN:0x{:x}&quot;</span>, <span class="ident">payload</span>)
             }
         }
     } <span class="kw">else</span> {
         <span class="comment">// Normal number.</span>
-        <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;0x1.{0:01$x}p{2}&quot;</span>, <span class="ident">left_t_bits</span>, <span class="ident">usize</span>::<span class="ident">from</span>(<span class="ident">digits</span>), <span class="ident">e</span>)
+        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;0x1.{0:01$x}p{2}&quot;</span>, <span class="ident">left_t_bits</span>, <span class="ident">usize::from</span>(<span class="ident">digits</span>), <span class="ident">e</span>)
     }
 }
 
@@ -1835,9 +1864,9 @@
 <span class="doccomment">/// t - trailing significand field width in bits</span>
 <span class="doccomment">///</span>
 <span class="kw">fn</span> <span class="ident">parse_float</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">w</span>: <span class="ident">u8</span>, <span class="ident">t</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
-    <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">w</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">w</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">16</span>, <span class="string">&quot;Invalid exponent range&quot;</span>);
-    <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="number">1</span> <span class="op">+</span> <span class="ident">w</span> <span class="op">+</span> <span class="ident">t</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">64</span>, <span class="string">&quot;Too large IEEE format for u64&quot;</span>);
-    <span class="macro">debug_assert</span><span class="macro">!</span>((<span class="ident">t</span> <span class="op">+</span> <span class="ident">w</span> <span class="op">+</span> <span class="number">1</span>).<span class="ident">is_power_of_two</span>(), <span class="string">&quot;Unexpected IEEE format size&quot;</span>);
+    <span class="macro">debug_assert!</span>(<span class="ident">w</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">w</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">16</span>, <span class="string">&quot;Invalid exponent range&quot;</span>);
+    <span class="macro">debug_assert!</span>(<span class="number">1</span> <span class="op">+</span> <span class="ident">w</span> <span class="op">+</span> <span class="ident">t</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">64</span>, <span class="string">&quot;Too large IEEE format for u64&quot;</span>);
+    <span class="macro">debug_assert!</span>((<span class="ident">t</span> <span class="op">+</span> <span class="ident">w</span> <span class="op">+</span> <span class="number">1</span>).<span class="ident">is_power_of_two</span>(), <span class="string">&quot;Unexpected IEEE format size&quot;</span>);
 
     <span class="kw">let</span> (<span class="ident">sign_bit</span>, <span class="ident">s2</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">starts_with</span>(<span class="string">&#39;-&#39;</span>) {
         (<span class="number">1u64</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="ident">t</span> <span class="op">+</span> <span class="ident">w</span>), <span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="number">1</span>..])
@@ -1866,7 +1895,7 @@
         }
         <span class="kw">if</span> <span class="ident">s2</span>.<span class="ident">starts_with</span>(<span class="string">&quot;NaN:0x&quot;</span>) {
             <span class="comment">// Quiet NaN with payload.</span>
-            <span class="kw">return</span> <span class="kw">match</span> <span class="ident">u64</span>::<span class="ident">from_str_radix</span>(<span class="kw-2">&amp;</span><span class="ident">s2</span>[<span class="number">6</span>..], <span class="number">16</span>) {
+            <span class="kw">return</span> <span class="kw">match</span> <span class="ident">u64::from_str_radix</span>(<span class="kw-2">&amp;</span><span class="ident">s2</span>[<span class="number">6</span>..], <span class="number">16</span>) {
                 <span class="prelude-val">Ok</span>(<span class="ident">payload</span>) <span class="kw">if</span> <span class="ident">payload</span> <span class="op">&lt;</span> <span class="ident">quiet_bit</span> <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="prelude-val">Ok</span>(<span class="ident">sign_bit</span> <span class="op">|</span> <span class="ident">max_e_bits</span> <span class="op">|</span> <span class="ident">quiet_bit</span> <span class="op">|</span> <span class="ident">payload</span>)
                 }
@@ -1875,7 +1904,7 @@
         }
         <span class="kw">if</span> <span class="ident">s2</span>.<span class="ident">starts_with</span>(<span class="string">&quot;sNaN:0x&quot;</span>) {
             <span class="comment">// Signaling NaN with payload.</span>
-            <span class="kw">return</span> <span class="kw">match</span> <span class="ident">u64</span>::<span class="ident">from_str_radix</span>(<span class="kw-2">&amp;</span><span class="ident">s2</span>[<span class="number">7</span>..], <span class="number">16</span>) {
+            <span class="kw">return</span> <span class="kw">match</span> <span class="ident">u64::from_str_radix</span>(<span class="kw-2">&amp;</span><span class="ident">s2</span>[<span class="number">7</span>..], <span class="number">16</span>) {
                 <span class="prelude-val">Ok</span>(<span class="ident">payload</span>) <span class="kw">if</span> <span class="number">0</span> <span class="op">&lt;</span> <span class="ident">payload</span> <span class="op">&amp;&amp;</span> <span class="ident">payload</span> <span class="op">&lt;</span> <span class="ident">quiet_bit</span> <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="prelude-val">Ok</span>(<span class="ident">sign_bit</span> <span class="op">|</span> <span class="ident">max_e_bits</span> <span class="op">|</span> <span class="ident">payload</span>)
                 }
@@ -1907,7 +1936,7 @@
                 <span class="kw">let</span> <span class="ident">exp_str</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">s3</span>[<span class="number">1</span> <span class="op">+</span> <span class="ident">idx</span>..];
                 <span class="kw">match</span> <span class="ident">exp_str</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">i16</span><span class="op">&gt;</span>() {
                     <span class="prelude-val">Ok</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                        <span class="ident">exponent</span> <span class="op">=</span> <span class="ident">i32</span>::<span class="ident">from</span>(<span class="ident">e</span>);
+                        <span class="ident">exponent</span> <span class="op">=</span> <span class="ident">i32::from</span>(<span class="ident">e</span>);
                         <span class="kw">break</span>;
                     }
                     <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Bad exponent&quot;</span>),
@@ -1919,7 +1948,7 @@
                     <span class="kw">if</span> <span class="ident">digits</span> <span class="op">&gt;</span> <span class="number">16</span> {
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Too many digits&quot;</span>);
                     }
-                    <span class="ident">significand</span> <span class="op">=</span> (<span class="ident">significand</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>) <span class="op">|</span> <span class="ident">u64</span>::<span class="ident">from</span>(<span class="ident">digit</span>);
+                    <span class="ident">significand</span> <span class="op">=</span> (<span class="ident">significand</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>) <span class="op">|</span> <span class="ident">u64::from</span>(<span class="ident">digit</span>);
                 }
                 <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Invalid character&quot;</span>),
             },
@@ -1938,7 +1967,7 @@
     <span class="comment">// Number of bits appearing after the radix point.</span>
     <span class="kw">match</span> <span class="ident">digits_before_period</span> {
         <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {} <span class="comment">// No radix point present.</span>
-        <span class="prelude-val">Some</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">exponent</span> <span class="op">-</span><span class="op">=</span> <span class="number">4</span> <span class="op">*</span> <span class="ident">i32</span>::<span class="ident">from</span>(<span class="ident">digits</span> <span class="op">-</span> <span class="ident">d</span>),
+        <span class="prelude-val">Some</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">exponent</span> <span class="op">-</span><span class="op">=</span> <span class="number">4</span> <span class="op">*</span> <span class="ident">i32::from</span>(<span class="ident">digits</span> <span class="op">-</span> <span class="ident">d</span>),
     };
 
     <span class="comment">// Normalize the significand and exponent.</span>
@@ -1950,20 +1979,20 @@
         }
         <span class="comment">// Adjust significand down.</span>
         <span class="ident">significand</span> <span class="op">&gt;</span><span class="op">&gt;</span><span class="op">=</span> <span class="ident">adjust</span>;
-        <span class="ident">exponent</span> <span class="op">+</span><span class="op">=</span> <span class="ident">i32</span>::<span class="ident">from</span>(<span class="ident">adjust</span>);
+        <span class="ident">exponent</span> <span class="op">+</span><span class="op">=</span> <span class="ident">i32::from</span>(<span class="ident">adjust</span>);
     } <span class="kw">else</span> {
         <span class="kw">let</span> <span class="ident">adjust</span> <span class="op">=</span> <span class="ident">t</span> <span class="op">+</span> <span class="number">1</span> <span class="op">-</span> <span class="ident">significant_bits</span>;
         <span class="ident">significand</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="op">=</span> <span class="ident">adjust</span>;
-        <span class="ident">exponent</span> <span class="op">-</span><span class="op">=</span> <span class="ident">i32</span>::<span class="ident">from</span>(<span class="ident">adjust</span>);
+        <span class="ident">exponent</span> <span class="op">-</span><span class="op">=</span> <span class="ident">i32::from</span>(<span class="ident">adjust</span>);
     }
-    <span class="macro">debug_assert_eq</span><span class="macro">!</span>(<span class="ident">significand</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">t</span>, <span class="number">1</span>);
+    <span class="macro">debug_assert_eq!</span>(<span class="ident">significand</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">t</span>, <span class="number">1</span>);
 
     <span class="comment">// Trailing significand excludes the high bit.</span>
     <span class="kw">let</span> <span class="ident">t_bits</span> <span class="op">=</span> <span class="ident">significand</span> <span class="op">&amp;</span> ((<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">t</span>) <span class="op">-</span> <span class="number">1</span>);
 
     <span class="kw">let</span> <span class="ident">max_exp</span> <span class="op">=</span> (<span class="number">1i32</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">w</span>) <span class="op">-</span> <span class="number">2</span>;
     <span class="kw">let</span> <span class="ident">bias</span>: <span class="ident">i32</span> <span class="op">=</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="ident">w</span> <span class="op">-</span> <span class="number">1</span>)) <span class="op">-</span> <span class="number">1</span>;
-    <span class="ident">exponent</span> <span class="op">+</span><span class="op">=</span> <span class="ident">bias</span> <span class="op">+</span> <span class="ident">i32</span>::<span class="ident">from</span>(<span class="ident">t</span>);
+    <span class="ident">exponent</span> <span class="op">+</span><span class="op">=</span> <span class="ident">bias</span> <span class="op">+</span> <span class="ident">i32::from</span>(<span class="ident">t</span>);
 
     <span class="kw">if</span> <span class="ident">exponent</span> <span class="op">&gt;</span> <span class="ident">max_exp</span> {
         <span class="prelude-val">Err</span>(<span class="string">&quot;Magnitude too large&quot;</span>)
@@ -1971,7 +2000,7 @@
         <span class="comment">// This is a normal number.</span>
         <span class="kw">let</span> <span class="ident">e_bits</span> <span class="op">=</span> (<span class="ident">exponent</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">t</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">sign_bit</span> <span class="op">|</span> <span class="ident">e_bits</span> <span class="op">|</span> <span class="ident">t_bits</span>)
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="number">1</span> <span class="op">-</span> <span class="ident">exponent</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">i32</span>::<span class="ident">from</span>(<span class="ident">t</span>) {
+    } <span class="kw">else</span> <span class="kw">if</span> <span class="number">1</span> <span class="op">-</span> <span class="ident">exponent</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">i32::from</span>(<span class="ident">t</span>) {
         <span class="comment">// This is a subnormal number: e = 0, t = significand bits.</span>
         <span class="comment">// Renormalize significand for exponent = 1.</span>
         <span class="kw">let</span> <span class="ident">adjust</span> <span class="op">=</span> <span class="number">1</span> <span class="op">-</span> <span class="ident">exponent</span>;
@@ -1999,8 +2028,8 @@
         <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="number">23</span>;
         <span class="kw">let</span> <span class="ident">bias</span> <span class="op">=</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="ident">w</span> <span class="op">-</span> <span class="number">1</span>)) <span class="op">-</span> <span class="number">1</span>;
         <span class="kw">let</span> <span class="ident">exponent</span> <span class="op">=</span> (<span class="ident">n</span> <span class="op">+</span> <span class="ident">bias</span>) <span class="kw">as</span> <span class="ident">u32</span>;
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">exponent</span> <span class="op">&gt;</span> <span class="number">0</span>, <span class="string">&quot;Underflow n={}&quot;</span>, <span class="ident">n</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">exponent</span> <span class="op">&lt;</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">w</span>) <span class="op">+</span> <span class="number">1</span>, <span class="string">&quot;Overflow n={}&quot;</span>, <span class="ident">n</span>);
+        <span class="macro">assert!</span>(<span class="ident">exponent</span> <span class="op">&gt;</span> <span class="number">0</span>, <span class="string">&quot;Underflow n={}&quot;</span>, <span class="ident">n</span>);
+        <span class="macro">assert!</span>(<span class="ident">exponent</span> <span class="op">&lt;</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">w</span>) <span class="op">+</span> <span class="number">1</span>, <span class="string">&quot;Overflow n={}&quot;</span>, <span class="ident">n</span>);
         <span class="self">Self</span>(<span class="ident">exponent</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">t</span>)
     }
 
@@ -2008,9 +2037,9 @@
     <span class="doccomment">/// not convertable from f32 to a signed integer with width n.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fcvt_to_sint_negative_overflow</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">n</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">n</span>.<span class="ident">into</span>();
-        <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">n</span> <span class="op">&lt;</span> <span class="number">32</span>);
-        <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="number">23</span> <span class="op">+</span> <span class="number">1</span> <span class="op">-</span> <span class="ident">n</span> <span class="op">&lt;</span> <span class="number">32</span>);
-        <span class="self">Self</span>::<span class="ident">with_bits</span>((<span class="number">1u32</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="number">32</span> <span class="op">-</span> <span class="number">1</span>)) <span class="op">|</span> <span class="self">Self</span>::<span class="ident">pow2</span>(<span class="ident">n</span> <span class="op">-</span> <span class="number">1</span>).<span class="number">0</span> <span class="op">|</span> (<span class="number">1u32</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="number">23</span> <span class="op">+</span> <span class="number">1</span> <span class="op">-</span> <span class="ident">n</span>)))
+        <span class="macro">debug_assert!</span>(<span class="ident">n</span> <span class="op">&lt;</span> <span class="number">32</span>);
+        <span class="macro">debug_assert!</span>(<span class="number">23</span> <span class="op">+</span> <span class="number">1</span> <span class="op">-</span> <span class="ident">n</span> <span class="op">&lt;</span> <span class="number">32</span>);
+        <span class="self">Self</span><span class="ident">::with_bits</span>((<span class="number">1u32</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="number">32</span> <span class="op">-</span> <span class="number">1</span>)) <span class="op">|</span> <span class="self">Self</span><span class="ident">::pow2</span>(<span class="ident">n</span> <span class="op">-</span> <span class="number">1</span>).<span class="number">0</span> <span class="op">|</span> (<span class="number">1u32</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="number">23</span> <span class="op">+</span> <span class="number">1</span> <span class="op">-</span> <span class="ident">n</span>)))
     }
 
     <span class="doccomment">/// Return self negated.</span>
@@ -2027,12 +2056,23 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bits</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
         <span class="self">self</span>.<span class="number">0</span>
     }
+
+    <span class="doccomment">/// Check if the value is a NaN.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_nan</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="ident">f32::from_bits</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="ident">is_nan</span>()
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="ident">Ieee32</span> {
+    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
+        <span class="ident">f32::from_bits</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="ident">f32::from_bits</span>(<span class="ident">other</span>.<span class="number">0</span>))
+    }
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Ieee32</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="ident">bits</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>;
-        <span class="ident">format_float</span>(<span class="ident">u64</span>::<span class="ident">from</span>(<span class="ident">bits</span>), <span class="number">8</span>, <span class="number">23</span>, <span class="ident">f</span>)
+        <span class="ident">format_float</span>(<span class="ident">u64::from</span>(<span class="ident">bits</span>), <span class="number">8</span>, <span class="number">23</span>, <span class="ident">f</span>)
     }
 }
 
@@ -2049,7 +2089,7 @@
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">f32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Ieee32</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">f32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span>::<span class="ident">with_float</span>(<span class="ident">x</span>)
+        <span class="self">Self</span><span class="ident">::with_float</span>(<span class="ident">x</span>)
     }
 }
 
@@ -2072,8 +2112,8 @@
         <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="number">52</span>;
         <span class="kw">let</span> <span class="ident">bias</span> <span class="op">=</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="ident">w</span> <span class="op">-</span> <span class="number">1</span>)) <span class="op">-</span> <span class="number">1</span>;
         <span class="kw">let</span> <span class="ident">exponent</span> <span class="op">=</span> (<span class="ident">n</span> <span class="op">+</span> <span class="ident">bias</span>) <span class="kw">as</span> <span class="ident">u64</span>;
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">exponent</span> <span class="op">&gt;</span> <span class="number">0</span>, <span class="string">&quot;Underflow n={}&quot;</span>, <span class="ident">n</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">exponent</span> <span class="op">&lt;</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">w</span>) <span class="op">+</span> <span class="number">1</span>, <span class="string">&quot;Overflow n={}&quot;</span>, <span class="ident">n</span>);
+        <span class="macro">assert!</span>(<span class="ident">exponent</span> <span class="op">&gt;</span> <span class="number">0</span>, <span class="string">&quot;Underflow n={}&quot;</span>, <span class="ident">n</span>);
+        <span class="macro">assert!</span>(<span class="ident">exponent</span> <span class="op">&lt;</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">w</span>) <span class="op">+</span> <span class="number">1</span>, <span class="string">&quot;Overflow n={}&quot;</span>, <span class="ident">n</span>);
         <span class="self">Self</span>(<span class="ident">exponent</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">t</span>)
     }
 
@@ -2081,9 +2121,9 @@
     <span class="doccomment">/// not convertable from f64 to a signed integer with width n.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fcvt_to_sint_negative_overflow</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">n</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">n</span>.<span class="ident">into</span>();
-        <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">n</span> <span class="op">&lt;</span> <span class="number">64</span>);
-        <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="number">52</span> <span class="op">+</span> <span class="number">1</span> <span class="op">-</span> <span class="ident">n</span> <span class="op">&lt;</span> <span class="number">64</span>);
-        <span class="self">Self</span>::<span class="ident">with_bits</span>((<span class="number">1u64</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="number">64</span> <span class="op">-</span> <span class="number">1</span>)) <span class="op">|</span> <span class="self">Self</span>::<span class="ident">pow2</span>(<span class="ident">n</span> <span class="op">-</span> <span class="number">1</span>).<span class="number">0</span> <span class="op">|</span> (<span class="number">1u64</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="number">52</span> <span class="op">+</span> <span class="number">1</span> <span class="op">-</span> <span class="ident">n</span>)))
+        <span class="macro">debug_assert!</span>(<span class="ident">n</span> <span class="op">&lt;</span> <span class="number">64</span>);
+        <span class="macro">debug_assert!</span>(<span class="number">52</span> <span class="op">+</span> <span class="number">1</span> <span class="op">-</span> <span class="ident">n</span> <span class="op">&lt;</span> <span class="number">64</span>);
+        <span class="self">Self</span><span class="ident">::with_bits</span>((<span class="number">1u64</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="number">64</span> <span class="op">-</span> <span class="number">1</span>)) <span class="op">|</span> <span class="self">Self</span><span class="ident">::pow2</span>(<span class="ident">n</span> <span class="op">-</span> <span class="number">1</span>).<span class="number">0</span> <span class="op">|</span> (<span class="number">1u64</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="number">52</span> <span class="op">+</span> <span class="number">1</span> <span class="op">-</span> <span class="ident">n</span>)))
     }
 
     <span class="doccomment">/// Return self negated.</span>
@@ -2100,10 +2140,22 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bits</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
         <span class="self">self</span>.<span class="number">0</span>
     }
+
+    <span class="doccomment">/// Check if the value is a NaN. For [Ieee64], this means checking that the 11 exponent bits are</span>
+    <span class="doccomment">/// all set.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_nan</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="ident">f64::from_bits</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="ident">is_nan</span>()
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="ident">Ieee64</span> {
+    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
+        <span class="ident">f64::from_bits</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="ident">f64::from_bits</span>(<span class="ident">other</span>.<span class="number">0</span>))
+    }
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Ieee64</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="ident">bits</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>;
         <span class="ident">format_float</span>(<span class="ident">bits</span>, <span class="number">11</span>, <span class="number">52</span>, <span class="ident">f</span>)
     }
@@ -2122,13 +2174,13 @@
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Ieee64</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span>::<span class="ident">with_float</span>(<span class="ident">x</span>)
+        <span class="self">Self</span><span class="ident">::with_float</span>(<span class="ident">x</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Ieee64</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span>::<span class="ident">with_float</span>(<span class="ident">f64</span>::<span class="ident">from_bits</span>(<span class="ident">x</span>))
+        <span class="self">Self</span><span class="ident">::with_float</span>(<span class="ident">f64::from_bits</span>(<span class="ident">x</span>))
     }
 }
 
@@ -2141,56 +2193,56 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">alloc</span>::<span class="ident">string</span>::<span class="ident">ToString</span>;
-    <span class="kw">use</span> <span class="ident">core</span>::<span class="ident">fmt</span>::<span class="ident">Display</span>;
-    <span class="kw">use</span> <span class="ident">core</span>::<span class="ident">mem</span>;
-    <span class="kw">use</span> <span class="ident">core</span>::<span class="ident">str</span>::<span class="ident">FromStr</span>;
+    <span class="kw">use</span> <span class="ident">alloc::string::ToString</span>;
+    <span class="kw">use</span> <span class="ident">core::fmt::Display</span>;
+    <span class="kw">use</span> <span class="ident">core::mem</span>;
+    <span class="kw">use</span> <span class="ident">core::str::FromStr</span>;
     <span class="kw">use</span> <span class="ident">core</span>::{<span class="ident">f32</span>, <span class="ident">f64</span>};
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">format_imm64</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Imm64</span>(<span class="number">0</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Imm64</span>(<span class="number">9999</span>).<span class="ident">to_string</span>(), <span class="string">&quot;9999&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Imm64</span>(<span class="number">10000</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x2710&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Imm64</span>(<span class="op">-</span><span class="number">9999</span>).<span class="ident">to_string</span>(), <span class="string">&quot;-9999&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Imm64</span>(<span class="op">-</span><span class="number">10000</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0xffff_ffff_ffff_d8f0&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Imm64</span>(<span class="number">0xffff</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0xffff&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Imm64</span>(<span class="number">0x10000</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x0001_0000&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Imm64</span>(<span class="number">0</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Imm64</span>(<span class="number">9999</span>).<span class="ident">to_string</span>(), <span class="string">&quot;9999&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Imm64</span>(<span class="number">10000</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x2710&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Imm64</span>(<span class="op">-</span><span class="number">9999</span>).<span class="ident">to_string</span>(), <span class="string">&quot;-9999&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Imm64</span>(<span class="op">-</span><span class="number">10000</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0xffff_ffff_ffff_d8f0&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Imm64</span>(<span class="number">0xffff</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0xffff&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Imm64</span>(<span class="number">0x10000</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x0001_0000&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">format_uimm64</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Uimm64</span>(<span class="number">0</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Uimm64</span>(<span class="number">9999</span>).<span class="ident">to_string</span>(), <span class="string">&quot;9999&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Uimm64</span>(<span class="number">10000</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x2710&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Uimm64</span>(<span class="op">-</span><span class="number">9999i64</span> <span class="kw">as</span> <span class="ident">u64</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0xffff_ffff_ffff_d8f1&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(<span class="ident">Uimm64</span>(<span class="number">0</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Uimm64</span>(<span class="number">9999</span>).<span class="ident">to_string</span>(), <span class="string">&quot;9999&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Uimm64</span>(<span class="number">10000</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x2710&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Uimm64</span>(<span class="op">-</span><span class="number">9999i64</span> <span class="kw">as</span> <span class="ident">u64</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0xffff_ffff_ffff_d8f1&quot;</span>);
+        <span class="macro">assert_eq!</span>(
             <span class="ident">Uimm64</span>(<span class="op">-</span><span class="number">10000i64</span> <span class="kw">as</span> <span class="ident">u64</span>).<span class="ident">to_string</span>(),
             <span class="string">&quot;0xffff_ffff_ffff_d8f0&quot;</span>
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Uimm64</span>(<span class="number">0xffff</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0xffff&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Uimm64</span>(<span class="number">0x10000</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x0001_0000&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Uimm64</span>(<span class="number">0xffff</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0xffff&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Uimm64</span>(<span class="number">0x10000</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x0001_0000&quot;</span>);
     }
 
     <span class="comment">// Verify that `text` can be parsed as a `T` into a value that displays as `want`.</span>
     <span class="kw">fn</span> <span class="ident">parse_ok</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">FromStr</span> <span class="op">+</span> <span class="ident">Display</span><span class="op">&gt;</span>(<span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">want</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>)
     <span class="kw">where</span>
-        <span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">FromStr</span><span class="op">&gt;</span>::<span class="prelude-val">Err</span>: <span class="ident">Display</span>,
+        <span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">FromStr</span><span class="op">&gt;</span><span class="ident">::Err</span>: <span class="ident">Display</span>,
     {
         <span class="kw">match</span> <span class="ident">text</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() {
-            <span class="prelude-val">Err</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;\&quot;{}\&quot;.parse() error: {}&quot;</span>, <span class="ident">text</span>, <span class="ident">s</span>),
-            <span class="prelude-val">Ok</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">x</span>.<span class="ident">to_string</span>(), <span class="ident">want</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;\&quot;{}\&quot;.parse() error: {}&quot;</span>, <span class="ident">text</span>, <span class="ident">s</span>),
+            <span class="prelude-val">Ok</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">assert_eq!</span>(<span class="ident">x</span>.<span class="ident">to_string</span>(), <span class="ident">want</span>),
         }
     }
 
     <span class="comment">// Verify that `text` fails to parse as `T` with the error `msg`.</span>
     <span class="kw">fn</span> <span class="ident">parse_err</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">FromStr</span> <span class="op">+</span> <span class="ident">Display</span><span class="op">&gt;</span>(<span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>)
     <span class="kw">where</span>
-        <span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">FromStr</span><span class="op">&gt;</span>::<span class="prelude-val">Err</span>: <span class="ident">Display</span>,
+        <span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">FromStr</span><span class="op">&gt;</span><span class="ident">::Err</span>: <span class="ident">Display</span>,
     {
         <span class="kw">match</span> <span class="ident">text</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() {
-            <span class="prelude-val">Err</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">s</span>.<span class="ident">to_string</span>(), <span class="ident">msg</span>),
-            <span class="prelude-val">Ok</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Wanted Err({}), but got {}&quot;</span>, <span class="ident">msg</span>, <span class="ident">x</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">assert_eq!</span>(<span class="ident">s</span>.<span class="ident">to_string</span>(), <span class="ident">msg</span>),
+            <span class="prelude-val">Ok</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Wanted Err({}), but got {}&quot;</span>, <span class="ident">msg</span>, <span class="ident">x</span>),
         }
     }
 
@@ -2281,15 +2333,15 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">format_offset32</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Offset32</span>(<span class="number">0</span>).<span class="ident">to_string</span>(), <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Offset32</span>(<span class="number">1</span>).<span class="ident">to_string</span>(), <span class="string">&quot;+1&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Offset32</span>(<span class="op">-</span><span class="number">1</span>).<span class="ident">to_string</span>(), <span class="string">&quot;-1&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Offset32</span>(<span class="number">9999</span>).<span class="ident">to_string</span>(), <span class="string">&quot;+9999&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Offset32</span>(<span class="number">10000</span>).<span class="ident">to_string</span>(), <span class="string">&quot;+0x2710&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Offset32</span>(<span class="op">-</span><span class="number">9999</span>).<span class="ident">to_string</span>(), <span class="string">&quot;-9999&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Offset32</span>(<span class="op">-</span><span class="number">10000</span>).<span class="ident">to_string</span>(), <span class="string">&quot;-0x2710&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Offset32</span>(<span class="number">0xffff</span>).<span class="ident">to_string</span>(), <span class="string">&quot;+0xffff&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Offset32</span>(<span class="number">0x10000</span>).<span class="ident">to_string</span>(), <span class="string">&quot;+0x0001_0000&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Offset32</span>(<span class="number">0</span>).<span class="ident">to_string</span>(), <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Offset32</span>(<span class="number">1</span>).<span class="ident">to_string</span>(), <span class="string">&quot;+1&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Offset32</span>(<span class="op">-</span><span class="number">1</span>).<span class="ident">to_string</span>(), <span class="string">&quot;-1&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Offset32</span>(<span class="number">9999</span>).<span class="ident">to_string</span>(), <span class="string">&quot;+9999&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Offset32</span>(<span class="number">10000</span>).<span class="ident">to_string</span>(), <span class="string">&quot;+0x2710&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Offset32</span>(<span class="op">-</span><span class="number">9999</span>).<span class="ident">to_string</span>(), <span class="string">&quot;-9999&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Offset32</span>(<span class="op">-</span><span class="number">10000</span>).<span class="ident">to_string</span>(), <span class="string">&quot;-0x2710&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Offset32</span>(<span class="number">0xffff</span>).<span class="ident">to_string</span>(), <span class="string">&quot;+0xffff&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Offset32</span>(<span class="number">0x10000</span>).<span class="ident">to_string</span>(), <span class="string">&quot;+0x0001_0000&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -2308,41 +2360,41 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">format_ieee32</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee32</span>::<span class="ident">with_float</span>(<span class="number">0.0</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0.0&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee32</span>::<span class="ident">with_float</span>(<span class="op">-</span><span class="number">0.0</span>).<span class="ident">to_string</span>(), <span class="string">&quot;-0.0&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee32</span>::<span class="ident">with_float</span>(<span class="number">1.0</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x1.000000p0&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee32</span>::<span class="ident">with_float</span>(<span class="number">1.5</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x1.800000p0&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee32</span>::<span class="ident">with_float</span>(<span class="number">0.5</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x1.000000p-1&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
-            <span class="ident">Ieee32</span>::<span class="ident">with_float</span>(<span class="ident">f32</span>::<span class="ident">EPSILON</span>).<span class="ident">to_string</span>(),
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee32::with_float</span>(<span class="number">0.0</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0.0&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee32::with_float</span>(<span class="op">-</span><span class="number">0.0</span>).<span class="ident">to_string</span>(), <span class="string">&quot;-0.0&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee32::with_float</span>(<span class="number">1.0</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x1.000000p0&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee32::with_float</span>(<span class="number">1.5</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x1.800000p0&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee32::with_float</span>(<span class="number">0.5</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x1.000000p-1&quot;</span>);
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">Ieee32::with_float</span>(<span class="ident">f32::EPSILON</span>).<span class="ident">to_string</span>(),
             <span class="string">&quot;0x1.000000p-23&quot;</span>
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee32</span>::<span class="ident">with_float</span>(<span class="ident">f32</span>::<span class="ident">MIN</span>).<span class="ident">to_string</span>(), <span class="string">&quot;-0x1.fffffep127&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee32</span>::<span class="ident">with_float</span>(<span class="ident">f32</span>::<span class="ident">MAX</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x1.fffffep127&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee32::with_float</span>(<span class="ident">f32::MIN</span>).<span class="ident">to_string</span>(), <span class="string">&quot;-0x1.fffffep127&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee32::with_float</span>(<span class="ident">f32::MAX</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x1.fffffep127&quot;</span>);
         <span class="comment">// Smallest positive normal number.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
-            <span class="ident">Ieee32</span>::<span class="ident">with_float</span>(<span class="ident">f32</span>::<span class="ident">MIN_POSITIVE</span>).<span class="ident">to_string</span>(),
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">Ieee32::with_float</span>(<span class="ident">f32::MIN_POSITIVE</span>).<span class="ident">to_string</span>(),
             <span class="string">&quot;0x1.000000p-126&quot;</span>
         );
         <span class="comment">// Subnormals.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
-            <span class="ident">Ieee32</span>::<span class="ident">with_float</span>(<span class="ident">f32</span>::<span class="ident">MIN_POSITIVE</span> <span class="op">/</span> <span class="number">2.0</span>).<span class="ident">to_string</span>(),
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">Ieee32::with_float</span>(<span class="ident">f32::MIN_POSITIVE</span> <span class="op">/</span> <span class="number">2.0</span>).<span class="ident">to_string</span>(),
             <span class="string">&quot;0x0.800000p-126&quot;</span>
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
-            <span class="ident">Ieee32</span>::<span class="ident">with_float</span>(<span class="ident">f32</span>::<span class="ident">MIN_POSITIVE</span> <span class="op">*</span> <span class="ident">f32</span>::<span class="ident">EPSILON</span>).<span class="ident">to_string</span>(),
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">Ieee32::with_float</span>(<span class="ident">f32::MIN_POSITIVE</span> <span class="op">*</span> <span class="ident">f32::EPSILON</span>).<span class="ident">to_string</span>(),
             <span class="string">&quot;0x0.000002p-126&quot;</span>
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee32</span>::<span class="ident">with_float</span>(<span class="ident">f32</span>::<span class="ident">INFINITY</span>).<span class="ident">to_string</span>(), <span class="string">&quot;+Inf&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee32</span>::<span class="ident">with_float</span>(<span class="ident">f32</span>::<span class="ident">NEG_INFINITY</span>).<span class="ident">to_string</span>(), <span class="string">&quot;-Inf&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee32</span>::<span class="ident">with_float</span>(<span class="ident">f32</span>::<span class="ident">NAN</span>).<span class="ident">to_string</span>(), <span class="string">&quot;+NaN&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee32</span>::<span class="ident">with_float</span>(<span class="op">-</span><span class="ident">f32</span>::<span class="ident">NAN</span>).<span class="ident">to_string</span>(), <span class="string">&quot;-NaN&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee32::with_float</span>(<span class="ident">f32::INFINITY</span>).<span class="ident">to_string</span>(), <span class="string">&quot;+Inf&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee32::with_float</span>(<span class="ident">f32::NEG_INFINITY</span>).<span class="ident">to_string</span>(), <span class="string">&quot;-Inf&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee32::with_float</span>(<span class="ident">f32::NAN</span>).<span class="ident">to_string</span>(), <span class="string">&quot;+NaN&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee32::with_float</span>(<span class="op">-</span><span class="ident">f32::NAN</span>).<span class="ident">to_string</span>(), <span class="string">&quot;-NaN&quot;</span>);
         <span class="comment">// Construct some qNaNs with payloads.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee32</span>(<span class="number">0x7fc00001</span>).<span class="ident">to_string</span>(), <span class="string">&quot;+NaN:0x1&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee32</span>(<span class="number">0x7ff00001</span>).<span class="ident">to_string</span>(), <span class="string">&quot;+NaN:0x300001&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee32</span>(<span class="number">0x7fc00001</span>).<span class="ident">to_string</span>(), <span class="string">&quot;+NaN:0x1&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee32</span>(<span class="number">0x7ff00001</span>).<span class="ident">to_string</span>(), <span class="string">&quot;+NaN:0x300001&quot;</span>);
         <span class="comment">// Signaling NaNs.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee32</span>(<span class="number">0x7f800001</span>).<span class="ident">to_string</span>(), <span class="string">&quot;+sNaN:0x1&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee32</span>(<span class="number">0x7fa00001</span>).<span class="ident">to_string</span>(), <span class="string">&quot;+sNaN:0x200001&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee32</span>(<span class="number">0x7f800001</span>).<span class="ident">to_string</span>(), <span class="string">&quot;+sNaN:0x1&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee32</span>(<span class="number">0x7fa00001</span>).<span class="ident">to_string</span>(), <span class="string">&quot;+sNaN:0x200001&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -2418,70 +2470,70 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">pow2_ieee32</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee32</span>::<span class="ident">pow2</span>(<span class="number">0</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x1.000000p0&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee32</span>::<span class="ident">pow2</span>(<span class="number">1</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x1.000000p1&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee32</span>::<span class="ident">pow2</span>(<span class="op">-</span><span class="number">1</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x1.000000p-1&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee32</span>::<span class="ident">pow2</span>(<span class="number">127</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x1.000000p127&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee32</span>::<span class="ident">pow2</span>(<span class="op">-</span><span class="number">126</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x1.000000p-126&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee32::pow2</span>(<span class="number">0</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x1.000000p0&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee32::pow2</span>(<span class="number">1</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x1.000000p1&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee32::pow2</span>(<span class="op">-</span><span class="number">1</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x1.000000p-1&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee32::pow2</span>(<span class="number">127</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x1.000000p127&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee32::pow2</span>(<span class="op">-</span><span class="number">126</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x1.000000p-126&quot;</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee32</span>::<span class="ident">pow2</span>(<span class="number">1</span>).<span class="ident">neg</span>().<span class="ident">to_string</span>(), <span class="string">&quot;-0x1.000000p1&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee32::pow2</span>(<span class="number">1</span>).<span class="ident">neg</span>().<span class="ident">to_string</span>(), <span class="string">&quot;-0x1.000000p1&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">fcvt_to_sint_negative_overflow_ieee32</span>() {
         <span class="kw">for</span> <span class="ident">n</span> <span class="kw">in</span> <span class="kw-2">&amp;</span>[<span class="number">8</span>, <span class="number">16</span>] {
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="op">-</span>((<span class="number">1u32</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="ident">n</span> <span class="op">-</span> <span class="number">1</span>)) <span class="kw">as</span> <span class="ident">f32</span>) <span class="op">-</span> <span class="number">1.0</span>, <span class="kw">unsafe</span> {
-                <span class="ident">mem</span>::<span class="ident">transmute</span>(<span class="ident">Ieee32</span>::<span class="ident">fcvt_to_sint_negative_overflow</span>(<span class="kw-2">*</span><span class="ident">n</span>))
+            <span class="macro">assert_eq!</span>(<span class="op">-</span>((<span class="number">1u32</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="ident">n</span> <span class="op">-</span> <span class="number">1</span>)) <span class="kw">as</span> <span class="ident">f32</span>) <span class="op">-</span> <span class="number">1.0</span>, <span class="kw">unsafe</span> {
+                <span class="ident">mem::transmute</span>(<span class="ident">Ieee32::fcvt_to_sint_negative_overflow</span>(<span class="kw-2">*</span><span class="ident">n</span>))
             });
         }
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">format_ieee64</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee64</span>::<span class="ident">with_float</span>(<span class="number">0.0</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0.0&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee64</span>::<span class="ident">with_float</span>(<span class="op">-</span><span class="number">0.0</span>).<span class="ident">to_string</span>(), <span class="string">&quot;-0.0&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee64</span>::<span class="ident">with_float</span>(<span class="number">1.0</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x1.0000000000000p0&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee64</span>::<span class="ident">with_float</span>(<span class="number">1.5</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x1.8000000000000p0&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee64</span>::<span class="ident">with_float</span>(<span class="number">0.5</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x1.0000000000000p-1&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
-            <span class="ident">Ieee64</span>::<span class="ident">with_float</span>(<span class="ident">f64</span>::<span class="ident">EPSILON</span>).<span class="ident">to_string</span>(),
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee64::with_float</span>(<span class="number">0.0</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0.0&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee64::with_float</span>(<span class="op">-</span><span class="number">0.0</span>).<span class="ident">to_string</span>(), <span class="string">&quot;-0.0&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee64::with_float</span>(<span class="number">1.0</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x1.0000000000000p0&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee64::with_float</span>(<span class="number">1.5</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x1.8000000000000p0&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee64::with_float</span>(<span class="number">0.5</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x1.0000000000000p-1&quot;</span>);
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">Ieee64::with_float</span>(<span class="ident">f64::EPSILON</span>).<span class="ident">to_string</span>(),
             <span class="string">&quot;0x1.0000000000000p-52&quot;</span>
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
-            <span class="ident">Ieee64</span>::<span class="ident">with_float</span>(<span class="ident">f64</span>::<span class="ident">MIN</span>).<span class="ident">to_string</span>(),
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">Ieee64::with_float</span>(<span class="ident">f64::MIN</span>).<span class="ident">to_string</span>(),
             <span class="string">&quot;-0x1.fffffffffffffp1023&quot;</span>
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
-            <span class="ident">Ieee64</span>::<span class="ident">with_float</span>(<span class="ident">f64</span>::<span class="ident">MAX</span>).<span class="ident">to_string</span>(),
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">Ieee64::with_float</span>(<span class="ident">f64::MAX</span>).<span class="ident">to_string</span>(),
             <span class="string">&quot;0x1.fffffffffffffp1023&quot;</span>
         );
         <span class="comment">// Smallest positive normal number.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
-            <span class="ident">Ieee64</span>::<span class="ident">with_float</span>(<span class="ident">f64</span>::<span class="ident">MIN_POSITIVE</span>).<span class="ident">to_string</span>(),
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">Ieee64::with_float</span>(<span class="ident">f64::MIN_POSITIVE</span>).<span class="ident">to_string</span>(),
             <span class="string">&quot;0x1.0000000000000p-1022&quot;</span>
         );
         <span class="comment">// Subnormals.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
-            <span class="ident">Ieee64</span>::<span class="ident">with_float</span>(<span class="ident">f64</span>::<span class="ident">MIN_POSITIVE</span> <span class="op">/</span> <span class="number">2.0</span>).<span class="ident">to_string</span>(),
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">Ieee64::with_float</span>(<span class="ident">f64::MIN_POSITIVE</span> <span class="op">/</span> <span class="number">2.0</span>).<span class="ident">to_string</span>(),
             <span class="string">&quot;0x0.8000000000000p-1022&quot;</span>
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
-            <span class="ident">Ieee64</span>::<span class="ident">with_float</span>(<span class="ident">f64</span>::<span class="ident">MIN_POSITIVE</span> <span class="op">*</span> <span class="ident">f64</span>::<span class="ident">EPSILON</span>).<span class="ident">to_string</span>(),
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">Ieee64::with_float</span>(<span class="ident">f64::MIN_POSITIVE</span> <span class="op">*</span> <span class="ident">f64::EPSILON</span>).<span class="ident">to_string</span>(),
             <span class="string">&quot;0x0.0000000000001p-1022&quot;</span>
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee64</span>::<span class="ident">with_float</span>(<span class="ident">f64</span>::<span class="ident">INFINITY</span>).<span class="ident">to_string</span>(), <span class="string">&quot;+Inf&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee64</span>::<span class="ident">with_float</span>(<span class="ident">f64</span>::<span class="ident">NEG_INFINITY</span>).<span class="ident">to_string</span>(), <span class="string">&quot;-Inf&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee64</span>::<span class="ident">with_float</span>(<span class="ident">f64</span>::<span class="ident">NAN</span>).<span class="ident">to_string</span>(), <span class="string">&quot;+NaN&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee64</span>::<span class="ident">with_float</span>(<span class="op">-</span><span class="ident">f64</span>::<span class="ident">NAN</span>).<span class="ident">to_string</span>(), <span class="string">&quot;-NaN&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee64::with_float</span>(<span class="ident">f64::INFINITY</span>).<span class="ident">to_string</span>(), <span class="string">&quot;+Inf&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee64::with_float</span>(<span class="ident">f64::NEG_INFINITY</span>).<span class="ident">to_string</span>(), <span class="string">&quot;-Inf&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee64::with_float</span>(<span class="ident">f64::NAN</span>).<span class="ident">to_string</span>(), <span class="string">&quot;+NaN&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee64::with_float</span>(<span class="op">-</span><span class="ident">f64::NAN</span>).<span class="ident">to_string</span>(), <span class="string">&quot;-NaN&quot;</span>);
         <span class="comment">// Construct some qNaNs with payloads.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee64</span>(<span class="number">0x7ff8000000000001</span>).<span class="ident">to_string</span>(), <span class="string">&quot;+NaN:0x1&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee64</span>(<span class="number">0x7ff8000000000001</span>).<span class="ident">to_string</span>(), <span class="string">&quot;+NaN:0x1&quot;</span>);
+        <span class="macro">assert_eq!</span>(
             <span class="ident">Ieee64</span>(<span class="number">0x7ffc000000000001</span>).<span class="ident">to_string</span>(),
             <span class="string">&quot;+NaN:0x4000000000001&quot;</span>
         );
         <span class="comment">// Signaling NaNs.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee64</span>(<span class="number">0x7ff0000000000001</span>).<span class="ident">to_string</span>(), <span class="string">&quot;+sNaN:0x1&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee64</span>(<span class="number">0x7ff0000000000001</span>).<span class="ident">to_string</span>(), <span class="string">&quot;+sNaN:0x1&quot;</span>);
+        <span class="macro">assert_eq!</span>(
             <span class="ident">Ieee64</span>(<span class="number">0x7ff4000000000001</span>).<span class="ident">to_string</span>(),
             <span class="string">&quot;+sNaN:0x4000000000001&quot;</span>
         );
@@ -2556,23 +2608,24 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">pow2_ieee64</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee64</span>::<span class="ident">pow2</span>(<span class="number">0</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x1.0000000000000p0&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee64</span>::<span class="ident">pow2</span>(<span class="number">1</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x1.0000000000000p1&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee64</span>::<span class="ident">pow2</span>(<span class="op">-</span><span class="number">1</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x1.0000000000000p-1&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee64</span>::<span class="ident">pow2</span>(<span class="number">1023</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x1.0000000000000p1023&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee64</span>::<span class="ident">pow2</span>(<span class="op">-</span><span class="number">1022</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x1.0000000000000p-1022&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee64::pow2</span>(<span class="number">0</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x1.0000000000000p0&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee64::pow2</span>(<span class="number">1</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x1.0000000000000p1&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee64::pow2</span>(<span class="op">-</span><span class="number">1</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x1.0000000000000p-1&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee64::pow2</span>(<span class="number">1023</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x1.0000000000000p1023&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee64::pow2</span>(<span class="op">-</span><span class="number">1022</span>).<span class="ident">to_string</span>(), <span class="string">&quot;0x1.0000000000000p-1022&quot;</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ieee64</span>::<span class="ident">pow2</span>(<span class="number">1</span>).<span class="ident">neg</span>().<span class="ident">to_string</span>(), <span class="string">&quot;-0x1.0000000000000p1&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">Ieee64::pow2</span>(<span class="number">1</span>).<span class="ident">neg</span>().<span class="ident">to_string</span>(), <span class="string">&quot;-0x1.0000000000000p1&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">fcvt_to_sint_negative_overflow_ieee64</span>() {
         <span class="kw">for</span> <span class="ident">n</span> <span class="kw">in</span> <span class="kw-2">&amp;</span>[<span class="number">8</span>, <span class="number">16</span>, <span class="number">32</span>] {
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="op">-</span>((<span class="number">1u64</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="ident">n</span> <span class="op">-</span> <span class="number">1</span>)) <span class="kw">as</span> <span class="ident">f64</span>) <span class="op">-</span> <span class="number">1.0</span>, <span class="kw">unsafe</span> {
-                <span class="ident">mem</span>::<span class="ident">transmute</span>(<span class="ident">Ieee64</span>::<span class="ident">fcvt_to_sint_negative_overflow</span>(<span class="kw-2">*</span><span class="ident">n</span>))
+            <span class="macro">assert_eq!</span>(<span class="op">-</span>((<span class="number">1u64</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="ident">n</span> <span class="op">-</span> <span class="number">1</span>)) <span class="kw">as</span> <span class="ident">f64</span>) <span class="op">-</span> <span class="number">1.0</span>, <span class="kw">unsafe</span> {
+                <span class="ident">mem::transmute</span>(<span class="ident">Ieee64::fcvt_to_sint_negative_overflow</span>(<span class="kw-2">*</span><span class="ident">n</span>))
             });
         }
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "cranelift_codegen";</script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="cranelift_codegen" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
+    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script></body></html>

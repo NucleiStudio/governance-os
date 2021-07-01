@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/wasmtime-runtime-0.19.0/src/traphandlers.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>traphandlers.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/wasmtime-runtime-0.22.0/src/traphandlers.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>traphandlers.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../wasmtime_runtime/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../wasmtime_runtime/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -788,20 +788,50 @@
 <span id="785">785</span>
 <span id="786">786</span>
 <span id="787">787</span>
+<span id="788">788</span>
+<span id="789">789</span>
+<span id="790">790</span>
+<span id="791">791</span>
+<span id="792">792</span>
+<span id="793">793</span>
+<span id="794">794</span>
+<span id="795">795</span>
+<span id="796">796</span>
+<span id="797">797</span>
+<span id="798">798</span>
+<span id="799">799</span>
+<span id="800">800</span>
+<span id="801">801</span>
+<span id="802">802</span>
+<span id="803">803</span>
+<span id="804">804</span>
+<span id="805">805</span>
+<span id="806">806</span>
+<span id="807">807</span>
+<span id="808">808</span>
+<span id="809">809</span>
+<span id="810">810</span>
+<span id="811">811</span>
+<span id="812">812</span>
+<span id="813">813</span>
+<span id="814">814</span>
+<span id="815">815</span>
+<span id="816">816</span>
+<span id="817">817</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! WebAssembly trap handling, which is built on top of the lower-level</span>
 <span class="doccomment">//! signalhandling mechanisms.</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">VMContext</span>;
-<span class="kw">use</span> <span class="ident">backtrace</span>::<span class="ident">Backtrace</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">any</span>::<span class="ident">Any</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cell</span>::<span class="ident">Cell</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ptr</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">atomic</span>::{<span class="ident">AtomicUsize</span>, <span class="ident">Ordering</span>::<span class="ident">SeqCst</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Once</span>;
-<span class="kw">use</span> <span class="ident">wasmtime_environ</span>::<span class="ident">ir</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::VMContext</span>;
+<span class="kw">use</span> <span class="ident">backtrace::Backtrace</span>;
+<span class="kw">use</span> <span class="ident">std::any::Any</span>;
+<span class="kw">use</span> <span class="ident">std::cell::Cell</span>;
+<span class="kw">use</span> <span class="ident">std::error::Error</span>;
+<span class="kw">use</span> <span class="ident">std::io</span>;
+<span class="kw">use</span> <span class="ident">std::ptr</span>;
+<span class="kw">use</span> <span class="ident">std::sync::atomic</span>::{<span class="ident">AtomicUsize</span>, <span class="ident">Ordering::SeqCst</span>};
+<span class="kw">use</span> <span class="ident">std::sync::Once</span>;
+<span class="kw">use</span> <span class="ident">wasmtime_environ::ir</span>;
 
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
     <span class="kw">fn</span> <span class="ident">RegisterSetjmp</span>(
@@ -812,21 +842,21 @@
     <span class="kw">fn</span> <span class="ident">Unwind</span>(<span class="ident">jmp_buf</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="op">!</span>;
 }
 
-<span class="ident">cfg_if</span>::<span class="macro">cfg_if</span><span class="macro">!</span> {
+<span class="macro">cfg_if::cfg_if!</span> {
     <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span> {
-        <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">mem</span>::{<span class="self">self</span>, <span class="ident">MaybeUninit</span>};
+        <span class="kw">use</span> <span class="ident">std::mem</span>::{<span class="self">self</span>, <span class="ident">MaybeUninit</span>};
 
         <span class="doccomment">/// Function which may handle custom signals while processing traps.</span>
-        <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">SignalHandler</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">dyn</span> <span class="ident">Fn</span>(<span class="ident">libc</span>::<span class="ident">c_int</span>, <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">libc</span>::<span class="ident">siginfo_t</span>, <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">libc</span>::<span class="ident">c_void</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>;
+        <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">SignalHandler</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="ident">libc::c_int</span>, <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">libc::siginfo_t</span>, <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">libc::c_void</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>;
 
-        <span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">PREV_SIGSEGV</span>: <span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">libc</span>::<span class="ident">sigaction</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">MaybeUninit</span>::<span class="ident">uninit</span>();
-        <span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">PREV_SIGBUS</span>: <span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">libc</span>::<span class="ident">sigaction</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">MaybeUninit</span>::<span class="ident">uninit</span>();
-        <span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">PREV_SIGILL</span>: <span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">libc</span>::<span class="ident">sigaction</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">MaybeUninit</span>::<span class="ident">uninit</span>();
-        <span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">PREV_SIGFPE</span>: <span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">libc</span>::<span class="ident">sigaction</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">MaybeUninit</span>::<span class="ident">uninit</span>();
+        <span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">PREV_SIGSEGV</span>: <span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">libc::sigaction</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">MaybeUninit::uninit</span>();
+        <span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">PREV_SIGBUS</span>: <span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">libc::sigaction</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">MaybeUninit::uninit</span>();
+        <span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">PREV_SIGILL</span>: <span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">libc::sigaction</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">MaybeUninit::uninit</span>();
+        <span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">PREV_SIGFPE</span>: <span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">libc::sigaction</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">MaybeUninit::uninit</span>();
 
         <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">platform_init</span>() {
-            <span class="kw">let</span> <span class="ident">register</span> <span class="op">=</span> <span class="op">|</span><span class="ident">slot</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">libc</span>::<span class="ident">sigaction</span><span class="op">&gt;</span>, <span class="ident">signal</span>: <span class="ident">i32</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">handler</span>: <span class="ident">libc</span>::<span class="ident">sigaction</span> <span class="op">=</span> <span class="ident">mem</span>::<span class="ident">zeroed</span>();
+            <span class="kw">let</span> <span class="ident">register</span> <span class="op">=</span> <span class="op">|</span><span class="ident">slot</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">libc::sigaction</span><span class="op">&gt;</span>, <span class="ident">signal</span>: <span class="ident">i32</span><span class="op">|</span> {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">handler</span>: <span class="ident">libc::sigaction</span> <span class="op">=</span> <span class="ident">mem::zeroed</span>();
                 <span class="comment">// The flags here are relatively careful, and they are...</span>
                 <span class="comment">//</span>
                 <span class="comment">// SA_SIGINFO gives us access to information like the program</span>
@@ -840,48 +870,48 @@
                 <span class="comment">// SA_NODEFER allows us to reenter the signal handler if we</span>
                 <span class="comment">// crash while handling the signal, and fall through to the</span>
                 <span class="comment">// Breakpad handler by testing handlingSegFault.</span>
-                <span class="ident">handler</span>.<span class="ident">sa_flags</span> <span class="op">=</span> <span class="ident">libc</span>::<span class="ident">SA_SIGINFO</span> <span class="op">|</span> <span class="ident">libc</span>::<span class="ident">SA_NODEFER</span> <span class="op">|</span> <span class="ident">libc</span>::<span class="ident">SA_ONSTACK</span>;
+                <span class="ident">handler</span>.<span class="ident">sa_flags</span> <span class="op">=</span> <span class="ident">libc::SA_SIGINFO</span> <span class="op">|</span> <span class="ident">libc::SA_NODEFER</span> <span class="op">|</span> <span class="ident">libc::SA_ONSTACK</span>;
                 <span class="ident">handler</span>.<span class="ident">sa_sigaction</span> <span class="op">=</span> <span class="ident">trap_handler</span> <span class="kw">as</span> <span class="ident">usize</span>;
-                <span class="ident">libc</span>::<span class="ident">sigemptyset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">handler</span>.<span class="ident">sa_mask</span>);
-                <span class="kw">if</span> <span class="ident">libc</span>::<span class="ident">sigaction</span>(<span class="ident">signal</span>, <span class="kw-2">&amp;</span><span class="ident">handler</span>, <span class="ident">slot</span>.<span class="ident">as_mut_ptr</span>()) <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                    <span class="macro">panic</span><span class="macro">!</span>(
+                <span class="ident">libc::sigemptyset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">handler</span>.<span class="ident">sa_mask</span>);
+                <span class="kw">if</span> <span class="ident">libc::sigaction</span>(<span class="ident">signal</span>, <span class="kw-2">&amp;</span><span class="ident">handler</span>, <span class="ident">slot</span>.<span class="ident">as_mut_ptr</span>()) <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
+                    <span class="macro">panic!</span>(
                         <span class="string">&quot;unable to install signal handler: {}&quot;</span>,
-                        <span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">last_os_error</span>(),
+                        <span class="ident">io::Error::last_os_error</span>(),
                     );
                 }
             };
 
             <span class="comment">// Allow handling OOB with signals on all architectures</span>
-            <span class="ident">register</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">PREV_SIGSEGV</span>, <span class="ident">libc</span>::<span class="ident">SIGSEGV</span>);
+            <span class="ident">register</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">PREV_SIGSEGV</span>, <span class="ident">libc::SIGSEGV</span>);
 
             <span class="comment">// Handle `unreachable` instructions which execute `ud2` right now</span>
-            <span class="ident">register</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">PREV_SIGILL</span>, <span class="ident">libc</span>::<span class="ident">SIGILL</span>);
+            <span class="ident">register</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">PREV_SIGILL</span>, <span class="ident">libc::SIGILL</span>);
 
             <span class="comment">// x86 uses SIGFPE to report division by zero</span>
-            <span class="kw">if</span> <span class="macro">cfg</span><span class="macro">!</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>) <span class="op">|</span><span class="op">|</span> <span class="macro">cfg</span><span class="macro">!</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>) {
-                <span class="ident">register</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">PREV_SIGFPE</span>, <span class="ident">libc</span>::<span class="ident">SIGFPE</span>);
+            <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>) <span class="op">|</span><span class="op">|</span> <span class="macro">cfg!</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>) {
+                <span class="ident">register</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">PREV_SIGFPE</span>, <span class="ident">libc::SIGFPE</span>);
             }
 
             <span class="comment">// On ARM, handle Unaligned Accesses.</span>
             <span class="comment">// On Darwin, guard page accesses are raised as SIGBUS.</span>
-            <span class="kw">if</span> <span class="macro">cfg</span><span class="macro">!</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;arm&quot;</span>) <span class="op">|</span><span class="op">|</span> <span class="macro">cfg</span><span class="macro">!</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;macos&quot;</span>) {
-                <span class="ident">register</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">PREV_SIGBUS</span>, <span class="ident">libc</span>::<span class="ident">SIGBUS</span>);
+            <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;arm&quot;</span>) <span class="op">|</span><span class="op">|</span> <span class="macro">cfg!</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;macos&quot;</span>) <span class="op">|</span><span class="op">|</span> <span class="macro">cfg!</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;freebsd&quot;</span>) {
+                <span class="ident">register</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">PREV_SIGBUS</span>, <span class="ident">libc::SIGBUS</span>);
             }
         }
 
         <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">trap_handler</span>(
-            <span class="ident">signum</span>: <span class="ident">libc</span>::<span class="ident">c_int</span>,
-            <span class="ident">siginfo</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">libc</span>::<span class="ident">siginfo_t</span>,
-            <span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">libc</span>::<span class="ident">c_void</span>,
+            <span class="ident">signum</span>: <span class="ident">libc::c_int</span>,
+            <span class="ident">siginfo</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">libc::siginfo_t</span>,
+            <span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">libc::c_void</span>,
         ) {
             <span class="kw">let</span> <span class="ident">previous</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">signum</span> {
-                <span class="ident">libc</span>::<span class="ident">SIGSEGV</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">PREV_SIGSEGV</span>,
-                <span class="ident">libc</span>::<span class="ident">SIGBUS</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">PREV_SIGBUS</span>,
-                <span class="ident">libc</span>::<span class="ident">SIGFPE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">PREV_SIGFPE</span>,
-                <span class="ident">libc</span>::<span class="ident">SIGILL</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">PREV_SIGILL</span>,
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;unknown signal: {}&quot;</span>, <span class="ident">signum</span>),
+                <span class="ident">libc::SIGSEGV</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">PREV_SIGSEGV</span>,
+                <span class="ident">libc::SIGBUS</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">PREV_SIGBUS</span>,
+                <span class="ident">libc::SIGFPE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">PREV_SIGFPE</span>,
+                <span class="ident">libc::SIGILL</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">PREV_SIGILL</span>,
+                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;unknown signal: {}&quot;</span>, <span class="ident">signum</span>),
             };
-            <span class="kw">let</span> <span class="ident">handled</span> <span class="op">=</span> <span class="ident">tls</span>::<span class="ident">with</span>(<span class="op">|</span><span class="ident">info</span><span class="op">|</span> {
+            <span class="kw">let</span> <span class="ident">handled</span> <span class="op">=</span> <span class="ident">tls::with</span>(<span class="op">|</span><span class="ident">info</span><span class="op">|</span> {
                 <span class="comment">// If no wasm code is executing, we don&#39;t handle this as a wasm</span>
                 <span class="comment">// trap.</span>
                 <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">info</span> {
@@ -928,56 +958,59 @@
             <span class="comment">// so that execution can continue and return, or trigger a crash by</span>
             <span class="comment">// returning the signal to it&#39;s original disposition and returning.</span>
             <span class="kw">let</span> <span class="ident">previous</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">previous</span>.<span class="ident">as_ptr</span>();
-            <span class="kw">if</span> <span class="ident">previous</span>.<span class="ident">sa_flags</span> <span class="op">&amp;</span> <span class="ident">libc</span>::<span class="ident">SA_SIGINFO</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                <span class="ident">mem</span>::<span class="ident">transmute</span>::<span class="op">&lt;</span>
+            <span class="kw">if</span> <span class="ident">previous</span>.<span class="ident">sa_flags</span> <span class="op">&amp;</span> <span class="ident">libc::SA_SIGINFO</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
+                <span class="ident">mem::transmute</span>::<span class="op">&lt;</span>
                     <span class="ident">usize</span>,
-                    <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">libc</span>::<span class="ident">c_int</span>, <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">libc</span>::<span class="ident">siginfo_t</span>, <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">libc</span>::<span class="ident">c_void</span>),
+                    <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">libc::c_int</span>, <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">libc::siginfo_t</span>, <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">libc::c_void</span>),
                 <span class="op">&gt;</span>(<span class="ident">previous</span>.<span class="ident">sa_sigaction</span>)(<span class="ident">signum</span>, <span class="ident">siginfo</span>, <span class="ident">context</span>)
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">previous</span>.<span class="ident">sa_sigaction</span> <span class="op">=</span><span class="op">=</span> <span class="ident">libc</span>::<span class="ident">SIG_DFL</span> <span class="op">|</span><span class="op">|</span>
-                <span class="ident">previous</span>.<span class="ident">sa_sigaction</span> <span class="op">=</span><span class="op">=</span> <span class="ident">libc</span>::<span class="ident">SIG_IGN</span>
+            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">previous</span>.<span class="ident">sa_sigaction</span> <span class="op">=</span><span class="op">=</span> <span class="ident">libc::SIG_DFL</span> <span class="op">|</span><span class="op">|</span>
+                <span class="ident">previous</span>.<span class="ident">sa_sigaction</span> <span class="op">=</span><span class="op">=</span> <span class="ident">libc::SIG_IGN</span>
             {
-                <span class="ident">libc</span>::<span class="ident">sigaction</span>(<span class="ident">signum</span>, <span class="ident">previous</span>, <span class="ident">ptr</span>::<span class="ident">null_mut</span>());
+                <span class="ident">libc::sigaction</span>(<span class="ident">signum</span>, <span class="ident">previous</span>, <span class="ident">ptr::null_mut</span>());
             } <span class="kw">else</span> {
-                <span class="ident">mem</span>::<span class="ident">transmute</span>::<span class="op">&lt;</span><span class="ident">usize</span>, <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">libc</span>::<span class="ident">c_int</span>)<span class="op">&gt;</span>(
+                <span class="ident">mem::transmute</span>::<span class="op">&lt;</span><span class="ident">usize</span>, <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">libc::c_int</span>)<span class="op">&gt;</span>(
                     <span class="ident">previous</span>.<span class="ident">sa_sigaction</span>
                 )(<span class="ident">signum</span>)
             }
         }
 
-        <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">get_pc</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">libc</span>::<span class="ident">c_void</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span> {
-            <span class="ident">cfg_if</span>::<span class="macro">cfg_if</span><span class="macro">!</span> {
+        <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">get_pc</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">libc::c_void</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span> {
+            <span class="macro">cfg_if::cfg_if!</span> {
                 <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;linux&quot;</span>, <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>))]</span> {
-                    <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">cx</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">libc</span>::<span class="ident">ucontext_t</span>);
-                    <span class="ident">cx</span>.<span class="ident">uc_mcontext</span>.<span class="ident">gregs</span>[<span class="ident">libc</span>::<span class="ident">REG_RIP</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>
+                    <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">cx</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">libc::ucontext_t</span>);
+                    <span class="ident">cx</span>.<span class="ident">uc_mcontext</span>.<span class="ident">gregs</span>[<span class="ident">libc::REG_RIP</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>
                 } <span class="kw">else</span> <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;linux&quot;</span>, <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>))]</span> {
-                    <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">cx</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">libc</span>::<span class="ident">ucontext_t</span>);
-                    <span class="ident">cx</span>.<span class="ident">uc_mcontext</span>.<span class="ident">gregs</span>[<span class="ident">libc</span>::<span class="ident">REG_EIP</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>
+                    <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">cx</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">libc::ucontext_t</span>);
+                    <span class="ident">cx</span>.<span class="ident">uc_mcontext</span>.<span class="ident">gregs</span>[<span class="ident">libc::REG_EIP</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>
                 } <span class="kw">else</span> <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">any</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;linux&quot;</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;android&quot;</span>), <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>))]</span> {
-                    <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">cx</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">libc</span>::<span class="ident">ucontext_t</span>);
+                    <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">cx</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">libc::ucontext_t</span>);
                     <span class="ident">cx</span>.<span class="ident">uc_mcontext</span>.<span class="ident">pc</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>
                 } <span class="kw">else</span> <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;macos&quot;</span>)]</span> {
-                    <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">cx</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">libc</span>::<span class="ident">ucontext_t</span>);
+                    <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">cx</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">libc::ucontext_t</span>);
                     (<span class="kw-2">*</span><span class="ident">cx</span>.<span class="ident">uc_mcontext</span>).<span class="ident">__ss</span>.<span class="ident">__rip</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>
+                } <span class="kw">else</span> <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;freebsd&quot;</span>, <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>))]</span> {
+                    <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">cx</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">libc::ucontext_t</span>);
+                    <span class="ident">cx</span>.<span class="ident">uc_mcontext</span>.<span class="ident">mc_rip</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>
                 } <span class="kw">else</span> {
-                    <span class="macro">compile_error</span><span class="macro">!</span>(<span class="string">&quot;unsupported platform&quot;</span>);
+                    <span class="macro">compile_error!</span>(<span class="string">&quot;unsupported platform&quot;</span>);
                 }
             }
         }
     } <span class="kw">else</span> <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;windows&quot;</span>)]</span> {
-        <span class="kw">use</span> <span class="ident">winapi</span>::<span class="ident">um</span>::<span class="ident">errhandlingapi</span>::<span class="kw-2">*</span>;
-        <span class="kw">use</span> <span class="ident">winapi</span>::<span class="ident">um</span>::<span class="ident">winnt</span>::<span class="kw-2">*</span>;
-        <span class="kw">use</span> <span class="ident">winapi</span>::<span class="ident">um</span>::<span class="ident">minwinbase</span>::<span class="kw-2">*</span>;
-        <span class="kw">use</span> <span class="ident">winapi</span>::<span class="ident">vc</span>::<span class="ident">excpt</span>::<span class="kw-2">*</span>;
+        <span class="kw">use</span> <span class="ident">winapi::um::errhandlingapi</span>::<span class="kw-2">*</span>;
+        <span class="kw">use</span> <span class="ident">winapi::um::winnt</span>::<span class="kw-2">*</span>;
+        <span class="kw">use</span> <span class="ident">winapi::um::minwinbase</span>::<span class="kw-2">*</span>;
+        <span class="kw">use</span> <span class="ident">winapi::vc::excpt</span>::<span class="kw-2">*</span>;
 
         <span class="doccomment">/// Function which may handle custom signals while processing traps.</span>
-        <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">SignalHandler</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">dyn</span> <span class="ident">Fn</span>(<span class="ident">winapi</span>::<span class="ident">um</span>::<span class="ident">winnt</span>::<span class="ident">PEXCEPTION_POINTERS</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>;
+        <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">SignalHandler</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="ident">winapi::um::winnt::PEXCEPTION_POINTERS</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>;
 
         <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">platform_init</span>() {
             <span class="comment">// our trap handler needs to go first, so that we can recover from</span>
             <span class="comment">// wasm faults and continue execution, so pass `1` as a true value</span>
             <span class="comment">// here.</span>
             <span class="kw">if</span> <span class="ident">AddVectoredExceptionHandler</span>(<span class="number">1</span>, <span class="prelude-val">Some</span>(<span class="ident">exception_handler</span>)).<span class="ident">is_null</span>() {
-                <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;failed to add exception handler: {}&quot;</span>, <span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">last_os_error</span>());
+                <span class="macro">panic!</span>(<span class="string">&quot;failed to add exception handler: {}&quot;</span>, <span class="ident">io::Error::last_os_error</span>());
             }
         }
 
@@ -1010,18 +1043,18 @@
 
             <span class="comment">// This is basically the same as the unix version above, only with a</span>
             <span class="comment">// few parameters tweaked here and there.</span>
-            <span class="ident">tls</span>::<span class="ident">with</span>(<span class="op">|</span><span class="ident">info</span><span class="op">|</span> {
+            <span class="ident">tls::with</span>(<span class="op">|</span><span class="ident">info</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">info</span> {
                     <span class="prelude-val">Some</span>(<span class="ident">info</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">info</span>,
                     <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">EXCEPTION_CONTINUE_SEARCH</span>,
                 };
-                <span class="ident">cfg_if</span>::<span class="macro">cfg_if</span><span class="macro">!</span> {
+                <span class="macro">cfg_if::cfg_if!</span> {
                     <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>)]</span> {
                         <span class="kw">let</span> <span class="ident">ip</span> <span class="op">=</span> (<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="ident">exception_info</span>).<span class="ident">ContextRecord</span>).<span class="ident">Rip</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>;
                     } <span class="kw">else</span> <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>)]</span> {
                         <span class="kw">let</span> <span class="ident">ip</span> <span class="op">=</span> (<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="ident">exception_info</span>).<span class="ident">ContextRecord</span>).<span class="ident">Eip</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>;
                     } <span class="kw">else</span> {
-                        <span class="macro">compile_error</span><span class="macro">!</span>(<span class="string">&quot;unsupported platform&quot;</span>);
+                        <span class="macro">compile_error!</span>(<span class="string">&quot;unsupported platform&quot;</span>);
                     }
                 }
                 <span class="kw">let</span> <span class="ident">jmp_buf</span> <span class="op">=</span> <span class="ident">info</span>.<span class="ident">handle_trap</span>(<span class="ident">ip</span>, <span class="op">|</span><span class="ident">handler</span><span class="op">|</span> <span class="ident">handler</span>(<span class="ident">exception_info</span>));
@@ -1047,7 +1080,7 @@
 <span class="doccomment">/// handlers have been installed. This function can thus be called multiple</span>
 <span class="doccomment">/// times, having no effect after the first call.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init_traps</span>() {
-    <span class="kw">static</span> <span class="ident">INIT</span>: <span class="ident">Once</span> <span class="op">=</span> <span class="ident">Once</span>::<span class="ident">new</span>();
+    <span class="kw">static</span> <span class="ident">INIT</span>: <span class="ident">Once</span> <span class="op">=</span> <span class="ident">Once::new</span>();
     <span class="ident">INIT</span>.<span class="ident">call_once</span>(<span class="ident">real_init</span>);
 }
 
@@ -1068,8 +1101,8 @@
 <span class="doccomment">/// Only safe to call when wasm code is on the stack, aka `catch_traps` must</span>
 <span class="doccomment">/// have been previously called. Additionally no Rust destructors can be on the</span>
 <span class="doccomment">/// stack. They will be skipped and not executed.</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">raise_user_trap</span>(<span class="ident">data</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="op">!</span> {
-    <span class="ident">tls</span>::<span class="ident">with</span>(<span class="op">|</span><span class="ident">info</span><span class="op">|</span> <span class="ident">info</span>.<span class="ident">unwrap</span>().<span class="ident">unwind_with</span>(<span class="ident">UnwindReason</span>::<span class="ident">UserTrap</span>(<span class="ident">data</span>)))
+<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">raise_user_trap</span>(<span class="ident">data</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="op">!</span> {
+    <span class="ident">tls::with</span>(<span class="op">|</span><span class="ident">info</span><span class="op">|</span> <span class="ident">info</span>.<span class="ident">unwrap</span>().<span class="ident">unwind_with</span>(<span class="ident">UnwindReason::UserTrap</span>(<span class="ident">data</span>)))
 }
 
 <span class="doccomment">/// Raises a trap from inside library code immediately.</span>
@@ -1083,7 +1116,7 @@
 <span class="doccomment">/// have been previously called. Additionally no Rust destructors can be on the</span>
 <span class="doccomment">/// stack. They will be skipped and not executed.</span>
 <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">raise_lib_trap</span>(<span class="ident">trap</span>: <span class="ident">Trap</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="op">!</span> {
-    <span class="ident">tls</span>::<span class="ident">with</span>(<span class="op">|</span><span class="ident">info</span><span class="op">|</span> <span class="ident">info</span>.<span class="ident">unwrap</span>().<span class="ident">unwind_with</span>(<span class="ident">UnwindReason</span>::<span class="ident">LibTrap</span>(<span class="ident">trap</span>)))
+    <span class="ident">tls::with</span>(<span class="op">|</span><span class="ident">info</span><span class="op">|</span> <span class="ident">info</span>.<span class="ident">unwrap</span>().<span class="ident">unwind_with</span>(<span class="ident">UnwindReason::LibTrap</span>(<span class="ident">trap</span>)))
 }
 
 <span class="doccomment">/// Carries a Rust panic across wasm code and resumes the panic on the other</span>
@@ -1094,15 +1127,15 @@
 <span class="doccomment">/// Only safe to call when wasm code is on the stack, aka `catch_traps` must</span>
 <span class="doccomment">/// have been previously called. Additionally no Rust destructors can be on the</span>
 <span class="doccomment">/// stack. They will be skipped and not executed.</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">resume_panic</span>(<span class="ident">payload</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Any</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="op">!</span> {
-    <span class="ident">tls</span>::<span class="ident">with</span>(<span class="op">|</span><span class="ident">info</span><span class="op">|</span> <span class="ident">info</span>.<span class="ident">unwrap</span>().<span class="ident">unwind_with</span>(<span class="ident">UnwindReason</span>::<span class="ident">Panic</span>(<span class="ident">payload</span>)))
+<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">resume_panic</span>(<span class="ident">payload</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Any</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="op">!</span> {
+    <span class="ident">tls::with</span>(<span class="op">|</span><span class="ident">info</span><span class="op">|</span> <span class="ident">info</span>.<span class="ident">unwrap</span>().<span class="ident">unwind_with</span>(<span class="ident">UnwindReason::Panic</span>(<span class="ident">payload</span>)))
 }
 
 <span class="doccomment">/// Stores trace message with backtrace.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Trap</span> {
     <span class="doccomment">/// A user-raised trap through `raise_user_trap`.</span>
-    <span class="ident">User</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>),
+    <span class="ident">User</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>),
 
     <span class="doccomment">/// A trap raised from jit code</span>
     <span class="ident">Jit</span> {
@@ -1119,7 +1152,7 @@
     <span class="doccomment">/// A trap raised from a wasm libcall</span>
     <span class="ident">Wasm</span> {
         <span class="doccomment">/// Code of the trap.</span>
-        <span class="ident">trap_code</span>: <span class="ident">ir</span>::<span class="ident">TrapCode</span>,
+        <span class="ident">trap_code</span>: <span class="ident">ir::TrapCode</span>,
         <span class="doccomment">/// Native stack backtrace at the time the trap occurred</span>
         <span class="ident">backtrace</span>: <span class="ident">Backtrace</span>,
     },
@@ -1135,9 +1168,9 @@
     <span class="doccomment">/// Construct a new Wasm trap with the given source location and trap code.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Internally saves a backtrace when constructed.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wasm</span>(<span class="ident">trap_code</span>: <span class="ident">ir</span>::<span class="ident">TrapCode</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">backtrace</span> <span class="op">=</span> <span class="ident">Backtrace</span>::<span class="ident">new_unresolved</span>();
-        <span class="ident">Trap</span>::<span class="ident">Wasm</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wasm</span>(<span class="ident">trap_code</span>: <span class="ident">ir::TrapCode</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">backtrace</span> <span class="op">=</span> <span class="ident">Backtrace::new_unresolved</span>();
+        <span class="ident">Trap::Wasm</span> {
             <span class="ident">trap_code</span>,
             <span class="ident">backtrace</span>,
         }
@@ -1147,8 +1180,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Internally saves a backtrace when constructed.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">oom</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">backtrace</span> <span class="op">=</span> <span class="ident">Backtrace</span>::<span class="ident">new_unresolved</span>();
-        <span class="ident">Trap</span>::<span class="ident">OOM</span> { <span class="ident">backtrace</span> }
+        <span class="kw">let</span> <span class="ident">backtrace</span> <span class="op">=</span> <span class="ident">Backtrace::new_unresolved</span>();
+        <span class="ident">Trap::OOM</span> { <span class="ident">backtrace</span> }
     }
 }
 
@@ -1158,9 +1191,7 @@
 <span class="doccomment">/// Highly unsafe since `closure` won&#39;t have any dtors run.</span>
 <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">catch_traps</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
     <span class="ident">vmctx</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">VMContext</span>,
-    <span class="ident">max_wasm_stack</span>: <span class="ident">usize</span>,
-    <span class="ident">is_wasm_code</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
-    <span class="ident">signal_handler</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SignalHandler</span><span class="op">&gt;</span>,
+    <span class="ident">trap_info</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">TrapInfo</span>,
     <span class="kw-2">mut</span> <span class="ident">closure</span>: <span class="ident">F</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Trap</span><span class="op">&gt;</span>
 <span class="kw">where</span>
@@ -1170,7 +1201,7 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
     <span class="ident">setup_unix_sigaltstack</span>()<span class="question-mark">?</span>;
 
-    <span class="kw">return</span> <span class="ident">CallThreadState</span>::<span class="ident">new</span>(<span class="ident">vmctx</span>, <span class="kw-2">&amp;</span><span class="ident">is_wasm_code</span>, <span class="ident">signal_handler</span>).<span class="ident">with</span>(<span class="ident">max_wasm_stack</span>, <span class="op">|</span><span class="ident">cx</span><span class="op">|</span> {
+    <span class="kw">return</span> <span class="ident">CallThreadState::new</span>(<span class="ident">vmctx</span>, <span class="ident">trap_info</span>).<span class="ident">with</span>(<span class="op">|</span><span class="ident">cx</span><span class="op">|</span> {
         <span class="ident">RegisterSetjmp</span>(
             <span class="ident">cx</span>.<span class="ident">jmp_buf</span>.<span class="ident">as_ptr</span>(),
             <span class="ident">call_closure</span>::<span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>,
@@ -1186,6 +1217,14 @@
     }
 }
 
+<span class="doccomment">/// Runs `func` with the last `trap_info` object registered by `catch_traps`.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Calls `func` with `None` if `catch_traps` wasn&#39;t previously called from this</span>
+<span class="doccomment">/// stack frame.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_last_info</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Any</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">R</span> {
+    <span class="ident">tls::with</span>(<span class="op">|</span><span class="ident">state</span><span class="op">|</span> <span class="ident">func</span>(<span class="ident">state</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">trap_info</span>.<span class="ident">as_any</span>())))
+}
+
 <span class="doccomment">/// Temporary state stored on the stack which is registered in the `tls` module</span>
 <span class="doccomment">/// below for calls into wasm.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CallThreadState</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
@@ -1193,66 +1232,80 @@
     <span class="ident">jmp_buf</span>: <span class="ident">Cell</span><span class="op">&lt;</span><span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span><span class="op">&gt;</span>,
     <span class="ident">vmctx</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">VMContext</span>,
     <span class="ident">handling_trap</span>: <span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="ident">is_wasm_code</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> (<span class="ident">dyn</span> <span class="ident">Fn</span>(<span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>),
-    <span class="ident">signal_handler</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">SignalHandler</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">trap_info</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> (<span class="kw">dyn</span> <span class="ident">TrapInfo</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>),
+}
+
+<span class="doccomment">/// A package of functionality needed by `catch_traps` to figure out what to do</span>
+<span class="doccomment">/// when handling a trap.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Note that this is an `unsafe` trait at least because it&#39;s being run in the</span>
+<span class="doccomment">/// context of a synchronous signal handler, so it needs to be careful to not</span>
+<span class="doccomment">/// access too much state in answering these queries.</span>
+<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">trait</span> <span class="ident">TrapInfo</span> {
+    <span class="doccomment">/// Converts this object into an `Any` to dynamically check its type.</span>
+    <span class="kw">fn</span> <span class="ident">as_any</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Any</span>;
+
+    <span class="doccomment">/// Returns whether the given program counter lies within wasm code,</span>
+    <span class="doccomment">/// indicating whether we should handle a trap or not.</span>
+    <span class="kw">fn</span> <span class="ident">is_wasm_code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">pc</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+
+    <span class="doccomment">/// Uses `call` to call a custom signal handler, if one is specified.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns `true` if `call` returns true, otherwise returns `false`.</span>
+    <span class="kw">fn</span> <span class="ident">custom_signal_handler</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">call</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">SignalHandler</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+
+    <span class="doccomment">/// Returns the maximum size, in bytes, the wasm native stack is allowed to</span>
+    <span class="doccomment">/// grow to.</span>
+    <span class="kw">fn</span> <span class="ident">max_wasm_stack</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span>;
 }
 
 <span class="kw">enum</span> <span class="ident">UnwindReason</span> {
     <span class="prelude-val">None</span>,
-    <span class="ident">Panic</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Any</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>),
-    <span class="ident">UserTrap</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>),
+    <span class="ident">Panic</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Any</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>),
+    <span class="ident">UserTrap</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>),
     <span class="ident">LibTrap</span>(<span class="ident">Trap</span>),
     <span class="ident">JitTrap</span> { <span class="ident">backtrace</span>: <span class="ident">Backtrace</span>, <span class="ident">pc</span>: <span class="ident">usize</span> },
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">CallThreadState</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">vmctx</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">VMContext</span>,
-        <span class="ident">is_wasm_code</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> (<span class="ident">dyn</span> <span class="ident">Fn</span>(<span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>),
-        <span class="ident">signal_handler</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">SignalHandler</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CallThreadState</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">vmctx</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">VMContext</span>, <span class="ident">trap_info</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> (<span class="kw">dyn</span> <span class="ident">TrapInfo</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>)) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CallThreadState</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="ident">CallThreadState</span> {
-            <span class="ident">unwind</span>: <span class="ident">Cell</span>::<span class="ident">new</span>(<span class="ident">UnwindReason</span>::<span class="prelude-val">None</span>),
+            <span class="ident">unwind</span>: <span class="ident">Cell::new</span>(<span class="ident">UnwindReason::None</span>),
             <span class="ident">vmctx</span>,
-            <span class="ident">jmp_buf</span>: <span class="ident">Cell</span>::<span class="ident">new</span>(<span class="ident">ptr</span>::<span class="ident">null</span>()),
-            <span class="ident">handling_trap</span>: <span class="ident">Cell</span>::<span class="ident">new</span>(<span class="bool-val">false</span>),
-            <span class="ident">is_wasm_code</span>,
-            <span class="ident">signal_handler</span>,
+            <span class="ident">jmp_buf</span>: <span class="ident">Cell::new</span>(<span class="ident">ptr::null</span>()),
+            <span class="ident">handling_trap</span>: <span class="ident">Cell::new</span>(<span class="bool-val">false</span>),
+            <span class="ident">trap_info</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">with</span>(
-        <span class="self">self</span>,
-        <span class="ident">max_wasm_stack</span>: <span class="ident">usize</span>,
-        <span class="ident">closure</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">CallThreadState</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i32</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Trap</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">_reset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">update_stack_limit</span>(<span class="ident">max_wasm_stack</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">tls</span>::<span class="ident">set</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="op">|</span><span class="op">|</span> <span class="ident">closure</span>(<span class="kw-2">&amp;</span><span class="self">self</span>));
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">unwind</span>.<span class="ident">replace</span>(<span class="ident">UnwindReason</span>::<span class="prelude-val">None</span>) {
-            <span class="ident">UnwindReason</span>::<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">debug_assert_eq</span><span class="macro">!</span>(<span class="ident">ret</span>, <span class="number">1</span>);
+    <span class="kw">fn</span> <span class="ident">with</span>(<span class="self">self</span>, <span class="ident">closure</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">CallThreadState</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Trap</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">_reset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">update_stack_limit</span>()<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">tls::set</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="op">|</span><span class="op">|</span> <span class="ident">closure</span>(<span class="kw-2">&amp;</span><span class="self">self</span>));
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">unwind</span>.<span class="ident">replace</span>(<span class="ident">UnwindReason::None</span>) {
+            <span class="ident">UnwindReason::None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="macro">debug_assert_eq!</span>(<span class="ident">ret</span>, <span class="number">1</span>);
                 <span class="prelude-val">Ok</span>(())
             }
-            <span class="ident">UnwindReason</span>::<span class="ident">UserTrap</span>(<span class="ident">data</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">debug_assert_eq</span><span class="macro">!</span>(<span class="ident">ret</span>, <span class="number">0</span>);
-                <span class="prelude-val">Err</span>(<span class="ident">Trap</span>::<span class="ident">User</span>(<span class="ident">data</span>))
+            <span class="ident">UnwindReason::UserTrap</span>(<span class="ident">data</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="macro">debug_assert_eq!</span>(<span class="ident">ret</span>, <span class="number">0</span>);
+                <span class="prelude-val">Err</span>(<span class="ident">Trap::User</span>(<span class="ident">data</span>))
             }
-            <span class="ident">UnwindReason</span>::<span class="ident">LibTrap</span>(<span class="ident">trap</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">trap</span>),
-            <span class="ident">UnwindReason</span>::<span class="ident">JitTrap</span> { <span class="ident">backtrace</span>, <span class="ident">pc</span> } <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">debug_assert_eq</span><span class="macro">!</span>(<span class="ident">ret</span>, <span class="number">0</span>);
+            <span class="ident">UnwindReason::LibTrap</span>(<span class="ident">trap</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">trap</span>),
+            <span class="ident">UnwindReason::JitTrap</span> { <span class="ident">backtrace</span>, <span class="ident">pc</span> } <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="macro">debug_assert_eq!</span>(<span class="ident">ret</span>, <span class="number">0</span>);
                 <span class="kw">let</span> <span class="ident">maybe_interrupted</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-                    (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">vmctx</span>).<span class="ident">instance</span>().<span class="ident">interrupts</span>.<span class="ident">stack_limit</span>.<span class="ident">load</span>(<span class="ident">SeqCst</span>)
-                        <span class="op">=</span><span class="op">=</span> <span class="ident">wasmtime_environ</span>::<span class="ident">INTERRUPTED</span>
+                    <span class="kw">let</span> <span class="ident">interrupts</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">vmctx</span>).<span class="ident">instance</span>().<span class="ident">interrupts</span>();
+                    (<span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">interrupts</span>).<span class="ident">stack_limit</span>.<span class="ident">load</span>(<span class="ident">SeqCst</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">wasmtime_environ::INTERRUPTED</span>
                 };
-                <span class="prelude-val">Err</span>(<span class="ident">Trap</span>::<span class="ident">Jit</span> {
+                <span class="prelude-val">Err</span>(<span class="ident">Trap::Jit</span> {
                     <span class="ident">pc</span>,
                     <span class="ident">backtrace</span>,
                     <span class="ident">maybe_interrupted</span>,
                 })
             }
-            <span class="ident">UnwindReason</span>::<span class="ident">Panic</span>(<span class="ident">panic</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">debug_assert_eq</span><span class="macro">!</span>(<span class="ident">ret</span>, <span class="number">0</span>);
-                <span class="ident">std</span>::<span class="ident">panic</span>::<span class="ident">resume_unwind</span>(<span class="ident">panic</span>)
+            <span class="ident">UnwindReason::Panic</span>(<span class="ident">panic</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="macro">debug_assert_eq!</span>(<span class="ident">ret</span>, <span class="number">0</span>);
+                <span class="ident">std::panic::resume_unwind</span>(<span class="ident">panic</span>)
             }
         }
     }
@@ -1286,14 +1339,23 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Note that this function must be called with `self` on the stack, not the</span>
     <span class="doccomment">/// heap/etc.</span>
-    <span class="kw">fn</span> <span class="ident">update_stack_limit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">max_wasm_stack</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">Drop</span> <span class="op">+</span> <span class="lifetime">&#39;_</span>, <span class="ident">Trap</span><span class="op">&gt;</span> {
-        <span class="comment">// Make an &quot;educated guess&quot; to figure out where the wasm sp value should</span>
-        <span class="comment">// start trapping if it drops below.</span>
-        <span class="kw">let</span> <span class="ident">wasm_stack_limit</span> <span class="op">=</span> <span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="ident">max_wasm_stack</span>;
+    <span class="kw">fn</span> <span class="ident">update_stack_limit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">Drop</span> <span class="op">+</span> <span class="lifetime">&#39;_</span>, <span class="ident">Trap</span><span class="op">&gt;</span> {
+        <span class="comment">// Determine the stack pointer where, after which, any wasm code will</span>
+        <span class="comment">// immediately trap. This is checked on the entry to all wasm functions.</span>
+        <span class="comment">//</span>
+        <span class="comment">// Note that this isn&#39;t 100% precise. We are requested to give wasm</span>
+        <span class="comment">// `max_wasm_stack` bytes, but what we&#39;re actually doing is giving wasm</span>
+        <span class="comment">// probably a little less than `max_wasm_stack` because we&#39;re</span>
+        <span class="comment">// calculating the limit relative to this function&#39;s approximate stack</span>
+        <span class="comment">// pointer. Wasm will be executed on a frame beneath this one (or next</span>
+        <span class="comment">// to it). In any case it&#39;s expected to be at most a few hundred bytes</span>
+        <span class="comment">// of slop one way or another. When wasm is typically given a MB or so</span>
+        <span class="comment">// (a million bytes) the slop shouldn&#39;t matter too much.</span>
+        <span class="kw">let</span> <span class="ident">wasm_stack_limit</span> <span class="op">=</span> <span class="ident">psm::stack_pointer</span>() <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">trap_info</span>.<span class="ident">max_wasm_stack</span>();
 
         <span class="kw">let</span> <span class="ident">interrupts</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">vmctx</span>).<span class="ident">instance</span>().<span class="ident">interrupts</span>() };
         <span class="kw">let</span> <span class="ident">reset_stack_limit</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">interrupts</span>.<span class="ident">stack_limit</span>.<span class="ident">compare_exchange</span>(
-            <span class="ident">usize</span>::<span class="ident">max_value</span>(),
+            <span class="ident">usize::max_value</span>(),
             <span class="ident">wasm_stack_limit</span>,
             <span class="ident">SeqCst</span>,
             <span class="ident">SeqCst</span>,
@@ -1305,15 +1367,15 @@
                 <span class="comment">// done.</span>
                 <span class="bool-val">true</span>
             }
-            <span class="prelude-val">Err</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span> <span class="op">=</span><span class="op">=</span> <span class="ident">wasmtime_environ</span>::<span class="ident">INTERRUPTED</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Err</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span> <span class="op">=</span><span class="op">=</span> <span class="ident">wasmtime_environ::INTERRUPTED</span> <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="comment">// This means that an interrupt happened before we actually</span>
                 <span class="comment">// called this function, which means that we&#39;re now</span>
                 <span class="comment">// considered interrupted. Be sure to consume this interrupt</span>
                 <span class="comment">// as part of this process too.</span>
-                <span class="ident">interrupts</span>.<span class="ident">stack_limit</span>.<span class="ident">store</span>(<span class="ident">usize</span>::<span class="ident">max_value</span>(), <span class="ident">SeqCst</span>);
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Trap</span>::<span class="ident">Wasm</span> {
-                    <span class="ident">trap_code</span>: <span class="ident">ir</span>::<span class="ident">TrapCode</span>::<span class="ident">Interrupt</span>,
-                    <span class="ident">backtrace</span>: <span class="ident">Backtrace</span>::<span class="ident">new_unresolved</span>(),
+                <span class="ident">interrupts</span>.<span class="ident">stack_limit</span>.<span class="ident">store</span>(<span class="ident">usize::max_value</span>(), <span class="ident">SeqCst</span>);
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Trap::Wasm</span> {
+                    <span class="ident">trap_code</span>: <span class="ident">ir::TrapCode::Interrupt</span>,
+                    <span class="ident">backtrace</span>: <span class="ident">Backtrace::new_unresolved</span>(),
                 });
             }
             <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
@@ -1330,7 +1392,7 @@
         <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Reset</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
             <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
                 <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span> {
-                    <span class="self">self</span>.<span class="number">1</span>.<span class="ident">store</span>(<span class="ident">usize</span>::<span class="ident">max_value</span>(), <span class="ident">SeqCst</span>);
+                    <span class="self">self</span>.<span class="number">1</span>.<span class="ident">store</span>(<span class="ident">usize::max_value</span>(), <span class="ident">SeqCst</span>);
                 }
             }
         }
@@ -1371,27 +1433,25 @@
         <span class="comment">// Otherwise flag ourselves as handling a trap, do the trap handling,</span>
         <span class="comment">// and reset our trap handling flag.</span>
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">handling_trap</span>.<span class="ident">replace</span>(<span class="bool-val">true</span>) {
-            <span class="kw">return</span> <span class="ident">ptr</span>::<span class="ident">null</span>();
+            <span class="kw">return</span> <span class="ident">ptr::null</span>();
         }
         <span class="kw">let</span> <span class="ident">_reset</span> <span class="op">=</span> <span class="ident">ResetCell</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">handling_trap</span>, <span class="bool-val">false</span>);
 
         <span class="comment">// If we haven&#39;t even started to handle traps yet, bail out.</span>
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">jmp_buf</span>.<span class="ident">get</span>().<span class="ident">is_null</span>() {
-            <span class="kw">return</span> <span class="ident">ptr</span>::<span class="ident">null</span>();
+            <span class="kw">return</span> <span class="ident">ptr::null</span>();
         }
 
         <span class="comment">// First up see if any instance registered has a custom trap handler,</span>
         <span class="comment">// in which case run them all. If anything handles the trap then we</span>
         <span class="comment">// return that the trap was handled.</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">handler</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">signal_handler</span> {
-            <span class="kw">if</span> <span class="ident">call_handler</span>(<span class="ident">handler</span>) {
-                <span class="kw">return</span> <span class="number">1</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span>;
-            }
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">trap_info</span>.<span class="ident">custom_signal_handler</span>(<span class="kw-2">&amp;</span><span class="ident">call_handler</span>) {
+            <span class="kw">return</span> <span class="number">1</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span>;
         }
 
         <span class="comment">// If this fault wasn&#39;t in wasm code, then it&#39;s not our problem</span>
-        <span class="kw">if</span> <span class="op">!</span>(<span class="self">self</span>.<span class="ident">is_wasm_code</span>)(<span class="ident">pc</span> <span class="kw">as</span> <span class="ident">usize</span>) {
-            <span class="kw">return</span> <span class="ident">ptr</span>::<span class="ident">null</span>();
+        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">trap_info</span>.<span class="ident">is_wasm_code</span>(<span class="ident">pc</span> <span class="kw">as</span> <span class="ident">usize</span>) {
+            <span class="kw">return</span> <span class="ident">ptr::null</span>();
         }
 
         <span class="comment">// TODO: stack overflow can happen at any random time (i.e. in malloc()</span>
@@ -1402,10 +1462,10 @@
         <span class="comment">// doesn&#39;t trap. Then, if we have called some WebAssembly code, it</span>
         <span class="comment">// means the trap is stack overflow.</span>
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">jmp_buf</span>.<span class="ident">get</span>().<span class="ident">is_null</span>() {
-            <span class="kw">return</span> <span class="ident">ptr</span>::<span class="ident">null</span>();
+            <span class="kw">return</span> <span class="ident">ptr::null</span>();
         }
-        <span class="kw">let</span> <span class="ident">backtrace</span> <span class="op">=</span> <span class="ident">Backtrace</span>::<span class="ident">new_unresolved</span>();
-        <span class="self">self</span>.<span class="ident">unwind</span>.<span class="ident">replace</span>(<span class="ident">UnwindReason</span>::<span class="ident">JitTrap</span> {
+        <span class="kw">let</span> <span class="ident">backtrace</span> <span class="op">=</span> <span class="ident">Backtrace::new_unresolved</span>();
+        <span class="self">self</span>.<span class="ident">unwind</span>.<span class="ident">replace</span>(<span class="ident">UnwindReason::JitTrap</span> {
             <span class="ident">backtrace</span>,
             <span class="ident">pc</span>: <span class="ident">pc</span> <span class="kw">as</span> <span class="ident">usize</span>,
         });
@@ -1427,12 +1487,12 @@
 <span class="comment">// do with the trap. This `tls` module is used to persist that information from</span>
 <span class="comment">// the caller to the trap site.</span>
 <span class="kw">mod</span> <span class="ident">tls</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">CallThreadState</span>;
-    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cell</span>::<span class="ident">Cell</span>;
-    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">mem</span>;
-    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ptr</span>;
+    <span class="kw">use</span> <span class="kw">super</span><span class="ident">::CallThreadState</span>;
+    <span class="kw">use</span> <span class="ident">std::cell::Cell</span>;
+    <span class="kw">use</span> <span class="ident">std::mem</span>;
+    <span class="kw">use</span> <span class="ident">std::ptr</span>;
 
-    <span class="macro">thread_local</span><span class="macro">!</span>(<span class="kw">static</span> <span class="ident">PTR</span>: <span class="ident">Cell</span><span class="op">&lt;</span><span class="kw-2">*</span><span class="kw">const</span> <span class="ident">CallThreadState</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Cell</span>::<span class="ident">new</span>(<span class="ident">ptr</span>::<span class="ident">null</span>()));
+    <span class="macro">thread_local!</span>(<span class="kw">static</span> <span class="ident">PTR</span>: <span class="ident">Cell</span><span class="op">&lt;</span><span class="kw-2">*</span><span class="kw">const</span> <span class="ident">CallThreadState</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Cell::new</span>(<span class="ident">ptr::null</span>()));
 
     <span class="doccomment">/// Configures thread local state such that for the duration of the</span>
     <span class="doccomment">/// execution of `closure` any call to `with` will yield `ptr`, unless this</span>
@@ -1451,7 +1511,7 @@
             <span class="comment">// safe because we only ever access it below with an anonymous</span>
             <span class="comment">// lifetime, meaning `&#39;static` never leaks out of this module.</span>
             <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-                <span class="ident">mem</span>::<span class="ident">transmute</span>::<span class="op">&lt;</span><span class="kw-2">*</span><span class="kw">const</span> <span class="ident">CallThreadState</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">CallThreadState</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">ptr</span>)
+                <span class="ident">mem::transmute</span>::<span class="op">&lt;</span><span class="kw-2">*</span><span class="kw">const</span> <span class="ident">CallThreadState</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">CallThreadState</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">ptr</span>)
             };
             <span class="kw">let</span> <span class="ident">_r</span> <span class="op">=</span> <span class="ident">Reset</span>(<span class="ident">p</span>, <span class="ident">p</span>.<span class="ident">replace</span>(<span class="ident">ptr</span>));
             <span class="ident">closure</span>()
@@ -1476,14 +1536,14 @@
 <span class="doccomment">/// page.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
 <span class="kw">fn</span> <span class="ident">setup_unix_sigaltstack</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Trap</span><span class="op">&gt;</span> {
-    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cell</span>::<span class="ident">RefCell</span>;
-    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">convert</span>::<span class="ident">TryInto</span>;
-    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">null_mut</span>;
+    <span class="kw">use</span> <span class="ident">std::cell::RefCell</span>;
+    <span class="kw">use</span> <span class="ident">std::convert::TryInto</span>;
+    <span class="kw">use</span> <span class="ident">std::ptr::null_mut</span>;
 
-    <span class="macro">thread_local</span><span class="macro">!</span> {
+    <span class="macro">thread_local!</span> {
         <span class="doccomment">/// Thread-local state is lazy-initialized on the first time it&#39;s used,</span>
         <span class="doccomment">/// and dropped when the thread exits.</span>
-        <span class="kw">static</span> <span class="ident">TLS</span>: <span class="ident">RefCell</span><span class="op">&lt;</span><span class="ident">Tls</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">RefCell</span>::<span class="ident">new</span>(<span class="ident">Tls</span>::<span class="prelude-val">None</span>);
+        <span class="kw">static</span> <span class="ident">TLS</span>: <span class="ident">RefCell</span><span class="op">&lt;</span><span class="ident">Tls</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">RefCell::new</span>(<span class="ident">Tls::None</span>);
     }
 
     <span class="doccomment">/// The size of the sigaltstack (not including the guard, which will be</span>
@@ -1493,7 +1553,7 @@
     <span class="kw">enum</span> <span class="ident">Tls</span> {
         <span class="prelude-val">None</span>,
         <span class="ident">Allocated</span> {
-            <span class="ident">mmap_ptr</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">libc</span>::<span class="ident">c_void</span>,
+            <span class="ident">mmap_ptr</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">libc::c_void</span>,
             <span class="ident">mmap_size</span>: <span class="ident">usize</span>,
         },
         <span class="ident">BigEnough</span>,
@@ -1502,57 +1562,57 @@
     <span class="kw">return</span> <span class="ident">TLS</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">slot</span><span class="op">|</span> <span class="kw">unsafe</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">slot</span> <span class="op">=</span> <span class="ident">slot</span>.<span class="ident">borrow_mut</span>();
         <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">slot</span> {
-            <span class="ident">Tls</span>::<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {}
+            <span class="ident">Tls::None</span> <span class="op">=</span><span class="op">&gt;</span> {}
             <span class="comment">// already checked</span>
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(()),
         }
 
         <span class="comment">// Check to see if the existing sigaltstack, if it exists, is big</span>
         <span class="comment">// enough. If so we don&#39;t need to allocate our own.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">old_stack</span> <span class="op">=</span> <span class="ident">mem</span>::<span class="ident">zeroed</span>();
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">libc</span>::<span class="ident">sigaltstack</span>(<span class="ident">ptr</span>::<span class="ident">null</span>(), <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">old_stack</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">r</span>, <span class="number">0</span>, <span class="string">&quot;learning about sigaltstack failed&quot;</span>);
-        <span class="kw">if</span> <span class="ident">old_stack</span>.<span class="ident">ss_flags</span> <span class="op">&amp;</span> <span class="ident">libc</span>::<span class="ident">SS_DISABLE</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">old_stack</span>.<span class="ident">ss_size</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">MIN_STACK_SIZE</span> {
-            <span class="kw-2">*</span><span class="ident">slot</span> <span class="op">=</span> <span class="ident">Tls</span>::<span class="ident">BigEnough</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">old_stack</span> <span class="op">=</span> <span class="ident">mem::zeroed</span>();
+        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">libc::sigaltstack</span>(<span class="ident">ptr::null</span>(), <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">old_stack</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">r</span>, <span class="number">0</span>, <span class="string">&quot;learning about sigaltstack failed&quot;</span>);
+        <span class="kw">if</span> <span class="ident">old_stack</span>.<span class="ident">ss_flags</span> <span class="op">&amp;</span> <span class="ident">libc::SS_DISABLE</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">old_stack</span>.<span class="ident">ss_size</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">MIN_STACK_SIZE</span> {
+            <span class="kw-2">*</span><span class="ident">slot</span> <span class="op">=</span> <span class="ident">Tls::BigEnough</span>;
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
         }
 
         <span class="comment">// ... but failing that we need to allocate our own, so do all that</span>
         <span class="comment">// here.</span>
-        <span class="kw">let</span> <span class="ident">page_size</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">libc</span>::<span class="ident">sysconf</span>(<span class="ident">libc</span>::<span class="ident">_SC_PAGESIZE</span>).<span class="ident">try_into</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">page_size</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">libc::sysconf</span>(<span class="ident">libc::_SC_PAGESIZE</span>).<span class="ident">try_into</span>().<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">guard_size</span> <span class="op">=</span> <span class="ident">page_size</span>;
         <span class="kw">let</span> <span class="ident">alloc_size</span> <span class="op">=</span> <span class="ident">guard_size</span> <span class="op">+</span> <span class="ident">MIN_STACK_SIZE</span>;
 
-        <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">libc</span>::<span class="ident">mmap</span>(
+        <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">libc::mmap</span>(
             <span class="ident">null_mut</span>(),
             <span class="ident">alloc_size</span>,
-            <span class="ident">libc</span>::<span class="ident">PROT_NONE</span>,
-            <span class="ident">libc</span>::<span class="ident">MAP_PRIVATE</span> <span class="op">|</span> <span class="ident">libc</span>::<span class="ident">MAP_ANON</span>,
+            <span class="ident">libc::PROT_NONE</span>,
+            <span class="ident">libc::MAP_PRIVATE</span> <span class="op">|</span> <span class="ident">libc::MAP_ANON</span>,
             <span class="op">-</span><span class="number">1</span>,
             <span class="number">0</span>,
         );
-        <span class="kw">if</span> <span class="ident">ptr</span> <span class="op">=</span><span class="op">=</span> <span class="ident">libc</span>::<span class="ident">MAP_FAILED</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Trap</span>::<span class="ident">oom</span>());
+        <span class="kw">if</span> <span class="ident">ptr</span> <span class="op">=</span><span class="op">=</span> <span class="ident">libc::MAP_FAILED</span> {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Trap::oom</span>());
         }
 
         <span class="comment">// Prepare the stack with readable/writable memory and then register it</span>
         <span class="comment">// with `sigaltstack`.</span>
-        <span class="kw">let</span> <span class="ident">stack_ptr</span> <span class="op">=</span> (<span class="ident">ptr</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="ident">guard_size</span>) <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">libc</span>::<span class="ident">c_void</span>;
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">libc</span>::<span class="ident">mprotect</span>(
+        <span class="kw">let</span> <span class="ident">stack_ptr</span> <span class="op">=</span> (<span class="ident">ptr</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="ident">guard_size</span>) <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">libc::c_void</span>;
+        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">libc::mprotect</span>(
             <span class="ident">stack_ptr</span>,
             <span class="ident">MIN_STACK_SIZE</span>,
-            <span class="ident">libc</span>::<span class="ident">PROT_READ</span> <span class="op">|</span> <span class="ident">libc</span>::<span class="ident">PROT_WRITE</span>,
+            <span class="ident">libc::PROT_READ</span> <span class="op">|</span> <span class="ident">libc::PROT_WRITE</span>,
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">r</span>, <span class="number">0</span>, <span class="string">&quot;mprotect to configure memory for sigaltstack failed&quot;</span>);
-        <span class="kw">let</span> <span class="ident">new_stack</span> <span class="op">=</span> <span class="ident">libc</span>::<span class="ident">stack_t</span> {
+        <span class="macro">assert_eq!</span>(<span class="ident">r</span>, <span class="number">0</span>, <span class="string">&quot;mprotect to configure memory for sigaltstack failed&quot;</span>);
+        <span class="kw">let</span> <span class="ident">new_stack</span> <span class="op">=</span> <span class="ident">libc::stack_t</span> {
             <span class="ident">ss_sp</span>: <span class="ident">stack_ptr</span>,
             <span class="ident">ss_flags</span>: <span class="number">0</span>,
             <span class="ident">ss_size</span>: <span class="ident">MIN_STACK_SIZE</span>,
         };
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">libc</span>::<span class="ident">sigaltstack</span>(<span class="kw-2">&amp;</span><span class="ident">new_stack</span>, <span class="ident">ptr</span>::<span class="ident">null_mut</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">r</span>, <span class="number">0</span>, <span class="string">&quot;registering new sigaltstack failed&quot;</span>);
+        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">libc::sigaltstack</span>(<span class="kw-2">&amp;</span><span class="ident">new_stack</span>, <span class="ident">ptr::null_mut</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">r</span>, <span class="number">0</span>, <span class="string">&quot;registering new sigaltstack failed&quot;</span>);
 
-        <span class="kw-2">*</span><span class="ident">slot</span> <span class="op">=</span> <span class="ident">Tls</span>::<span class="ident">Allocated</span> {
+        <span class="kw-2">*</span><span class="ident">slot</span> <span class="op">=</span> <span class="ident">Tls::Allocated</span> {
             <span class="ident">mmap_ptr</span>: <span class="ident">ptr</span>,
             <span class="ident">mmap_size</span>: <span class="ident">alloc_size</span>,
         };
@@ -1562,7 +1622,7 @@
     <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Tls</span> {
         <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
             <span class="kw">let</span> (<span class="ident">ptr</span>, <span class="ident">size</span>) <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-                <span class="ident">Tls</span>::<span class="ident">Allocated</span> {
+                <span class="ident">Tls::Allocated</span> {
                     <span class="ident">mmap_ptr</span>,
                     <span class="ident">mmap_size</span>,
                 } <span class="op">=</span><span class="op">&gt;</span> (<span class="kw-2">*</span><span class="ident">mmap_ptr</span>, <span class="kw-2">*</span><span class="ident">mmap_size</span>),
@@ -1570,11 +1630,12 @@
             };
             <span class="kw">unsafe</span> {
                 <span class="comment">// Deallocate the stack memory.</span>
-                <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">libc</span>::<span class="ident">munmap</span>(<span class="ident">ptr</span>, <span class="ident">size</span>);
-                <span class="macro">debug_assert_eq</span><span class="macro">!</span>(<span class="ident">r</span>, <span class="number">0</span>, <span class="string">&quot;munmap failed during thread shutdown&quot;</span>);
+                <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">libc::munmap</span>(<span class="ident">ptr</span>, <span class="ident">size</span>);
+                <span class="macro">debug_assert_eq!</span>(<span class="ident">r</span>, <span class="number">0</span>, <span class="string">&quot;munmap failed during thread shutdown&quot;</span>);
             }
         }
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "wasmtime_runtime";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="wasmtime_runtime" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pwasm-utils-0.14.0/src/gas/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pwasm-utils-0.14.0/src/gas/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../pwasm_utils/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../pwasm_utils/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -983,15 +983,15 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">validation</span>;
 
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">min</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">mem</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">vec</span>::<span class="ident">Vec</span>;
+<span class="kw">use</span> <span class="ident">std::cmp::min</span>;
+<span class="kw">use</span> <span class="ident">std::mem</span>;
+<span class="kw">use</span> <span class="ident">std::vec::Vec</span>;
 
 <span class="kw">use</span> <span class="ident">parity_wasm</span>::{<span class="ident">elements</span>, <span class="ident">builder</span>};
 <span class="kw">use</span> <span class="ident">rules</span>;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update_call_index</span>(<span class="ident">instructions</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">elements</span>::<span class="ident">Instructions</span>, <span class="ident">inserted_index</span>: <span class="ident">u32</span>) {
-	<span class="kw">use</span> <span class="ident">parity_wasm</span>::<span class="ident">elements</span>::<span class="ident">Instruction</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update_call_index</span>(<span class="ident">instructions</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">elements::Instructions</span>, <span class="ident">inserted_index</span>: <span class="ident">u32</span>) {
+	<span class="kw">use</span> <span class="ident">parity_wasm::elements::Instruction</span>::<span class="kw-2">*</span>;
 	<span class="kw">for</span> <span class="ident">instruction</span> <span class="kw">in</span> <span class="ident">instructions</span>.<span class="ident">elements_mut</span>().<span class="ident">iter_mut</span>() {
 		<span class="kw">if</span> <span class="kw">let</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Call</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">call_index</span>) <span class="op">=</span> <span class="ident">instruction</span> {
 			<span class="kw">if</span> <span class="kw-2">*</span><span class="ident">call_index</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">inserted_index</span> { <span class="kw-2">*</span><span class="ident">call_index</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>}
@@ -1065,8 +1065,8 @@
 <span class="kw">impl</span> <span class="ident">Counter</span> {
 	<span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Counter</span> {
 		<span class="ident">Counter</span> {
-			<span class="ident">stack</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
-			<span class="ident">finalized_blocks</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
+			<span class="ident">stack</span>: <span class="ident">Vec::new</span>(),
+			<span class="ident">finalized_blocks</span>: <span class="ident">Vec::new</span>(),
 		}
 	}
 
@@ -1123,7 +1123,7 @@
 	<span class="kw">fn</span> <span class="ident">finalize_metered_block</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cursor</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
 		<span class="kw">let</span> <span class="ident">closing_metered_block</span> <span class="op">=</span> {
 			<span class="kw">let</span> <span class="ident">control_block</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">last_mut</span>().<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> ())<span class="question-mark">?</span>;
-			<span class="ident">mem</span>::<span class="ident">replace</span>(
+			<span class="ident">mem::replace</span>(
 				<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">control_block</span>.<span class="ident">active_metered_block</span>,
 				<span class="ident">MeteredBlock</span> {
 					<span class="ident">start_pos</span>: <span class="ident">cursor</span> <span class="op">+</span> <span class="number">1</span>,
@@ -1198,8 +1198,8 @@
 	}
 }
 
-<span class="kw">fn</span> <span class="ident">inject_grow_counter</span>(<span class="ident">instructions</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">elements</span>::<span class="ident">Instructions</span>, <span class="ident">grow_counter_func</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
-	<span class="kw">use</span> <span class="ident">parity_wasm</span>::<span class="ident">elements</span>::<span class="ident">Instruction</span>::<span class="kw-2">*</span>;
+<span class="kw">fn</span> <span class="ident">inject_grow_counter</span>(<span class="ident">instructions</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">elements::Instructions</span>, <span class="ident">grow_counter_func</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+	<span class="kw">use</span> <span class="ident">parity_wasm::elements::Instruction</span>::<span class="kw-2">*</span>;
 	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">counter</span> <span class="op">=</span> <span class="number">0</span>;
 	<span class="kw">for</span> <span class="ident">instruction</span> <span class="kw">in</span> <span class="ident">instructions</span>.<span class="ident">elements_mut</span>() {
 		<span class="kw">if</span> <span class="kw">let</span> <span class="ident">GrowMemory</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">instruction</span> {
@@ -1210,15 +1210,15 @@
 	<span class="ident">counter</span>
 }
 
-<span class="kw">fn</span> <span class="ident">add_grow_counter</span>(<span class="ident">module</span>: <span class="ident">elements</span>::<span class="ident">Module</span>, <span class="ident">rules</span>: <span class="kw-2">&amp;</span><span class="ident">rules</span>::<span class="ident">Set</span>, <span class="ident">gas_func</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">elements</span>::<span class="ident">Module</span> {
-	<span class="kw">use</span> <span class="ident">parity_wasm</span>::<span class="ident">elements</span>::<span class="ident">Instruction</span>::<span class="kw-2">*</span>;
+<span class="kw">fn</span> <span class="ident">add_grow_counter</span>(<span class="ident">module</span>: <span class="ident">elements::Module</span>, <span class="ident">rules</span>: <span class="kw-2">&amp;</span><span class="ident">rules::Set</span>, <span class="ident">gas_func</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">elements::Module</span> {
+	<span class="kw">use</span> <span class="ident">parity_wasm::elements::Instruction</span>::<span class="kw-2">*</span>;
 
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">builder</span>::<span class="ident">from_module</span>(<span class="ident">module</span>);
+	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">builder::from_module</span>(<span class="ident">module</span>);
 	<span class="ident">b</span>.<span class="ident">push_function</span>(
-		<span class="ident">builder</span>::<span class="ident">function</span>()
-			.<span class="ident">signature</span>().<span class="ident">params</span>().<span class="ident">i32</span>().<span class="ident">build</span>().<span class="ident">with_return_type</span>(<span class="prelude-val">Some</span>(<span class="ident">elements</span>::<span class="ident">ValueType</span>::<span class="ident">I32</span>)).<span class="ident">build</span>()
+		<span class="ident">builder::function</span>()
+			.<span class="ident">signature</span>().<span class="ident">params</span>().<span class="ident">i32</span>().<span class="ident">build</span>().<span class="ident">with_return_type</span>(<span class="prelude-val">Some</span>(<span class="ident">elements::ValueType::I32</span>)).<span class="ident">build</span>()
 			.<span class="ident">body</span>()
-				.<span class="ident">with_instructions</span>(<span class="ident">elements</span>::<span class="ident">Instructions</span>::<span class="ident">new</span>(<span class="macro">vec</span><span class="macro">!</span>[
+				.<span class="ident">with_instructions</span>(<span class="ident">elements::Instructions::new</span>(<span class="macro">vec!</span>[
 					<span class="ident">GetLocal</span>(<span class="number">0</span>),
 					<span class="ident">GetLocal</span>(<span class="number">0</span>),
 					<span class="ident">I32Const</span>(<span class="ident">rules</span>.<span class="ident">grow_cost</span>() <span class="kw">as</span> <span class="ident">i32</span>),
@@ -1236,12 +1236,12 @@
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">determine_metered_blocks</span>(
-	<span class="ident">instructions</span>: <span class="kw-2">&amp;</span><span class="ident">elements</span>::<span class="ident">Instructions</span>,
-	<span class="ident">rules</span>: <span class="kw-2">&amp;</span><span class="ident">rules</span>::<span class="ident">Set</span>,
+	<span class="ident">instructions</span>: <span class="kw-2">&amp;</span><span class="ident">elements::Instructions</span>,
+	<span class="ident">rules</span>: <span class="kw-2">&amp;</span><span class="ident">rules::Set</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MeteredBlock</span><span class="op">&gt;</span>, ()<span class="op">&gt;</span> {
-	<span class="kw">use</span> <span class="ident">parity_wasm</span>::<span class="ident">elements</span>::<span class="ident">Instruction</span>::<span class="kw-2">*</span>;
+	<span class="kw">use</span> <span class="ident">parity_wasm::elements::Instruction</span>::<span class="kw-2">*</span>;
 
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">counter</span> <span class="op">=</span> <span class="ident">Counter</span>::<span class="ident">new</span>();
+	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">counter</span> <span class="op">=</span> <span class="ident">Counter::new</span>();
 
 	<span class="comment">// Begin an implicit function (i.e. `func...end`) block.</span>
 	<span class="ident">counter</span>.<span class="ident">begin_control_block</span>(<span class="number">0</span>, <span class="bool-val">false</span>);
@@ -1310,8 +1310,8 @@
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inject_counter</span>(
-	<span class="ident">instructions</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">elements</span>::<span class="ident">Instructions</span>,
-	<span class="ident">rules</span>: <span class="kw-2">&amp;</span><span class="ident">rules</span>::<span class="ident">Set</span>,
+	<span class="ident">instructions</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">elements::Instructions</span>,
+	<span class="ident">rules</span>: <span class="kw-2">&amp;</span><span class="ident">rules::Set</span>,
 	<span class="ident">gas_func</span>: <span class="ident">u32</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> {
 	<span class="kw">let</span> <span class="ident">blocks</span> <span class="op">=</span> <span class="ident">determine_metered_blocks</span>(<span class="ident">instructions</span>, <span class="ident">rules</span>)<span class="question-mark">?</span>;
@@ -1320,19 +1320,19 @@
 
 <span class="comment">// Then insert metering calls into a sequence of instructions given the block locations and costs.</span>
 <span class="kw">fn</span> <span class="ident">insert_metering_calls</span>(
-	<span class="ident">instructions</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">elements</span>::<span class="ident">Instructions</span>,
+	<span class="ident">instructions</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">elements::Instructions</span>,
 	<span class="ident">blocks</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MeteredBlock</span><span class="op">&gt;</span>,
 	<span class="ident">gas_func</span>: <span class="ident">u32</span>,
 )
 	<span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span>
 {
-	<span class="kw">use</span> <span class="ident">parity_wasm</span>::<span class="ident">elements</span>::<span class="ident">Instruction</span>::<span class="kw-2">*</span>;
+	<span class="kw">use</span> <span class="ident">parity_wasm::elements::Instruction</span>::<span class="kw-2">*</span>;
 
 	<span class="comment">// To do this in linear time, construct a new vector of instructions, copying over old</span>
 	<span class="comment">// instructions one by one and injecting new ones as required.</span>
 	<span class="kw">let</span> <span class="ident">new_instrs_len</span> <span class="op">=</span> <span class="ident">instructions</span>.<span class="ident">elements</span>().<span class="ident">len</span>() <span class="op">+</span> <span class="number">2</span> <span class="op">*</span> <span class="ident">blocks</span>.<span class="ident">len</span>();
-	<span class="kw">let</span> <span class="ident">original_instrs</span> <span class="op">=</span> <span class="ident">mem</span>::<span class="ident">replace</span>(
-		<span class="ident">instructions</span>.<span class="ident">elements_mut</span>(), <span class="ident">Vec</span>::<span class="ident">with_capacity</span>(<span class="ident">new_instrs_len</span>)
+	<span class="kw">let</span> <span class="ident">original_instrs</span> <span class="op">=</span> <span class="ident">mem::replace</span>(
+		<span class="ident">instructions</span>.<span class="ident">elements_mut</span>(), <span class="ident">Vec::with_capacity</span>(<span class="ident">new_instrs_len</span>)
 	);
 	<span class="kw">let</span> <span class="ident">new_instrs</span> <span class="op">=</span> <span class="ident">instructions</span>.<span class="ident">elements_mut</span>();
 
@@ -1396,19 +1396,19 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The function fails if the module contains any operation forbidden by gas rule set, returning</span>
 <span class="doccomment">/// the original module as an Err.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inject_gas_counter</span>(<span class="ident">module</span>: <span class="ident">elements</span>::<span class="ident">Module</span>, <span class="ident">rules</span>: <span class="kw-2">&amp;</span><span class="ident">rules</span>::<span class="ident">Set</span>, <span class="ident">gas_module_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>)
-	<span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">elements</span>::<span class="ident">Module</span>, <span class="ident">elements</span>::<span class="ident">Module</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inject_gas_counter</span>(<span class="ident">module</span>: <span class="ident">elements::Module</span>, <span class="ident">rules</span>: <span class="kw-2">&amp;</span><span class="ident">rules::Set</span>, <span class="ident">gas_module_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>)
+	<span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">elements::Module</span>, <span class="ident">elements::Module</span><span class="op">&gt;</span>
 {
 	<span class="comment">// Injecting gas counting external</span>
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mbuilder</span> <span class="op">=</span> <span class="ident">builder</span>::<span class="ident">from_module</span>(<span class="ident">module</span>);
+	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mbuilder</span> <span class="op">=</span> <span class="ident">builder::from_module</span>(<span class="ident">module</span>);
 	<span class="kw">let</span> <span class="ident">import_sig</span> <span class="op">=</span> <span class="ident">mbuilder</span>.<span class="ident">push_signature</span>(
-		<span class="ident">builder</span>::<span class="ident">signature</span>()
+		<span class="ident">builder::signature</span>()
 			.<span class="ident">param</span>().<span class="ident">i32</span>()
 			.<span class="ident">build_sig</span>()
 		);
 
 	<span class="ident">mbuilder</span>.<span class="ident">push_import</span>(
-		<span class="ident">builder</span>::<span class="ident">import</span>()
+		<span class="ident">builder::import</span>()
 			.<span class="ident">module</span>(<span class="ident">gas_module_name</span>)
 			.<span class="ident">field</span>(<span class="string">&quot;gas&quot;</span>)
 			.<span class="ident">external</span>().<span class="ident">func</span>(<span class="ident">import_sig</span>)
@@ -1421,7 +1421,7 @@
 	<span class="comment">// calculate actual function index of the imported definition</span>
 	<span class="comment">//    (subtract all imports that are NOT functions)</span>
 
-	<span class="kw">let</span> <span class="ident">gas_func</span> <span class="op">=</span> <span class="ident">module</span>.<span class="ident">import_count</span>(<span class="ident">elements</span>::<span class="ident">ImportCountType</span>::<span class="ident">Function</span>) <span class="kw">as</span> <span class="ident">u32</span> <span class="op">-</span> <span class="number">1</span>;
+	<span class="kw">let</span> <span class="ident">gas_func</span> <span class="op">=</span> <span class="ident">module</span>.<span class="ident">import_count</span>(<span class="ident">elements::ImportCountType::Function</span>) <span class="kw">as</span> <span class="ident">u32</span> <span class="op">-</span> <span class="number">1</span>;
 	<span class="kw">let</span> <span class="ident">total_func</span> <span class="op">=</span> <span class="ident">module</span>.<span class="ident">functions_space</span>() <span class="kw">as</span> <span class="ident">u32</span>;
 	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">need_grow_counter</span> <span class="op">=</span> <span class="bool-val">false</span>;
 	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">error</span> <span class="op">=</span> <span class="bool-val">false</span>;
@@ -1429,7 +1429,7 @@
 	<span class="comment">// Updating calling addresses (all calls to function index &gt;= `gas_func` should be incremented)</span>
 	<span class="kw">for</span> <span class="ident">section</span> <span class="kw">in</span> <span class="ident">module</span>.<span class="ident">sections_mut</span>() {
 		<span class="kw">match</span> <span class="ident">section</span> {
-			<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">elements</span>::<span class="ident">Section</span>::<span class="ident">Code</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">code_section</span>) <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">elements::Section::Code</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">code_section</span>) <span class="op">=</span><span class="op">&gt;</span> {
 				<span class="kw">for</span> <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">func_body</span> <span class="kw">in</span> <span class="ident">code_section</span>.<span class="ident">bodies_mut</span>() {
 					<span class="ident">update_call_index</span>(<span class="ident">func_body</span>.<span class="ident">code_mut</span>(), <span class="ident">gas_func</span>);
 					<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="ident">inject_counter</span>(<span class="ident">func_body</span>.<span class="ident">code_mut</span>(), <span class="ident">rules</span>, <span class="ident">gas_func</span>) {
@@ -1443,14 +1443,14 @@
 					}
 				}
 			},
-			<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">elements</span>::<span class="ident">Section</span>::<span class="ident">Export</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">export_section</span>) <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">elements::Section::Export</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">export_section</span>) <span class="op">=</span><span class="op">&gt;</span> {
 				<span class="kw">for</span> <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">export</span> <span class="kw">in</span> <span class="ident">export_section</span>.<span class="ident">entries_mut</span>() {
-					<span class="kw">if</span> <span class="kw">let</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">elements</span>::<span class="ident">Internal</span>::<span class="ident">Function</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">func_index</span>) <span class="op">=</span> <span class="ident">export</span>.<span class="ident">internal_mut</span>() {
+					<span class="kw">if</span> <span class="kw">let</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">elements::Internal::Function</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">func_index</span>) <span class="op">=</span> <span class="ident">export</span>.<span class="ident">internal_mut</span>() {
 						<span class="kw">if</span> <span class="kw-2">*</span><span class="ident">func_index</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">gas_func</span> { <span class="kw-2">*</span><span class="ident">func_index</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>}
 					}
 				}
 			},
-			<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">elements</span>::<span class="ident">Section</span>::<span class="ident">Element</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">elements_section</span>) <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">elements::Section::Element</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">elements_section</span>) <span class="op">=</span><span class="op">&gt;</span> {
 				<span class="comment">// Note that we do not need to check the element type referenced because in the</span>
 				<span class="comment">// WebAssembly 1.0 spec, the only allowed element type is funcref.</span>
 				<span class="kw">for</span> <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">segment</span> <span class="kw">in</span> <span class="ident">elements_section</span>.<span class="ident">entries_mut</span>() {
@@ -1460,7 +1460,7 @@
 					}
 				}
 			},
-			<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">elements</span>::<span class="ident">Section</span>::<span class="ident">Start</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">start_idx</span>) <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">elements::Section::Start</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">start_idx</span>) <span class="op">=</span><span class="op">&gt;</span> {
 				<span class="kw">if</span> <span class="kw-2">*</span><span class="ident">start_idx</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">gas_func</span> { <span class="kw-2">*</span><span class="ident">start_idx</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>}
 			},
 			<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> { }
@@ -1478,12 +1478,12 @@
 	<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">wabt</span>;
 
 	<span class="kw">use</span> <span class="ident">parity_wasm</span>::{<span class="ident">serialize</span>, <span class="ident">builder</span>, <span class="ident">elements</span>};
-	<span class="kw">use</span> <span class="ident">parity_wasm</span>::<span class="ident">elements</span>::<span class="ident">Instruction</span>::<span class="kw-2">*</span>;
+	<span class="kw">use</span> <span class="ident">parity_wasm::elements::Instruction</span>::<span class="kw-2">*</span>;
 	<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 	<span class="kw">use</span> <span class="ident">rules</span>;
 
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_function_body</span>(<span class="ident">module</span>: <span class="kw-2">&amp;</span><span class="ident">elements</span>::<span class="ident">Module</span>, <span class="ident">index</span>: <span class="ident">usize</span>)
-		<span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">elements</span>::<span class="ident">Instruction</span>]<span class="op">&gt;</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_function_body</span>(<span class="ident">module</span>: <span class="kw-2">&amp;</span><span class="ident">elements::Module</span>, <span class="ident">index</span>: <span class="ident">usize</span>)
+		<span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">elements::Instruction</span>]<span class="op">&gt;</span>
 	{
 		<span class="ident">module</span>.<span class="ident">code_section</span>()
 			.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">code_section</span><span class="op">|</span> <span class="ident">code_section</span>.<span class="ident">bodies</span>().<span class="ident">get</span>(<span class="ident">index</span>))
@@ -1492,15 +1492,15 @@
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">simple_grow</span>() {
-		<span class="kw">let</span> <span class="ident">module</span> <span class="op">=</span> <span class="ident">builder</span>::<span class="ident">module</span>()
+		<span class="kw">let</span> <span class="ident">module</span> <span class="op">=</span> <span class="ident">builder::module</span>()
 			.<span class="ident">global</span>()
 				.<span class="ident">value_type</span>().<span class="ident">i32</span>()
 				.<span class="ident">build</span>()
 			.<span class="ident">function</span>()
 				.<span class="ident">signature</span>().<span class="ident">param</span>().<span class="ident">i32</span>().<span class="ident">build</span>()
 				.<span class="ident">body</span>()
-					.<span class="ident">with_instructions</span>(<span class="ident">elements</span>::<span class="ident">Instructions</span>::<span class="ident">new</span>(
-						<span class="macro">vec</span><span class="macro">!</span>[
+					.<span class="ident">with_instructions</span>(<span class="ident">elements::Instructions::new</span>(
+						<span class="macro">vec!</span>[
 							<span class="ident">GetGlobal</span>(<span class="number">0</span>),
 							<span class="ident">GrowMemory</span>(<span class="number">0</span>),
 							<span class="ident">End</span>
@@ -1512,13 +1512,13 @@
 
 		<span class="kw">let</span> <span class="ident">injected_module</span> <span class="op">=</span> <span class="ident">inject_gas_counter</span>(
 			<span class="ident">module</span>,
-			<span class="kw-2">&amp;</span><span class="ident">rules</span>::<span class="ident">Set</span>::<span class="ident">default</span>().<span class="ident">with_grow_cost</span>(<span class="number">10000</span>),
+			<span class="kw-2">&amp;</span><span class="ident">rules::Set::default</span>().<span class="ident">with_grow_cost</span>(<span class="number">10000</span>),
 			<span class="string">&quot;env&quot;</span>,
 		).<span class="ident">unwrap</span>();
 
-		<span class="macro">assert_eq</span><span class="macro">!</span>(
+		<span class="macro">assert_eq!</span>(
 			<span class="ident">get_function_body</span>(<span class="kw-2">&amp;</span><span class="ident">injected_module</span>, <span class="number">0</span>).<span class="ident">unwrap</span>(),
-			<span class="kw-2">&amp;</span><span class="macro">vec</span><span class="macro">!</span>[
+			<span class="kw-2">&amp;</span><span class="macro">vec!</span>[
 				<span class="ident">I32Const</span>(<span class="number">2</span>),
 				<span class="ident">Call</span>(<span class="number">0</span>),
 				<span class="ident">GetGlobal</span>(<span class="number">0</span>),
@@ -1526,9 +1526,9 @@
 				<span class="ident">End</span>
 			][..]
 		);
-		<span class="macro">assert_eq</span><span class="macro">!</span>(
+		<span class="macro">assert_eq!</span>(
 			<span class="ident">get_function_body</span>(<span class="kw-2">&amp;</span><span class="ident">injected_module</span>, <span class="number">1</span>).<span class="ident">unwrap</span>(),
-			<span class="kw-2">&amp;</span><span class="macro">vec</span><span class="macro">!</span>[
+			<span class="kw-2">&amp;</span><span class="macro">vec!</span>[
 				<span class="ident">GetLocal</span>(<span class="number">0</span>),
 				<span class="ident">GetLocal</span>(<span class="number">0</span>),
 				<span class="ident">I32Const</span>(<span class="number">10000</span>),
@@ -1540,20 +1540,20 @@
 		);
 
 		<span class="kw">let</span> <span class="ident">binary</span> <span class="op">=</span> <span class="ident">serialize</span>(<span class="ident">injected_module</span>).<span class="ident">expect</span>(<span class="string">&quot;serialization failed&quot;</span>);
-		<span class="self">self</span>::<span class="ident">wabt</span>::<span class="ident">wasm2wat</span>(<span class="kw-2">&amp;</span><span class="ident">binary</span>).<span class="ident">unwrap</span>();
+		<span class="self">self</span><span class="ident">::wabt::wasm2wat</span>(<span class="kw-2">&amp;</span><span class="ident">binary</span>).<span class="ident">unwrap</span>();
 	}
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">grow_no_gas_no_track</span>() {
-		<span class="kw">let</span> <span class="ident">module</span> <span class="op">=</span> <span class="ident">builder</span>::<span class="ident">module</span>()
+		<span class="kw">let</span> <span class="ident">module</span> <span class="op">=</span> <span class="ident">builder::module</span>()
 			.<span class="ident">global</span>()
 				.<span class="ident">value_type</span>().<span class="ident">i32</span>()
 				.<span class="ident">build</span>()
 			.<span class="ident">function</span>()
 				.<span class="ident">signature</span>().<span class="ident">param</span>().<span class="ident">i32</span>().<span class="ident">build</span>()
 				.<span class="ident">body</span>()
-					.<span class="ident">with_instructions</span>(<span class="ident">elements</span>::<span class="ident">Instructions</span>::<span class="ident">new</span>(
-						<span class="macro">vec</span><span class="macro">!</span>[
+					.<span class="ident">with_instructions</span>(<span class="ident">elements::Instructions::new</span>(
+						<span class="macro">vec!</span>[
 							<span class="ident">GetGlobal</span>(<span class="number">0</span>),
 							<span class="ident">GrowMemory</span>(<span class="number">0</span>),
 							<span class="ident">End</span>
@@ -1563,11 +1563,11 @@
 				.<span class="ident">build</span>()
 			.<span class="ident">build</span>();
 
-		<span class="kw">let</span> <span class="ident">injected_module</span> <span class="op">=</span> <span class="ident">inject_gas_counter</span>(<span class="ident">module</span>, <span class="kw-2">&amp;</span><span class="ident">rules</span>::<span class="ident">Set</span>::<span class="ident">default</span>(), <span class="string">&quot;env&quot;</span>).<span class="ident">unwrap</span>();
+		<span class="kw">let</span> <span class="ident">injected_module</span> <span class="op">=</span> <span class="ident">inject_gas_counter</span>(<span class="ident">module</span>, <span class="kw-2">&amp;</span><span class="ident">rules::Set::default</span>(), <span class="string">&quot;env&quot;</span>).<span class="ident">unwrap</span>();
 
-		<span class="macro">assert_eq</span><span class="macro">!</span>(
+		<span class="macro">assert_eq!</span>(
 			<span class="ident">get_function_body</span>(<span class="kw-2">&amp;</span><span class="ident">injected_module</span>, <span class="number">0</span>).<span class="ident">unwrap</span>(),
-			<span class="kw-2">&amp;</span><span class="macro">vec</span><span class="macro">!</span>[
+			<span class="kw-2">&amp;</span><span class="macro">vec!</span>[
 				<span class="ident">I32Const</span>(<span class="number">2</span>),
 				<span class="ident">Call</span>(<span class="number">0</span>),
 				<span class="ident">GetGlobal</span>(<span class="number">0</span>),
@@ -1576,15 +1576,15 @@
 			][..]
 		);
 
-		<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">injected_module</span>.<span class="ident">functions_space</span>(), <span class="number">2</span>);
+		<span class="macro">assert_eq!</span>(<span class="ident">injected_module</span>.<span class="ident">functions_space</span>(), <span class="number">2</span>);
 
 		<span class="kw">let</span> <span class="ident">binary</span> <span class="op">=</span> <span class="ident">serialize</span>(<span class="ident">injected_module</span>).<span class="ident">expect</span>(<span class="string">&quot;serialization failed&quot;</span>);
-		<span class="self">self</span>::<span class="ident">wabt</span>::<span class="ident">wasm2wat</span>(<span class="kw-2">&amp;</span><span class="ident">binary</span>).<span class="ident">unwrap</span>();
+		<span class="self">self</span><span class="ident">::wabt::wasm2wat</span>(<span class="kw-2">&amp;</span><span class="ident">binary</span>).<span class="ident">unwrap</span>();
 	}
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">call_index</span>() {
-		<span class="kw">let</span> <span class="ident">module</span> <span class="op">=</span> <span class="ident">builder</span>::<span class="ident">module</span>()
+		<span class="kw">let</span> <span class="ident">module</span> <span class="op">=</span> <span class="ident">builder::module</span>()
 			.<span class="ident">global</span>()
 				.<span class="ident">value_type</span>().<span class="ident">i32</span>()
 				.<span class="ident">build</span>()
@@ -1595,10 +1595,10 @@
 			.<span class="ident">function</span>()
 				.<span class="ident">signature</span>().<span class="ident">param</span>().<span class="ident">i32</span>().<span class="ident">build</span>()
 				.<span class="ident">body</span>()
-					.<span class="ident">with_instructions</span>(<span class="ident">elements</span>::<span class="ident">Instructions</span>::<span class="ident">new</span>(
-						<span class="macro">vec</span><span class="macro">!</span>[
+					.<span class="ident">with_instructions</span>(<span class="ident">elements::Instructions::new</span>(
+						<span class="macro">vec!</span>[
 							<span class="ident">Call</span>(<span class="number">0</span>),
-							<span class="ident">If</span>(<span class="ident">elements</span>::<span class="ident">BlockType</span>::<span class="ident">NoResult</span>),
+							<span class="ident">If</span>(<span class="ident">elements::BlockType::NoResult</span>),
 								<span class="ident">Call</span>(<span class="number">0</span>),
 								<span class="ident">Call</span>(<span class="number">0</span>),
 								<span class="ident">Call</span>(<span class="number">0</span>),
@@ -1614,15 +1614,15 @@
 				.<span class="ident">build</span>()
 			.<span class="ident">build</span>();
 
-		<span class="kw">let</span> <span class="ident">injected_module</span> <span class="op">=</span> <span class="ident">inject_gas_counter</span>(<span class="ident">module</span>, <span class="kw-2">&amp;</span><span class="ident">Default</span>::<span class="ident">default</span>(), <span class="string">&quot;env&quot;</span>).<span class="ident">unwrap</span>();
+		<span class="kw">let</span> <span class="ident">injected_module</span> <span class="op">=</span> <span class="ident">inject_gas_counter</span>(<span class="ident">module</span>, <span class="kw-2">&amp;</span><span class="ident">Default::default</span>(), <span class="string">&quot;env&quot;</span>).<span class="ident">unwrap</span>();
 
-		<span class="macro">assert_eq</span><span class="macro">!</span>(
+		<span class="macro">assert_eq!</span>(
 			<span class="ident">get_function_body</span>(<span class="kw-2">&amp;</span><span class="ident">injected_module</span>, <span class="number">1</span>).<span class="ident">unwrap</span>(),
-			<span class="kw-2">&amp;</span><span class="macro">vec</span><span class="macro">!</span>[
+			<span class="kw-2">&amp;</span><span class="macro">vec!</span>[
 				<span class="ident">I32Const</span>(<span class="number">3</span>),
 				<span class="ident">Call</span>(<span class="number">0</span>),
 				<span class="ident">Call</span>(<span class="number">1</span>),
-				<span class="ident">If</span>(<span class="ident">elements</span>::<span class="ident">BlockType</span>::<span class="ident">NoResult</span>),
+				<span class="ident">If</span>(<span class="ident">elements::BlockType::NoResult</span>),
 					<span class="ident">I32Const</span>(<span class="number">3</span>),
 					<span class="ident">Call</span>(<span class="number">0</span>),
 					<span class="ident">Call</span>(<span class="number">1</span>),
@@ -1642,15 +1642,15 @@
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">forbidden</span>() {
-		<span class="kw">let</span> <span class="ident">module</span> <span class="op">=</span> <span class="ident">builder</span>::<span class="ident">module</span>()
+		<span class="kw">let</span> <span class="ident">module</span> <span class="op">=</span> <span class="ident">builder::module</span>()
 			.<span class="ident">global</span>()
 				.<span class="ident">value_type</span>().<span class="ident">i32</span>()
 				.<span class="ident">build</span>()
 			.<span class="ident">function</span>()
 				.<span class="ident">signature</span>().<span class="ident">param</span>().<span class="ident">i32</span>().<span class="ident">build</span>()
 				.<span class="ident">body</span>()
-					.<span class="ident">with_instructions</span>(<span class="ident">elements</span>::<span class="ident">Instructions</span>::<span class="ident">new</span>(
-						<span class="macro">vec</span><span class="macro">!</span>[
+					.<span class="ident">with_instructions</span>(<span class="ident">elements::Instructions::new</span>(
+						<span class="macro">vec!</span>[
 							<span class="ident">F32Const</span>(<span class="number">555555</span>),
 							<span class="ident">End</span>
 						]
@@ -1659,30 +1659,30 @@
 				.<span class="ident">build</span>()
 			.<span class="ident">build</span>();
 
-		<span class="kw">let</span> <span class="ident">rules</span> <span class="op">=</span> <span class="ident">rules</span>::<span class="ident">Set</span>::<span class="ident">default</span>().<span class="ident">with_forbidden_floats</span>();
+		<span class="kw">let</span> <span class="ident">rules</span> <span class="op">=</span> <span class="ident">rules::Set::default</span>().<span class="ident">with_forbidden_floats</span>();
 
 		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="ident">inject_gas_counter</span>(<span class="ident">module</span>, <span class="kw-2">&amp;</span><span class="ident">rules</span>, <span class="string">&quot;env&quot;</span>) { }
-		<span class="kw">else</span> { <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Should be error because of the forbidden operation&quot;</span>)}
+		<span class="kw">else</span> { <span class="macro">panic!</span>(<span class="string">&quot;Should be error because of the forbidden operation&quot;</span>)}
 
 	}
 
-	<span class="kw">fn</span> <span class="ident">parse_wat</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">elements</span>::<span class="ident">Module</span> {
-		<span class="kw">let</span> <span class="ident">module_bytes</span> <span class="op">=</span> <span class="ident">wabt</span>::<span class="ident">Wat2Wasm</span>::<span class="ident">new</span>()
+	<span class="kw">fn</span> <span class="ident">parse_wat</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">elements::Module</span> {
+		<span class="kw">let</span> <span class="ident">module_bytes</span> <span class="op">=</span> <span class="ident">wabt::Wat2Wasm::new</span>()
 			.<span class="ident">validate</span>(<span class="bool-val">false</span>)
 			.<span class="ident">convert</span>(<span class="ident">source</span>)
 			.<span class="ident">expect</span>(<span class="string">&quot;failed to parse module&quot;</span>);
-		<span class="ident">elements</span>::<span class="ident">deserialize_buffer</span>(<span class="ident">module_bytes</span>.<span class="ident">as_ref</span>())
+		<span class="ident">elements::deserialize_buffer</span>(<span class="ident">module_bytes</span>.<span class="ident">as_ref</span>())
 			.<span class="ident">expect</span>(<span class="string">&quot;failed to parse module&quot;</span>)
 	}
 
-	<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">test_gas_counter_injection</span> {
+	<span class="macro">macro_rules!</span> <span class="ident">test_gas_counter_injection</span> {
 		(<span class="ident">name</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>; <span class="ident">input</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">input</span>:<span class="ident">expr</span>; <span class="ident">expected</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">expected</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
 			<span class="attribute">#[<span class="ident">test</span>]</span>
 			<span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>() {
 				<span class="kw">let</span> <span class="ident">input_module</span> <span class="op">=</span> <span class="ident">parse_wat</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input</span>);
 				<span class="kw">let</span> <span class="ident">expected_module</span> <span class="op">=</span> <span class="ident">parse_wat</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">expected</span>);
 
-				<span class="kw">let</span> <span class="ident">injected_module</span> <span class="op">=</span> <span class="ident">inject_gas_counter</span>(<span class="ident">input_module</span>, <span class="kw-2">&amp;</span><span class="ident">Default</span>::<span class="ident">default</span>(), <span class="string">&quot;env&quot;</span>)
+				<span class="kw">let</span> <span class="ident">injected_module</span> <span class="op">=</span> <span class="ident">inject_gas_counter</span>(<span class="ident">input_module</span>, <span class="kw-2">&amp;</span><span class="ident">Default::default</span>(), <span class="string">&quot;env&quot;</span>)
 					.<span class="ident">expect</span>(<span class="string">&quot;inject_gas_counter call failed&quot;</span>);
 
 				<span class="kw">let</span> <span class="ident">actual_func_body</span> <span class="op">=</span> <span class="ident">get_function_body</span>(<span class="kw-2">&amp;</span><span class="ident">injected_module</span>, <span class="number">0</span>)
@@ -1690,12 +1690,12 @@
 				<span class="kw">let</span> <span class="ident">expected_func_body</span> <span class="op">=</span> <span class="ident">get_function_body</span>(<span class="kw-2">&amp;</span><span class="ident">expected_module</span>, <span class="number">0</span>)
 					.<span class="ident">expect</span>(<span class="string">&quot;post-module must have a function body&quot;</span>);
 
-				<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">actual_func_body</span>, <span class="ident">expected_func_body</span>);
+				<span class="macro">assert_eq!</span>(<span class="ident">actual_func_body</span>, <span class="ident">expected_func_body</span>);
 			}
 		}
 	}
 
-	<span class="macro">test_gas_counter_injection</span><span class="macro">!</span> {
+	<span class="macro">test_gas_counter_injection!</span> {
 		<span class="ident">name</span> <span class="op">=</span> <span class="ident">simple</span>;
 		<span class="ident">input</span> <span class="op">=</span> <span class="string">r#&quot;
 		(module
@@ -1710,7 +1710,7 @@
 		&quot;#</span>
 	}
 
-	<span class="macro">test_gas_counter_injection</span><span class="macro">!</span> {
+	<span class="macro">test_gas_counter_injection!</span> {
 		<span class="ident">name</span> <span class="op">=</span> <span class="ident">nested</span>;
 		<span class="ident">input</span> <span class="op">=</span> <span class="string">r#&quot;
 		(module
@@ -1735,7 +1735,7 @@
 		&quot;#</span>
 	}
 
-	<span class="macro">test_gas_counter_injection</span><span class="macro">!</span> {
+	<span class="macro">test_gas_counter_injection!</span> {
 		<span class="ident">name</span> <span class="op">=</span> <span class="ident">ifelse</span>;
 		<span class="ident">input</span> <span class="op">=</span> <span class="string">r#&quot;
 		(module
@@ -1770,7 +1770,7 @@
 		&quot;#</span>
 	}
 
-	<span class="macro">test_gas_counter_injection</span><span class="macro">!</span> {
+	<span class="macro">test_gas_counter_injection!</span> {
 		<span class="ident">name</span> <span class="op">=</span> <span class="ident">branch_innermost</span>;
 		<span class="ident">input</span> <span class="op">=</span> <span class="string">r#&quot;
 		(module
@@ -1800,7 +1800,7 @@
 		&quot;#</span>
 	}
 
-	<span class="macro">test_gas_counter_injection</span><span class="macro">!</span> {
+	<span class="macro">test_gas_counter_injection!</span> {
 		<span class="ident">name</span> <span class="op">=</span> <span class="ident">branch_outer_block</span>;
 		<span class="ident">input</span> <span class="op">=</span> <span class="string">r#&quot;
 		(module
@@ -1839,7 +1839,7 @@
 		&quot;#</span>
 	}
 
-	<span class="macro">test_gas_counter_injection</span><span class="macro">!</span> {
+	<span class="macro">test_gas_counter_injection!</span> {
 		<span class="ident">name</span> <span class="op">=</span> <span class="ident">branch_outer_loop</span>;
 		<span class="ident">input</span> <span class="op">=</span> <span class="string">r#&quot;
 		(module
@@ -1885,7 +1885,7 @@
 		&quot;#</span>
 	}
 
-	<span class="macro">test_gas_counter_injection</span><span class="macro">!</span> {
+	<span class="macro">test_gas_counter_injection!</span> {
 		<span class="ident">name</span> <span class="op">=</span> <span class="ident">return_from_func</span>;
 		<span class="ident">input</span> <span class="op">=</span> <span class="string">r#&quot;
 		(module
@@ -1910,7 +1910,7 @@
 		&quot;#</span>
 	}
 
-	<span class="macro">test_gas_counter_injection</span><span class="macro">!</span> {
+	<span class="macro">test_gas_counter_injection!</span> {
 		<span class="ident">name</span> <span class="op">=</span> <span class="ident">branch_from_if_not_else</span>;
 		<span class="ident">input</span> <span class="op">=</span> <span class="string">r#&quot;
 		(module
@@ -1947,4 +1947,5 @@
 	}
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "pwasm_utils";</script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="pwasm_utils" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
+    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script></body></html>

@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/frame-support-procedural-2.0.0/src/storage/parse.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>parse.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/frame-support-procedural-3.0.0/src/storage/parse.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>parse.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../frame_support_procedural/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../frame_support_procedural/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -518,7 +518,7 @@
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// This file is part of Substrate.</span>
 
-<span class="comment">// Copyright (C) 2017-2020 Parity Technologies (UK) Ltd.</span>
+<span class="comment">// Copyright (C) 2017-2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// SPDX-License-Identifier: Apache-2.0</span>
 
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -536,28 +536,28 @@
 <span class="doccomment">//! Parsing of decl_storage input.</span>
 
 <span class="kw">use</span> <span class="ident">frame_support_procedural_tools</span>::{<span class="ident">ToTokens</span>, <span class="ident">Parse</span>, <span class="ident">syn_ext</span> <span class="kw">as</span> <span class="ident">ext</span>};
-<span class="kw">use</span> <span class="ident">syn</span>::{<span class="ident">Ident</span>, <span class="ident">Token</span>, <span class="ident">spanned</span>::<span class="ident">Spanned</span>};
+<span class="kw">use</span> <span class="ident">syn</span>::{<span class="ident">Ident</span>, <span class="ident">Token</span>, <span class="ident">spanned::Spanned</span>};
 
 <span class="kw">mod</span> <span class="ident">keyword</span> {
-	<span class="ident">syn</span>::<span class="macro">custom_keyword</span><span class="macro">!</span>(<span class="ident">hiddencrate</span>);
-	<span class="ident">syn</span>::<span class="macro">custom_keyword</span><span class="macro">!</span>(<span class="ident">add_extra_genesis</span>);
-	<span class="ident">syn</span>::<span class="macro">custom_keyword</span><span class="macro">!</span>(<span class="ident">extra_genesis_skip_phantom_data_field</span>);
-	<span class="ident">syn</span>::<span class="macro">custom_keyword</span><span class="macro">!</span>(<span class="ident">config</span>);
-	<span class="ident">syn</span>::<span class="macro">custom_keyword</span><span class="macro">!</span>(<span class="ident">build</span>);
-	<span class="ident">syn</span>::<span class="macro">custom_keyword</span><span class="macro">!</span>(<span class="ident">get</span>);
-	<span class="ident">syn</span>::<span class="macro">custom_keyword</span><span class="macro">!</span>(<span class="ident">map</span>);
-	<span class="ident">syn</span>::<span class="macro">custom_keyword</span><span class="macro">!</span>(<span class="ident">double_map</span>);
-	<span class="ident">syn</span>::<span class="macro">custom_keyword</span><span class="macro">!</span>(<span class="ident">opaque_blake2_256</span>);
-	<span class="ident">syn</span>::<span class="macro">custom_keyword</span><span class="macro">!</span>(<span class="ident">opaque_blake2_128</span>);
-	<span class="ident">syn</span>::<span class="macro">custom_keyword</span><span class="macro">!</span>(<span class="ident">blake2_128_concat</span>);
-	<span class="ident">syn</span>::<span class="macro">custom_keyword</span><span class="macro">!</span>(<span class="ident">opaque_twox_256</span>);
-	<span class="ident">syn</span>::<span class="macro">custom_keyword</span><span class="macro">!</span>(<span class="ident">opaque_twox_128</span>);
-	<span class="ident">syn</span>::<span class="macro">custom_keyword</span><span class="macro">!</span>(<span class="ident">twox_64_concat</span>);
-	<span class="ident">syn</span>::<span class="macro">custom_keyword</span><span class="macro">!</span>(<span class="ident">identity</span>);
-	<span class="ident">syn</span>::<span class="macro">custom_keyword</span><span class="macro">!</span>(<span class="ident">hasher</span>);
-	<span class="ident">syn</span>::<span class="macro">custom_keyword</span><span class="macro">!</span>(<span class="ident">tainted</span>);
-	<span class="ident">syn</span>::<span class="macro">custom_keyword</span><span class="macro">!</span>(<span class="ident">natural</span>);
-	<span class="ident">syn</span>::<span class="macro">custom_keyword</span><span class="macro">!</span>(<span class="ident">prehashed</span>);
+	<span class="macro">syn::custom_keyword!</span>(<span class="ident">hiddencrate</span>);
+	<span class="macro">syn::custom_keyword!</span>(<span class="ident">add_extra_genesis</span>);
+	<span class="macro">syn::custom_keyword!</span>(<span class="ident">extra_genesis_skip_phantom_data_field</span>);
+	<span class="macro">syn::custom_keyword!</span>(<span class="ident">config</span>);
+	<span class="macro">syn::custom_keyword!</span>(<span class="ident">build</span>);
+	<span class="macro">syn::custom_keyword!</span>(<span class="ident">get</span>);
+	<span class="macro">syn::custom_keyword!</span>(<span class="ident">map</span>);
+	<span class="macro">syn::custom_keyword!</span>(<span class="ident">double_map</span>);
+	<span class="macro">syn::custom_keyword!</span>(<span class="ident">opaque_blake2_256</span>);
+	<span class="macro">syn::custom_keyword!</span>(<span class="ident">opaque_blake2_128</span>);
+	<span class="macro">syn::custom_keyword!</span>(<span class="ident">blake2_128_concat</span>);
+	<span class="macro">syn::custom_keyword!</span>(<span class="ident">opaque_twox_256</span>);
+	<span class="macro">syn::custom_keyword!</span>(<span class="ident">opaque_twox_128</span>);
+	<span class="macro">syn::custom_keyword!</span>(<span class="ident">twox_64_concat</span>);
+	<span class="macro">syn::custom_keyword!</span>(<span class="ident">identity</span>);
+	<span class="macro">syn::custom_keyword!</span>(<span class="ident">hasher</span>);
+	<span class="macro">syn::custom_keyword!</span>(<span class="ident">tainted</span>);
+	<span class="macro">syn::custom_keyword!</span>(<span class="ident">natural</span>);
+	<span class="macro">syn::custom_keyword!</span>(<span class="ident">prehashed</span>);
 }
 
 <span class="doccomment">/// Specific `Opt` to implement structure with optional parsing</span>
@@ -565,18 +565,18 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Opt</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span> {
 	<span class="kw">pub</span> <span class="ident">inner</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>,
 }
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">syn</span>::<span class="ident">export</span>::<span class="ident">ToTokens</span><span class="op">&gt;</span> <span class="ident">syn</span>::<span class="ident">export</span>::<span class="ident">ToTokens</span> <span class="kw">for</span> <span class="ident">Opt</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">to_tokens</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">tokens</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">proc_macro2</span>::<span class="ident">TokenStream</span>) {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">quote::ToTokens</span><span class="op">&gt;</span> <span class="ident">quote::ToTokens</span> <span class="kw">for</span> <span class="ident">Opt</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">to_tokens</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">tokens</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">proc_macro2::TokenStream</span>) {
 		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">p</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span> {
 			<span class="ident">p</span>.<span class="ident">to_tokens</span>(<span class="ident">tokens</span>);
 		}
 	}
 }
 
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">impl_parse_for_opt</span> {
+<span class="macro">macro_rules!</span> <span class="ident">impl_parse_for_opt</span> {
 	(<span class="macro-nonterminal">$</span><span class="kw">struct</span>:<span class="macro-nonterminal">ident</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">token</span>:<span class="ident">path</span>) <span class="op">=</span><span class="op">&gt;</span> {
-		<span class="kw">impl</span> <span class="ident">syn</span>::<span class="ident">parse</span>::<span class="ident">Parse</span> <span class="kw">for</span> <span class="ident">Opt</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="kw">struct</span><span class="op">&gt;</span> {
-			<span class="kw">fn</span> <span class="macro-nonterminal">parse</span>(<span class="ident">input</span>: <span class="ident">syn</span>::<span class="ident">parse</span>::<span class="ident">ParseStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">syn</span>::<span class="ident">parse</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+		<span class="kw">impl</span> <span class="ident">syn::parse::Parse</span> <span class="kw">for</span> <span class="ident">Opt</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="kw">struct</span><span class="op">&gt;</span> {
+			<span class="kw">fn</span> <span class="macro-nonterminal">parse</span>(<span class="ident">input</span>: <span class="ident">syn::parse::ParseStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">syn::parse::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
 				<span class="kw">if</span> <span class="ident">input</span>.<span class="ident">peek</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">token</span>) {
 					<span class="ident">input</span>.<span class="ident">parse</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">Opt</span> { <span class="ident">inner</span>: <span class="prelude-val">Some</span>(<span class="ident">p</span>) })
 				} <span class="kw">else</span> {
@@ -591,47 +591,47 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Parse</span>, <span class="ident">ToTokens</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">struct</span> <span class="ident">StorageDefinition</span> {
 	<span class="kw">pub</span> <span class="ident">hidden_crate</span>: <span class="ident">Opt</span><span class="op">&lt;</span><span class="ident">SpecificHiddenCrate</span><span class="op">&gt;</span>,
-	<span class="kw">pub</span> <span class="ident">visibility</span>: <span class="ident">syn</span>::<span class="ident">Visibility</span>,
-	<span class="kw">pub</span> <span class="ident">trait_token</span>: <span class="macro">Token</span><span class="macro">!</span>[<span class="kw">trait</span>],
+	<span class="kw">pub</span> <span class="ident">visibility</span>: <span class="ident">syn::Visibility</span>,
+	<span class="kw">pub</span> <span class="ident">trait_token</span>: <span class="macro">Token!</span>[<span class="kw">trait</span>],
 	<span class="kw">pub</span> <span class="ident">ident</span>: <span class="ident">Ident</span>,
-	<span class="kw">pub</span> <span class="ident">for_token</span>: <span class="macro">Token</span><span class="macro">!</span>[<span class="kw">for</span>],
+	<span class="kw">pub</span> <span class="ident">for_token</span>: <span class="macro">Token!</span>[<span class="kw">for</span>],
 	<span class="kw">pub</span> <span class="ident">module_ident</span>: <span class="ident">Ident</span>,
-	<span class="kw">pub</span> <span class="ident">mod_lt_token</span>: <span class="macro">Token</span><span class="macro">!</span>[<span class="op">&lt;</span>],
-	<span class="kw">pub</span> <span class="ident">mod_param_generic</span>: <span class="ident">syn</span>::<span class="ident">Ident</span>,
-	<span class="kw">pub</span> <span class="ident">mod_param_bound_token</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="macro">Token</span><span class="macro">!</span>[:]<span class="op">&gt;</span>,
-	<span class="kw">pub</span> <span class="ident">mod_param_bound</span>: <span class="ident">syn</span>::<span class="ident">Path</span>,
-	<span class="kw">pub</span> <span class="ident">mod_instance_param_token</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="macro">Token</span><span class="macro">!</span>[,]<span class="op">&gt;</span>,
-	<span class="kw">pub</span> <span class="ident">mod_instance</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">syn</span>::<span class="ident">Ident</span><span class="op">&gt;</span>,
-	<span class="kw">pub</span> <span class="ident">mod_instantiable_token</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="macro">Token</span><span class="macro">!</span>[:]<span class="op">&gt;</span>,
-	<span class="kw">pub</span> <span class="ident">mod_instantiable</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">syn</span>::<span class="ident">Ident</span><span class="op">&gt;</span>,
-	<span class="kw">pub</span> <span class="ident">mod_default_instance_token</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="macro">Token</span><span class="macro">!</span>[<span class="op">=</span>]<span class="op">&gt;</span>,
-	<span class="kw">pub</span> <span class="ident">mod_default_instance</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">syn</span>::<span class="ident">Ident</span><span class="op">&gt;</span>,
-	<span class="kw">pub</span> <span class="ident">mod_gt_token</span>: <span class="macro">Token</span><span class="macro">!</span>[<span class="op">&gt;</span>],
-	<span class="kw">pub</span> <span class="ident">as_token</span>: <span class="macro">Token</span><span class="macro">!</span>[<span class="kw">as</span>],
+	<span class="kw">pub</span> <span class="ident">mod_lt_token</span>: <span class="macro">Token!</span>[<span class="op">&lt;</span>],
+	<span class="kw">pub</span> <span class="ident">mod_param_generic</span>: <span class="ident">syn::Ident</span>,
+	<span class="kw">pub</span> <span class="ident">mod_param_bound_token</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="macro">Token!</span>[:]<span class="op">&gt;</span>,
+	<span class="kw">pub</span> <span class="ident">mod_param_bound</span>: <span class="ident">syn::Path</span>,
+	<span class="kw">pub</span> <span class="ident">mod_instance_param_token</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="macro">Token!</span>[,]<span class="op">&gt;</span>,
+	<span class="kw">pub</span> <span class="ident">mod_instance</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">syn::Ident</span><span class="op">&gt;</span>,
+	<span class="kw">pub</span> <span class="ident">mod_instantiable_token</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="macro">Token!</span>[:]<span class="op">&gt;</span>,
+	<span class="kw">pub</span> <span class="ident">mod_instantiable</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">syn::Ident</span><span class="op">&gt;</span>,
+	<span class="kw">pub</span> <span class="ident">mod_default_instance_token</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="macro">Token!</span>[<span class="op">=</span>]<span class="op">&gt;</span>,
+	<span class="kw">pub</span> <span class="ident">mod_default_instance</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">syn::Ident</span><span class="op">&gt;</span>,
+	<span class="kw">pub</span> <span class="ident">mod_gt_token</span>: <span class="macro">Token!</span>[<span class="op">&gt;</span>],
+	<span class="kw">pub</span> <span class="ident">as_token</span>: <span class="macro">Token!</span>[<span class="kw">as</span>],
 	<span class="kw">pub</span> <span class="ident">crate_ident</span>: <span class="ident">Ident</span>,
-	<span class="kw">pub</span> <span class="ident">where_clause</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">syn</span>::<span class="ident">WhereClause</span><span class="op">&gt;</span>,
-	<span class="kw">pub</span> <span class="ident">content</span>: <span class="ident">ext</span>::<span class="ident">Braces</span><span class="op">&lt;</span><span class="ident">ext</span>::<span class="ident">Punctuated</span><span class="op">&lt;</span><span class="ident">DeclStorageLine</span>, <span class="macro">Token</span><span class="macro">!</span>[;]<span class="op">&gt;</span><span class="op">&gt;</span>,
+	<span class="kw">pub</span> <span class="ident">where_clause</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">syn::WhereClause</span><span class="op">&gt;</span>,
+	<span class="kw">pub</span> <span class="ident">content</span>: <span class="ident">ext::Braces</span><span class="op">&lt;</span><span class="ident">ext::Punctuated</span><span class="op">&lt;</span><span class="ident">DeclStorageLine</span>, <span class="macro">Token!</span>[;]<span class="op">&gt;</span><span class="op">&gt;</span>,
 	<span class="kw">pub</span> <span class="ident">extra_genesis</span>: <span class="ident">Opt</span><span class="op">&lt;</span><span class="ident">AddExtraGenesis</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Parse</span>, <span class="ident">ToTokens</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">struct</span> <span class="ident">SpecificHiddenCrate</span> {
-	<span class="kw">pub</span> <span class="ident">keyword</span>: <span class="ident">keyword</span>::<span class="ident">hiddencrate</span>,
-	<span class="kw">pub</span> <span class="ident">ident</span>: <span class="ident">ext</span>::<span class="ident">Parens</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span>,
+	<span class="kw">pub</span> <span class="ident">keyword</span>: <span class="ident">keyword::hiddencrate</span>,
+	<span class="kw">pub</span> <span class="ident">ident</span>: <span class="ident">ext::Parens</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span>,
 }
-<span class="macro">impl_parse_for_opt</span><span class="macro">!</span>(<span class="ident">SpecificHiddenCrate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">keyword</span>::<span class="ident">hiddencrate</span>);
+<span class="macro">impl_parse_for_opt!</span>(<span class="ident">SpecificHiddenCrate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">keyword::hiddencrate</span>);
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Parse</span>, <span class="ident">ToTokens</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">struct</span> <span class="ident">AddExtraGenesis</span> {
-	<span class="kw">pub</span> <span class="ident">extragenesis_keyword</span>: <span class="ident">keyword</span>::<span class="ident">add_extra_genesis</span>,
-	<span class="kw">pub</span> <span class="ident">content</span>: <span class="ident">ext</span>::<span class="ident">Braces</span><span class="op">&lt;</span><span class="ident">AddExtraGenesisContent</span><span class="op">&gt;</span>,
+	<span class="kw">pub</span> <span class="ident">extragenesis_keyword</span>: <span class="ident">keyword::add_extra_genesis</span>,
+	<span class="kw">pub</span> <span class="ident">content</span>: <span class="ident">ext::Braces</span><span class="op">&lt;</span><span class="ident">AddExtraGenesisContent</span><span class="op">&gt;</span>,
 }
 
-<span class="macro">impl_parse_for_opt</span><span class="macro">!</span>(<span class="ident">AddExtraGenesis</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">keyword</span>::<span class="ident">add_extra_genesis</span>);
+<span class="macro">impl_parse_for_opt!</span>(<span class="ident">AddExtraGenesis</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">keyword::add_extra_genesis</span>);
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Parse</span>, <span class="ident">ToTokens</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">struct</span> <span class="ident">AddExtraGenesisContent</span> {
-	<span class="kw">pub</span> <span class="ident">lines</span>: <span class="ident">ext</span>::<span class="ident">Punctuated</span><span class="op">&lt;</span><span class="ident">AddExtraGenesisLineEnum</span>, <span class="macro">Token</span><span class="macro">!</span>[;]<span class="op">&gt;</span>,
+	<span class="kw">pub</span> <span class="ident">lines</span>: <span class="ident">ext::Punctuated</span><span class="op">&lt;</span><span class="ident">AddExtraGenesisLineEnum</span>, <span class="macro">Token!</span>[;]<span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">ToTokens</span>, <span class="ident">Debug</span>)]</span>
@@ -640,17 +640,17 @@
 	<span class="ident">AddExtraGenesisBuild</span>(<span class="ident">DeclStorageBuild</span>),
 }
 
-<span class="kw">impl</span> <span class="ident">syn</span>::<span class="ident">parse</span>::<span class="ident">Parse</span> <span class="kw">for</span> <span class="ident">AddExtraGenesisLineEnum</span> {
-	<span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">syn</span>::<span class="ident">parse</span>::<span class="ident">ParseStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">syn</span>::<span class="ident">parse</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+<span class="kw">impl</span> <span class="ident">syn::parse::Parse</span> <span class="kw">for</span> <span class="ident">AddExtraGenesisLineEnum</span> {
+	<span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">syn::parse::ParseStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">syn::parse::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
 		<span class="kw">let</span> <span class="ident">input_fork</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">fork</span>();
 		<span class="comment">// OuterAttributes are forbidden for build variant,</span>
 		<span class="comment">// However to have better documentation we match against the keyword after those attributes.</span>
-		<span class="kw">let</span> <span class="kw">_</span>: <span class="ident">ext</span>::<span class="ident">OuterAttributes</span> <span class="op">=</span> <span class="ident">input_fork</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
+		<span class="kw">let</span> <span class="kw">_</span>: <span class="ident">ext::OuterAttributes</span> <span class="op">=</span> <span class="ident">input_fork</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
 		<span class="kw">let</span> <span class="ident">lookahead</span> <span class="op">=</span> <span class="ident">input_fork</span>.<span class="ident">lookahead1</span>();
-		<span class="kw">if</span> <span class="ident">lookahead</span>.<span class="ident">peek</span>(<span class="ident">keyword</span>::<span class="ident">build</span>) {
-			<span class="prelude-val">Ok</span>(<span class="self">Self</span>::<span class="ident">AddExtraGenesisBuild</span>(<span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>))
-		} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">lookahead</span>.<span class="ident">peek</span>(<span class="ident">keyword</span>::<span class="ident">config</span>) {
-			<span class="prelude-val">Ok</span>(<span class="self">Self</span>::<span class="ident">AddExtraGenesisLine</span>(<span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>))
+		<span class="kw">if</span> <span class="ident">lookahead</span>.<span class="ident">peek</span>(<span class="ident">keyword::build</span>) {
+			<span class="prelude-val">Ok</span>(<span class="self">Self</span><span class="ident">::AddExtraGenesisBuild</span>(<span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>))
+		} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">lookahead</span>.<span class="ident">peek</span>(<span class="ident">keyword::config</span>) {
+			<span class="prelude-val">Ok</span>(<span class="self">Self</span><span class="ident">::AddExtraGenesisLine</span>(<span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>))
 		} <span class="kw">else</span> {
 			<span class="prelude-val">Err</span>(<span class="ident">lookahead</span>.<span class="ident">error</span>())
 		}
@@ -659,134 +659,134 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Parse</span>, <span class="ident">ToTokens</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">struct</span> <span class="ident">AddExtraGenesisLine</span> {
-	<span class="kw">pub</span> <span class="ident">attrs</span>: <span class="ident">ext</span>::<span class="ident">OuterAttributes</span>,
-	<span class="kw">pub</span> <span class="ident">config_keyword</span>: <span class="ident">keyword</span>::<span class="ident">config</span>,
-	<span class="kw">pub</span> <span class="ident">extra_field</span>: <span class="ident">ext</span>::<span class="ident">Parens</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span>,
-	<span class="kw">pub</span> <span class="ident">coldot_token</span>: <span class="macro">Token</span><span class="macro">!</span>[:],
-	<span class="kw">pub</span> <span class="ident">extra_type</span>: <span class="ident">syn</span>::<span class="ident">Type</span>,
+	<span class="kw">pub</span> <span class="ident">attrs</span>: <span class="ident">ext::OuterAttributes</span>,
+	<span class="kw">pub</span> <span class="ident">config_keyword</span>: <span class="ident">keyword::config</span>,
+	<span class="kw">pub</span> <span class="ident">extra_field</span>: <span class="ident">ext::Parens</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span>,
+	<span class="kw">pub</span> <span class="ident">coldot_token</span>: <span class="macro">Token!</span>[:],
+	<span class="kw">pub</span> <span class="ident">extra_type</span>: <span class="ident">syn::Type</span>,
 	<span class="kw">pub</span> <span class="ident">default_value</span>: <span class="ident">Opt</span><span class="op">&lt;</span><span class="ident">DeclStorageDefault</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Parse</span>, <span class="ident">ToTokens</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">struct</span> <span class="ident">DeclStorageLine</span> {
 	<span class="comment">// attrs (main use case is doc)</span>
-	<span class="kw">pub</span> <span class="ident">attrs</span>: <span class="ident">ext</span>::<span class="ident">OuterAttributes</span>,
+	<span class="kw">pub</span> <span class="ident">attrs</span>: <span class="ident">ext::OuterAttributes</span>,
 	<span class="comment">// visibility (no need to make optional</span>
-	<span class="kw">pub</span> <span class="ident">visibility</span>: <span class="ident">syn</span>::<span class="ident">Visibility</span>,
+	<span class="kw">pub</span> <span class="ident">visibility</span>: <span class="ident">syn::Visibility</span>,
 	<span class="comment">// name</span>
 	<span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">Ident</span>,
 	<span class="kw">pub</span> <span class="ident">getter</span>: <span class="ident">Opt</span><span class="op">&lt;</span><span class="ident">DeclStorageGetter</span><span class="op">&gt;</span>,
 	<span class="kw">pub</span> <span class="ident">config</span>: <span class="ident">Opt</span><span class="op">&lt;</span><span class="ident">DeclStorageConfig</span><span class="op">&gt;</span>,
 	<span class="kw">pub</span> <span class="ident">build</span>: <span class="ident">Opt</span><span class="op">&lt;</span><span class="ident">DeclStorageBuild</span><span class="op">&gt;</span>,
-	<span class="kw">pub</span> <span class="ident">coldot_token</span>: <span class="macro">Token</span><span class="macro">!</span>[:],
+	<span class="kw">pub</span> <span class="ident">coldot_token</span>: <span class="macro">Token!</span>[:],
 	<span class="kw">pub</span> <span class="ident">storage_type</span>: <span class="ident">DeclStorageType</span>,
 	<span class="kw">pub</span> <span class="ident">default_value</span>: <span class="ident">Opt</span><span class="op">&lt;</span><span class="ident">DeclStorageDefault</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Parse</span>, <span class="ident">ToTokens</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">struct</span> <span class="ident">DeclStorageGetterBody</span> {
-	<span class="ident">fn_keyword</span>: <span class="macro">Token</span><span class="macro">!</span>[<span class="kw">fn</span>],
+	<span class="ident">fn_keyword</span>: <span class="macro">Token!</span>[<span class="kw">fn</span>],
 	<span class="ident">ident</span>: <span class="ident">Ident</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Parse</span>, <span class="ident">ToTokens</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">struct</span> <span class="ident">DeclStorageGetter</span> {
-	<span class="kw">pub</span> <span class="ident">getter_keyword</span>: <span class="ident">keyword</span>::<span class="ident">get</span>,
-	<span class="kw">pub</span> <span class="ident">getfn</span>: <span class="ident">ext</span>::<span class="ident">Parens</span><span class="op">&lt;</span><span class="ident">DeclStorageGetterBody</span><span class="op">&gt;</span>,
+	<span class="kw">pub</span> <span class="ident">getter_keyword</span>: <span class="ident">keyword::get</span>,
+	<span class="kw">pub</span> <span class="ident">getfn</span>: <span class="ident">ext::Parens</span><span class="op">&lt;</span><span class="ident">DeclStorageGetterBody</span><span class="op">&gt;</span>,
 }
 
-<span class="macro">impl_parse_for_opt</span><span class="macro">!</span>(<span class="ident">DeclStorageGetter</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">keyword</span>::<span class="ident">get</span>);
+<span class="macro">impl_parse_for_opt!</span>(<span class="ident">DeclStorageGetter</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">keyword::get</span>);
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Parse</span>, <span class="ident">ToTokens</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">struct</span> <span class="ident">DeclStorageConfig</span> {
-	<span class="kw">pub</span> <span class="ident">config_keyword</span>: <span class="ident">keyword</span>::<span class="ident">config</span>,
-	<span class="kw">pub</span> <span class="ident">expr</span>: <span class="ident">ext</span>::<span class="ident">Parens</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">syn</span>::<span class="ident">Ident</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+	<span class="kw">pub</span> <span class="ident">config_keyword</span>: <span class="ident">keyword::config</span>,
+	<span class="kw">pub</span> <span class="ident">expr</span>: <span class="ident">ext::Parens</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">syn::Ident</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
-<span class="macro">impl_parse_for_opt</span><span class="macro">!</span>(<span class="ident">DeclStorageConfig</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">keyword</span>::<span class="ident">config</span>);
+<span class="macro">impl_parse_for_opt!</span>(<span class="ident">DeclStorageConfig</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">keyword::config</span>);
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Parse</span>, <span class="ident">ToTokens</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">struct</span> <span class="ident">DeclStorageBuild</span> {
-	<span class="kw">pub</span> <span class="ident">build_keyword</span>: <span class="ident">keyword</span>::<span class="ident">build</span>,
-	<span class="kw">pub</span> <span class="ident">expr</span>: <span class="ident">ext</span>::<span class="ident">Parens</span><span class="op">&lt;</span><span class="ident">syn</span>::<span class="ident">Expr</span><span class="op">&gt;</span>,
+	<span class="kw">pub</span> <span class="ident">build_keyword</span>: <span class="ident">keyword::build</span>,
+	<span class="kw">pub</span> <span class="ident">expr</span>: <span class="ident">ext::Parens</span><span class="op">&lt;</span><span class="ident">syn::Expr</span><span class="op">&gt;</span>,
 }
 
-<span class="macro">impl_parse_for_opt</span><span class="macro">!</span>(<span class="ident">DeclStorageBuild</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">keyword</span>::<span class="ident">build</span>);
+<span class="macro">impl_parse_for_opt!</span>(<span class="ident">DeclStorageBuild</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">keyword::build</span>);
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">ToTokens</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">enum</span> <span class="ident">DeclStorageType</span> {
 	<span class="ident">Map</span>(<span class="ident">DeclStorageMap</span>),
 	<span class="ident">DoubleMap</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeclStorageDoubleMap</span><span class="op">&gt;</span>),
-	<span class="ident">Simple</span>(<span class="ident">syn</span>::<span class="ident">Type</span>),
+	<span class="ident">Simple</span>(<span class="ident">syn::Type</span>),
 }
 
-<span class="kw">impl</span> <span class="ident">syn</span>::<span class="ident">parse</span>::<span class="ident">Parse</span> <span class="kw">for</span> <span class="ident">DeclStorageType</span> {
-	<span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">syn</span>::<span class="ident">parse</span>::<span class="ident">ParseStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">syn</span>::<span class="ident">parse</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-		<span class="kw">if</span> <span class="ident">input</span>.<span class="ident">peek</span>(<span class="ident">keyword</span>::<span class="ident">map</span>) {
-			<span class="prelude-val">Ok</span>(<span class="self">Self</span>::<span class="ident">Map</span>(<span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>))
-		} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">peek</span>(<span class="ident">keyword</span>::<span class="ident">double_map</span>) {
-			<span class="prelude-val">Ok</span>(<span class="self">Self</span>::<span class="ident">DoubleMap</span>(<span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>))
+<span class="kw">impl</span> <span class="ident">syn::parse::Parse</span> <span class="kw">for</span> <span class="ident">DeclStorageType</span> {
+	<span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">syn::parse::ParseStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">syn::parse::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+		<span class="kw">if</span> <span class="ident">input</span>.<span class="ident">peek</span>(<span class="ident">keyword::map</span>) {
+			<span class="prelude-val">Ok</span>(<span class="self">Self</span><span class="ident">::Map</span>(<span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>))
+		} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">peek</span>(<span class="ident">keyword::double_map</span>) {
+			<span class="prelude-val">Ok</span>(<span class="self">Self</span><span class="ident">::DoubleMap</span>(<span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>))
 		} <span class="kw">else</span> {
-			<span class="prelude-val">Ok</span>(<span class="self">Self</span>::<span class="ident">Simple</span>(<span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>))
+			<span class="prelude-val">Ok</span>(<span class="self">Self</span><span class="ident">::Simple</span>(<span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>))
 		}
 	}
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Parse</span>, <span class="ident">ToTokens</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">struct</span> <span class="ident">DeclStorageMap</span> {
-	<span class="kw">pub</span> <span class="ident">map_keyword</span>: <span class="ident">keyword</span>::<span class="ident">map</span>,
+	<span class="kw">pub</span> <span class="ident">map_keyword</span>: <span class="ident">keyword::map</span>,
 	<span class="kw">pub</span> <span class="ident">hasher</span>: <span class="ident">Opt</span><span class="op">&lt;</span><span class="ident">SetHasher</span><span class="op">&gt;</span>,
-	<span class="kw">pub</span> <span class="ident">key</span>: <span class="ident">syn</span>::<span class="ident">Type</span>,
-	<span class="kw">pub</span> <span class="ident">ass_keyword</span>: <span class="macro">Token</span><span class="macro">!</span>[<span class="op">=</span><span class="op">&gt;</span>],
-	<span class="kw">pub</span> <span class="ident">value</span>: <span class="ident">syn</span>::<span class="ident">Type</span>,
+	<span class="kw">pub</span> <span class="ident">key</span>: <span class="ident">syn::Type</span>,
+	<span class="kw">pub</span> <span class="ident">ass_keyword</span>: <span class="macro">Token!</span>[<span class="op">=</span><span class="op">&gt;</span>],
+	<span class="kw">pub</span> <span class="ident">value</span>: <span class="ident">syn::Type</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Parse</span>, <span class="ident">ToTokens</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">struct</span> <span class="ident">DeclStorageDoubleMap</span> {
-	<span class="kw">pub</span> <span class="ident">map_keyword</span>: <span class="ident">keyword</span>::<span class="ident">double_map</span>,
+	<span class="kw">pub</span> <span class="ident">map_keyword</span>: <span class="ident">keyword::double_map</span>,
 	<span class="kw">pub</span> <span class="ident">hasher1</span>: <span class="ident">Opt</span><span class="op">&lt;</span><span class="ident">SetHasher</span><span class="op">&gt;</span>,
-	<span class="kw">pub</span> <span class="ident">key1</span>: <span class="ident">syn</span>::<span class="ident">Type</span>,
-	<span class="kw">pub</span> <span class="ident">comma_keyword</span>: <span class="macro">Token</span><span class="macro">!</span>[,],
+	<span class="kw">pub</span> <span class="ident">key1</span>: <span class="ident">syn::Type</span>,
+	<span class="kw">pub</span> <span class="ident">comma_keyword</span>: <span class="macro">Token!</span>[,],
 	<span class="kw">pub</span> <span class="ident">hasher2</span>: <span class="ident">Opt</span><span class="op">&lt;</span><span class="ident">SetHasher</span><span class="op">&gt;</span>,
-	<span class="kw">pub</span> <span class="ident">key2</span>: <span class="ident">syn</span>::<span class="ident">Type</span>,
-	<span class="kw">pub</span> <span class="ident">ass_keyword</span>: <span class="macro">Token</span><span class="macro">!</span>[<span class="op">=</span><span class="op">&gt;</span>],
-	<span class="kw">pub</span> <span class="ident">value</span>: <span class="ident">syn</span>::<span class="ident">Type</span>,
+	<span class="kw">pub</span> <span class="ident">key2</span>: <span class="ident">syn::Type</span>,
+	<span class="kw">pub</span> <span class="ident">ass_keyword</span>: <span class="macro">Token!</span>[<span class="op">=</span><span class="op">&gt;</span>],
+	<span class="kw">pub</span> <span class="ident">value</span>: <span class="ident">syn::Type</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">ToTokens</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">enum</span> <span class="ident">Hasher</span> {
-	<span class="ident">Blake2_256</span>(<span class="ident">keyword</span>::<span class="ident">opaque_blake2_256</span>),
-	<span class="ident">Blake2_128</span>(<span class="ident">keyword</span>::<span class="ident">opaque_blake2_128</span>),
-	<span class="ident">Blake2_128Concat</span>(<span class="ident">keyword</span>::<span class="ident">blake2_128_concat</span>),
-	<span class="ident">Twox256</span>(<span class="ident">keyword</span>::<span class="ident">opaque_twox_256</span>),
-	<span class="ident">Twox128</span>(<span class="ident">keyword</span>::<span class="ident">opaque_twox_128</span>),
-	<span class="ident">Twox64Concat</span>(<span class="ident">keyword</span>::<span class="ident">twox_64_concat</span>),
-	<span class="ident">Identity</span>(<span class="ident">keyword</span>::<span class="ident">identity</span>),
+	<span class="ident">Blake2_256</span>(<span class="ident">keyword::opaque_blake2_256</span>),
+	<span class="ident">Blake2_128</span>(<span class="ident">keyword::opaque_blake2_128</span>),
+	<span class="ident">Blake2_128Concat</span>(<span class="ident">keyword::blake2_128_concat</span>),
+	<span class="ident">Twox256</span>(<span class="ident">keyword::opaque_twox_256</span>),
+	<span class="ident">Twox128</span>(<span class="ident">keyword::opaque_twox_128</span>),
+	<span class="ident">Twox64Concat</span>(<span class="ident">keyword::twox_64_concat</span>),
+	<span class="ident">Identity</span>(<span class="ident">keyword::identity</span>),
 }
 
-<span class="kw">impl</span> <span class="ident">syn</span>::<span class="ident">parse</span>::<span class="ident">Parse</span> <span class="kw">for</span> <span class="ident">Hasher</span> {
-	<span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">syn</span>::<span class="ident">parse</span>::<span class="ident">ParseStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">syn</span>::<span class="ident">parse</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+<span class="kw">impl</span> <span class="ident">syn::parse::Parse</span> <span class="kw">for</span> <span class="ident">Hasher</span> {
+	<span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">syn::parse::ParseStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">syn::parse::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
 		<span class="kw">let</span> <span class="ident">lookahead</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">lookahead1</span>();
-		<span class="kw">if</span> <span class="ident">lookahead</span>.<span class="ident">peek</span>(<span class="ident">keyword</span>::<span class="ident">opaque_blake2_256</span>) {
-			<span class="prelude-val">Ok</span>(<span class="self">Self</span>::<span class="ident">Blake2_256</span>(<span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>))
-		} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">lookahead</span>.<span class="ident">peek</span>(<span class="ident">keyword</span>::<span class="ident">opaque_blake2_128</span>) {
-			<span class="prelude-val">Ok</span>(<span class="self">Self</span>::<span class="ident">Blake2_128</span>(<span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>))
-		} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">lookahead</span>.<span class="ident">peek</span>(<span class="ident">keyword</span>::<span class="ident">blake2_128_concat</span>) {
-			<span class="prelude-val">Ok</span>(<span class="self">Self</span>::<span class="ident">Blake2_128Concat</span>(<span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>))
-		} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">lookahead</span>.<span class="ident">peek</span>(<span class="ident">keyword</span>::<span class="ident">opaque_twox_256</span>) {
-			<span class="prelude-val">Ok</span>(<span class="self">Self</span>::<span class="ident">Twox256</span>(<span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>))
-		} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">lookahead</span>.<span class="ident">peek</span>(<span class="ident">keyword</span>::<span class="ident">opaque_twox_128</span>) {
-			<span class="prelude-val">Ok</span>(<span class="self">Self</span>::<span class="ident">Twox128</span>(<span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>))
-		} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">lookahead</span>.<span class="ident">peek</span>(<span class="ident">keyword</span>::<span class="ident">twox_64_concat</span>) {
-			<span class="prelude-val">Ok</span>(<span class="self">Self</span>::<span class="ident">Twox64Concat</span>(<span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>))
-		} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">lookahead</span>.<span class="ident">peek</span>(<span class="ident">keyword</span>::<span class="ident">identity</span>) {
-			<span class="prelude-val">Ok</span>(<span class="self">Self</span>::<span class="ident">Identity</span>(<span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>))
-		} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">lookahead</span>.<span class="ident">peek</span>(<span class="ident">keyword</span>::<span class="ident">tainted</span>) {
-			<span class="prelude-val">Ok</span>(<span class="self">Self</span>::<span class="ident">Blake2_128Concat</span>(<span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>))
-		} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">lookahead</span>.<span class="ident">peek</span>(<span class="ident">keyword</span>::<span class="ident">natural</span>) {
-			<span class="prelude-val">Ok</span>(<span class="self">Self</span>::<span class="ident">Twox64Concat</span>(<span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>))
-		} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">lookahead</span>.<span class="ident">peek</span>(<span class="ident">keyword</span>::<span class="ident">prehashed</span>) {
-			<span class="prelude-val">Ok</span>(<span class="self">Self</span>::<span class="ident">Identity</span>(<span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>))
+		<span class="kw">if</span> <span class="ident">lookahead</span>.<span class="ident">peek</span>(<span class="ident">keyword::opaque_blake2_256</span>) {
+			<span class="prelude-val">Ok</span>(<span class="self">Self</span><span class="ident">::Blake2_256</span>(<span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>))
+		} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">lookahead</span>.<span class="ident">peek</span>(<span class="ident">keyword::opaque_blake2_128</span>) {
+			<span class="prelude-val">Ok</span>(<span class="self">Self</span><span class="ident">::Blake2_128</span>(<span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>))
+		} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">lookahead</span>.<span class="ident">peek</span>(<span class="ident">keyword::blake2_128_concat</span>) {
+			<span class="prelude-val">Ok</span>(<span class="self">Self</span><span class="ident">::Blake2_128Concat</span>(<span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>))
+		} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">lookahead</span>.<span class="ident">peek</span>(<span class="ident">keyword::opaque_twox_256</span>) {
+			<span class="prelude-val">Ok</span>(<span class="self">Self</span><span class="ident">::Twox256</span>(<span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>))
+		} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">lookahead</span>.<span class="ident">peek</span>(<span class="ident">keyword::opaque_twox_128</span>) {
+			<span class="prelude-val">Ok</span>(<span class="self">Self</span><span class="ident">::Twox128</span>(<span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>))
+		} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">lookahead</span>.<span class="ident">peek</span>(<span class="ident">keyword::twox_64_concat</span>) {
+			<span class="prelude-val">Ok</span>(<span class="self">Self</span><span class="ident">::Twox64Concat</span>(<span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>))
+		} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">lookahead</span>.<span class="ident">peek</span>(<span class="ident">keyword::identity</span>) {
+			<span class="prelude-val">Ok</span>(<span class="self">Self</span><span class="ident">::Identity</span>(<span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>))
+		} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">lookahead</span>.<span class="ident">peek</span>(<span class="ident">keyword::tainted</span>) {
+			<span class="prelude-val">Ok</span>(<span class="self">Self</span><span class="ident">::Blake2_128Concat</span>(<span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>))
+		} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">lookahead</span>.<span class="ident">peek</span>(<span class="ident">keyword::natural</span>) {
+			<span class="prelude-val">Ok</span>(<span class="self">Self</span><span class="ident">::Twox64Concat</span>(<span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>))
+		} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">lookahead</span>.<span class="ident">peek</span>(<span class="ident">keyword::prehashed</span>) {
+			<span class="prelude-val">Ok</span>(<span class="self">Self</span><span class="ident">::Identity</span>(<span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>))
 		} <span class="kw">else</span> {
 			<span class="prelude-val">Err</span>(<span class="ident">lookahead</span>.<span class="ident">error</span>())
 		}
@@ -795,13 +795,13 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Parse</span>, <span class="ident">ToTokens</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">struct</span> <span class="ident">DeclStorageDefault</span> {
-	<span class="kw">pub</span> <span class="ident">equal_token</span>: <span class="macro">Token</span><span class="macro">!</span>[<span class="op">=</span>],
-	<span class="kw">pub</span> <span class="ident">expr</span>: <span class="ident">syn</span>::<span class="ident">Expr</span>,
+	<span class="kw">pub</span> <span class="ident">equal_token</span>: <span class="macro">Token!</span>[<span class="op">=</span>],
+	<span class="kw">pub</span> <span class="ident">expr</span>: <span class="ident">syn::Expr</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">syn</span>::<span class="ident">parse</span>::<span class="ident">Parse</span> <span class="kw">for</span> <span class="ident">Opt</span><span class="op">&lt;</span><span class="ident">DeclStorageDefault</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">syn</span>::<span class="ident">parse</span>::<span class="ident">ParseStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">syn</span>::<span class="ident">parse</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-		<span class="kw">if</span> <span class="ident">input</span>.<span class="ident">peek</span>(<span class="macro">Token</span><span class="macro">!</span>[<span class="op">=</span>]) {
+<span class="kw">impl</span> <span class="ident">syn::parse::Parse</span> <span class="kw">for</span> <span class="ident">Opt</span><span class="op">&lt;</span><span class="ident">DeclStorageDefault</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">syn::parse::ParseStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">syn::parse::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+		<span class="kw">if</span> <span class="ident">input</span>.<span class="ident">peek</span>(<span class="macro">Token!</span>[<span class="op">=</span>]) {
 			<span class="ident">input</span>.<span class="ident">parse</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">Opt</span> { <span class="ident">inner</span>: <span class="prelude-val">Some</span>(<span class="ident">p</span>) })
 		} <span class="kw">else</span> {
 			<span class="prelude-val">Ok</span>(<span class="ident">Opt</span> { <span class="ident">inner</span>: <span class="prelude-val">None</span> })
@@ -811,51 +811,51 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Parse</span>, <span class="ident">ToTokens</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">struct</span> <span class="ident">SetHasher</span> {
-	<span class="kw">pub</span> <span class="ident">hasher_keyword</span>: <span class="ident">keyword</span>::<span class="ident">hasher</span>,
-	<span class="kw">pub</span> <span class="ident">inner</span>: <span class="ident">ext</span>::<span class="ident">Parens</span><span class="op">&lt;</span><span class="ident">Hasher</span><span class="op">&gt;</span>,
+	<span class="kw">pub</span> <span class="ident">hasher_keyword</span>: <span class="ident">keyword::hasher</span>,
+	<span class="kw">pub</span> <span class="ident">inner</span>: <span class="ident">ext::Parens</span><span class="op">&lt;</span><span class="ident">Hasher</span><span class="op">&gt;</span>,
 }
 
-<span class="macro">impl_parse_for_opt</span><span class="macro">!</span>(<span class="ident">SetHasher</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">keyword</span>::<span class="ident">hasher</span>);
+<span class="macro">impl_parse_for_opt!</span>(<span class="ident">SetHasher</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">keyword::hasher</span>);
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SetHasher</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw">super</span>::<span class="ident">HasherKind</span> {
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SetHasher</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw">super</span><span class="ident">::HasherKind</span> {
 	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">set_hasher</span>: <span class="ident">SetHasher</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
 		<span class="ident">set_hasher</span>.<span class="ident">inner</span>.<span class="ident">content</span>.<span class="ident">into</span>()
 	}
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Hasher</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw">super</span>::<span class="ident">HasherKind</span> {
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Hasher</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw">super</span><span class="ident">::HasherKind</span> {
 	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">hasher</span>: <span class="ident">Hasher</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
 		<span class="kw">match</span> <span class="ident">hasher</span> {
-			<span class="ident">Hasher</span>::<span class="ident">Blake2_256</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">super</span>::<span class="ident">HasherKind</span>::<span class="ident">Blake2_256</span>,
-			<span class="ident">Hasher</span>::<span class="ident">Blake2_128</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">super</span>::<span class="ident">HasherKind</span>::<span class="ident">Blake2_128</span>,
-			<span class="ident">Hasher</span>::<span class="ident">Blake2_128Concat</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">super</span>::<span class="ident">HasherKind</span>::<span class="ident">Blake2_128Concat</span>,
-			<span class="ident">Hasher</span>::<span class="ident">Twox256</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">super</span>::<span class="ident">HasherKind</span>::<span class="ident">Twox256</span>,
-			<span class="ident">Hasher</span>::<span class="ident">Twox128</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">super</span>::<span class="ident">HasherKind</span>::<span class="ident">Twox128</span>,
-			<span class="ident">Hasher</span>::<span class="ident">Twox64Concat</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">super</span>::<span class="ident">HasherKind</span>::<span class="ident">Twox64Concat</span>,
-			<span class="ident">Hasher</span>::<span class="ident">Identity</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">super</span>::<span class="ident">HasherKind</span>::<span class="ident">Identity</span>,
+			<span class="ident">Hasher::Blake2_256</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">super</span><span class="ident">::HasherKind::Blake2_256</span>,
+			<span class="ident">Hasher::Blake2_128</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">super</span><span class="ident">::HasherKind::Blake2_128</span>,
+			<span class="ident">Hasher::Blake2_128Concat</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">super</span><span class="ident">::HasherKind::Blake2_128Concat</span>,
+			<span class="ident">Hasher::Twox256</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">super</span><span class="ident">::HasherKind::Twox256</span>,
+			<span class="ident">Hasher::Twox128</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">super</span><span class="ident">::HasherKind::Twox128</span>,
+			<span class="ident">Hasher::Twox64Concat</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">super</span><span class="ident">::HasherKind::Twox64Concat</span>,
+			<span class="ident">Hasher::Identity</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">super</span><span class="ident">::HasherKind::Identity</span>,
 		}
 	}
 }
 
 <span class="kw">fn</span> <span class="ident">get_module_instance</span>(
-	<span class="ident">instance</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">syn</span>::<span class="ident">Ident</span><span class="op">&gt;</span>,
-	<span class="ident">instantiable</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">syn</span>::<span class="ident">Ident</span><span class="op">&gt;</span>,
-	<span class="ident">default_instance</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">syn</span>::<span class="ident">Ident</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">syn</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span>::<span class="ident">ModuleInstanceDef</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+	<span class="ident">instance</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">syn::Ident</span><span class="op">&gt;</span>,
+	<span class="ident">instantiable</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">syn::Ident</span><span class="op">&gt;</span>,
+	<span class="ident">default_instance</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">syn::Ident</span><span class="op">&gt;</span>,
+) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">syn::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::ModuleInstanceDef</span><span class="op">&gt;</span><span class="op">&gt;</span> {
 	<span class="kw">let</span> <span class="ident">right_syntax</span> <span class="op">=</span> <span class="string">&quot;Should be $I: $Instance = $DefaultInstance&quot;</span>;
 
 	<span class="kw">if</span> <span class="ident">instantiable</span>.<span class="ident">as_ref</span>().<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span> <span class="op">!</span><span class="op">=</span> <span class="string">&quot;Instance&quot;</span>) {
-		<span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format</span><span class="macro">!</span>(
+		<span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(
 			<span class="string">&quot;Instance trait must be named `Instance`, other names are no longer supported, because \
 			it is now defined at frame_support::traits::Instance. Expect `Instance` found `{}`&quot;</span>,
 			<span class="ident">instantiable</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>(),
 		);
-		<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn</span>::<span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">instantiable</span>.<span class="ident">span</span>(), <span class="ident">msg</span>));
+		<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new</span>(<span class="ident">instantiable</span>.<span class="ident">span</span>(), <span class="ident">msg</span>));
 	}
 
 	<span class="kw">match</span> (<span class="ident">instance</span>, <span class="ident">instantiable</span>, <span class="ident">default_instance</span>) {
 		(<span class="prelude-val">Some</span>(<span class="ident">instance</span>), <span class="prelude-val">Some</span>(<span class="ident">instantiable</span>), <span class="ident">default_instance</span>) <span class="op">=</span><span class="op">&gt;</span> {
-			<span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="kw">super</span>::<span class="ident">ModuleInstanceDef</span> {
+			<span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="kw">super</span><span class="ident">::ModuleInstanceDef</span> {
 				<span class="ident">instance_generic</span>: <span class="ident">instance</span>,
 				<span class="ident">instance_trait</span>: <span class="ident">instantiable</span>,
 				<span class="ident">instance_default</span>: <span class="ident">default_instance</span>,
@@ -863,9 +863,9 @@
 		},
 		(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
 		(<span class="prelude-val">Some</span>(<span class="ident">instance</span>), <span class="prelude-val">None</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(
-			<span class="ident">syn</span>::<span class="ident">Error</span>::<span class="ident">new</span>(
+			<span class="ident">syn::Error::new</span>(
 				<span class="ident">instance</span>.<span class="ident">span</span>(),
-				<span class="macro">format</span><span class="macro">!</span>(
+				<span class="macro">format!</span>(
 					<span class="string">&quot;Expect instantiable trait bound for instance: {}. {}&quot;</span>,
 					<span class="ident">instance</span>,
 					<span class="ident">right_syntax</span>,
@@ -873,9 +873,9 @@
 			)
 		),
 		(<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">instantiable</span>), <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(
-			<span class="ident">syn</span>::<span class="ident">Error</span>::<span class="ident">new</span>(
+			<span class="ident">syn::Error::new</span>(
 				<span class="ident">instantiable</span>.<span class="ident">span</span>(),
-				<span class="macro">format</span><span class="macro">!</span>(
+				<span class="macro">format!</span>(
 					<span class="string">&quot;Expect instance generic for bound instantiable: {}. {}&quot;</span>,
 					<span class="ident">instantiable</span>,
 					<span class="ident">right_syntax</span>,
@@ -883,9 +883,9 @@
 			)
 		),
 		(<span class="prelude-val">None</span>, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">default_instance</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(
-			<span class="ident">syn</span>::<span class="ident">Error</span>::<span class="ident">new</span>(
+			<span class="ident">syn::Error::new</span>(
 				<span class="ident">default_instance</span>.<span class="ident">span</span>(),
-				<span class="macro">format</span><span class="macro">!</span>(
+				<span class="macro">format!</span>(
 					<span class="string">&quot;Expect instance generic for default instance: {}. {}&quot;</span>,
 					<span class="ident">default_instance</span>,
 					<span class="ident">right_syntax</span>,
@@ -895,10 +895,10 @@
 	}
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">syn</span>::<span class="ident">parse</span>::<span class="ident">ParseStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">syn</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw">super</span>::<span class="ident">DeclStorageDef</span><span class="op">&gt;</span> {
-	<span class="kw">use</span> <span class="ident">syn</span>::<span class="ident">parse</span>::<span class="ident">Parse</span>;
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">syn::parse::ParseStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">syn::Result</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::DeclStorageDef</span><span class="op">&gt;</span> {
+	<span class="kw">use</span> <span class="ident">syn::parse::Parse</span>;
 
-	<span class="kw">let</span> <span class="ident">def</span> <span class="op">=</span> <span class="ident">StorageDefinition</span>::<span class="ident">parse</span>(<span class="ident">input</span>)<span class="question-mark">?</span>;
+	<span class="kw">let</span> <span class="ident">def</span> <span class="op">=</span> <span class="ident">StorageDefinition::parse</span>(<span class="ident">input</span>)<span class="question-mark">?</span>;
 
 	<span class="kw">let</span> <span class="ident">module_instance</span> <span class="op">=</span> <span class="ident">get_module_instance</span>(
 		<span class="ident">def</span>.<span class="ident">mod_instance</span>,
@@ -906,24 +906,24 @@
 		<span class="ident">def</span>.<span class="ident">mod_default_instance</span>,
 	)<span class="question-mark">?</span>;
 
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">extra_genesis_config_lines</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[];
+	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">extra_genesis_config_lines</span> <span class="op">=</span> <span class="macro">vec!</span>[];
 	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">extra_genesis_build</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 
 	<span class="kw">for</span> <span class="ident">line</span> <span class="kw">in</span> <span class="ident">def</span>.<span class="ident">extra_genesis</span>.<span class="ident">inner</span>.<span class="ident">into_iter</span>()
 		.<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="ident">o</span>.<span class="ident">content</span>.<span class="ident">content</span>.<span class="ident">lines</span>.<span class="ident">inner</span>.<span class="ident">into_iter</span>())
 	{
 		<span class="kw">match</span> <span class="ident">line</span> {
-			<span class="ident">AddExtraGenesisLineEnum</span>::<span class="ident">AddExtraGenesisLine</span>(<span class="ident">def</span>) <span class="op">=</span><span class="op">&gt;</span> {
-				<span class="ident">extra_genesis_config_lines</span>.<span class="ident">push</span>(<span class="kw">super</span>::<span class="ident">ExtraGenesisLineDef</span>{
+			<span class="ident">AddExtraGenesisLineEnum::AddExtraGenesisLine</span>(<span class="ident">def</span>) <span class="op">=</span><span class="op">&gt;</span> {
+				<span class="ident">extra_genesis_config_lines</span>.<span class="ident">push</span>(<span class="kw">super</span><span class="ident">::ExtraGenesisLineDef</span>{
 					<span class="ident">attrs</span>: <span class="ident">def</span>.<span class="ident">attrs</span>.<span class="ident">inner</span>,
 					<span class="ident">name</span>: <span class="ident">def</span>.<span class="ident">extra_field</span>.<span class="ident">content</span>,
 					<span class="ident">typ</span>: <span class="ident">def</span>.<span class="ident">extra_type</span>,
 					<span class="ident">default</span>: <span class="ident">def</span>.<span class="ident">default_value</span>.<span class="ident">inner</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="ident">o</span>.<span class="ident">expr</span>),
 				});
 			}
-			<span class="ident">AddExtraGenesisLineEnum</span>::<span class="ident">AddExtraGenesisBuild</span>(<span class="ident">def</span>) <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="ident">AddExtraGenesisLineEnum::AddExtraGenesisBuild</span>(<span class="ident">def</span>) <span class="op">=</span><span class="op">&gt;</span> {
 				<span class="kw">if</span> <span class="ident">extra_genesis_build</span>.<span class="ident">is_some</span>() {
-					<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn</span>::<span class="ident">Error</span>::<span class="ident">new</span>(
+					<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new</span>(
 						<span class="ident">def</span>.<span class="ident">span</span>(),
 						<span class="string">&quot;Only one build expression allowed for extra genesis&quot;</span>
 					))
@@ -936,7 +936,7 @@
 
 	<span class="kw">let</span> <span class="ident">storage_lines</span> <span class="op">=</span> <span class="ident">parse_storage_line_defs</span>(<span class="ident">def</span>.<span class="ident">content</span>.<span class="ident">content</span>.<span class="ident">inner</span>.<span class="ident">into_iter</span>())<span class="question-mark">?</span>;
 
-	<span class="prelude-val">Ok</span>(<span class="kw">super</span>::<span class="ident">DeclStorageDef</span> {
+	<span class="prelude-val">Ok</span>(<span class="kw">super</span><span class="ident">::DeclStorageDef</span> {
 		<span class="ident">hidden_crate</span>: <span class="ident">def</span>.<span class="ident">hidden_crate</span>.<span class="ident">inner</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">ident</span>.<span class="ident">content</span>),
 		<span class="ident">visibility</span>: <span class="ident">def</span>.<span class="ident">visibility</span>,
 		<span class="ident">module_name</span>: <span class="ident">def</span>.<span class="ident">module_ident</span>,
@@ -955,8 +955,8 @@
 <span class="doccomment">/// Parse the `DeclStorageLine` into `StorageLineDef`.</span>
 <span class="kw">fn</span> <span class="ident">parse_storage_line_defs</span>(
 	<span class="ident">defs</span>: <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">DeclStorageLine</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">syn</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">super</span>::<span class="ident">StorageLineDef</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">storage_lines</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="kw">super</span>::<span class="ident">StorageLineDef</span><span class="op">&gt;</span>::<span class="ident">new</span>();
+) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">syn::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">super</span><span class="ident">::StorageLineDef</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">storage_lines</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="kw">super</span><span class="ident">::StorageLineDef</span><span class="op">&gt;</span><span class="ident">::new</span>();
 
 	<span class="kw">for</span> <span class="ident">line</span> <span class="kw">in</span> <span class="ident">defs</span> {
 		<span class="kw">let</span> <span class="ident">getter</span> <span class="op">=</span> <span class="ident">line</span>.<span class="ident">getter</span>.<span class="ident">inner</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="ident">o</span>.<span class="ident">getfn</span>.<span class="ident">content</span>.<span class="ident">ident</span>);
@@ -966,7 +966,7 @@
 			} <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">ident</span>) <span class="op">=</span> <span class="ident">getter</span> {
 				<span class="prelude-val">Some</span>(<span class="ident">ident</span>.<span class="ident">clone</span>())
 			} <span class="kw">else</span> {
-				<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn</span>::<span class="ident">Error</span>::<span class="ident">new</span>(
+				<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new</span>(
 					<span class="ident">config</span>.<span class="ident">span</span>(),
 					<span class="string">&quot;Invalid storage definition, couldn&#39;t find config identifier: storage must \
 					either have a get identifier `get(fn ident)` or a defined config identifier \
@@ -980,7 +980,7 @@
 		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">config</span>) <span class="op">=</span> <span class="ident">config</span> {
 			<span class="ident">storage_lines</span>.<span class="ident">iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">sl</span><span class="op">|</span> <span class="ident">sl</span>.<span class="ident">config</span>.<span class="ident">as_ref</span>()).<span class="ident">try_for_each</span>(<span class="op">|</span><span class="ident">other_config</span><span class="op">|</span> {
 				<span class="kw">if</span> <span class="ident">other_config</span> <span class="op">=</span><span class="op">=</span> <span class="ident">config</span> {
-					<span class="prelude-val">Err</span>(<span class="ident">syn</span>::<span class="ident">Error</span>::<span class="ident">new</span>(
+					<span class="prelude-val">Err</span>(<span class="ident">syn::Error::new</span>(
 						<span class="ident">config</span>.<span class="ident">span</span>(),
 						<span class="string">&quot;`config()`/`get()` with the same name already defined.&quot;</span>,
 					))
@@ -991,21 +991,21 @@
 		}
 
 		<span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">line</span>.<span class="ident">storage_type</span>.<span class="ident">span</span>();
-		<span class="kw">let</span> <span class="ident">no_hasher_error</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> <span class="ident">syn</span>::<span class="ident">Error</span>::<span class="ident">new</span>(
+		<span class="kw">let</span> <span class="ident">no_hasher_error</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> <span class="ident">syn::Error::new</span>(
 			<span class="ident">span</span>,
 			<span class="string">&quot;Default hasher has been removed, use explicit hasher(blake2_128_concat) instead.&quot;</span>
 		);
 
 		<span class="kw">let</span> <span class="ident">storage_type</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">line</span>.<span class="ident">storage_type</span> {
-			<span class="ident">DeclStorageType</span>::<span class="ident">Map</span>(<span class="ident">map</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">super</span>::<span class="ident">StorageLineTypeDef</span>::<span class="ident">Map</span>(
-				<span class="kw">super</span>::<span class="ident">MapDef</span> {
+			<span class="ident">DeclStorageType::Map</span>(<span class="ident">map</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">super</span><span class="ident">::StorageLineTypeDef::Map</span>(
+				<span class="kw">super</span><span class="ident">::MapDef</span> {
 					<span class="ident">hasher</span>: <span class="ident">map</span>.<span class="ident">hasher</span>.<span class="ident">inner</span>.<span class="ident">ok_or_else</span>(<span class="ident">no_hasher_error</span>)<span class="question-mark">?</span>.<span class="ident">into</span>(),
 					<span class="ident">key</span>: <span class="ident">map</span>.<span class="ident">key</span>,
 					<span class="ident">value</span>: <span class="ident">map</span>.<span class="ident">value</span>,
 				}
 			),
-			<span class="ident">DeclStorageType</span>::<span class="ident">DoubleMap</span>(<span class="ident">map</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">super</span>::<span class="ident">StorageLineTypeDef</span>::<span class="ident">DoubleMap</span>(
-				<span class="ident">Box</span>::<span class="ident">new</span>(<span class="kw">super</span>::<span class="ident">DoubleMapDef</span> {
+			<span class="ident">DeclStorageType::DoubleMap</span>(<span class="ident">map</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">super</span><span class="ident">::StorageLineTypeDef::DoubleMap</span>(
+				<span class="ident">Box::new</span>(<span class="kw">super</span><span class="ident">::DoubleMapDef</span> {
 					<span class="ident">hasher1</span>: <span class="ident">map</span>.<span class="ident">hasher1</span>.<span class="ident">inner</span>.<span class="ident">ok_or_else</span>(<span class="ident">no_hasher_error</span>)<span class="question-mark">?</span>.<span class="ident">into</span>(),
 					<span class="ident">hasher2</span>: <span class="ident">map</span>.<span class="ident">hasher2</span>.<span class="ident">inner</span>.<span class="ident">ok_or_else</span>(<span class="ident">no_hasher_error</span>)<span class="question-mark">?</span>.<span class="ident">into</span>(),
 					<span class="ident">key1</span>: <span class="ident">map</span>.<span class="ident">key1</span>,
@@ -1013,10 +1013,10 @@
 					<span class="ident">value</span>: <span class="ident">map</span>.<span class="ident">value</span>,
 				})
 			),
-			<span class="ident">DeclStorageType</span>::<span class="ident">Simple</span>(<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">super</span>::<span class="ident">StorageLineTypeDef</span>::<span class="ident">Simple</span>(<span class="ident">expr</span>),
+			<span class="ident">DeclStorageType::Simple</span>(<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">super</span><span class="ident">::StorageLineTypeDef::Simple</span>(<span class="ident">expr</span>),
 		};
 
-		<span class="ident">storage_lines</span>.<span class="ident">push</span>(<span class="kw">super</span>::<span class="ident">StorageLineDef</span> {
+		<span class="ident">storage_lines</span>.<span class="ident">push</span>(<span class="kw">super</span><span class="ident">::StorageLineDef</span> {
 			<span class="ident">attrs</span>: <span class="ident">line</span>.<span class="ident">attrs</span>.<span class="ident">inner</span>,
 			<span class="ident">visibility</span>: <span class="ident">line</span>.<span class="ident">visibility</span>,
 			<span class="ident">name</span>: <span class="ident">line</span>.<span class="ident">name</span>,
@@ -1031,4 +1031,5 @@
 	<span class="prelude-val">Ok</span>(<span class="ident">storage_lines</span>)
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "frame_support_procedural";</script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="frame_support_procedural" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
+    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script></body></html>

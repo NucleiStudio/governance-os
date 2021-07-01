@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-reactor-0.1.12/src/registration.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>registration.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-reactor-0.1.12/src/registration.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>registration.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../tokio_reactor/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../tokio_reactor/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -557,9 +557,9 @@
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">task</span>, <span class="ident">Async</span>, <span class="ident">Poll</span>};
 <span class="kw">use</span> <span class="ident">mio</span>::{<span class="self">self</span>, <span class="ident">Evented</span>};
 
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cell</span>::<span class="ident">UnsafeCell</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">atomic</span>::<span class="ident">AtomicUsize</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">atomic</span>::<span class="ident">Ordering</span>::<span class="ident">SeqCst</span>;
+<span class="kw">use</span> <span class="ident">std::cell::UnsafeCell</span>;
+<span class="kw">use</span> <span class="ident">std::sync::atomic::AtomicUsize</span>;
+<span class="kw">use</span> <span class="ident">std::sync::atomic::Ordering::SeqCst</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">io</span>, <span class="ident">ptr</span>, <span class="ident">usize</span>};
 
 <span class="doccomment">/// Associates an I/O resource with the reactor instance that drives it.</span>
@@ -641,7 +641,7 @@
 <span class="kw">const</span> <span class="ident">LIFECYCLE_MASK</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0b11</span>;
 
 <span class="doccomment">/// A fake token used to identify error situations</span>
-<span class="kw">const</span> <span class="ident">ERROR</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">usize</span>::<span class="ident">MAX</span>;
+<span class="kw">const</span> <span class="ident">ERROR</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">usize::MAX</span>;
 
 <span class="comment">// ===== impl Registration =====</span>
 
@@ -652,8 +652,8 @@
     <span class="doccomment">/// `register` to establish the association.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Registration</span> {
         <span class="ident">Registration</span> {
-            <span class="ident">inner</span>: <span class="ident">UnsafeCell</span>::<span class="ident">new</span>(<span class="prelude-val">None</span>),
-            <span class="ident">state</span>: <span class="ident">AtomicUsize</span>::<span class="ident">new</span>(<span class="ident">INIT</span>),
+            <span class="ident">inner</span>: <span class="ident">UnsafeCell::new</span>(<span class="prelude-val">None</span>),
+            <span class="ident">state</span>: <span class="ident">AtomicUsize::new</span>(<span class="ident">INIT</span>),
         }
     }
 
@@ -671,11 +671,11 @@
     <span class="doccomment">/// `Ok(false)` is returned.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If an error is encountered during registration, `Err` is returned.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">register</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">io</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">register</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">io</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Evented</span>,
     {
-        <span class="self">self</span>.<span class="ident">register2</span>(<span class="ident">io</span>, <span class="op">|</span><span class="op">|</span> <span class="ident">HandlePriv</span>::<span class="ident">try_current</span>())
+        <span class="self">self</span>.<span class="ident">register2</span>(<span class="ident">io</span>, <span class="op">|</span><span class="op">|</span> <span class="ident">HandlePriv::try_current</span>())
     }
 
     <span class="doccomment">/// Deregister the I/O resource from the reactor it is associated with.</span>
@@ -694,7 +694,7 @@
     <span class="doccomment">/// no longer result in notifications getting sent for this registration.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// `Err` is returned if an error is encountered.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deregister</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">io</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deregister</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">io</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Evented</span>,
     {
@@ -720,27 +720,27 @@
     <span class="doccomment">/// `Ok(false)` is returned.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If an error is encountered during registration, `Err` is returned.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">register_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">io</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">handle</span>: <span class="kw-2">&amp;</span><span class="ident">Handle</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">register_with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">io</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">handle</span>: <span class="kw-2">&amp;</span><span class="ident">Handle</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Evented</span>,
     {
         <span class="self">self</span>.<span class="ident">register2</span>(<span class="ident">io</span>, <span class="op">|</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">handle</span>.<span class="ident">as_priv</span>() {
             <span class="prelude-val">Some</span>(<span class="ident">handle</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">handle</span>.<span class="ident">clone</span>()),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">HandlePriv</span>::<span class="ident">try_current</span>(),
+            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">HandlePriv::try_current</span>(),
         })
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">register_with_priv</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">io</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">handle</span>: <span class="kw-2">&amp;</span><span class="ident">HandlePriv</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">register_with_priv</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">io</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">handle</span>: <span class="kw-2">&amp;</span><span class="ident">HandlePriv</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Evented</span>,
     {
         <span class="self">self</span>.<span class="ident">register2</span>(<span class="ident">io</span>, <span class="op">|</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="ident">handle</span>.<span class="ident">clone</span>()))
     }
 
-    <span class="kw">fn</span> <span class="ident">register2</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">io</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">register2</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">io</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Evented</span>,
-        <span class="ident">F</span>: <span class="ident">Fn</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HandlePriv</span><span class="op">&gt;</span>,
+        <span class="ident">F</span>: <span class="ident">Fn</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">HandlePriv</span><span class="op">&gt;</span>,
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">load</span>(<span class="ident">SeqCst</span>);
 
@@ -759,7 +759,7 @@
                     }
 
                     <span class="comment">// Create the actual registration</span>
-                    <span class="kw">let</span> (<span class="ident">inner</span>, <span class="ident">res</span>) <span class="op">=</span> <span class="ident">Inner</span>::<span class="ident">new</span>(<span class="ident">io</span>, <span class="ident">handle</span>);
+                    <span class="kw">let</span> (<span class="ident">inner</span>, <span class="ident">res</span>) <span class="op">=</span> <span class="ident">Inner::new</span>(<span class="ident">io</span>, <span class="ident">handle</span>);
 
                     <span class="kw">unsafe</span> {
                         <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get</span>() <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">inner</span>);
@@ -779,7 +779,7 @@
                     <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="kw">unsafe</span> { (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get</span>()).<span class="ident">as_ref</span>().<span class="ident">unwrap</span>() };
 
                     <span class="kw">while</span> <span class="op">!</span><span class="ident">ptr</span>.<span class="ident">is_null</span>() {
-                        <span class="kw">let</span> <span class="ident">node</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">Box</span>::<span class="ident">from_raw</span>(<span class="ident">ptr</span>) };
+                        <span class="kw">let</span> <span class="ident">node</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">Box::from_raw</span>(<span class="ident">ptr</span>) };
                         <span class="kw">let</span> <span class="ident">node</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">node</span>;
                         <span class="kw">let</span> <span class="ident">Node</span> {
                             <span class="ident">direction</span>,
@@ -788,8 +788,8 @@
                         } <span class="op">=</span> <span class="ident">node</span>;
 
                         <span class="kw">let</span> <span class="ident">flag</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">direction</span> {
-                            <span class="ident">Direction</span>::<span class="ident">Read</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">read</span>,
-                            <span class="ident">Direction</span>::<span class="ident">Write</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">write</span>,
+                            <span class="ident">Direction::Read</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">read</span>,
+                            <span class="ident">Direction::Write</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">write</span>,
                         };
 
                         <span class="kw">if</span> <span class="op">!</span><span class="kw-2">*</span><span class="ident">flag</span> {
@@ -840,11 +840,11 @@
     <span class="doccomment">/// # Panics</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This function will panic if called from outside of a task context.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_read_ready</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">mio</span>::<span class="ident">Ready</span>, <span class="ident">io</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">poll_ready</span>(<span class="ident">Direction</span>::<span class="ident">Read</span>, <span class="ident">Notify</span>::<span class="ident">Yes</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_read_ready</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">mio::Ready</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">poll_ready</span>(<span class="ident">Direction::Read</span>, <span class="ident">Notify::Yes</span>)
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">v</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="ident">v</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Async</span>::<span class="ident">NotReady</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Async::Ready</span>(<span class="ident">v</span>),
+                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Async::NotReady</span>,
             })
     }
 
@@ -855,8 +855,8 @@
     <span class="doccomment">/// it is safe to call this function from outside of a task context.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`poll_read_ready`]: #method.poll_read_ready</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_read_ready</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">mio</span>::<span class="ident">Ready</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">poll_ready</span>(<span class="ident">Direction</span>::<span class="ident">Read</span>, <span class="ident">Notify</span>::<span class="ident">No</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_read_ready</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">mio::Ready</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">poll_ready</span>(<span class="ident">Direction::Read</span>, <span class="ident">Notify::No</span>)
     }
 
     <span class="doccomment">/// Poll for events on the I/O resource&#39;s write readiness stream.</span>
@@ -891,11 +891,11 @@
     <span class="doccomment">/// # Panics</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This function will panic if called from outside of a task context.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_write_ready</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">mio</span>::<span class="ident">Ready</span>, <span class="ident">io</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">poll_ready</span>(<span class="ident">Direction</span>::<span class="ident">Write</span>, <span class="ident">Notify</span>::<span class="ident">Yes</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_write_ready</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">mio::Ready</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">poll_ready</span>(<span class="ident">Direction::Write</span>, <span class="ident">Notify::Yes</span>)
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">v</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Async</span>::<span class="ident">Ready</span>(<span class="ident">v</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Async</span>::<span class="ident">NotReady</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Async::Ready</span>(<span class="ident">v</span>),
+                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Async::NotReady</span>,
             })
     }
 
@@ -906,11 +906,11 @@
     <span class="doccomment">/// it is safe to call this function from outside of a task context.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`poll_write_ready`]: #method.poll_write_ready</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_write_ready</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">mio</span>::<span class="ident">Ready</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">poll_ready</span>(<span class="ident">Direction</span>::<span class="ident">Write</span>, <span class="ident">Notify</span>::<span class="ident">No</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_write_ready</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">mio::Ready</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">poll_ready</span>(<span class="ident">Direction::Write</span>, <span class="ident">Notify::No</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">direction</span>: <span class="ident">Direction</span>, <span class="ident">notify</span>: <span class="ident">Notify</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">mio</span>::<span class="ident">Ready</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">direction</span>: <span class="ident">Direction</span>, <span class="ident">notify</span>: <span class="ident">Notify</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">mio::Ready</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">load</span>(<span class="ident">SeqCst</span>);
 
         <span class="comment">// Cache the node pointer</span>
@@ -919,8 +919,8 @@
         <span class="kw">loop</span> {
             <span class="kw">match</span> <span class="ident">state</span> {
                 <span class="ident">INIT</span> <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(
-                        <span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">Other</span>,
+                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
+                        <span class="ident">io::ErrorKind::Other</span>,
                         <span class="string">&quot;must call `register`
                                               before poll_read_ready&quot;</span>,
                     ));
@@ -930,34 +930,34 @@
                     <span class="kw">return</span> <span class="ident">inner</span>.<span class="ident">poll_ready</span>(<span class="ident">direction</span>, <span class="ident">notify</span>);
                 }
                 <span class="ident">LOCKED</span> <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Notify</span>::<span class="ident">No</span> <span class="op">=</span> <span class="ident">notify</span> {
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Notify::No</span> <span class="op">=</span> <span class="ident">notify</span> {
                         <span class="comment">// Skip the notification tracking junk.</span>
                         <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
                     }
 
                     <span class="kw">let</span> <span class="ident">next_ptr</span> <span class="op">=</span> (<span class="ident">state</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">LIFECYCLE_MASK</span>) <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Node</span>;
 
-                    <span class="kw">let</span> <span class="ident">task</span> <span class="op">=</span> <span class="ident">task</span>::<span class="ident">current</span>();
+                    <span class="kw">let</span> <span class="ident">task</span> <span class="op">=</span> <span class="ident">task::current</span>();
 
                     <span class="comment">// Get the node</span>
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">node</span>.<span class="ident">take</span>().<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                        <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">Node</span> {
+                        <span class="ident">Box::new</span>(<span class="ident">Node</span> {
                             <span class="ident">direction</span>,
                             <span class="ident">task</span>: <span class="ident">task</span>,
-                            <span class="ident">next</span>: <span class="ident">ptr</span>::<span class="ident">null_mut</span>(),
+                            <span class="ident">next</span>: <span class="ident">ptr::null_mut</span>(),
                         })
                     });
 
                     <span class="ident">n</span>.<span class="ident">next</span> <span class="op">=</span> <span class="ident">next_ptr</span>;
 
-                    <span class="kw">let</span> <span class="ident">node_ptr</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="ident">into_raw</span>(<span class="ident">n</span>);
+                    <span class="kw">let</span> <span class="ident">node_ptr</span> <span class="op">=</span> <span class="ident">Box::into_raw</span>(<span class="ident">n</span>);
                     <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="ident">node_ptr</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">|</span> (<span class="ident">state</span> <span class="op">&amp;</span> <span class="ident">LIFECYCLE_MASK</span>);
 
                     <span class="kw">let</span> <span class="ident">actual</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">compare_and_swap</span>(<span class="ident">state</span>, <span class="ident">next</span>, <span class="ident">SeqCst</span>);
 
                     <span class="kw">if</span> <span class="ident">actual</span> <span class="op">!</span><span class="op">=</span> <span class="ident">state</span> {
                         <span class="comment">// Back out of the node boxing</span>
-                        <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">Box</span>::<span class="ident">from_raw</span>(<span class="ident">node_ptr</span>) };
+                        <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">Box::from_raw</span>(<span class="ident">node_ptr</span>) };
 
                         <span class="comment">// Save this for next loop</span>
                         <span class="ident">node</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">n</span>);
@@ -968,7 +968,7 @@
 
                     <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
                 }
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(),
+                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
             }
         }
     }
@@ -980,7 +980,7 @@
 <span class="comment">// ===== impl Inner =====</span>
 
 <span class="kw">impl</span> <span class="ident">Inner</span> {
-    <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">io</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">handle</span>: <span class="ident">HandlePriv</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="self">Self</span>, <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>)
+    <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">io</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">handle</span>: <span class="ident">HandlePriv</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="self">Self</span>, <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>)
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Evented</span>,
     {
@@ -995,7 +995,7 @@
                 }
             },
             <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">res</span> <span class="op">=</span> <span class="prelude-val">Err</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">Other</span>, <span class="string">&quot;event loop gone&quot;</span>));
+                <span class="ident">res</span> <span class="op">=</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::Other</span>, <span class="string">&quot;event loop gone&quot;</span>));
                 <span class="ident">ERROR</span>
             }
         };
@@ -1022,37 +1022,37 @@
         <span class="ident">inner</span>.<span class="ident">register</span>(<span class="self">self</span>.<span class="ident">token</span>, <span class="ident">direction</span>, <span class="ident">task</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">deregister</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Evented</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">io</span>: <span class="kw-2">&amp;</span><span class="ident">E</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">deregister</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Evented</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">io</span>: <span class="kw-2">&amp;</span><span class="ident">E</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">token</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ERROR</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(
-                <span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">Other</span>,
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
+                <span class="ident">io::ErrorKind::Other</span>,
                 <span class="string">&quot;failed to associate with reactor&quot;</span>,
             ));
         }
 
         <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">handle</span>.<span class="ident">inner</span>() {
             <span class="prelude-val">Some</span>(<span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">inner</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">Other</span>, <span class="string">&quot;reactor gone&quot;</span>)),
+            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::Other</span>, <span class="string">&quot;reactor gone&quot;</span>)),
         };
 
         <span class="ident">inner</span>.<span class="ident">deregister_source</span>(<span class="ident">io</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">direction</span>: <span class="ident">Direction</span>, <span class="ident">notify</span>: <span class="ident">Notify</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">mio</span>::<span class="ident">Ready</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">direction</span>: <span class="ident">Direction</span>, <span class="ident">notify</span>: <span class="ident">Notify</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">mio::Ready</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">token</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ERROR</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(
-                <span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">Other</span>,
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
+                <span class="ident">io::ErrorKind::Other</span>,
                 <span class="string">&quot;failed to associate with reactor&quot;</span>,
             ));
         }
 
         <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">handle</span>.<span class="ident">inner</span>() {
             <span class="prelude-val">Some</span>(<span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">inner</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">Other</span>, <span class="string">&quot;reactor gone&quot;</span>)),
+            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::Other</span>, <span class="string">&quot;reactor gone&quot;</span>)),
         };
 
         <span class="kw">let</span> <span class="ident">mask</span> <span class="op">=</span> <span class="ident">direction</span>.<span class="ident">mask</span>();
-        <span class="kw">let</span> <span class="ident">mask_no_hup</span> <span class="op">=</span> (<span class="ident">mask</span> <span class="op">-</span> ::<span class="ident">platform</span>::<span class="ident">hup</span>()).<span class="ident">as_usize</span>();
+        <span class="kw">let</span> <span class="ident">mask_no_hup</span> <span class="op">=</span> (<span class="ident">mask</span> <span class="op">-</span> <span class="ident">::platform::hup</span>()).<span class="ident">as_usize</span>();
 
         <span class="kw">let</span> <span class="ident">io_dispatch</span> <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">io_dispatch</span>.<span class="ident">read</span>();
         <span class="kw">let</span> <span class="ident">sched</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">io_dispatch</span>[<span class="self">self</span>.<span class="ident">token</span>];
@@ -1066,18 +1066,18 @@
         <span class="comment">// `poll_ready` is called again with a _`direction` of `Write`, the HUP</span>
         <span class="comment">// state would not be visible.</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ready</span> <span class="op">=</span>
-            <span class="ident">mask</span> <span class="op">&amp;</span> <span class="ident">mio</span>::<span class="ident">Ready</span>::<span class="ident">from_usize</span>(<span class="ident">sched</span>.<span class="ident">readiness</span>.<span class="ident">fetch_and</span>(<span class="op">!</span><span class="ident">mask_no_hup</span>, <span class="ident">SeqCst</span>));
+            <span class="ident">mask</span> <span class="op">&amp;</span> <span class="ident">mio::Ready::from_usize</span>(<span class="ident">sched</span>.<span class="ident">readiness</span>.<span class="ident">fetch_and</span>(<span class="op">!</span><span class="ident">mask_no_hup</span>, <span class="ident">SeqCst</span>));
 
-        <span class="kw">if</span> <span class="ident">ready</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="ident">notify</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Notify</span>::<span class="ident">Yes</span> {
-            <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;scheduling {:?} for: {}&quot;</span>, <span class="ident">direction</span>, <span class="self">self</span>.<span class="ident">token</span>);
+        <span class="kw">if</span> <span class="ident">ready</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="ident">notify</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Notify::Yes</span> {
+            <span class="macro">debug!</span>(<span class="string">&quot;scheduling {:?} for: {}&quot;</span>, <span class="ident">direction</span>, <span class="self">self</span>.<span class="ident">token</span>);
             <span class="comment">// Update the task info</span>
             <span class="kw">match</span> <span class="ident">direction</span> {
-                <span class="ident">Direction</span>::<span class="ident">Read</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sched</span>.<span class="ident">reader</span>.<span class="ident">register</span>(),
-                <span class="ident">Direction</span>::<span class="ident">Write</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sched</span>.<span class="ident">writer</span>.<span class="ident">register</span>(),
+                <span class="ident">Direction::Read</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sched</span>.<span class="ident">reader</span>.<span class="ident">register</span>(),
+                <span class="ident">Direction::Write</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sched</span>.<span class="ident">writer</span>.<span class="ident">register</span>(),
             }
 
             <span class="comment">// Try again</span>
-            <span class="ident">ready</span> <span class="op">=</span> <span class="ident">mask</span> <span class="op">&amp;</span> <span class="ident">mio</span>::<span class="ident">Ready</span>::<span class="ident">from_usize</span>(<span class="ident">sched</span>.<span class="ident">readiness</span>.<span class="ident">fetch_and</span>(<span class="op">!</span><span class="ident">mask_no_hup</span>, <span class="ident">SeqCst</span>));
+            <span class="ident">ready</span> <span class="op">=</span> <span class="ident">mask</span> <span class="op">&amp;</span> <span class="ident">mio::Ready::from_usize</span>(<span class="ident">sched</span>.<span class="ident">readiness</span>.<span class="ident">fetch_and</span>(<span class="op">!</span><span class="ident">mask_no_hup</span>, <span class="ident">SeqCst</span>));
         }
 
         <span class="kw">if</span> <span class="ident">ready</span>.<span class="ident">is_empty</span>() {
@@ -1103,4 +1103,5 @@
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "tokio_reactor";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio_reactor" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

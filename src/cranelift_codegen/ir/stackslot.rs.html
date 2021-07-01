@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/cranelift-codegen-0.66.0/src/ir/stackslot.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>stackslot.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/cranelift-codegen-0.69.0/src/ir/stackslot.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>stackslot.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../cranelift_codegen/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../cranelift_codegen/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -444,28 +444,21 @@
 <span id="441">441</span>
 <span id="442">442</span>
 <span id="443">443</span>
-<span id="444">444</span>
-<span id="445">445</span>
-<span id="446">446</span>
-<span id="447">447</span>
-<span id="448">448</span>
-<span id="449">449</span>
-<span id="450">450</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Stack slots.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The `StackSlotData` struct keeps track of a single stack slot in a function.</span>
 <span class="doccomment">//!</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">entity</span>::{<span class="ident">Iter</span>, <span class="ident">IterMut</span>, <span class="ident">Keys</span>, <span class="ident">PrimaryMap</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">ir</span>::{<span class="ident">StackSlot</span>, <span class="ident">Type</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">packed_option</span>::<span class="ident">PackedOption</span>;
-<span class="kw">use</span> <span class="ident">alloc</span>::<span class="ident">vec</span>::<span class="ident">Vec</span>;
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">cmp</span>;
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">fmt</span>;
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">ops</span>::{<span class="ident">Index</span>, <span class="ident">IndexMut</span>};
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">slice</span>;
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">str</span>::<span class="ident">FromStr</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::entity</span>::{<span class="ident">Iter</span>, <span class="ident">IterMut</span>, <span class="ident">Keys</span>, <span class="ident">PrimaryMap</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::ir</span>::{<span class="ident">StackSlot</span>, <span class="ident">Type</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::packed_option::PackedOption</span>;
+<span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
+<span class="kw">use</span> <span class="ident">core::cmp</span>;
+<span class="kw">use</span> <span class="ident">core::fmt</span>;
+<span class="kw">use</span> <span class="ident">core::ops</span>::{<span class="ident">Index</span>, <span class="ident">IndexMut</span>};
+<span class="kw">use</span> <span class="ident">core::slice</span>;
+<span class="kw">use</span> <span class="ident">core::str::FromStr</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;enable-serde&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
@@ -490,7 +483,7 @@
 
 <span class="doccomment">/// Get the spill slot size to use for `ty`.</span>
 <span class="kw">fn</span> <span class="ident">spill_size</span>(<span class="ident">ty</span>: <span class="ident">Type</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StackSize</span> {
-    <span class="ident">cmp</span>::<span class="ident">max</span>(<span class="ident">MIN_SPILL_SLOT_SIZE</span>, <span class="ident">ty</span>.<span class="ident">bytes</span>())
+    <span class="ident">cmp::max</span>(<span class="ident">MIN_SPILL_SLOT_SIZE</span>, <span class="ident">ty</span>.<span class="ident">bytes</span>())
 }
 
 <span class="doccomment">/// The kind of a stack slot.</span>
@@ -538,7 +531,7 @@
     <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> ();
 
     <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, ()<span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="self">self</span>::<span class="ident">StackSlotKind</span>::<span class="kw-2">*</span>;
+        <span class="kw">use</span> <span class="self">self</span><span class="ident">::StackSlotKind</span>::<span class="kw-2">*</span>;
         <span class="kw">match</span> <span class="ident">s</span> {
             <span class="string">&quot;explicit_slot&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">ExplicitSlot</span>),
             <span class="string">&quot;spill_slot&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">SpillSlot</span>),
@@ -551,9 +544,9 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">StackSlotKind</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
-        <span class="kw">use</span> <span class="self">self</span>::<span class="ident">StackSlotKind</span>::<span class="kw-2">*</span>;
+<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">StackSlotKind</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+        <span class="kw">use</span> <span class="self">self</span><span class="ident">::StackSlotKind</span>::<span class="kw-2">*</span>;
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
             <span class="ident">ExplicitSlot</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;explicit_slot&quot;</span>,
             <span class="ident">SpillSlot</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;spill_slot&quot;</span>,
@@ -597,7 +590,7 @@
 
     <span class="doccomment">/// Get the alignment in bytes of this stack slot given the stack pointer alignment.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">alignment</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">max_align</span>: <span class="ident">StackSize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StackSize</span> {
-        <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">max_align</span>.<span class="ident">is_power_of_two</span>());
+        <span class="macro">debug_assert!</span>(<span class="ident">max_align</span>.<span class="ident">is_power_of_two</span>());
         <span class="comment">// We want to find the largest power of two that divides both `self.size` and `max_align`.</span>
         <span class="comment">// That is the same as isolating the rightmost bit in `x`.</span>
         <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">size</span> <span class="op">|</span> <span class="ident">max_align</span>;
@@ -606,11 +599,11 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">StackSlotData</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
-        <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;{} {}&quot;</span>, <span class="self">self</span>.<span class="ident">kind</span>, <span class="self">self</span>.<span class="ident">size</span>)<span class="question-mark">?</span>;
+<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">StackSlotData</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{} {}&quot;</span>, <span class="self">self</span>.<span class="ident">kind</span>, <span class="self">self</span>.<span class="ident">size</span>)<span class="question-mark">?</span>;
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">offset</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span> {
-            <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;, offset {}&quot;</span>, <span class="ident">offset</span>)<span class="question-mark">?</span>;
+            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;, offset {}&quot;</span>, <span class="ident">offset</span>)<span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(())
     }
@@ -636,7 +629,7 @@
 <span class="doccomment">/// Stack frame manager.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Keep track of all the stack slots used by a function.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Default</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;enable-serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StackSlots</span> {
     <span class="doccomment">/// All allocated stack slots.</span>
@@ -656,12 +649,7 @@
 <span class="kw">impl</span> <span class="ident">StackSlots</span> {
     <span class="doccomment">/// Create an empty stack slot manager.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">slots</span>: <span class="ident">PrimaryMap</span>::<span class="ident">new</span>(),
-            <span class="ident">outgoing</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
-            <span class="ident">emergency</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
-            <span class="ident">layout_info</span>: <span class="prelude-val">None</span>,
-        }
+        <span class="ident">StackSlots::default</span>()
     }
 
     <span class="doccomment">/// Clear out everything.</span>
@@ -696,12 +684,12 @@
     }
 
     <span class="doccomment">/// Get an iterator over all the stack slot records.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">values</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">slice</span>::<span class="ident">Iter</span><span class="op">&lt;</span><span class="ident">StackSlotData</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">values</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">slice::Iter</span><span class="op">&lt;</span><span class="ident">StackSlotData</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">slots</span>.<span class="ident">values</span>()
     }
 
     <span class="doccomment">/// Get an iterator over all the stack slot records, mutable edition.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">values_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">slice</span>::<span class="ident">IterMut</span><span class="op">&lt;</span><span class="ident">StackSlotData</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">values_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">slice::IterMut</span><span class="op">&lt;</span><span class="ident">StackSlotData</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">slots</span>.<span class="ident">values_mut</span>()
     }
 
@@ -736,13 +724,13 @@
 <span class="kw">impl</span> <span class="ident">StackSlots</span> {
     <span class="doccomment">/// Create a new spill slot for spilling values of type `ty`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">make_spill_slot</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ty</span>: <span class="ident">Type</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StackSlot</span> {
-        <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">StackSlotData</span>::<span class="ident">new</span>(<span class="ident">StackSlotKind</span>::<span class="ident">SpillSlot</span>, <span class="ident">spill_size</span>(<span class="ident">ty</span>)))
+        <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">StackSlotData::new</span>(<span class="ident">StackSlotKind::SpillSlot</span>, <span class="ident">spill_size</span>(<span class="ident">ty</span>)))
     }
 
     <span class="doccomment">/// Create a stack slot representing an incoming function argument.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">make_incoming_arg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ty</span>: <span class="ident">Type</span>, <span class="ident">offset</span>: <span class="ident">StackOffset</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StackSlot</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">StackSlotData</span>::<span class="ident">new</span>(<span class="ident">StackSlotKind</span>::<span class="ident">IncomingArg</span>, <span class="ident">ty</span>.<span class="ident">bytes</span>());
-        <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">offset</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">StackOffset</span>::<span class="ident">max_value</span>() <span class="op">-</span> <span class="ident">data</span>.<span class="ident">size</span> <span class="kw">as</span> <span class="ident">StackOffset</span>);
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">make_incoming_arg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">size</span>: <span class="ident">u32</span>, <span class="ident">offset</span>: <span class="ident">StackOffset</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StackSlot</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">StackSlotData::new</span>(<span class="ident">StackSlotKind::IncomingArg</span>, <span class="ident">size</span>);
+        <span class="macro">debug_assert!</span>(<span class="ident">offset</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">StackOffset::max_value</span>() <span class="op">-</span> <span class="ident">data</span>.<span class="ident">size</span> <span class="kw">as</span> <span class="ident">StackOffset</span>);
         <span class="ident">data</span>.<span class="ident">offset</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">offset</span>);
         <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">data</span>)
     }
@@ -754,9 +742,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The requested offset is relative to this function&#39;s stack pointer immediately before making</span>
     <span class="doccomment">/// the call.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_outgoing_arg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ty</span>: <span class="ident">Type</span>, <span class="ident">offset</span>: <span class="ident">StackOffset</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StackSlot</span> {
-        <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">ty</span>.<span class="ident">bytes</span>();
-
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_outgoing_arg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">size</span>: <span class="ident">u32</span>, <span class="ident">offset</span>: <span class="ident">StackOffset</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StackSlot</span> {
         <span class="comment">// Look for an existing outgoing stack slot with the same offset and size.</span>
         <span class="kw">let</span> <span class="ident">inspos</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">outgoing</span>.<span class="ident">binary_search_by_key</span>(<span class="kw-2">&amp;</span>(<span class="ident">offset</span>, <span class="ident">size</span>), <span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">ss</span><span class="op">|</span> {
             (<span class="self">self</span>[<span class="ident">ss</span>].<span class="ident">offset</span>.<span class="ident">unwrap</span>(), <span class="self">self</span>[<span class="ident">ss</span>].<span class="ident">size</span>)
@@ -766,8 +752,8 @@
         };
 
         <span class="comment">// No existing slot found. Make one and insert it into `outgoing`.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">StackSlotData</span>::<span class="ident">new</span>(<span class="ident">StackSlotKind</span>::<span class="ident">OutgoingArg</span>, <span class="ident">size</span>);
-        <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">offset</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">StackOffset</span>::<span class="ident">max_value</span>() <span class="op">-</span> <span class="ident">size</span> <span class="kw">as</span> <span class="ident">StackOffset</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">StackSlotData::new</span>(<span class="ident">StackSlotKind::OutgoingArg</span>, <span class="ident">size</span>);
+        <span class="macro">debug_assert!</span>(<span class="ident">offset</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">StackOffset::max_value</span>() <span class="op">-</span> <span class="ident">size</span> <span class="kw">as</span> <span class="ident">StackOffset</span>);
         <span class="ident">data</span>.<span class="ident">offset</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">offset</span>);
         <span class="kw">let</span> <span class="ident">ss</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">slots</span>.<span class="ident">push</span>(<span class="ident">data</span>);
         <span class="self">self</span>.<span class="ident">outgoing</span>.<span class="ident">insert</span>(<span class="ident">inspos</span>, <span class="ident">ss</span>);
@@ -807,7 +793,7 @@
         }
 
         <span class="comment">// No existing slot found. Make one and insert it into `emergency`.</span>
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">StackSlotData</span>::<span class="ident">new</span>(<span class="ident">StackSlotKind</span>::<span class="ident">EmergencySlot</span>, <span class="ident">size</span>);
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">StackSlotData::new</span>(<span class="ident">StackSlotKind::EmergencySlot</span>, <span class="ident">size</span>);
         <span class="kw">let</span> <span class="ident">ss</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">slots</span>.<span class="ident">push</span>(<span class="ident">data</span>);
         <span class="self">self</span>.<span class="ident">emergency</span>.<span class="ident">push</span>(<span class="ident">ss</span>);
         <span class="ident">ss</span>
@@ -817,90 +803,91 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">ir</span>::<span class="ident">types</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">ir</span>::<span class="ident">Function</span>;
-    <span class="kw">use</span> <span class="ident">alloc</span>::<span class="ident">string</span>::<span class="ident">ToString</span>;
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::ir::types</span>;
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::ir::Function</span>;
+    <span class="kw">use</span> <span class="ident">alloc::string::ToString</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">stack_slot</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">func</span> <span class="op">=</span> <span class="ident">Function</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">func</span> <span class="op">=</span> <span class="ident">Function::new</span>();
 
-        <span class="kw">let</span> <span class="ident">ss0</span> <span class="op">=</span> <span class="ident">func</span>.<span class="ident">create_stack_slot</span>(<span class="ident">StackSlotData</span>::<span class="ident">new</span>(<span class="ident">StackSlotKind</span>::<span class="ident">IncomingArg</span>, <span class="number">4</span>));
-        <span class="kw">let</span> <span class="ident">ss1</span> <span class="op">=</span> <span class="ident">func</span>.<span class="ident">create_stack_slot</span>(<span class="ident">StackSlotData</span>::<span class="ident">new</span>(<span class="ident">StackSlotKind</span>::<span class="ident">SpillSlot</span>, <span class="number">8</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">ss0</span>.<span class="ident">to_string</span>(), <span class="string">&quot;ss0&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">ss1</span>.<span class="ident">to_string</span>(), <span class="string">&quot;ss1&quot;</span>);
+        <span class="kw">let</span> <span class="ident">ss0</span> <span class="op">=</span> <span class="ident">func</span>.<span class="ident">create_stack_slot</span>(<span class="ident">StackSlotData::new</span>(<span class="ident">StackSlotKind::IncomingArg</span>, <span class="number">4</span>));
+        <span class="kw">let</span> <span class="ident">ss1</span> <span class="op">=</span> <span class="ident">func</span>.<span class="ident">create_stack_slot</span>(<span class="ident">StackSlotData::new</span>(<span class="ident">StackSlotKind::SpillSlot</span>, <span class="number">8</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">ss0</span>.<span class="ident">to_string</span>(), <span class="string">&quot;ss0&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">ss1</span>.<span class="ident">to_string</span>(), <span class="string">&quot;ss1&quot;</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">func</span>.<span class="ident">stack_slots</span>[<span class="ident">ss0</span>].<span class="ident">size</span>, <span class="number">4</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">func</span>.<span class="ident">stack_slots</span>[<span class="ident">ss1</span>].<span class="ident">size</span>, <span class="number">8</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">func</span>.<span class="ident">stack_slots</span>[<span class="ident">ss0</span>].<span class="ident">size</span>, <span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">func</span>.<span class="ident">stack_slots</span>[<span class="ident">ss1</span>].<span class="ident">size</span>, <span class="number">8</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">func</span>.<span class="ident">stack_slots</span>[<span class="ident">ss0</span>].<span class="ident">to_string</span>(), <span class="string">&quot;incoming_arg 4&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">func</span>.<span class="ident">stack_slots</span>[<span class="ident">ss1</span>].<span class="ident">to_string</span>(), <span class="string">&quot;spill_slot 8&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">func</span>.<span class="ident">stack_slots</span>[<span class="ident">ss0</span>].<span class="ident">to_string</span>(), <span class="string">&quot;incoming_arg 4&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">func</span>.<span class="ident">stack_slots</span>[<span class="ident">ss1</span>].<span class="ident">to_string</span>(), <span class="string">&quot;spill_slot 8&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">outgoing</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sss</span> <span class="op">=</span> <span class="ident">StackSlots</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sss</span> <span class="op">=</span> <span class="ident">StackSlots::new</span>();
 
-        <span class="kw">let</span> <span class="ident">ss0</span> <span class="op">=</span> <span class="ident">sss</span>.<span class="ident">get_outgoing_arg</span>(<span class="ident">types</span>::<span class="ident">I32</span>, <span class="number">8</span>);
-        <span class="kw">let</span> <span class="ident">ss1</span> <span class="op">=</span> <span class="ident">sss</span>.<span class="ident">get_outgoing_arg</span>(<span class="ident">types</span>::<span class="ident">I32</span>, <span class="number">4</span>);
-        <span class="kw">let</span> <span class="ident">ss2</span> <span class="op">=</span> <span class="ident">sss</span>.<span class="ident">get_outgoing_arg</span>(<span class="ident">types</span>::<span class="ident">I64</span>, <span class="number">8</span>);
+        <span class="kw">let</span> <span class="ident">ss0</span> <span class="op">=</span> <span class="ident">sss</span>.<span class="ident">get_outgoing_arg</span>(<span class="number">4</span>, <span class="number">8</span>);
+        <span class="kw">let</span> <span class="ident">ss1</span> <span class="op">=</span> <span class="ident">sss</span>.<span class="ident">get_outgoing_arg</span>(<span class="number">4</span>, <span class="number">4</span>);
+        <span class="kw">let</span> <span class="ident">ss2</span> <span class="op">=</span> <span class="ident">sss</span>.<span class="ident">get_outgoing_arg</span>(<span class="number">8</span>, <span class="number">8</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sss</span>[<span class="ident">ss0</span>].<span class="ident">offset</span>, <span class="prelude-val">Some</span>(<span class="number">8</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sss</span>[<span class="ident">ss0</span>].<span class="ident">size</span>, <span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">sss</span>[<span class="ident">ss0</span>].<span class="ident">offset</span>, <span class="prelude-val">Some</span>(<span class="number">8</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">sss</span>[<span class="ident">ss0</span>].<span class="ident">size</span>, <span class="number">4</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sss</span>[<span class="ident">ss1</span>].<span class="ident">offset</span>, <span class="prelude-val">Some</span>(<span class="number">4</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sss</span>[<span class="ident">ss1</span>].<span class="ident">size</span>, <span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">sss</span>[<span class="ident">ss1</span>].<span class="ident">offset</span>, <span class="prelude-val">Some</span>(<span class="number">4</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">sss</span>[<span class="ident">ss1</span>].<span class="ident">size</span>, <span class="number">4</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sss</span>[<span class="ident">ss2</span>].<span class="ident">offset</span>, <span class="prelude-val">Some</span>(<span class="number">8</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sss</span>[<span class="ident">ss2</span>].<span class="ident">size</span>, <span class="number">8</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">sss</span>[<span class="ident">ss2</span>].<span class="ident">offset</span>, <span class="prelude-val">Some</span>(<span class="number">8</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">sss</span>[<span class="ident">ss2</span>].<span class="ident">size</span>, <span class="number">8</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sss</span>.<span class="ident">get_outgoing_arg</span>(<span class="ident">types</span>::<span class="ident">I32</span>, <span class="number">8</span>), <span class="ident">ss0</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sss</span>.<span class="ident">get_outgoing_arg</span>(<span class="ident">types</span>::<span class="ident">I32</span>, <span class="number">4</span>), <span class="ident">ss1</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sss</span>.<span class="ident">get_outgoing_arg</span>(<span class="ident">types</span>::<span class="ident">I64</span>, <span class="number">8</span>), <span class="ident">ss2</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">sss</span>.<span class="ident">get_outgoing_arg</span>(<span class="number">4</span>, <span class="number">8</span>), <span class="ident">ss0</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">sss</span>.<span class="ident">get_outgoing_arg</span>(<span class="number">4</span>, <span class="number">4</span>), <span class="ident">ss1</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">sss</span>.<span class="ident">get_outgoing_arg</span>(<span class="number">8</span>, <span class="number">8</span>), <span class="ident">ss2</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">alignment</span>() {
-        <span class="kw">let</span> <span class="ident">slot</span> <span class="op">=</span> <span class="ident">StackSlotData</span>::<span class="ident">new</span>(<span class="ident">StackSlotKind</span>::<span class="ident">SpillSlot</span>, <span class="number">8</span>);
+        <span class="kw">let</span> <span class="ident">slot</span> <span class="op">=</span> <span class="ident">StackSlotData::new</span>(<span class="ident">StackSlotKind::SpillSlot</span>, <span class="number">8</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">slot</span>.<span class="ident">alignment</span>(<span class="number">4</span>), <span class="number">4</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">slot</span>.<span class="ident">alignment</span>(<span class="number">8</span>), <span class="number">8</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">slot</span>.<span class="ident">alignment</span>(<span class="number">16</span>), <span class="number">8</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">slot</span>.<span class="ident">alignment</span>(<span class="number">4</span>), <span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">slot</span>.<span class="ident">alignment</span>(<span class="number">8</span>), <span class="number">8</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">slot</span>.<span class="ident">alignment</span>(<span class="number">16</span>), <span class="number">8</span>);
 
-        <span class="kw">let</span> <span class="ident">slot2</span> <span class="op">=</span> <span class="ident">StackSlotData</span>::<span class="ident">new</span>(<span class="ident">StackSlotKind</span>::<span class="ident">ExplicitSlot</span>, <span class="number">24</span>);
+        <span class="kw">let</span> <span class="ident">slot2</span> <span class="op">=</span> <span class="ident">StackSlotData::new</span>(<span class="ident">StackSlotKind::ExplicitSlot</span>, <span class="number">24</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">slot2</span>.<span class="ident">alignment</span>(<span class="number">4</span>), <span class="number">4</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">slot2</span>.<span class="ident">alignment</span>(<span class="number">8</span>), <span class="number">8</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">slot2</span>.<span class="ident">alignment</span>(<span class="number">16</span>), <span class="number">8</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">slot2</span>.<span class="ident">alignment</span>(<span class="number">32</span>), <span class="number">8</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">slot2</span>.<span class="ident">alignment</span>(<span class="number">4</span>), <span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">slot2</span>.<span class="ident">alignment</span>(<span class="number">8</span>), <span class="number">8</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">slot2</span>.<span class="ident">alignment</span>(<span class="number">16</span>), <span class="number">8</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">slot2</span>.<span class="ident">alignment</span>(<span class="number">32</span>), <span class="number">8</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">emergency</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sss</span> <span class="op">=</span> <span class="ident">StackSlots</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sss</span> <span class="op">=</span> <span class="ident">StackSlots::new</span>();
 
-        <span class="kw">let</span> <span class="ident">ss0</span> <span class="op">=</span> <span class="ident">sss</span>.<span class="ident">get_emergency_slot</span>(<span class="ident">types</span>::<span class="ident">I32</span>, <span class="kw-2">&amp;</span>[]);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sss</span>[<span class="ident">ss0</span>].<span class="ident">size</span>, <span class="number">4</span>);
+        <span class="kw">let</span> <span class="ident">ss0</span> <span class="op">=</span> <span class="ident">sss</span>.<span class="ident">get_emergency_slot</span>(<span class="ident">types::I32</span>, <span class="kw-2">&amp;</span>[]);
+        <span class="macro">assert_eq!</span>(<span class="ident">sss</span>[<span class="ident">ss0</span>].<span class="ident">size</span>, <span class="number">4</span>);
 
         <span class="comment">// When a smaller size is requested, we should simply get the same slot back.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sss</span>.<span class="ident">get_emergency_slot</span>(<span class="ident">types</span>::<span class="ident">I8</span>, <span class="kw-2">&amp;</span>[]), <span class="ident">ss0</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sss</span>[<span class="ident">ss0</span>].<span class="ident">size</span>, <span class="number">4</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sss</span>.<span class="ident">get_emergency_slot</span>(<span class="ident">types</span>::<span class="ident">F32</span>, <span class="kw-2">&amp;</span>[]), <span class="ident">ss0</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sss</span>[<span class="ident">ss0</span>].<span class="ident">size</span>, <span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">sss</span>.<span class="ident">get_emergency_slot</span>(<span class="ident">types::I8</span>, <span class="kw-2">&amp;</span>[]), <span class="ident">ss0</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">sss</span>[<span class="ident">ss0</span>].<span class="ident">size</span>, <span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">sss</span>.<span class="ident">get_emergency_slot</span>(<span class="ident">types::F32</span>, <span class="kw-2">&amp;</span>[]), <span class="ident">ss0</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">sss</span>[<span class="ident">ss0</span>].<span class="ident">size</span>, <span class="number">4</span>);
 
         <span class="comment">// Ask for a larger size and the slot should grow.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sss</span>.<span class="ident">get_emergency_slot</span>(<span class="ident">types</span>::<span class="ident">F64</span>, <span class="kw-2">&amp;</span>[]), <span class="ident">ss0</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sss</span>[<span class="ident">ss0</span>].<span class="ident">size</span>, <span class="number">8</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">sss</span>.<span class="ident">get_emergency_slot</span>(<span class="ident">types::F64</span>, <span class="kw-2">&amp;</span>[]), <span class="ident">ss0</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">sss</span>[<span class="ident">ss0</span>].<span class="ident">size</span>, <span class="number">8</span>);
 
         <span class="comment">// When one slot is in use, we should get a new one.</span>
-        <span class="kw">let</span> <span class="ident">ss1</span> <span class="op">=</span> <span class="ident">sss</span>.<span class="ident">get_emergency_slot</span>(<span class="ident">types</span>::<span class="ident">I32</span>, <span class="kw-2">&amp;</span>[<span class="prelude-val">None</span>.<span class="ident">into</span>(), <span class="ident">ss0</span>.<span class="ident">into</span>()]);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sss</span>[<span class="ident">ss0</span>].<span class="ident">size</span>, <span class="number">8</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sss</span>[<span class="ident">ss1</span>].<span class="ident">size</span>, <span class="number">4</span>);
+        <span class="kw">let</span> <span class="ident">ss1</span> <span class="op">=</span> <span class="ident">sss</span>.<span class="ident">get_emergency_slot</span>(<span class="ident">types::I32</span>, <span class="kw-2">&amp;</span>[<span class="prelude-val">None</span>.<span class="ident">into</span>(), <span class="ident">ss0</span>.<span class="ident">into</span>()]);
+        <span class="macro">assert_eq!</span>(<span class="ident">sss</span>[<span class="ident">ss0</span>].<span class="ident">size</span>, <span class="number">8</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">sss</span>[<span class="ident">ss1</span>].<span class="ident">size</span>, <span class="number">4</span>);
 
         <span class="comment">// Now we should get the smallest fit of the two available slots.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sss</span>.<span class="ident">get_emergency_slot</span>(<span class="ident">types</span>::<span class="ident">F32</span>, <span class="kw-2">&amp;</span>[]), <span class="ident">ss1</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">sss</span>.<span class="ident">get_emergency_slot</span>(<span class="ident">types</span>::<span class="ident">F64</span>, <span class="kw-2">&amp;</span>[]), <span class="ident">ss0</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">sss</span>.<span class="ident">get_emergency_slot</span>(<span class="ident">types::F32</span>, <span class="kw-2">&amp;</span>[]), <span class="ident">ss1</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">sss</span>.<span class="ident">get_emergency_slot</span>(<span class="ident">types::F64</span>, <span class="kw-2">&amp;</span>[]), <span class="ident">ss0</span>);
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "cranelift_codegen";</script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="cranelift_codegen" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
+    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script></body></html>

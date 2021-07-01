@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/cranelift-codegen-0.66.0/src/machinst/buffer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>buffer.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/cranelift-codegen-0.69.0/src/machinst/buffer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>buffer.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../cranelift_codegen/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
+<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../cranelift_codegen/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1564,6 +1564,265 @@
 <span id="1561">1561</span>
 <span id="1562">1562</span>
 <span id="1563">1563</span>
+<span id="1564">1564</span>
+<span id="1565">1565</span>
+<span id="1566">1566</span>
+<span id="1567">1567</span>
+<span id="1568">1568</span>
+<span id="1569">1569</span>
+<span id="1570">1570</span>
+<span id="1571">1571</span>
+<span id="1572">1572</span>
+<span id="1573">1573</span>
+<span id="1574">1574</span>
+<span id="1575">1575</span>
+<span id="1576">1576</span>
+<span id="1577">1577</span>
+<span id="1578">1578</span>
+<span id="1579">1579</span>
+<span id="1580">1580</span>
+<span id="1581">1581</span>
+<span id="1582">1582</span>
+<span id="1583">1583</span>
+<span id="1584">1584</span>
+<span id="1585">1585</span>
+<span id="1586">1586</span>
+<span id="1587">1587</span>
+<span id="1588">1588</span>
+<span id="1589">1589</span>
+<span id="1590">1590</span>
+<span id="1591">1591</span>
+<span id="1592">1592</span>
+<span id="1593">1593</span>
+<span id="1594">1594</span>
+<span id="1595">1595</span>
+<span id="1596">1596</span>
+<span id="1597">1597</span>
+<span id="1598">1598</span>
+<span id="1599">1599</span>
+<span id="1600">1600</span>
+<span id="1601">1601</span>
+<span id="1602">1602</span>
+<span id="1603">1603</span>
+<span id="1604">1604</span>
+<span id="1605">1605</span>
+<span id="1606">1606</span>
+<span id="1607">1607</span>
+<span id="1608">1608</span>
+<span id="1609">1609</span>
+<span id="1610">1610</span>
+<span id="1611">1611</span>
+<span id="1612">1612</span>
+<span id="1613">1613</span>
+<span id="1614">1614</span>
+<span id="1615">1615</span>
+<span id="1616">1616</span>
+<span id="1617">1617</span>
+<span id="1618">1618</span>
+<span id="1619">1619</span>
+<span id="1620">1620</span>
+<span id="1621">1621</span>
+<span id="1622">1622</span>
+<span id="1623">1623</span>
+<span id="1624">1624</span>
+<span id="1625">1625</span>
+<span id="1626">1626</span>
+<span id="1627">1627</span>
+<span id="1628">1628</span>
+<span id="1629">1629</span>
+<span id="1630">1630</span>
+<span id="1631">1631</span>
+<span id="1632">1632</span>
+<span id="1633">1633</span>
+<span id="1634">1634</span>
+<span id="1635">1635</span>
+<span id="1636">1636</span>
+<span id="1637">1637</span>
+<span id="1638">1638</span>
+<span id="1639">1639</span>
+<span id="1640">1640</span>
+<span id="1641">1641</span>
+<span id="1642">1642</span>
+<span id="1643">1643</span>
+<span id="1644">1644</span>
+<span id="1645">1645</span>
+<span id="1646">1646</span>
+<span id="1647">1647</span>
+<span id="1648">1648</span>
+<span id="1649">1649</span>
+<span id="1650">1650</span>
+<span id="1651">1651</span>
+<span id="1652">1652</span>
+<span id="1653">1653</span>
+<span id="1654">1654</span>
+<span id="1655">1655</span>
+<span id="1656">1656</span>
+<span id="1657">1657</span>
+<span id="1658">1658</span>
+<span id="1659">1659</span>
+<span id="1660">1660</span>
+<span id="1661">1661</span>
+<span id="1662">1662</span>
+<span id="1663">1663</span>
+<span id="1664">1664</span>
+<span id="1665">1665</span>
+<span id="1666">1666</span>
+<span id="1667">1667</span>
+<span id="1668">1668</span>
+<span id="1669">1669</span>
+<span id="1670">1670</span>
+<span id="1671">1671</span>
+<span id="1672">1672</span>
+<span id="1673">1673</span>
+<span id="1674">1674</span>
+<span id="1675">1675</span>
+<span id="1676">1676</span>
+<span id="1677">1677</span>
+<span id="1678">1678</span>
+<span id="1679">1679</span>
+<span id="1680">1680</span>
+<span id="1681">1681</span>
+<span id="1682">1682</span>
+<span id="1683">1683</span>
+<span id="1684">1684</span>
+<span id="1685">1685</span>
+<span id="1686">1686</span>
+<span id="1687">1687</span>
+<span id="1688">1688</span>
+<span id="1689">1689</span>
+<span id="1690">1690</span>
+<span id="1691">1691</span>
+<span id="1692">1692</span>
+<span id="1693">1693</span>
+<span id="1694">1694</span>
+<span id="1695">1695</span>
+<span id="1696">1696</span>
+<span id="1697">1697</span>
+<span id="1698">1698</span>
+<span id="1699">1699</span>
+<span id="1700">1700</span>
+<span id="1701">1701</span>
+<span id="1702">1702</span>
+<span id="1703">1703</span>
+<span id="1704">1704</span>
+<span id="1705">1705</span>
+<span id="1706">1706</span>
+<span id="1707">1707</span>
+<span id="1708">1708</span>
+<span id="1709">1709</span>
+<span id="1710">1710</span>
+<span id="1711">1711</span>
+<span id="1712">1712</span>
+<span id="1713">1713</span>
+<span id="1714">1714</span>
+<span id="1715">1715</span>
+<span id="1716">1716</span>
+<span id="1717">1717</span>
+<span id="1718">1718</span>
+<span id="1719">1719</span>
+<span id="1720">1720</span>
+<span id="1721">1721</span>
+<span id="1722">1722</span>
+<span id="1723">1723</span>
+<span id="1724">1724</span>
+<span id="1725">1725</span>
+<span id="1726">1726</span>
+<span id="1727">1727</span>
+<span id="1728">1728</span>
+<span id="1729">1729</span>
+<span id="1730">1730</span>
+<span id="1731">1731</span>
+<span id="1732">1732</span>
+<span id="1733">1733</span>
+<span id="1734">1734</span>
+<span id="1735">1735</span>
+<span id="1736">1736</span>
+<span id="1737">1737</span>
+<span id="1738">1738</span>
+<span id="1739">1739</span>
+<span id="1740">1740</span>
+<span id="1741">1741</span>
+<span id="1742">1742</span>
+<span id="1743">1743</span>
+<span id="1744">1744</span>
+<span id="1745">1745</span>
+<span id="1746">1746</span>
+<span id="1747">1747</span>
+<span id="1748">1748</span>
+<span id="1749">1749</span>
+<span id="1750">1750</span>
+<span id="1751">1751</span>
+<span id="1752">1752</span>
+<span id="1753">1753</span>
+<span id="1754">1754</span>
+<span id="1755">1755</span>
+<span id="1756">1756</span>
+<span id="1757">1757</span>
+<span id="1758">1758</span>
+<span id="1759">1759</span>
+<span id="1760">1760</span>
+<span id="1761">1761</span>
+<span id="1762">1762</span>
+<span id="1763">1763</span>
+<span id="1764">1764</span>
+<span id="1765">1765</span>
+<span id="1766">1766</span>
+<span id="1767">1767</span>
+<span id="1768">1768</span>
+<span id="1769">1769</span>
+<span id="1770">1770</span>
+<span id="1771">1771</span>
+<span id="1772">1772</span>
+<span id="1773">1773</span>
+<span id="1774">1774</span>
+<span id="1775">1775</span>
+<span id="1776">1776</span>
+<span id="1777">1777</span>
+<span id="1778">1778</span>
+<span id="1779">1779</span>
+<span id="1780">1780</span>
+<span id="1781">1781</span>
+<span id="1782">1782</span>
+<span id="1783">1783</span>
+<span id="1784">1784</span>
+<span id="1785">1785</span>
+<span id="1786">1786</span>
+<span id="1787">1787</span>
+<span id="1788">1788</span>
+<span id="1789">1789</span>
+<span id="1790">1790</span>
+<span id="1791">1791</span>
+<span id="1792">1792</span>
+<span id="1793">1793</span>
+<span id="1794">1794</span>
+<span id="1795">1795</span>
+<span id="1796">1796</span>
+<span id="1797">1797</span>
+<span id="1798">1798</span>
+<span id="1799">1799</span>
+<span id="1800">1800</span>
+<span id="1801">1801</span>
+<span id="1802">1802</span>
+<span id="1803">1803</span>
+<span id="1804">1804</span>
+<span id="1805">1805</span>
+<span id="1806">1806</span>
+<span id="1807">1807</span>
+<span id="1808">1808</span>
+<span id="1809">1809</span>
+<span id="1810">1810</span>
+<span id="1811">1811</span>
+<span id="1812">1812</span>
+<span id="1813">1813</span>
+<span id="1814">1814</span>
+<span id="1815">1815</span>
+<span id="1816">1816</span>
+<span id="1817">1817</span>
+<span id="1818">1818</span>
+<span id="1819">1819</span>
+<span id="1820">1820</span>
+<span id="1821">1821</span>
+<span id="1822">1822</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! In-memory representation of compiled machine code, with labels and fixups to</span>
 <span class="doccomment">//! refer to those labels. Handles constant-pool island insertion and also</span>
@@ -1707,13 +1966,16 @@
 <span class="doccomment">//! Given these invariants, we argue why each optimization preserves execution</span>
 <span class="doccomment">//! semantics below (grep for &quot;Preserves execution semantics&quot;).</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">binemit</span>::{<span class="ident">Addend</span>, <span class="ident">CodeOffset</span>, <span class="ident">CodeSink</span>, <span class="ident">Reloc</span>, <span class="ident">Stackmap</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">ir</span>::{<span class="ident">ExternalName</span>, <span class="ident">Opcode</span>, <span class="ident">SourceLoc</span>, <span class="ident">TrapCode</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">machinst</span>::{<span class="ident">BlockIndex</span>, <span class="ident">MachInstLabelUse</span>, <span class="ident">VCodeInst</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::binemit</span>::{<span class="ident">Addend</span>, <span class="ident">CodeOffset</span>, <span class="ident">CodeSink</span>, <span class="ident">Reloc</span>, <span class="ident">StackMap</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::ir</span>::{<span class="ident">ExternalName</span>, <span class="ident">Opcode</span>, <span class="ident">SourceLoc</span>, <span class="ident">TrapCode</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::machinst</span>::{<span class="ident">BlockIndex</span>, <span class="ident">MachInstLabelUse</span>, <span class="ident">VCodeConstant</span>, <span class="ident">VCodeConstants</span>, <span class="ident">VCodeInst</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::timing</span>;
+<span class="kw">use</span> <span class="ident">cranelift_entity</span>::{<span class="ident">entity_impl</span>, <span class="ident">SecondaryMap</span>};
 
-<span class="kw">use</span> <span class="ident">log</span>::<span class="ident">trace</span>;
-<span class="kw">use</span> <span class="ident">smallvec</span>::<span class="ident">SmallVec</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">mem</span>;
+<span class="kw">use</span> <span class="ident">log::trace</span>;
+<span class="kw">use</span> <span class="ident">smallvec::SmallVec</span>;
+<span class="kw">use</span> <span class="ident">std::mem</span>;
+<span class="kw">use</span> <span class="ident">std::string::String</span>;
 
 <span class="doccomment">/// A buffer of output to be produced, fixed up, and then emitted to a CodeSink</span>
 <span class="doccomment">/// in bulk.</span>
@@ -1735,8 +1997,8 @@
     <span class="ident">call_sites</span>: <span class="ident">SmallVec</span><span class="op">&lt;</span>[<span class="ident">MachCallSite</span>; <span class="number">16</span>]<span class="op">&gt;</span>,
     <span class="doccomment">/// Any source location mappings referring to this code.</span>
     <span class="ident">srclocs</span>: <span class="ident">SmallVec</span><span class="op">&lt;</span>[<span class="ident">MachSrcLoc</span>; <span class="number">64</span>]<span class="op">&gt;</span>,
-    <span class="doccomment">/// Any stackmaps referring to this code.</span>
-    <span class="ident">stackmaps</span>: <span class="ident">SmallVec</span><span class="op">&lt;</span>[<span class="ident">MachStackMap</span>; <span class="number">8</span>]<span class="op">&gt;</span>,
+    <span class="doccomment">/// Any stack maps referring to this code.</span>
+    <span class="ident">stack_maps</span>: <span class="ident">SmallVec</span><span class="op">&lt;</span>[<span class="ident">MachStackMap</span>; <span class="number">8</span>]<span class="op">&gt;</span>,
     <span class="doccomment">/// The current source location in progress (after `start_srcloc()` and</span>
     <span class="doccomment">/// before `end_srcloc()`).  This is a (start_offset, src_loc) tuple.</span>
     <span class="ident">cur_srcloc</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">CodeOffset</span>, <span class="ident">SourceLoc</span>)<span class="op">&gt;</span>,
@@ -1744,9 +2006,12 @@
     <span class="ident">label_offsets</span>: <span class="ident">SmallVec</span><span class="op">&lt;</span>[<span class="ident">CodeOffset</span>; <span class="number">16</span>]<span class="op">&gt;</span>,
     <span class="doccomment">/// Label aliases: when one label points to an unconditional jump, and that</span>
     <span class="doccomment">/// jump points to another label, we can redirect references to the first</span>
-    <span class="doccomment">/// label immediately to the second. (We don&#39;t chase arbitrarily deep to</span>
-    <span class="doccomment">/// avoid problems with cycles, but rather only one level, i.e.  through one</span>
-    <span class="doccomment">/// jump.)</span>
+    <span class="doccomment">/// label immediately to the second.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Invariant: we don&#39;t have label-alias cycles. We ensure this by,</span>
+    <span class="doccomment">/// before setting label A to alias label B, resolving B&#39;s alias</span>
+    <span class="doccomment">/// target (iteratively until a non-aliased label); if B is already</span>
+    <span class="doccomment">/// aliased to A, then we cannot alias A back to B.</span>
     <span class="ident">label_aliases</span>: <span class="ident">SmallVec</span><span class="op">&lt;</span>[<span class="ident">MachLabel</span>; <span class="number">16</span>]<span class="op">&gt;</span>,
     <span class="doccomment">/// Constants that must be emitted at some point.</span>
     <span class="ident">pending_constants</span>: <span class="ident">SmallVec</span><span class="op">&lt;</span>[<span class="ident">MachLabelConstant</span>; <span class="number">16</span>]<span class="op">&gt;</span>,
@@ -1780,6 +2045,8 @@
     <span class="doccomment">/// when the offset has grown past this (`labels_at_tail_off`) point.</span>
     <span class="doccomment">/// Always &lt;= `cur_offset()`.</span>
     <span class="ident">labels_at_tail_off</span>: <span class="ident">CodeOffset</span>,
+    <span class="doccomment">/// Map used constants to their [MachLabel].</span>
+    <span class="ident">constant_labels</span>: <span class="ident">SecondaryMap</span><span class="op">&lt;</span><span class="ident">VCodeConstant</span>, <span class="ident">MachLabel</span><span class="op">&gt;</span>,
 }
 
 <span class="doccomment">/// A `MachBuffer` once emission is completed: holds generated code and records,</span>
@@ -1797,8 +2064,8 @@
     <span class="ident">call_sites</span>: <span class="ident">SmallVec</span><span class="op">&lt;</span>[<span class="ident">MachCallSite</span>; <span class="number">16</span>]<span class="op">&gt;</span>,
     <span class="doccomment">/// Any source location mappings referring to this code.</span>
     <span class="ident">srclocs</span>: <span class="ident">SmallVec</span><span class="op">&lt;</span>[<span class="ident">MachSrcLoc</span>; <span class="number">64</span>]<span class="op">&gt;</span>,
-    <span class="doccomment">/// Any stackmaps referring to this code.</span>
-    <span class="ident">stackmaps</span>: <span class="ident">SmallVec</span><span class="op">&lt;</span>[<span class="ident">MachStackMap</span>; <span class="number">8</span>]<span class="op">&gt;</span>,
+    <span class="doccomment">/// Any stack maps referring to this code.</span>
+    <span class="ident">stack_maps</span>: <span class="ident">SmallVec</span><span class="op">&lt;</span>[<span class="ident">MachStackMap</span>; <span class="number">8</span>]<span class="op">&gt;</span>,
 }
 
 <span class="kw">static</span> <span class="ident">UNKNOWN_LABEL_OFFSET</span>: <span class="ident">CodeOffset</span> <span class="op">=</span> <span class="number">0xffff_ffff</span>;
@@ -1810,6 +2077,7 @@
 <span class="doccomment">/// appropriately when the label&#39;s location is eventually known.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MachLabel</span>(<span class="ident">u32</span>);
+<span class="macro">entity_impl!</span>(<span class="ident">MachLabel</span>);
 
 <span class="kw">impl</span> <span class="ident">MachLabel</span> {
     <span class="doccomment">/// Get a label for a block. (The first N MachLabels are always reseved for</span>
@@ -1822,28 +2090,52 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
         <span class="self">self</span>.<span class="number">0</span>
     }
+
+    <span class="doccomment">/// Creates a string representing this label, for convenience.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+        <span class="macro">format!</span>(<span class="string">&quot;label{}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">MachLabel</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="ident">UNKNOWN_LABEL</span>
+    }
+}
+
+<span class="doccomment">/// A stack map extent, when creating a stack map.</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">StackMapExtent</span> {
+    <span class="doccomment">/// The stack map starts at this instruction, and ends after the number of upcoming bytes</span>
+    <span class="doccomment">/// (note: this is a code offset diff).</span>
+    <span class="ident">UpcomingBytes</span>(<span class="ident">CodeOffset</span>),
+
+    <span class="doccomment">/// The stack map started at the given offset and ends at the current one. This helps</span>
+    <span class="doccomment">/// architectures where the instruction size has not a fixed length.</span>
+    <span class="ident">StartedAtOffset</span>(<span class="ident">CodeOffset</span>),
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">VCodeInst</span><span class="op">&gt;</span> <span class="ident">MachBuffer</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Create a new section, known to start at `start_offset` and with a size limited to `length_limit`.</span>
+    <span class="doccomment">/// Create a new section, known to start at `start_offset` and with a size limited to</span>
+    <span class="doccomment">/// `length_limit`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MachBuffer</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> {
         <span class="ident">MachBuffer</span> {
-            <span class="ident">data</span>: <span class="ident">SmallVec</span>::<span class="ident">new</span>(),
-            <span class="ident">relocs</span>: <span class="ident">SmallVec</span>::<span class="ident">new</span>(),
-            <span class="ident">traps</span>: <span class="ident">SmallVec</span>::<span class="ident">new</span>(),
-            <span class="ident">call_sites</span>: <span class="ident">SmallVec</span>::<span class="ident">new</span>(),
-            <span class="ident">srclocs</span>: <span class="ident">SmallVec</span>::<span class="ident">new</span>(),
-            <span class="ident">stackmaps</span>: <span class="ident">SmallVec</span>::<span class="ident">new</span>(),
+            <span class="ident">data</span>: <span class="ident">SmallVec::new</span>(),
+            <span class="ident">relocs</span>: <span class="ident">SmallVec::new</span>(),
+            <span class="ident">traps</span>: <span class="ident">SmallVec::new</span>(),
+            <span class="ident">call_sites</span>: <span class="ident">SmallVec::new</span>(),
+            <span class="ident">srclocs</span>: <span class="ident">SmallVec::new</span>(),
+            <span class="ident">stack_maps</span>: <span class="ident">SmallVec::new</span>(),
             <span class="ident">cur_srcloc</span>: <span class="prelude-val">None</span>,
-            <span class="ident">label_offsets</span>: <span class="ident">SmallVec</span>::<span class="ident">new</span>(),
-            <span class="ident">label_aliases</span>: <span class="ident">SmallVec</span>::<span class="ident">new</span>(),
-            <span class="ident">pending_constants</span>: <span class="ident">SmallVec</span>::<span class="ident">new</span>(),
-            <span class="ident">fixup_records</span>: <span class="ident">SmallVec</span>::<span class="ident">new</span>(),
+            <span class="ident">label_offsets</span>: <span class="ident">SmallVec::new</span>(),
+            <span class="ident">label_aliases</span>: <span class="ident">SmallVec::new</span>(),
+            <span class="ident">pending_constants</span>: <span class="ident">SmallVec::new</span>(),
+            <span class="ident">fixup_records</span>: <span class="ident">SmallVec::new</span>(),
             <span class="ident">island_deadline</span>: <span class="ident">UNKNOWN_LABEL_OFFSET</span>,
             <span class="ident">island_worst_case_size</span>: <span class="number">0</span>,
-            <span class="ident">latest_branches</span>: <span class="ident">SmallVec</span>::<span class="ident">new</span>(),
-            <span class="ident">labels_at_tail</span>: <span class="ident">SmallVec</span>::<span class="ident">new</span>(),
+            <span class="ident">latest_branches</span>: <span class="ident">SmallVec::new</span>(),
+            <span class="ident">labels_at_tail</span>: <span class="ident">SmallVec::new</span>(),
             <span class="ident">labels_at_tail_off</span>: <span class="number">0</span>,
+            <span class="ident">constant_labels</span>: <span class="ident">SecondaryMap::new</span>(),
         }
     }
 
@@ -1858,13 +2150,13 @@
         <span class="comment">// for a debug invariant check.</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">last_end</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="kw">for</span> <span class="ident">b</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">latest_branches</span> {
-            <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">b</span>.<span class="ident">start</span> <span class="op">&lt;</span> <span class="ident">b</span>.<span class="ident">end</span>);
-            <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">b</span>.<span class="ident">end</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">cur_off</span>);
-            <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">b</span>.<span class="ident">start</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">last_end</span>);
+            <span class="macro">debug_assert!</span>(<span class="ident">b</span>.<span class="ident">start</span> <span class="op">&lt;</span> <span class="ident">b</span>.<span class="ident">end</span>);
+            <span class="macro">debug_assert!</span>(<span class="ident">b</span>.<span class="ident">end</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">cur_off</span>);
+            <span class="macro">debug_assert!</span>(<span class="ident">b</span>.<span class="ident">start</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">last_end</span>);
             <span class="ident">last_end</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">end</span>;
             <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">l</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="ident">labels_at_this_branch</span> {
-                <span class="macro">debug_assert_eq</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">resolve_label_offset</span>(<span class="ident">l</span>), <span class="ident">b</span>.<span class="ident">start</span>);
-                <span class="macro">debug_assert_eq</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">label_aliases</span>[<span class="ident">l</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>], <span class="ident">UNKNOWN_LABEL</span>);
+                <span class="macro">debug_assert_eq!</span>(<span class="self">self</span>.<span class="ident">resolve_label_offset</span>(<span class="ident">l</span>), <span class="ident">b</span>.<span class="ident">start</span>);
+                <span class="macro">debug_assert_eq!</span>(<span class="self">self</span>.<span class="ident">label_aliases</span>[<span class="ident">l</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>], <span class="ident">UNKNOWN_LABEL</span>);
             }
         }
 
@@ -1872,9 +2164,9 @@
         <span class="comment">// cur_offset. If at cur_offset, must be in `labels_at_tail`.</span>
         <span class="kw">for</span> (<span class="ident">i</span>, <span class="kw-2">&amp;</span><span class="ident">off</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">label_offsets</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
             <span class="kw">let</span> <span class="ident">label</span> <span class="op">=</span> <span class="ident">MachLabel</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">u32</span>);
-            <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">off</span> <span class="op">=</span><span class="op">=</span> <span class="ident">UNKNOWN_LABEL_OFFSET</span> <span class="op">|</span><span class="op">|</span> <span class="ident">off</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">cur_off</span>);
+            <span class="macro">debug_assert!</span>(<span class="ident">off</span> <span class="op">=</span><span class="op">=</span> <span class="ident">UNKNOWN_LABEL_OFFSET</span> <span class="op">|</span><span class="op">|</span> <span class="ident">off</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">cur_off</span>);
             <span class="kw">if</span> <span class="ident">off</span> <span class="op">=</span><span class="op">=</span> <span class="ident">cur_off</span> {
-                <span class="macro">debug_assert</span><span class="macro">!</span>(
+                <span class="macro">debug_assert!</span>(
                     <span class="self">self</span>.<span class="ident">labels_at_tail_off</span> <span class="op">=</span><span class="op">=</span> <span class="ident">cur_off</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">labels_at_tail</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">label</span>)
                 );
             }
@@ -1882,11 +2174,11 @@
 
         <span class="comment">// Check that every label in `labels_at_tail_off` is precise, i.e.,</span>
         <span class="comment">// resolves to the cur offset.</span>
-        <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">labels_at_tail_off</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">cur_off</span>);
+        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">labels_at_tail_off</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">cur_off</span>);
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">labels_at_tail_off</span> <span class="op">=</span><span class="op">=</span> <span class="ident">cur_off</span> {
             <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">l</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">labels_at_tail</span> {
-                <span class="macro">debug_assert_eq</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">resolve_label_offset</span>(<span class="ident">l</span>), <span class="ident">cur_off</span>);
-                <span class="macro">debug_assert_eq</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">label_aliases</span>[<span class="ident">l</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>], <span class="ident">UNKNOWN_LABEL</span>);
+                <span class="macro">debug_assert_eq!</span>(<span class="self">self</span>.<span class="ident">resolve_label_offset</span>(<span class="ident">l</span>), <span class="ident">cur_off</span>);
+                <span class="macro">debug_assert_eq!</span>(<span class="self">self</span>.<span class="ident">label_aliases</span>[<span class="ident">l</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>], <span class="ident">UNKNOWN_LABEL</span>);
             }
         }
     }
@@ -1903,7 +2195,7 @@
 
     <span class="doccomment">/// Add a byte.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">put1</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u8</span>) {
-        <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;MachBuffer: put byte @ {}: {:x}&quot;</span>, <span class="self">self</span>.<span class="ident">cur_offset</span>(), <span class="ident">value</span>);
+        <span class="macro">trace!</span>(<span class="string">&quot;MachBuffer: put byte @ {}: {:x}&quot;</span>, <span class="self">self</span>.<span class="ident">cur_offset</span>(), <span class="ident">value</span>);
         <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">push</span>(<span class="ident">value</span>);
 
         <span class="comment">// Post-invariant: conceptual-labels_at_tail contains a complete and</span>
@@ -1918,7 +2210,7 @@
 
     <span class="doccomment">/// Add 2 bytes.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">put2</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u16</span>) {
-        <span class="macro">trace</span><span class="macro">!</span>(
+        <span class="macro">trace!</span>(
             <span class="string">&quot;MachBuffer: put 16-bit word @ {}: {:x}&quot;</span>,
             <span class="self">self</span>.<span class="ident">cur_offset</span>(),
             <span class="ident">value</span>
@@ -1931,7 +2223,7 @@
 
     <span class="doccomment">/// Add 4 bytes.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">put4</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u32</span>) {
-        <span class="macro">trace</span><span class="macro">!</span>(
+        <span class="macro">trace!</span>(
             <span class="string">&quot;MachBuffer: put 32-bit word @ {}: {:x}&quot;</span>,
             <span class="self">self</span>.<span class="ident">cur_offset</span>(),
             <span class="ident">value</span>
@@ -1944,7 +2236,7 @@
 
     <span class="doccomment">/// Add 8 bytes.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">put8</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u64</span>) {
-        <span class="macro">trace</span><span class="macro">!</span>(
+        <span class="macro">trace!</span>(
             <span class="string">&quot;MachBuffer: put 64-bit word @ {}: {:x}&quot;</span>,
             <span class="self">self</span>.<span class="ident">cur_offset</span>(),
             <span class="ident">value</span>
@@ -1957,7 +2249,7 @@
 
     <span class="doccomment">/// Add a slice of bytes.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">put_data</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
-        <span class="macro">trace</span><span class="macro">!</span>(
+        <span class="macro">trace!</span>(
             <span class="string">&quot;MachBuffer: put data @ {}: len {}&quot;</span>,
             <span class="self">self</span>.<span class="ident">cur_offset</span>(),
             <span class="ident">data</span>.<span class="ident">len</span>()
@@ -1969,7 +2261,7 @@
 
     <span class="doccomment">/// Reserve appended space and return a mutable slice referring to it.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_appended_space</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>] {
-        <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;MachBuffer: put data @ {}: len {}&quot;</span>, <span class="self">self</span>.<span class="ident">cur_offset</span>(), <span class="ident">len</span>);
+        <span class="macro">trace!</span>(<span class="string">&quot;MachBuffer: put data @ {}: len {}&quot;</span>, <span class="self">self</span>.<span class="ident">cur_offset</span>(), <span class="ident">len</span>);
         <span class="kw">let</span> <span class="ident">off</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>();
         <span class="kw">let</span> <span class="ident">new_len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">len</span>;
         <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">resize</span>(<span class="ident">new_len</span>, <span class="number">0</span>);
@@ -1980,8 +2272,8 @@
 
     <span class="doccomment">/// Align up to the given alignment.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">align_to</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">align_to</span>: <span class="ident">CodeOffset</span>) {
-        <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;MachBuffer: align to {}&quot;</span>, <span class="ident">align_to</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">align_to</span>.<span class="ident">is_power_of_two</span>());
+        <span class="macro">trace!</span>(<span class="string">&quot;MachBuffer: align to {}&quot;</span>, <span class="ident">align_to</span>);
+        <span class="macro">assert!</span>(<span class="ident">align_to</span>.<span class="ident">is_power_of_two</span>());
         <span class="kw">while</span> <span class="self">self</span>.<span class="ident">cur_offset</span>() <span class="op">&amp;</span> (<span class="ident">align_to</span> <span class="op">-</span> <span class="number">1</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
             <span class="self">self</span>.<span class="ident">put1</span>(<span class="number">0</span>);
         }
@@ -1995,7 +2287,7 @@
         <span class="kw">let</span> <span class="ident">l</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">label_offsets</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>;
         <span class="self">self</span>.<span class="ident">label_offsets</span>.<span class="ident">push</span>(<span class="ident">UNKNOWN_LABEL_OFFSET</span>);
         <span class="self">self</span>.<span class="ident">label_aliases</span>.<span class="ident">push</span>(<span class="ident">UNKNOWN_LABEL</span>);
-        <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;MachBuffer: new label -&gt; {:?}&quot;</span>, <span class="ident">MachLabel</span>(<span class="ident">l</span>));
+        <span class="macro">trace!</span>(<span class="string">&quot;MachBuffer: new label -&gt; {:?}&quot;</span>, <span class="ident">MachLabel</span>(<span class="ident">l</span>));
         <span class="ident">MachLabel</span>(<span class="ident">l</span>)
 
         <span class="comment">// Post-invariant: the only mutation is to add a new label; it has no</span>
@@ -2004,8 +2296,8 @@
 
     <span class="doccomment">/// Reserve the first N MachLabels for blocks.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reserve_labels_for_blocks</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">blocks</span>: <span class="ident">BlockIndex</span>) {
-        <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;MachBuffer: first {} labels are for blocks&quot;</span>, <span class="ident">blocks</span>);
-        <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">label_offsets</span>.<span class="ident">is_empty</span>());
+        <span class="macro">trace!</span>(<span class="string">&quot;MachBuffer: first {} labels are for blocks&quot;</span>, <span class="ident">blocks</span>);
+        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">label_offsets</span>.<span class="ident">is_empty</span>());
         <span class="self">self</span>.<span class="ident">label_offsets</span>
             .<span class="ident">resize</span>(<span class="ident">blocks</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">UNKNOWN_LABEL_OFFSET</span>);
         <span class="self">self</span>.<span class="ident">label_aliases</span>.<span class="ident">resize</span>(<span class="ident">blocks</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">UNKNOWN_LABEL</span>);
@@ -2013,15 +2305,33 @@
         <span class="comment">// Post-invariant: as for `get_label()`.</span>
     }
 
+    <span class="doccomment">/// Reserve the next N MachLabels for constants.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reserve_labels_for_constants</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">constants</span>: <span class="kw-2">&amp;</span><span class="ident">VCodeConstants</span>) {
+        <span class="macro">trace!</span>(
+            <span class="string">&quot;MachBuffer: next {} labels are for constants&quot;</span>,
+            <span class="ident">constants</span>.<span class="ident">len</span>()
+        );
+        <span class="kw">for</span> <span class="ident">c</span> <span class="kw">in</span> <span class="ident">constants</span>.<span class="ident">keys</span>() {
+            <span class="self">self</span>.<span class="ident">constant_labels</span>[<span class="ident">c</span>] <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_label</span>();
+        }
+
+        <span class="comment">// Post-invariant: as for `get_label()`.</span>
+    }
+
+    <span class="doccomment">/// Retrieve the reserved label for a constant.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_label_for_constant</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">constant</span>: <span class="ident">VCodeConstant</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MachLabel</span> {
+        <span class="self">self</span>.<span class="ident">constant_labels</span>[<span class="ident">constant</span>]
+    }
+
     <span class="doccomment">/// Bind a label to the current offset. A label can only be bound once.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bind_label</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">label</span>: <span class="ident">MachLabel</span>) {
-        <span class="macro">trace</span><span class="macro">!</span>(
+        <span class="macro">trace!</span>(
             <span class="string">&quot;MachBuffer: bind label {:?} at offset {}&quot;</span>,
             <span class="ident">label</span>,
             <span class="self">self</span>.<span class="ident">cur_offset</span>()
         );
-        <span class="macro">debug_assert_eq</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">label_offsets</span>[<span class="ident">label</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>], <span class="ident">UNKNOWN_LABEL_OFFSET</span>);
-        <span class="macro">debug_assert_eq</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">label_aliases</span>[<span class="ident">label</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>], <span class="ident">UNKNOWN_LABEL</span>);
+        <span class="macro">debug_assert_eq!</span>(<span class="self">self</span>.<span class="ident">label_offsets</span>[<span class="ident">label</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>], <span class="ident">UNKNOWN_LABEL_OFFSET</span>);
+        <span class="macro">debug_assert_eq!</span>(<span class="self">self</span>.<span class="ident">label_aliases</span>[<span class="ident">label</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>], <span class="ident">UNKNOWN_LABEL</span>);
         <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cur_offset</span>();
         <span class="self">self</span>.<span class="ident">label_offsets</span>[<span class="ident">label</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">=</span> <span class="ident">offset</span>;
         <span class="self">self</span>.<span class="ident">lazily_clear_labels_at_tail</span>();
@@ -2056,13 +2366,19 @@
     }
 
     <span class="doccomment">/// Resolve a label to an offset, if known. May return `UNKNOWN_LABEL_OFFSET`.</span>
-    <span class="kw">fn</span> <span class="ident">resolve_label_offset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">label</span>: <span class="ident">MachLabel</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CodeOffset</span> {
-        <span class="kw">let</span> <span class="ident">alias</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">label_aliases</span>[<span class="ident">label</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>];
-        <span class="kw">if</span> <span class="ident">alias</span> <span class="op">!</span><span class="op">=</span> <span class="ident">UNKNOWN_LABEL</span> {
-            <span class="self">self</span>.<span class="ident">label_offsets</span>[<span class="ident">alias</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>]
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">label_offsets</span>[<span class="ident">label</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>]
+    <span class="kw">fn</span> <span class="ident">resolve_label_offset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">label</span>: <span class="ident">MachLabel</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CodeOffset</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iters</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="kw">while</span> <span class="self">self</span>.<span class="ident">label_aliases</span>[<span class="ident">label</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">!</span><span class="op">=</span> <span class="ident">UNKNOWN_LABEL</span> {
+            <span class="ident">label</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">label_aliases</span>[<span class="ident">label</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>];
+            <span class="comment">// To protect against an infinite loop (despite our assurances to</span>
+            <span class="comment">// ourselves that the invariants make this impossible), assert out</span>
+            <span class="comment">// after 1M iterations. The number of basic blocks is limited</span>
+            <span class="comment">// in most contexts anyway so this should be impossible to hit with</span>
+            <span class="comment">// a legitimate input.</span>
+            <span class="ident">iters</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            <span class="macro">assert!</span>(<span class="ident">iters</span> <span class="op">&lt;</span> <span class="number">1_000_000</span>, <span class="string">&quot;Unexpected cycle in label aliases&quot;</span>);
         }
+        <span class="self">self</span>.<span class="ident">label_offsets</span>[<span class="ident">label</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>]
 
         <span class="comment">// Post-invariant: no mutations.</span>
     }
@@ -2073,8 +2389,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This can be called before the branch is actually emitted; fixups will</span>
     <span class="doccomment">/// not happen until an island is emitted or the buffer is finished.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">use_label_at_offset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">offset</span>: <span class="ident">CodeOffset</span>, <span class="ident">label</span>: <span class="ident">MachLabel</span>, <span class="ident">kind</span>: <span class="ident">I</span>::<span class="ident">LabelUse</span>) {
-        <span class="macro">trace</span><span class="macro">!</span>(
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">use_label_at_offset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">offset</span>: <span class="ident">CodeOffset</span>, <span class="ident">label</span>: <span class="ident">MachLabel</span>, <span class="ident">kind</span>: <span class="ident">I::LabelUse</span>) {
+        <span class="macro">trace!</span>(
             <span class="string">&quot;MachBuffer: use_label_at_offset: offset {} label {:?} kind {:?}&quot;</span>,
             <span class="ident">offset</span>,
             <span class="ident">label</span>,
@@ -2090,7 +2406,7 @@
         });
         <span class="kw">if</span> <span class="ident">kind</span>.<span class="ident">supports_veneer</span>() {
             <span class="self">self</span>.<span class="ident">island_worst_case_size</span> <span class="op">+</span><span class="op">=</span> <span class="ident">kind</span>.<span class="ident">veneer_size</span>();
-            <span class="self">self</span>.<span class="ident">island_worst_case_size</span> <span class="op">&amp;=</span> <span class="op">!</span>(<span class="ident">I</span>::<span class="ident">LabelUse</span>::<span class="ident">ALIGN</span> <span class="op">-</span> <span class="number">1</span>);
+            <span class="self">self</span>.<span class="ident">island_worst_case_size</span> <span class="op">&amp;=</span> <span class="op">!</span>(<span class="ident">I::LabelUse::ALIGN</span> <span class="op">-</span> <span class="number">1</span>);
         }
         <span class="kw">let</span> <span class="ident">deadline</span> <span class="op">=</span> <span class="ident">offset</span> <span class="op">+</span> <span class="ident">kind</span>.<span class="ident">max_pos_range</span>();
         <span class="kw">if</span> <span class="ident">deadline</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">island_deadline</span> {
@@ -2116,9 +2432,9 @@
     <span class="doccomment">/// Additional requirement: no labels may be bound between `start` and `end`</span>
     <span class="doccomment">/// (exclusive on both ends).</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_uncond_branch</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">start</span>: <span class="ident">CodeOffset</span>, <span class="ident">end</span>: <span class="ident">CodeOffset</span>, <span class="ident">target</span>: <span class="ident">MachLabel</span>) {
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">cur_offset</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">start</span>);
-        <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">end</span> <span class="op">&gt;</span> <span class="ident">start</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="self">self</span>.<span class="ident">fixup_records</span>.<span class="ident">is_empty</span>());
+        <span class="macro">assert!</span>(<span class="self">self</span>.<span class="ident">cur_offset</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">start</span>);
+        <span class="macro">debug_assert!</span>(<span class="ident">end</span> <span class="op">&gt;</span> <span class="ident">start</span>);
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="self">self</span>.<span class="ident">fixup_records</span>.<span class="ident">is_empty</span>());
         <span class="kw">let</span> <span class="ident">fixup</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fixup_records</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>;
         <span class="self">self</span>.<span class="ident">lazily_clear_labels_at_tail</span>();
         <span class="self">self</span>.<span class="ident">latest_branches</span>.<span class="ident">push</span>(<span class="ident">MachBranch</span> {
@@ -2148,12 +2464,12 @@
         <span class="ident">target</span>: <span class="ident">MachLabel</span>,
         <span class="ident">inverted</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
     ) {
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">cur_offset</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">start</span>);
-        <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">end</span> <span class="op">&gt;</span> <span class="ident">start</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="self">self</span>.<span class="ident">fixup_records</span>.<span class="ident">is_empty</span>());
-        <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">inverted</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> (<span class="ident">end</span> <span class="op">-</span> <span class="ident">start</span>) <span class="kw">as</span> <span class="ident">usize</span>);
+        <span class="macro">assert!</span>(<span class="self">self</span>.<span class="ident">cur_offset</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">start</span>);
+        <span class="macro">debug_assert!</span>(<span class="ident">end</span> <span class="op">&gt;</span> <span class="ident">start</span>);
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="self">self</span>.<span class="ident">fixup_records</span>.<span class="ident">is_empty</span>());
+        <span class="macro">debug_assert!</span>(<span class="ident">inverted</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> (<span class="ident">end</span> <span class="op">-</span> <span class="ident">start</span>) <span class="kw">as</span> <span class="ident">usize</span>);
         <span class="kw">let</span> <span class="ident">fixup</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fixup_records</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>;
-        <span class="kw">let</span> <span class="ident">inverted</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">SmallVec</span>::<span class="ident">from</span>(<span class="ident">inverted</span>));
+        <span class="kw">let</span> <span class="ident">inverted</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">SmallVec::from</span>(<span class="ident">inverted</span>));
         <span class="self">self</span>.<span class="ident">lazily_clear_labels_at_tail</span>();
         <span class="self">self</span>.<span class="ident">latest_branches</span>.<span class="ident">push</span>(<span class="ident">MachBranch</span> {
             <span class="ident">start</span>,
@@ -2174,7 +2490,7 @@
         <span class="comment">// Invariants hold at this point.</span>
 
         <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">latest_branches</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>();
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">b</span>.<span class="ident">end</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">cur_offset</span>());
+        <span class="macro">assert!</span>(<span class="ident">b</span>.<span class="ident">end</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">cur_offset</span>());
 
         <span class="comment">// State:</span>
         <span class="comment">//    [PRE CODE]</span>
@@ -2184,6 +2500,12 @@
         <span class="comment">//    (end of buffer)</span>
         <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">truncate</span>(<span class="ident">b</span>.<span class="ident">start</span> <span class="kw">as</span> <span class="ident">usize</span>);
         <span class="self">self</span>.<span class="ident">fixup_records</span>.<span class="ident">truncate</span>(<span class="ident">b</span>.<span class="ident">fixup</span>);
+        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">last_srcloc</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">srclocs</span>.<span class="ident">last</span>() {
+            <span class="kw">if</span> <span class="ident">last_srcloc</span>.<span class="ident">end</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">b</span>.<span class="ident">start</span> {
+                <span class="kw">break</span>;
+            }
+            <span class="self">self</span>.<span class="ident">srclocs</span>.<span class="ident">pop</span>();
+        }
         <span class="comment">// State:</span>
         <span class="comment">//    [PRE CODE]</span>
         <span class="comment">//  cur_off, Offset b.start, b.labels_at_this_branch:</span>
@@ -2201,7 +2523,7 @@
         <span class="comment">// resolve_label_offset(l) for l in labels_at_tail:</span>
         <span class="comment">//    (past end of buffer)</span>
 
-        <span class="macro">trace</span><span class="macro">!</span>(
+        <span class="macro">trace!</span>(
             <span class="string">&quot;truncate_last_branch: truncated {:?}; off now {}&quot;</span>,
             <span class="ident">b</span>,
             <span class="ident">cur_off</span>
@@ -2258,7 +2580,7 @@
         <span class="self">self</span>.<span class="ident">lazily_clear_labels_at_tail</span>();
         <span class="comment">// Invariants valid at this point.</span>
 
-        <span class="macro">trace</span><span class="macro">!</span>(
+        <span class="macro">trace!</span>(
             <span class="string">&quot;enter optimize_branches:\n b = {:?}\n l = {:?}\n f = {:?}&quot;</span>,
             <span class="self">self</span>.<span class="ident">latest_branches</span>,
             <span class="self">self</span>.<span class="ident">labels_at_tail</span>,
@@ -2271,7 +2593,7 @@
         <span class="comment">// so this always makes progress.</span>
         <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">b</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">latest_branches</span>.<span class="ident">last</span>() {
             <span class="kw">let</span> <span class="ident">cur_off</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cur_offset</span>();
-            <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;optimize_branches: last branch {:?} at off {}&quot;</span>, <span class="ident">b</span>, <span class="ident">cur_off</span>);
+            <span class="macro">trace!</span>(<span class="string">&quot;optimize_branches: last branch {:?} at off {}&quot;</span>, <span class="ident">b</span>, <span class="ident">cur_off</span>);
             <span class="comment">// If there has been any code emission since the end of the last branch or</span>
             <span class="comment">// label definition, then there&#39;s nothing we can edit (because we</span>
             <span class="comment">// don&#39;t move code once placed, only back up and overwrite), so</span>
@@ -2293,7 +2615,7 @@
             <span class="comment">// address is equivalent to a no-op; in both cases, nextPC is the</span>
             <span class="comment">// fallthrough.</span>
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">resolve_label_offset</span>(<span class="ident">b</span>.<span class="ident">target</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">cur_off</span> {
-                <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;branch with target == cur off; truncating&quot;</span>);
+                <span class="macro">trace!</span>(<span class="string">&quot;branch with target == cur off; truncating&quot;</span>);
                 <span class="self">self</span>.<span class="ident">truncate_last_branch</span>();
                 <span class="kw">continue</span>;
             }
@@ -2376,10 +2698,39 @@
                 <span class="comment">// Set any label equal to current branch&#39;s start as an alias of</span>
                 <span class="comment">// the branch&#39;s target, if the target is not the branch itself</span>
                 <span class="comment">// (i.e., an infinite loop).</span>
+                <span class="comment">//</span>
+                <span class="comment">// We cannot perform this aliasing if the target of this branch</span>
+                <span class="comment">// ultimately aliases back here; if so, we need to keep this</span>
+                <span class="comment">// branch, so break out of this loop entirely (and clear the</span>
+                <span class="comment">// latest-branches list below).</span>
+                <span class="comment">//</span>
+                <span class="comment">// Note that this check is what prevents cycles from forming in</span>
+                <span class="comment">// `self.label_aliases`. To see why, consider an arbitrary start</span>
+                <span class="comment">// state:</span>
+                <span class="comment">//</span>
+                <span class="comment">// label_aliases[L1] = L2, label_aliases[L2] = L3, ..., up to</span>
+                <span class="comment">// Ln, which is not aliased.</span>
+                <span class="comment">//</span>
+                <span class="comment">// We would create a cycle if we assigned label_aliases[Ln]</span>
+                <span class="comment">// = L1.  Note that the below assignment is the only write</span>
+                <span class="comment">// to label_aliases.</span>
+                <span class="comment">//</span>
+                <span class="comment">// By our other invariants, we have that Ln (`l` below)</span>
+                <span class="comment">// resolves to the offset `b.start`, because it is in the</span>
+                <span class="comment">// set `b.labels_at_this_branch`.</span>
+                <span class="comment">//</span>
+                <span class="comment">// If L1 were already aliased, through some arbitrarily deep</span>
+                <span class="comment">// chain, to Ln, then it must also resolve to this offset</span>
+                <span class="comment">// `b.start`.</span>
+                <span class="comment">//</span>
+                <span class="comment">// By checking the resolution of `L1` against this offset,</span>
+                <span class="comment">// and aborting this branch-simplification if they are</span>
+                <span class="comment">// equal, we prevent the below assignment from ever creating</span>
+                <span class="comment">// a cycle.</span>
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">resolve_label_offset</span>(<span class="ident">b</span>.<span class="ident">target</span>) <span class="op">!</span><span class="op">=</span> <span class="ident">b</span>.<span class="ident">start</span> {
                     <span class="kw">let</span> <span class="ident">redirected</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">labels_at_this_branch</span>.<span class="ident">len</span>();
                     <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">l</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="ident">labels_at_this_branch</span> {
-                        <span class="macro">trace</span><span class="macro">!</span>(
+                        <span class="macro">trace!</span>(
                             <span class="string">&quot; -&gt; label at start of branch {:?} redirected to target {:?}&quot;</span>,
                             <span class="ident">l</span>,
                             <span class="ident">b</span>.<span class="ident">target</span>
@@ -2398,16 +2749,19 @@
                     <span class="ident">mut_b</span>.<span class="ident">labels_at_this_branch</span>.<span class="ident">clear</span>();
 
                     <span class="kw">if</span> <span class="ident">redirected</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                        <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot; -&gt; after label redirects, restarting loop&quot;</span>);
+                        <span class="macro">trace!</span>(<span class="string">&quot; -&gt; after label redirects, restarting loop&quot;</span>);
                         <span class="kw">continue</span>;
                     }
+                } <span class="kw">else</span> {
+                    <span class="kw">break</span>;
                 }
+
                 <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">latest_branches</span>.<span class="ident">last</span>().<span class="ident">unwrap</span>();
 
                 <span class="comment">// Examine any immediately preceding branch.</span>
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">latest_branches</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">1</span> {
                     <span class="kw">let</span> <span class="ident">prev_b</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">latest_branches</span>[<span class="self">self</span>.<span class="ident">latest_branches</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">2</span>];
-                    <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot; -&gt; more than one branch; prev_b = {:?}&quot;</span>, <span class="ident">prev_b</span>);
+                    <span class="macro">trace!</span>(<span class="string">&quot; -&gt; more than one branch; prev_b = {:?}&quot;</span>, <span class="ident">prev_b</span>);
                     <span class="comment">// This uncond is immediately after another uncond; we</span>
                     <span class="comment">// should have already redirected labels to this uncond away</span>
                     <span class="comment">// (but check to be sure); so we can truncate this uncond.</span>
@@ -2415,7 +2769,7 @@
                         <span class="op">&amp;&amp;</span> <span class="ident">prev_b</span>.<span class="ident">end</span> <span class="op">=</span><span class="op">=</span> <span class="ident">b</span>.<span class="ident">start</span>
                         <span class="op">&amp;&amp;</span> <span class="ident">b</span>.<span class="ident">labels_at_this_branch</span>.<span class="ident">is_empty</span>()
                     {
-                        <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot; -&gt; uncond follows another uncond; truncating&quot;</span>);
+                        <span class="macro">trace!</span>(<span class="string">&quot; -&gt; uncond follows another uncond; truncating&quot;</span>);
                         <span class="self">self</span>.<span class="ident">truncate_last_branch</span>();
                         <span class="kw">continue</span>;
                     }
@@ -2430,7 +2784,7 @@
                         <span class="op">&amp;&amp;</span> <span class="ident">prev_b</span>.<span class="ident">end</span> <span class="op">=</span><span class="op">=</span> <span class="ident">b</span>.<span class="ident">start</span>
                         <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">resolve_label_offset</span>(<span class="ident">prev_b</span>.<span class="ident">target</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">cur_off</span>
                     {
-                        <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot; -&gt; uncond follows a conditional, and conditional&#39;s target resolves to current offset&quot;</span>);
+                        <span class="macro">trace!</span>(<span class="string">&quot; -&gt; uncond follows a conditional, and conditional&#39;s target resolves to current offset&quot;</span>);
                         <span class="comment">// Save the target of the uncond (this becomes the</span>
                         <span class="comment">// target of the cond), and truncate the uncond.</span>
                         <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">target</span>;
@@ -2440,7 +2794,7 @@
                         <span class="comment">// Mutate the code and cond branch.</span>
                         <span class="kw">let</span> <span class="ident">off_before_edit</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cur_offset</span>();
                         <span class="kw">let</span> <span class="ident">prev_b</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">latest_branches</span>.<span class="ident">last_mut</span>().<span class="ident">unwrap</span>();
-                        <span class="kw">let</span> <span class="ident">not_inverted</span> <span class="op">=</span> <span class="ident">SmallVec</span>::<span class="ident">from</span>(
+                        <span class="kw">let</span> <span class="ident">not_inverted</span> <span class="op">=</span> <span class="ident">SmallVec::from</span>(
                             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>[(<span class="ident">prev_b</span>.<span class="ident">start</span> <span class="kw">as</span> <span class="ident">usize</span>)..(<span class="ident">prev_b</span>.<span class="ident">end</span> <span class="kw">as</span> <span class="ident">usize</span>)],
                         );
 
@@ -2455,9 +2809,9 @@
                         <span class="comment">// again.</span>
                         <span class="ident">prev_b</span>.<span class="ident">inverted</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">not_inverted</span>);
                         <span class="self">self</span>.<span class="ident">fixup_records</span>[<span class="ident">prev_b</span>.<span class="ident">fixup</span>].<span class="ident">label</span> <span class="op">=</span> <span class="ident">target</span>;
-                        <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot; -&gt; reassigning target of condbr to {:?}&quot;</span>, <span class="ident">target</span>);
+                        <span class="macro">trace!</span>(<span class="string">&quot; -&gt; reassigning target of condbr to {:?}&quot;</span>, <span class="ident">target</span>);
                         <span class="ident">prev_b</span>.<span class="ident">target</span> <span class="op">=</span> <span class="ident">target</span>;
-                        <span class="macro">debug_assert_eq</span><span class="macro">!</span>(<span class="ident">off_before_edit</span>, <span class="self">self</span>.<span class="ident">cur_offset</span>());
+                        <span class="macro">debug_assert_eq!</span>(<span class="ident">off_before_edit</span>, <span class="self">self</span>.<span class="ident">cur_offset</span>());
                         <span class="kw">continue</span>;
                     }
                 }
@@ -2469,7 +2823,7 @@
 
         <span class="self">self</span>.<span class="ident">purge_latest_branches</span>();
 
-        <span class="macro">trace</span><span class="macro">!</span>(
+        <span class="macro">trace!</span>(
             <span class="string">&quot;leave optimize_branches:\n b = {:?}\n l = {:?}\n f = {:?}&quot;</span>,
             <span class="self">self</span>.<span class="ident">latest_branches</span>,
             <span class="self">self</span>.<span class="ident">labels_at_tail</span>,
@@ -2485,7 +2839,7 @@
         <span class="kw">let</span> <span class="ident">cur_off</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cur_offset</span>();
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">l</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">latest_branches</span>.<span class="ident">last</span>() {
             <span class="kw">if</span> <span class="ident">l</span>.<span class="ident">end</span> <span class="op">&lt;</span> <span class="ident">cur_off</span> {
-                <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;purge_latest_branches: removing branch {:?}&quot;</span>, <span class="ident">l</span>);
+                <span class="macro">trace!</span>(<span class="string">&quot;purge_latest_branches: removing branch {:?}&quot;</span>, <span class="ident">l</span>);
                 <span class="self">self</span>.<span class="ident">latest_branches</span>.<span class="ident">clear</span>();
             }
         }
@@ -2505,13 +2859,20 @@
         <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">max_distance</span>: <span class="ident">CodeOffset</span>,
     ) {
-        <span class="kw">let</span> <span class="ident">deadline</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cur_offset</span>() <span class="op">+</span> <span class="ident">max_distance</span>;
+        <span class="macro">trace!</span>(
+            <span class="string">&quot;defer_constant: eventually emit {} bytes aligned to {} at label {:?}&quot;</span>,
+            <span class="ident">data</span>.<span class="ident">len</span>(),
+            <span class="ident">align</span>,
+            <span class="ident">label</span>
+        );
+        <span class="kw">let</span> <span class="ident">deadline</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cur_offset</span>().<span class="ident">saturating_add</span>(<span class="ident">max_distance</span>);
         <span class="self">self</span>.<span class="ident">island_worst_case_size</span> <span class="op">+</span><span class="op">=</span> <span class="ident">data</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">CodeOffset</span>;
-        <span class="self">self</span>.<span class="ident">island_worst_case_size</span> <span class="op">&amp;=</span> <span class="op">!</span>(<span class="ident">I</span>::<span class="ident">LabelUse</span>::<span class="ident">ALIGN</span> <span class="op">-</span> <span class="number">1</span>);
+        <span class="self">self</span>.<span class="ident">island_worst_case_size</span> <span class="op">=</span>
+            (<span class="self">self</span>.<span class="ident">island_worst_case_size</span> <span class="op">+</span> <span class="ident">I::LabelUse::ALIGN</span> <span class="op">-</span> <span class="number">1</span>) <span class="op">&amp;</span> <span class="op">!</span>(<span class="ident">I::LabelUse::ALIGN</span> <span class="op">-</span> <span class="number">1</span>);
         <span class="self">self</span>.<span class="ident">pending_constants</span>.<span class="ident">push</span>(<span class="ident">MachLabelConstant</span> {
             <span class="ident">label</span>,
             <span class="ident">align</span>,
-            <span class="ident">data</span>: <span class="ident">SmallVec</span>::<span class="ident">from</span>(<span class="ident">data</span>),
+            <span class="ident">data</span>: <span class="ident">SmallVec::from</span>(<span class="ident">data</span>),
         });
         <span class="kw">if</span> <span class="ident">deadline</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">island_deadline</span> {
             <span class="self">self</span>.<span class="ident">island_deadline</span> <span class="op">=</span> <span class="ident">deadline</span>;
@@ -2532,22 +2893,22 @@
         <span class="comment">// anymore.</span>
         <span class="self">self</span>.<span class="ident">latest_branches</span>.<span class="ident">clear</span>();
 
-        <span class="kw">let</span> <span class="ident">pending_constants</span> <span class="op">=</span> <span class="ident">mem</span>::<span class="ident">replace</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">pending_constants</span>, <span class="ident">SmallVec</span>::<span class="ident">new</span>());
+        <span class="kw">let</span> <span class="ident">pending_constants</span> <span class="op">=</span> <span class="ident">mem::replace</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">pending_constants</span>, <span class="ident">SmallVec::new</span>());
         <span class="kw">for</span> <span class="ident">MachLabelConstant</span> { <span class="ident">label</span>, <span class="ident">align</span>, <span class="ident">data</span> } <span class="kw">in</span> <span class="ident">pending_constants</span>.<span class="ident">into_iter</span>() {
             <span class="self">self</span>.<span class="ident">align_to</span>(<span class="ident">align</span>);
             <span class="self">self</span>.<span class="ident">bind_label</span>(<span class="ident">label</span>);
             <span class="self">self</span>.<span class="ident">put_data</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>[..]);
         }
 
-        <span class="kw">let</span> <span class="ident">fixup_records</span> <span class="op">=</span> <span class="ident">mem</span>::<span class="ident">replace</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">fixup_records</span>, <span class="ident">SmallVec</span>::<span class="ident">new</span>());
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_fixups</span> <span class="op">=</span> <span class="ident">SmallVec</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="ident">fixup_records</span> <span class="op">=</span> <span class="ident">mem::replace</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">fixup_records</span>, <span class="ident">SmallVec::new</span>());
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_fixups</span> <span class="op">=</span> <span class="ident">SmallVec::new</span>();
         <span class="kw">for</span> <span class="ident">MachLabelFixup</span> {
             <span class="ident">label</span>,
             <span class="ident">offset</span>,
             <span class="ident">kind</span>,
         } <span class="kw">in</span> <span class="ident">fixup_records</span>.<span class="ident">into_iter</span>()
         {
-            <span class="macro">trace</span><span class="macro">!</span>(
+            <span class="macro">trace!</span>(
                 <span class="string">&quot;emit_island: fixup for label {:?} at offset {} kind {:?}&quot;</span>,
                 <span class="ident">label</span>,
                 <span class="ident">offset</span>,
@@ -2567,7 +2928,7 @@
                 <span class="bool-val">false</span>
             };
 
-            <span class="macro">trace</span><span class="macro">!</span>(
+            <span class="macro">trace!</span>(
                 <span class="string">&quot; -&gt; label_offset = {}, known = {}, in_range = {} (pos {} neg {})&quot;</span>,
                 <span class="ident">label_offset</span>,
                 <span class="ident">known</span>,
@@ -2579,9 +2940,9 @@
             <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">offset</span> <span class="kw">as</span> <span class="ident">usize</span>;
             <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> (<span class="ident">offset</span> <span class="op">+</span> <span class="ident">kind</span>.<span class="ident">patch_size</span>()) <span class="kw">as</span> <span class="ident">usize</span>;
             <span class="kw">if</span> <span class="ident">in_range</span> {
-                <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">known</span>); <span class="comment">// implied by in_range.</span>
+                <span class="macro">debug_assert!</span>(<span class="ident">known</span>); <span class="comment">// implied by in_range.</span>
                 <span class="kw">let</span> <span class="ident">slice</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">data</span>[<span class="ident">start</span>..<span class="ident">end</span>];
-                <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;patching in-range!&quot;</span>);
+                <span class="macro">trace!</span>(<span class="string">&quot;patching in-range!&quot;</span>);
                 <span class="ident">kind</span>.<span class="ident">patch</span>(<span class="ident">slice</span>, <span class="ident">offset</span>, <span class="ident">label_offset</span>);
             } <span class="kw">else</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">known</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">kind</span>.<span class="ident">supports_veneer</span>() {
                 <span class="comment">// Nothing for now. Keep it for next round.</span>
@@ -2592,12 +2953,12 @@
                 });
             } <span class="kw">else</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">in_range</span> <span class="op">&amp;&amp;</span> <span class="ident">kind</span>.<span class="ident">supports_veneer</span>() {
                 <span class="comment">// Allocate space for a veneer in the island.</span>
-                <span class="self">self</span>.<span class="ident">align_to</span>(<span class="ident">I</span>::<span class="ident">LabelUse</span>::<span class="ident">ALIGN</span>);
+                <span class="self">self</span>.<span class="ident">align_to</span>(<span class="ident">I::LabelUse::ALIGN</span>);
                 <span class="kw">let</span> <span class="ident">veneer_offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cur_offset</span>();
-                <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;making a veneer at {}&quot;</span>, <span class="ident">veneer_offset</span>);
+                <span class="macro">trace!</span>(<span class="string">&quot;making a veneer at {}&quot;</span>, <span class="ident">veneer_offset</span>);
                 <span class="kw">let</span> <span class="ident">slice</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">data</span>[<span class="ident">start</span>..<span class="ident">end</span>];
                 <span class="comment">// Patch the original label use to refer to the veneer.</span>
-                <span class="macro">trace</span><span class="macro">!</span>(
+                <span class="macro">trace!</span>(
                     <span class="string">&quot;patching original at offset {} to veneer offset {}&quot;</span>,
                     <span class="ident">offset</span>,
                     <span class="ident">veneer_offset</span>
@@ -2607,7 +2968,7 @@
                 <span class="kw">let</span> <span class="ident">veneer_slice</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_appended_space</span>(<span class="ident">kind</span>.<span class="ident">veneer_size</span>() <span class="kw">as</span> <span class="ident">usize</span>);
                 <span class="kw">let</span> (<span class="ident">veneer_fixup_off</span>, <span class="ident">veneer_label_use</span>) <span class="op">=</span>
                     <span class="ident">kind</span>.<span class="ident">generate_veneer</span>(<span class="ident">veneer_slice</span>, <span class="ident">veneer_offset</span>);
-                <span class="macro">trace</span><span class="macro">!</span>(
+                <span class="macro">trace!</span>(
                     <span class="string">&quot;generated veneer; fixup offset {}, label_use {:?}&quot;</span>,
                     <span class="ident">veneer_fixup_off</span>,
                     <span class="ident">veneer_label_use</span>
@@ -2618,7 +2979,7 @@
                     <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">veneer_fixup_off</span> <span class="kw">as</span> <span class="ident">usize</span>;
                     <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> (<span class="ident">veneer_fixup_off</span> <span class="op">+</span> <span class="ident">veneer_label_use</span>.<span class="ident">patch_size</span>()) <span class="kw">as</span> <span class="ident">usize</span>;
                     <span class="kw">let</span> <span class="ident">veneer_slice</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">data</span>[<span class="ident">start</span>..<span class="ident">end</span>];
-                    <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;doing veneer fixup right away too&quot;</span>);
+                    <span class="macro">trace!</span>(<span class="string">&quot;doing veneer fixup right away too&quot;</span>);
                     <span class="ident">veneer_label_use</span>.<span class="ident">patch</span>(<span class="ident">veneer_slice</span>, <span class="ident">veneer_fixup_off</span>, <span class="ident">label_offset</span>);
                 } <span class="kw">else</span> {
                     <span class="ident">new_fixups</span>.<span class="ident">push</span>(<span class="ident">MachLabelFixup</span> {
@@ -2628,7 +2989,7 @@
                     });
                 }
             } <span class="kw">else</span> {
-                <span class="macro">panic</span><span class="macro">!</span>(
+                <span class="macro">panic!</span>(
                     <span class="string">&quot;Cannot support label-use {:?} (known = {}, in-range = {})&quot;</span>,
                     <span class="ident">kind</span>, <span class="ident">known</span>, <span class="ident">in_range</span>
                 );
@@ -2641,13 +3002,7 @@
 
     <span class="doccomment">/// Finish any deferred emissions and/or fixups.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MachBufferFinalized</span> {
-        <span class="comment">// Ensure that all labels are defined. This is a full (release-mode)</span>
-        <span class="comment">// assert because we must avoid looping indefinitely below; an</span>
-        <span class="comment">// unresolved label will prevent the fixup_records vec from emptying.</span>
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="self">self</span>
-            .<span class="ident">label_offsets</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">all</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">off</span><span class="op">|</span> <span class="ident">off</span> <span class="op">!</span><span class="op">=</span> <span class="ident">UNKNOWN_LABEL_OFFSET</span>));
+        <span class="kw">let</span> <span class="ident">_tt</span> <span class="op">=</span> <span class="ident">timing::vcode_emit_finish</span>();
 
         <span class="kw">while</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">pending_constants</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">fixup_records</span>.<span class="ident">is_empty</span>() {
             <span class="comment">// `emit_island()` will emit any pending veneers and constants, and</span>
@@ -2656,13 +3011,21 @@
             <span class="self">self</span>.<span class="ident">emit_island</span>();
         }
 
+        <span class="comment">// Ensure that all labels have been fixed up after the last island is emitted. This is a</span>
+        <span class="comment">// full (release-mode) assert because an unresolved label means the emitted code is</span>
+        <span class="comment">// incorrect.</span>
+        <span class="macro">assert!</span>(<span class="self">self</span>.<span class="ident">fixup_records</span>.<span class="ident">is_empty</span>());
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">srclocs</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">srclocs</span>;
+        <span class="ident">srclocs</span>.<span class="ident">sort_by_key</span>(<span class="op">|</span><span class="ident">entry</span><span class="op">|</span> <span class="ident">entry</span>.<span class="ident">start</span>);
+
         <span class="ident">MachBufferFinalized</span> {
             <span class="ident">data</span>: <span class="self">self</span>.<span class="ident">data</span>,
             <span class="ident">relocs</span>: <span class="self">self</span>.<span class="ident">relocs</span>,
             <span class="ident">traps</span>: <span class="self">self</span>.<span class="ident">traps</span>,
             <span class="ident">call_sites</span>: <span class="self">self</span>.<span class="ident">call_sites</span>,
-            <span class="ident">srclocs</span>: <span class="self">self</span>.<span class="ident">srclocs</span>,
-            <span class="ident">stackmaps</span>: <span class="self">self</span>.<span class="ident">stackmaps</span>,
+            <span class="ident">srclocs</span>,
+            <span class="ident">stack_maps</span>: <span class="self">self</span>.<span class="ident">stack_maps</span>,
         }
     }
 
@@ -2717,25 +3080,34 @@
             .<span class="ident">expect</span>(<span class="string">&quot;end_srcloc() called without start_srcloc()&quot;</span>);
         <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cur_offset</span>();
         <span class="comment">// Skip zero-length extends.</span>
-        <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">end</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">start</span>);
+        <span class="macro">debug_assert!</span>(<span class="ident">end</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">start</span>);
         <span class="kw">if</span> <span class="ident">end</span> <span class="op">&gt;</span> <span class="ident">start</span> {
             <span class="self">self</span>.<span class="ident">srclocs</span>.<span class="ident">push</span>(<span class="ident">MachSrcLoc</span> { <span class="ident">start</span>, <span class="ident">end</span>, <span class="ident">loc</span> });
         }
     }
 
-    <span class="doccomment">/// Add stackmap metadata for this program point: a set of stack offsets</span>
+    <span class="doccomment">/// Add stack map metadata for this program point: a set of stack offsets</span>
     <span class="doccomment">/// (from SP upward) that contain live references.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The `offset_to_fp` value is the offset from the nominal SP (at which the</span>
-    <span class="doccomment">/// `stack_offsets` are based) and the FP value. By subtracting</span>
-    <span class="doccomment">/// `offset_to_fp` from each `stack_offsets` element, one can obtain</span>
-    <span class="doccomment">/// live-reference offsets from FP instead.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_stackmap</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">insn_len</span>: <span class="ident">CodeOffset</span>, <span class="ident">stackmap</span>: <span class="ident">Stackmap</span>) {
-        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cur_offset</span>();
-        <span class="self">self</span>.<span class="ident">stackmaps</span>.<span class="ident">push</span>(<span class="ident">MachStackMap</span> {
-            <span class="ident">offset</span>,
-            <span class="ident">offset_end</span>: <span class="ident">offset</span> <span class="op">+</span> <span class="ident">insn_len</span>,
-            <span class="ident">stackmap</span>,
+    <span class="doccomment">/// The `offset_to_fp` value is the offset from the nominal SP (at which the `stack_offsets`</span>
+    <span class="doccomment">/// are based) and the FP value. By subtracting `offset_to_fp` from each `stack_offsets`</span>
+    <span class="doccomment">/// element, one can obtain live-reference offsets from FP instead.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_stack_map</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">extent</span>: <span class="ident">StackMapExtent</span>, <span class="ident">stack_map</span>: <span class="ident">StackMap</span>) {
+        <span class="kw">let</span> (<span class="ident">start</span>, <span class="ident">end</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">extent</span> {
+            <span class="ident">StackMapExtent::UpcomingBytes</span>(<span class="ident">insn_len</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="kw">let</span> <span class="ident">start_offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cur_offset</span>();
+                (<span class="ident">start_offset</span>, <span class="ident">start_offset</span> <span class="op">+</span> <span class="ident">insn_len</span>)
+            }
+            <span class="ident">StackMapExtent::StartedAtOffset</span>(<span class="ident">start_offset</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="kw">let</span> <span class="ident">end_offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cur_offset</span>();
+                <span class="macro">debug_assert!</span>(<span class="ident">end_offset</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">start_offset</span>);
+                (<span class="ident">start_offset</span>, <span class="ident">end_offset</span>)
+            }
+        };
+        <span class="self">self</span>.<span class="ident">stack_maps</span>.<span class="ident">push</span>(<span class="ident">MachStackMap</span> {
+            <span class="ident">offset</span>: <span class="ident">start</span>,
+            <span class="ident">offset_end</span>: <span class="ident">end</span>,
+            <span class="ident">stack_map</span>,
         });
     }
 }
@@ -2797,9 +3169,9 @@
         <span class="ident">sink</span>.<span class="ident">end_codegen</span>();
     }
 
-    <span class="doccomment">/// Get the stackmap metadata for this code.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stackmaps</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">MachStackMap</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">stackmaps</span>[..]
+    <span class="doccomment">/// Get the stack map metadata for this code.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stack_maps</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">MachStackMap</span>] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">stack_maps</span>[..]
     }
 }
 
@@ -2826,7 +3198,7 @@
     <span class="doccomment">/// e.g., several types of branch instructions, each with differently-sized</span>
     <span class="doccomment">/// offset fields and different places within the instruction to place the</span>
     <span class="doccomment">/// bits.</span>
-    <span class="ident">kind</span>: <span class="ident">I</span>::<span class="ident">LabelUse</span>,
+    <span class="ident">kind</span>: <span class="ident">I::LabelUse</span>,
 }
 
 <span class="doccomment">/// A relocation resulting from a compilation.</span>
@@ -2880,17 +3252,17 @@
     <span class="kw">pub</span> <span class="ident">loc</span>: <span class="ident">SourceLoc</span>,
 }
 
-<span class="doccomment">/// Record of stackmap metadata: stack offsets containing references.</span>
+<span class="doccomment">/// Record of stack map metadata: stack offsets containing references.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MachStackMap</span> {
-    <span class="doccomment">/// The code offset at which this stackmap applies.</span>
+    <span class="doccomment">/// The code offset at which this stack map applies.</span>
     <span class="kw">pub</span> <span class="ident">offset</span>: <span class="ident">CodeOffset</span>,
     <span class="doccomment">/// The code offset just past the &quot;end&quot; of the instruction: that is, the</span>
     <span class="doccomment">/// offset of the first byte of the following instruction, or equivalently,</span>
     <span class="doccomment">/// the start offset plus the instruction length.</span>
     <span class="kw">pub</span> <span class="ident">offset_end</span>: <span class="ident">CodeOffset</span>,
-    <span class="doccomment">/// The Stackmap itself.</span>
-    <span class="kw">pub</span> <span class="ident">stackmap</span>: <span class="ident">Stackmap</span>,
+    <span class="doccomment">/// The stack map itself.</span>
+    <span class="kw">pub</span> <span class="ident">stack_map</span>: <span class="ident">StackMap</span>,
 }
 
 <span class="doccomment">/// Record of branch instruction in the buffer, to facilitate editing.</span>
@@ -2922,211 +3294,358 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;arm64&quot;</span>))]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">isa</span>::<span class="ident">aarch64</span>::<span class="ident">inst</span>::<span class="ident">xreg</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">isa</span>::<span class="ident">aarch64</span>::<span class="ident">inst</span>::{<span class="ident">BranchTarget</span>, <span class="ident">CondBrKind</span>, <span class="ident">Inst</span>};
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">machinst</span>::<span class="ident">MachInstEmit</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">settings</span>;
-    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">default</span>::<span class="ident">Default</span>;
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::isa::aarch64::inst::xreg</span>;
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::isa::aarch64::inst</span>::{<span class="ident">BranchTarget</span>, <span class="ident">CondBrKind</span>, <span class="ident">EmitInfo</span>, <span class="ident">Inst</span>};
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::machinst::MachInstEmit</span>;
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::settings</span>;
+    <span class="kw">use</span> <span class="ident">std::default::Default</span>;
 
     <span class="kw">fn</span> <span class="ident">label</span>(<span class="ident">n</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MachLabel</span> {
-        <span class="ident">MachLabel</span>::<span class="ident">from_block</span>(<span class="ident">n</span>)
+        <span class="ident">MachLabel::from_block</span>(<span class="ident">n</span>)
     }
     <span class="kw">fn</span> <span class="ident">target</span>(<span class="ident">n</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BranchTarget</span> {
-        <span class="ident">BranchTarget</span>::<span class="ident">Label</span>(<span class="ident">label</span>(<span class="ident">n</span>))
+        <span class="ident">BranchTarget::Label</span>(<span class="ident">label</span>(<span class="ident">n</span>))
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_elide_jump_to_next</span>() {
-        <span class="kw">let</span> <span class="ident">flags</span> <span class="op">=</span> <span class="ident">settings</span>::<span class="ident">Flags</span>::<span class="ident">new</span>(<span class="ident">settings</span>::<span class="ident">builder</span>());
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">MachBuffer</span>::<span class="ident">new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">Default</span>::<span class="ident">default</span>();
+        <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">EmitInfo::new</span>(<span class="ident">settings::Flags::new</span>(<span class="ident">settings::builder</span>()));
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">MachBuffer::new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">Default::default</span>();
 
         <span class="ident">buf</span>.<span class="ident">reserve_labels_for_blocks</span>(<span class="number">2</span>);
         <span class="ident">buf</span>.<span class="ident">bind_label</span>(<span class="ident">label</span>(<span class="number">0</span>));
-        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst</span>::<span class="ident">Jump</span> { <span class="ident">dest</span>: <span class="ident">target</span>(<span class="number">1</span>) };
-        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">flags</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst::Jump</span> { <span class="ident">dest</span>: <span class="ident">target</span>(<span class="number">1</span>) };
+        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
         <span class="ident">buf</span>.<span class="ident">bind_label</span>(<span class="ident">label</span>(<span class="number">1</span>));
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">finish</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="number">0</span>, <span class="ident">buf</span>.<span class="ident">total_size</span>());
+        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="ident">buf</span>.<span class="ident">total_size</span>());
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_elide_trivial_jump_blocks</span>() {
-        <span class="kw">let</span> <span class="ident">flags</span> <span class="op">=</span> <span class="ident">settings</span>::<span class="ident">Flags</span>::<span class="ident">new</span>(<span class="ident">settings</span>::<span class="ident">builder</span>());
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">MachBuffer</span>::<span class="ident">new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">Default</span>::<span class="ident">default</span>();
+        <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">EmitInfo::new</span>(<span class="ident">settings::Flags::new</span>(<span class="ident">settings::builder</span>()));
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">MachBuffer::new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">Default::default</span>();
 
         <span class="ident">buf</span>.<span class="ident">reserve_labels_for_blocks</span>(<span class="number">4</span>);
 
         <span class="ident">buf</span>.<span class="ident">bind_label</span>(<span class="ident">label</span>(<span class="number">0</span>));
-        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst</span>::<span class="ident">CondBr</span> {
-            <span class="ident">kind</span>: <span class="ident">CondBrKind</span>::<span class="ident">NotZero</span>(<span class="ident">xreg</span>(<span class="number">0</span>)),
+        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst::CondBr</span> {
+            <span class="ident">kind</span>: <span class="ident">CondBrKind::NotZero</span>(<span class="ident">xreg</span>(<span class="number">0</span>)),
             <span class="ident">taken</span>: <span class="ident">target</span>(<span class="number">1</span>),
             <span class="ident">not_taken</span>: <span class="ident">target</span>(<span class="number">2</span>),
         };
-        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">flags</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
 
         <span class="ident">buf</span>.<span class="ident">bind_label</span>(<span class="ident">label</span>(<span class="number">1</span>));
-        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst</span>::<span class="ident">Jump</span> { <span class="ident">dest</span>: <span class="ident">target</span>(<span class="number">3</span>) };
-        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">flags</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst::Jump</span> { <span class="ident">dest</span>: <span class="ident">target</span>(<span class="number">3</span>) };
+        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
 
         <span class="ident">buf</span>.<span class="ident">bind_label</span>(<span class="ident">label</span>(<span class="number">2</span>));
-        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst</span>::<span class="ident">Jump</span> { <span class="ident">dest</span>: <span class="ident">target</span>(<span class="number">3</span>) };
-        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">flags</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst::Jump</span> { <span class="ident">dest</span>: <span class="ident">target</span>(<span class="number">3</span>) };
+        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
 
         <span class="ident">buf</span>.<span class="ident">bind_label</span>(<span class="ident">label</span>(<span class="number">3</span>));
 
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">finish</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="number">0</span>, <span class="ident">buf</span>.<span class="ident">total_size</span>());
+        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="ident">buf</span>.<span class="ident">total_size</span>());
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_flip_cond</span>() {
-        <span class="kw">let</span> <span class="ident">flags</span> <span class="op">=</span> <span class="ident">settings</span>::<span class="ident">Flags</span>::<span class="ident">new</span>(<span class="ident">settings</span>::<span class="ident">builder</span>());
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">MachBuffer</span>::<span class="ident">new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">Default</span>::<span class="ident">default</span>();
+        <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">EmitInfo::new</span>(<span class="ident">settings::Flags::new</span>(<span class="ident">settings::builder</span>()));
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">MachBuffer::new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">Default::default</span>();
 
         <span class="ident">buf</span>.<span class="ident">reserve_labels_for_blocks</span>(<span class="number">4</span>);
 
         <span class="ident">buf</span>.<span class="ident">bind_label</span>(<span class="ident">label</span>(<span class="number">0</span>));
-        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst</span>::<span class="ident">CondBr</span> {
-            <span class="ident">kind</span>: <span class="ident">CondBrKind</span>::<span class="ident">NotZero</span>(<span class="ident">xreg</span>(<span class="number">0</span>)),
+        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst::CondBr</span> {
+            <span class="ident">kind</span>: <span class="ident">CondBrKind::NotZero</span>(<span class="ident">xreg</span>(<span class="number">0</span>)),
             <span class="ident">taken</span>: <span class="ident">target</span>(<span class="number">1</span>),
             <span class="ident">not_taken</span>: <span class="ident">target</span>(<span class="number">2</span>),
         };
-        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">flags</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
 
         <span class="ident">buf</span>.<span class="ident">bind_label</span>(<span class="ident">label</span>(<span class="number">1</span>));
-        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst</span>::<span class="ident">Udf</span> {
-            <span class="ident">trap_info</span>: (<span class="ident">SourceLoc</span>::<span class="ident">default</span>(), <span class="ident">TrapCode</span>::<span class="ident">Interrupt</span>),
+        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst::Udf</span> {
+            <span class="ident">trap_code</span>: <span class="ident">TrapCode::Interrupt</span>,
         };
-        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">flags</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
 
         <span class="ident">buf</span>.<span class="ident">bind_label</span>(<span class="ident">label</span>(<span class="number">2</span>));
-        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst</span>::<span class="ident">Nop4</span>;
-        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">flags</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst::Nop4</span>;
+        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
 
         <span class="ident">buf</span>.<span class="ident">bind_label</span>(<span class="ident">label</span>(<span class="number">3</span>));
 
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">finish</span>();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf2</span> <span class="op">=</span> <span class="ident">MachBuffer</span>::<span class="ident">new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">Default</span>::<span class="ident">default</span>();
-        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst</span>::<span class="ident">TrapIf</span> {
-            <span class="ident">kind</span>: <span class="ident">CondBrKind</span>::<span class="ident">NotZero</span>(<span class="ident">xreg</span>(<span class="number">0</span>)),
-            <span class="ident">trap_info</span>: (<span class="ident">SourceLoc</span>::<span class="ident">default</span>(), <span class="ident">TrapCode</span>::<span class="ident">Interrupt</span>),
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf2</span> <span class="op">=</span> <span class="ident">MachBuffer::new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">Default::default</span>();
+        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst::TrapIf</span> {
+            <span class="ident">kind</span>: <span class="ident">CondBrKind::NotZero</span>(<span class="ident">xreg</span>(<span class="number">0</span>)),
+            <span class="ident">trap_code</span>: <span class="ident">TrapCode::Interrupt</span>,
         };
-        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf2</span>, <span class="kw-2">&amp;</span><span class="ident">flags</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
-        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst</span>::<span class="ident">Nop4</span>;
-        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf2</span>, <span class="kw-2">&amp;</span><span class="ident">flags</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf2</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst::Nop4</span>;
+        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf2</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
 
         <span class="kw">let</span> <span class="ident">buf2</span> <span class="op">=</span> <span class="ident">buf2</span>.<span class="ident">finish</span>();
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">buf</span>.<span class="ident">data</span>, <span class="ident">buf2</span>.<span class="ident">data</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">buf</span>.<span class="ident">data</span>, <span class="ident">buf2</span>.<span class="ident">data</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_island</span>() {
-        <span class="kw">let</span> <span class="ident">flags</span> <span class="op">=</span> <span class="ident">settings</span>::<span class="ident">Flags</span>::<span class="ident">new</span>(<span class="ident">settings</span>::<span class="ident">builder</span>());
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">MachBuffer</span>::<span class="ident">new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">Default</span>::<span class="ident">default</span>();
+        <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">EmitInfo::new</span>(<span class="ident">settings::Flags::new</span>(<span class="ident">settings::builder</span>()));
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">MachBuffer::new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">Default::default</span>();
 
         <span class="ident">buf</span>.<span class="ident">reserve_labels_for_blocks</span>(<span class="number">4</span>);
 
         <span class="ident">buf</span>.<span class="ident">bind_label</span>(<span class="ident">label</span>(<span class="number">0</span>));
-        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst</span>::<span class="ident">CondBr</span> {
-            <span class="ident">kind</span>: <span class="ident">CondBrKind</span>::<span class="ident">NotZero</span>(<span class="ident">xreg</span>(<span class="number">0</span>)),
+        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst::CondBr</span> {
+            <span class="ident">kind</span>: <span class="ident">CondBrKind::NotZero</span>(<span class="ident">xreg</span>(<span class="number">0</span>)),
             <span class="ident">taken</span>: <span class="ident">target</span>(<span class="number">2</span>),
             <span class="ident">not_taken</span>: <span class="ident">target</span>(<span class="number">3</span>),
         };
-        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">flags</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
 
         <span class="ident">buf</span>.<span class="ident">bind_label</span>(<span class="ident">label</span>(<span class="number">1</span>));
         <span class="kw">while</span> <span class="ident">buf</span>.<span class="ident">cur_offset</span>() <span class="op">&lt;</span> <span class="number">2000000</span> {
             <span class="kw">if</span> <span class="ident">buf</span>.<span class="ident">island_needed</span>(<span class="number">0</span>) {
                 <span class="ident">buf</span>.<span class="ident">emit_island</span>();
             }
-            <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst</span>::<span class="ident">Nop4</span>;
-            <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">flags</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+            <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst::Nop4</span>;
+            <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
         }
 
         <span class="ident">buf</span>.<span class="ident">bind_label</span>(<span class="ident">label</span>(<span class="number">2</span>));
-        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst</span>::<span class="ident">Nop4</span>;
-        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">flags</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst::Nop4</span>;
+        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
 
         <span class="ident">buf</span>.<span class="ident">bind_label</span>(<span class="ident">label</span>(<span class="number">3</span>));
-        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst</span>::<span class="ident">Nop4</span>;
-        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">flags</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst::Nop4</span>;
+        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
 
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">finish</span>();
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="number">2000000</span> <span class="op">+</span> <span class="number">8</span>, <span class="ident">buf</span>.<span class="ident">total_size</span>());
+        <span class="macro">assert_eq!</span>(<span class="number">2000000</span> <span class="op">+</span> <span class="number">8</span>, <span class="ident">buf</span>.<span class="ident">total_size</span>());
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf2</span> <span class="op">=</span> <span class="ident">MachBuffer</span>::<span class="ident">new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">Default</span>::<span class="ident">default</span>();
-        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst</span>::<span class="ident">CondBr</span> {
-            <span class="ident">kind</span>: <span class="ident">CondBrKind</span>::<span class="ident">NotZero</span>(<span class="ident">xreg</span>(<span class="number">0</span>)),
-            <span class="ident">taken</span>: <span class="ident">BranchTarget</span>::<span class="ident">ResolvedOffset</span>(<span class="number">1048576</span> <span class="op">-</span> <span class="number">4</span>),
-            <span class="ident">not_taken</span>: <span class="ident">BranchTarget</span>::<span class="ident">ResolvedOffset</span>(<span class="number">2000000</span> <span class="op">+</span> <span class="number">4</span> <span class="op">-</span> <span class="number">4</span>),
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf2</span> <span class="op">=</span> <span class="ident">MachBuffer::new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">Default::default</span>();
+        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst::CondBr</span> {
+            <span class="ident">kind</span>: <span class="ident">CondBrKind::NotZero</span>(<span class="ident">xreg</span>(<span class="number">0</span>)),
+            <span class="ident">taken</span>: <span class="ident">BranchTarget::ResolvedOffset</span>(<span class="number">1048576</span> <span class="op">-</span> <span class="number">4</span>),
+            <span class="ident">not_taken</span>: <span class="ident">BranchTarget::ResolvedOffset</span>(<span class="number">2000000</span> <span class="op">+</span> <span class="number">4</span> <span class="op">-</span> <span class="number">4</span>),
         };
-        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf2</span>, <span class="kw-2">&amp;</span><span class="ident">flags</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf2</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
 
         <span class="kw">let</span> <span class="ident">buf2</span> <span class="op">=</span> <span class="ident">buf2</span>.<span class="ident">finish</span>();
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>.<span class="ident">data</span>[<span class="number">0</span>..<span class="number">8</span>], <span class="kw-2">&amp;</span><span class="ident">buf2</span>.<span class="ident">data</span>[..]);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>.<span class="ident">data</span>[<span class="number">0</span>..<span class="number">8</span>], <span class="kw-2">&amp;</span><span class="ident">buf2</span>.<span class="ident">data</span>[..]);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_island_backward</span>() {
-        <span class="kw">let</span> <span class="ident">flags</span> <span class="op">=</span> <span class="ident">settings</span>::<span class="ident">Flags</span>::<span class="ident">new</span>(<span class="ident">settings</span>::<span class="ident">builder</span>());
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">MachBuffer</span>::<span class="ident">new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">Default</span>::<span class="ident">default</span>();
+        <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">EmitInfo::new</span>(<span class="ident">settings::Flags::new</span>(<span class="ident">settings::builder</span>()));
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">MachBuffer::new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">Default::default</span>();
 
         <span class="ident">buf</span>.<span class="ident">reserve_labels_for_blocks</span>(<span class="number">4</span>);
 
         <span class="ident">buf</span>.<span class="ident">bind_label</span>(<span class="ident">label</span>(<span class="number">0</span>));
-        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst</span>::<span class="ident">Nop4</span>;
-        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">flags</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst::Nop4</span>;
+        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
 
         <span class="ident">buf</span>.<span class="ident">bind_label</span>(<span class="ident">label</span>(<span class="number">1</span>));
-        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst</span>::<span class="ident">Nop4</span>;
-        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">flags</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst::Nop4</span>;
+        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
 
         <span class="ident">buf</span>.<span class="ident">bind_label</span>(<span class="ident">label</span>(<span class="number">2</span>));
         <span class="kw">while</span> <span class="ident">buf</span>.<span class="ident">cur_offset</span>() <span class="op">&lt;</span> <span class="number">2000000</span> {
-            <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst</span>::<span class="ident">Nop4</span>;
-            <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">flags</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+            <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst::Nop4</span>;
+            <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
         }
 
         <span class="ident">buf</span>.<span class="ident">bind_label</span>(<span class="ident">label</span>(<span class="number">3</span>));
-        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst</span>::<span class="ident">CondBr</span> {
-            <span class="ident">kind</span>: <span class="ident">CondBrKind</span>::<span class="ident">NotZero</span>(<span class="ident">xreg</span>(<span class="number">0</span>)),
+        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst::CondBr</span> {
+            <span class="ident">kind</span>: <span class="ident">CondBrKind::NotZero</span>(<span class="ident">xreg</span>(<span class="number">0</span>)),
             <span class="ident">taken</span>: <span class="ident">target</span>(<span class="number">0</span>),
             <span class="ident">not_taken</span>: <span class="ident">target</span>(<span class="number">1</span>),
         };
-        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">flags</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
 
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">finish</span>();
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="number">2000000</span> <span class="op">+</span> <span class="number">12</span>, <span class="ident">buf</span>.<span class="ident">total_size</span>());
+        <span class="macro">assert_eq!</span>(<span class="number">2000000</span> <span class="op">+</span> <span class="number">12</span>, <span class="ident">buf</span>.<span class="ident">total_size</span>());
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf2</span> <span class="op">=</span> <span class="ident">MachBuffer</span>::<span class="ident">new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">Default</span>::<span class="ident">default</span>();
-        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst</span>::<span class="ident">CondBr</span> {
-            <span class="ident">kind</span>: <span class="ident">CondBrKind</span>::<span class="ident">NotZero</span>(<span class="ident">xreg</span>(<span class="number">0</span>)),
-            <span class="ident">taken</span>: <span class="ident">BranchTarget</span>::<span class="ident">ResolvedOffset</span>(<span class="number">8</span>),
-            <span class="ident">not_taken</span>: <span class="ident">BranchTarget</span>::<span class="ident">ResolvedOffset</span>(<span class="number">4</span> <span class="op">-</span> (<span class="number">2000000</span> <span class="op">+</span> <span class="number">4</span>)),
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf2</span> <span class="op">=</span> <span class="ident">MachBuffer::new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">Default::default</span>();
+        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst::CondBr</span> {
+            <span class="ident">kind</span>: <span class="ident">CondBrKind::NotZero</span>(<span class="ident">xreg</span>(<span class="number">0</span>)),
+            <span class="ident">taken</span>: <span class="ident">BranchTarget::ResolvedOffset</span>(<span class="number">8</span>),
+            <span class="ident">not_taken</span>: <span class="ident">BranchTarget::ResolvedOffset</span>(<span class="number">4</span> <span class="op">-</span> (<span class="number">2000000</span> <span class="op">+</span> <span class="number">4</span>)),
         };
-        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf2</span>, <span class="kw-2">&amp;</span><span class="ident">flags</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
-        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst</span>::<span class="ident">Jump</span> {
-            <span class="ident">dest</span>: <span class="ident">BranchTarget</span>::<span class="ident">ResolvedOffset</span>(<span class="op">-</span>(<span class="number">2000000</span> <span class="op">+</span> <span class="number">8</span>)),
+        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf2</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst::Jump</span> {
+            <span class="ident">dest</span>: <span class="ident">BranchTarget::ResolvedOffset</span>(<span class="op">-</span>(<span class="number">2000000</span> <span class="op">+</span> <span class="number">8</span>)),
         };
-        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf2</span>, <span class="kw-2">&amp;</span><span class="ident">flags</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf2</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
 
         <span class="kw">let</span> <span class="ident">buf2</span> <span class="op">=</span> <span class="ident">buf2</span>.<span class="ident">finish</span>();
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>.<span class="ident">data</span>[<span class="number">2000000</span>..], <span class="kw-2">&amp;</span><span class="ident">buf2</span>.<span class="ident">data</span>[..]);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>.<span class="ident">data</span>[<span class="number">2000000</span>..], <span class="kw-2">&amp;</span><span class="ident">buf2</span>.<span class="ident">data</span>[..]);
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_multiple_redirect</span>() {
+        <span class="comment">// label0:</span>
+        <span class="comment">//   cbz x0, label1</span>
+        <span class="comment">//   b label2</span>
+        <span class="comment">// label1:</span>
+        <span class="comment">//   b label3</span>
+        <span class="comment">// label2:</span>
+        <span class="comment">//   nop</span>
+        <span class="comment">//   nop</span>
+        <span class="comment">//   b label0</span>
+        <span class="comment">// label3:</span>
+        <span class="comment">//   b label4</span>
+        <span class="comment">// label4:</span>
+        <span class="comment">//   b label5</span>
+        <span class="comment">// label5:</span>
+        <span class="comment">//   b label7</span>
+        <span class="comment">// label6:</span>
+        <span class="comment">//   nop</span>
+        <span class="comment">// label7:</span>
+        <span class="comment">//   ret</span>
+        <span class="comment">//</span>
+        <span class="comment">// -- should become:</span>
+        <span class="comment">//</span>
+        <span class="comment">// label0:</span>
+        <span class="comment">//   cbz x0, label7</span>
+        <span class="comment">// label2:</span>
+        <span class="comment">//   nop</span>
+        <span class="comment">//   nop</span>
+        <span class="comment">//   b label0</span>
+        <span class="comment">// label6:</span>
+        <span class="comment">//   nop</span>
+        <span class="comment">// label7:</span>
+        <span class="comment">//   ret</span>
+
+        <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">EmitInfo::new</span>(<span class="ident">settings::Flags::new</span>(<span class="ident">settings::builder</span>()));
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">MachBuffer::new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">Default::default</span>();
+
+        <span class="ident">buf</span>.<span class="ident">reserve_labels_for_blocks</span>(<span class="number">8</span>);
+
+        <span class="ident">buf</span>.<span class="ident">bind_label</span>(<span class="ident">label</span>(<span class="number">0</span>));
+        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst::CondBr</span> {
+            <span class="ident">kind</span>: <span class="ident">CondBrKind::Zero</span>(<span class="ident">xreg</span>(<span class="number">0</span>)),
+            <span class="ident">taken</span>: <span class="ident">target</span>(<span class="number">1</span>),
+            <span class="ident">not_taken</span>: <span class="ident">target</span>(<span class="number">2</span>),
+        };
+        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+
+        <span class="ident">buf</span>.<span class="ident">bind_label</span>(<span class="ident">label</span>(<span class="number">1</span>));
+        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst::Jump</span> { <span class="ident">dest</span>: <span class="ident">target</span>(<span class="number">3</span>) };
+        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+
+        <span class="ident">buf</span>.<span class="ident">bind_label</span>(<span class="ident">label</span>(<span class="number">2</span>));
+        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst::Nop4</span>;
+        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst::Jump</span> { <span class="ident">dest</span>: <span class="ident">target</span>(<span class="number">0</span>) };
+        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+
+        <span class="ident">buf</span>.<span class="ident">bind_label</span>(<span class="ident">label</span>(<span class="number">3</span>));
+        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst::Jump</span> { <span class="ident">dest</span>: <span class="ident">target</span>(<span class="number">4</span>) };
+        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+
+        <span class="ident">buf</span>.<span class="ident">bind_label</span>(<span class="ident">label</span>(<span class="number">4</span>));
+        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst::Jump</span> { <span class="ident">dest</span>: <span class="ident">target</span>(<span class="number">5</span>) };
+        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+
+        <span class="ident">buf</span>.<span class="ident">bind_label</span>(<span class="ident">label</span>(<span class="number">5</span>));
+        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst::Jump</span> { <span class="ident">dest</span>: <span class="ident">target</span>(<span class="number">7</span>) };
+        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+
+        <span class="ident">buf</span>.<span class="ident">bind_label</span>(<span class="ident">label</span>(<span class="number">6</span>));
+        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst::Nop4</span>;
+        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+
+        <span class="ident">buf</span>.<span class="ident">bind_label</span>(<span class="ident">label</span>(<span class="number">7</span>));
+        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst::Ret</span>;
+        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+
+        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">finish</span>();
+
+        <span class="kw">let</span> <span class="ident">golden_data</span> <span class="op">=</span> <span class="macro">vec!</span>[
+            <span class="number">0xa0</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0xb4</span>, <span class="comment">// cbz x0, 0x14</span>
+            <span class="number">0x1f</span>, <span class="number">0x20</span>, <span class="number">0x03</span>, <span class="number">0xd5</span>, <span class="comment">// nop</span>
+            <span class="number">0x1f</span>, <span class="number">0x20</span>, <span class="number">0x03</span>, <span class="number">0xd5</span>, <span class="comment">// nop</span>
+            <span class="number">0xfd</span>, <span class="number">0xff</span>, <span class="number">0xff</span>, <span class="number">0x17</span>, <span class="comment">// b 0</span>
+            <span class="number">0x1f</span>, <span class="number">0x20</span>, <span class="number">0x03</span>, <span class="number">0xd5</span>, <span class="comment">// nop</span>
+            <span class="number">0xc0</span>, <span class="number">0x03</span>, <span class="number">0x5f</span>, <span class="number">0xd6</span>, <span class="comment">// ret</span>
+        ];
+
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">golden_data</span>[..], <span class="kw-2">&amp;</span><span class="ident">buf</span>.<span class="ident">data</span>[..]);
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_handle_branch_cycle</span>() {
+        <span class="comment">// label0:</span>
+        <span class="comment">//   b label1</span>
+        <span class="comment">// label1:</span>
+        <span class="comment">//   b label2</span>
+        <span class="comment">// label2:</span>
+        <span class="comment">//   b label3</span>
+        <span class="comment">// label3:</span>
+        <span class="comment">//   b label4</span>
+        <span class="comment">// label4:</span>
+        <span class="comment">//   b label1  // note: not label0 (to make it interesting).</span>
+        <span class="comment">//</span>
+        <span class="comment">// -- should become:</span>
+        <span class="comment">//</span>
+        <span class="comment">// label0, label1, ..., label4:</span>
+        <span class="comment">//   b label0</span>
+        <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">EmitInfo::new</span>(<span class="ident">settings::Flags::new</span>(<span class="ident">settings::builder</span>()));
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">MachBuffer::new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">Default::default</span>();
+
+        <span class="ident">buf</span>.<span class="ident">reserve_labels_for_blocks</span>(<span class="number">5</span>);
+
+        <span class="ident">buf</span>.<span class="ident">bind_label</span>(<span class="ident">label</span>(<span class="number">0</span>));
+        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst::Jump</span> { <span class="ident">dest</span>: <span class="ident">target</span>(<span class="number">1</span>) };
+        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+
+        <span class="ident">buf</span>.<span class="ident">bind_label</span>(<span class="ident">label</span>(<span class="number">1</span>));
+        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst::Jump</span> { <span class="ident">dest</span>: <span class="ident">target</span>(<span class="number">2</span>) };
+        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+
+        <span class="ident">buf</span>.<span class="ident">bind_label</span>(<span class="ident">label</span>(<span class="number">2</span>));
+        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst::Jump</span> { <span class="ident">dest</span>: <span class="ident">target</span>(<span class="number">3</span>) };
+        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+
+        <span class="ident">buf</span>.<span class="ident">bind_label</span>(<span class="ident">label</span>(<span class="number">3</span>));
+        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst::Jump</span> { <span class="ident">dest</span>: <span class="ident">target</span>(<span class="number">4</span>) };
+        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+
+        <span class="ident">buf</span>.<span class="ident">bind_label</span>(<span class="ident">label</span>(<span class="number">4</span>));
+        <span class="kw">let</span> <span class="ident">inst</span> <span class="op">=</span> <span class="ident">Inst::Jump</span> { <span class="ident">dest</span>: <span class="ident">target</span>(<span class="number">1</span>) };
+        <span class="ident">inst</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+
+        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">finish</span>();
+
+        <span class="kw">let</span> <span class="ident">golden_data</span> <span class="op">=</span> <span class="macro">vec!</span>[
+            <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x14</span>, <span class="comment">// b 0</span>
+        ];
+
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">golden_data</span>[..], <span class="kw-2">&amp;</span><span class="ident">buf</span>.<span class="ident">data</span>[..]);
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "cranelift_codegen";</script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="cranelift_codegen" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
+    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script></body></html>

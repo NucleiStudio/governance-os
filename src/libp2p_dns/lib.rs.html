@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/libp2p-dns-0.22.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/libp2p-dns-0.27.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../libp2p_dns/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../libp2p_dns/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -319,6 +319,14 @@
 <span id="316">316</span>
 <span id="317">317</span>
 <span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2018 Parity Technologies (UK) Ltd.</span>
 <span class="comment">//</span>
@@ -355,14 +363,14 @@
 <span class="doccomment">//! will be replaced with `/ip4/` and/or `/ip6/` components.</span>
 <span class="doccomment">//!</span>
 
-<span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">prelude</span>::<span class="kw-2">*</span>, <span class="ident">channel</span>::<span class="ident">oneshot</span>, <span class="ident">future</span>::<span class="ident">BoxFuture</span>};
+<span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">prelude</span>::<span class="kw-2">*</span>, <span class="ident">channel::oneshot</span>, <span class="ident">future::BoxFuture</span>};
 <span class="kw">use</span> <span class="ident">libp2p_core</span>::{
     <span class="ident">Transport</span>,
     <span class="ident">multiaddr</span>::{<span class="ident">Protocol</span>, <span class="ident">Multiaddr</span>},
     <span class="ident">transport</span>::{<span class="ident">TransportError</span>, <span class="ident">ListenerEvent</span>}
 };
 <span class="kw">use</span> <span class="ident">log</span>::{<span class="ident">error</span>, <span class="ident">debug</span>, <span class="ident">trace</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">error</span>, <span class="ident">fmt</span>, <span class="ident">io</span>, <span class="ident">net</span>::<span class="ident">ToSocketAddrs</span>};
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">error</span>, <span class="ident">fmt</span>, <span class="ident">io</span>, <span class="ident">net::ToSocketAddrs</span>};
 
 <span class="doccomment">/// Represents the configuration for a DNS transport capability of libp2p.</span>
 <span class="doccomment">///</span>
@@ -376,23 +384,23 @@
     <span class="doccomment">/// Underlying transport to use once the DNS addresses have been resolved.</span>
     <span class="ident">inner</span>: <span class="ident">T</span>,
     <span class="doccomment">/// Pool of threads to use when resolving DNS addresses.</span>
-    <span class="ident">thread_pool</span>: <span class="ident">futures</span>::<span class="ident">executor</span>::<span class="ident">ThreadPool</span>,
+    <span class="ident">thread_pool</span>: <span class="ident">futures::executor::ThreadPool</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">DnsConfig</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Creates a new configuration object for DNS.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsConfig</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">io</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="ident">DnsConfig</span>::<span class="ident">with_resolve_threads</span>(<span class="ident">inner</span>, <span class="number">1</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsConfig</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
+        <span class="ident">DnsConfig::with_resolve_threads</span>(<span class="ident">inner</span>, <span class="number">1</span>)
     }
 
     <span class="doccomment">/// Same as `new`, but allows specifying a number of threads for the resolving.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_resolve_threads</span>(<span class="ident">inner</span>: <span class="ident">T</span>, <span class="ident">num_threads</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsConfig</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">io</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">thread_pool</span> <span class="op">=</span> <span class="ident">futures</span>::<span class="ident">executor</span>::<span class="ident">ThreadPool</span>::<span class="ident">builder</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_resolve_threads</span>(<span class="ident">inner</span>: <span class="ident">T</span>, <span class="ident">num_threads</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsConfig</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">thread_pool</span> <span class="op">=</span> <span class="ident">futures::executor::ThreadPool::builder</span>()
             .<span class="ident">pool_size</span>(<span class="ident">num_threads</span>)
             .<span class="ident">name_prefix</span>(<span class="string">&quot;libp2p-dns-&quot;</span>)
             .<span class="ident">create</span>()<span class="question-mark">?</span>;
 
-        <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Created a DNS thread pool&quot;</span>);
+        <span class="macro">trace!</span>(<span class="string">&quot;Created a DNS thread pool&quot;</span>);
 
         <span class="prelude-val">Ok</span>(<span class="ident">DnsConfig</span> {
             <span class="ident">inner</span>,
@@ -401,11 +409,11 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">DnsConfig</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">DnsConfig</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">fmt</span>::<span class="ident">Debug</span>,
+    <span class="ident">T</span>: <span class="ident">fmt::Debug</span>,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
         <span class="ident">fmt</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;DnsConfig&quot;</span>).<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>).<span class="ident">finish</span>()
     }
 }
@@ -413,60 +421,60 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Transport</span> <span class="kw">for</span> <span class="ident">DnsConfig</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">Transport</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">T</span>::<span class="ident">Error</span>: <span class="ident">Send</span>,
-    <span class="ident">T</span>::<span class="ident">Dial</span>: <span class="ident">Send</span>
+    <span class="ident">T::Error</span>: <span class="ident">Send</span>,
+    <span class="ident">T::Dial</span>: <span class="ident">Send</span>
 {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span>::<span class="ident">Output</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">DnsErr</span><span class="op">&lt;</span><span class="ident">T</span>::<span class="ident">Error</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">Listener</span> <span class="op">=</span> <span class="ident">stream</span>::<span class="ident">MapErr</span><span class="op">&lt;</span>
-        <span class="ident">stream</span>::<span class="ident">MapOk</span><span class="op">&lt;</span><span class="ident">T</span>::<span class="ident">Listener</span>,
-            <span class="kw">fn</span>(<span class="ident">ListenerEvent</span><span class="op">&lt;</span><span class="ident">T</span>::<span class="ident">ListenerUpgrade</span>, <span class="ident">T</span>::<span class="ident">Error</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ListenerEvent</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">ListenerUpgrade</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="kw">fn</span>(<span class="ident">T</span>::<span class="ident">Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">ListenerUpgrade</span> <span class="op">=</span> <span class="ident">future</span>::<span class="ident">MapErr</span><span class="op">&lt;</span><span class="ident">T</span>::<span class="ident">ListenerUpgrade</span>, <span class="kw">fn</span>(<span class="ident">T</span>::<span class="ident">Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">Dial</span> <span class="op">=</span> <span class="ident">future</span>::<span class="ident">Either</span><span class="op">&lt;</span>
-        <span class="ident">future</span>::<span class="ident">MapErr</span><span class="op">&lt;</span><span class="ident">T</span>::<span class="ident">Dial</span>, <span class="kw">fn</span>(<span class="ident">T</span>::<span class="ident">Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span>,
-        <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Output</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">T::Output</span>;
+    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">DnsErr</span><span class="op">&lt;</span><span class="ident">T::Error</span><span class="op">&gt;</span>;
+    <span class="kw">type</span> <span class="ident">Listener</span> <span class="op">=</span> <span class="ident">stream::MapErr</span><span class="op">&lt;</span>
+        <span class="ident">stream::MapOk</span><span class="op">&lt;</span><span class="ident">T::Listener</span>,
+            <span class="kw">fn</span>(<span class="ident">ListenerEvent</span><span class="op">&lt;</span><span class="ident">T::ListenerUpgrade</span>, <span class="ident">T::Error</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ListenerEvent</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::ListenerUpgrade</span>, <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="kw">fn</span>(<span class="ident">T::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span>;
+    <span class="kw">type</span> <span class="ident">ListenerUpgrade</span> <span class="op">=</span> <span class="ident">future::MapErr</span><span class="op">&lt;</span><span class="ident">T::ListenerUpgrade</span>, <span class="kw">fn</span>(<span class="ident">T::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span>;
+    <span class="kw">type</span> <span class="ident">Dial</span> <span class="op">=</span> <span class="ident">future::Either</span><span class="op">&lt;</span>
+        <span class="ident">future::MapErr</span><span class="op">&lt;</span><span class="ident">T::Dial</span>, <span class="kw">fn</span>(<span class="ident">T::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span>,
+        <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span>, <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">listen_on</span>(<span class="self">self</span>, <span class="ident">addr</span>: <span class="ident">Multiaddr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Listener</span>, <span class="ident">TransportError</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">listener</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">listen_on</span>(<span class="ident">addr</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">map</span>(<span class="ident">DnsErr</span>::<span class="ident">Underlying</span>))<span class="question-mark">?</span>;
+    <span class="kw">fn</span> <span class="ident">listen_on</span>(<span class="self">self</span>, <span class="ident">addr</span>: <span class="ident">Multiaddr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Listener</span>, <span class="ident">TransportError</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">listener</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">listen_on</span>(<span class="ident">addr</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">map</span>(<span class="ident">DnsErr::Underlying</span>))<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">listener</span> <span class="op">=</span> <span class="ident">listener</span>
             .<span class="ident">map_ok</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">fn</span>(<span class="kw">_</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">_</span><span class="op">&gt;</span>(<span class="op">|</span><span class="ident">event</span><span class="op">|</span> {
                 <span class="ident">event</span>
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">upgr</span><span class="op">|</span> {
-                        <span class="ident">upgr</span>.<span class="ident">map_err</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">fn</span>(<span class="kw">_</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">DnsErr</span>::<span class="ident">Underlying</span>)
+                        <span class="ident">upgr</span>.<span class="ident">map_err</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">fn</span>(<span class="kw">_</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">DnsErr::Underlying</span>)
                     })
-                    .<span class="ident">map_err</span>(<span class="ident">DnsErr</span>::<span class="ident">Underlying</span>)
+                    .<span class="ident">map_err</span>(<span class="ident">DnsErr::Underlying</span>)
             })
-            .<span class="ident">map_err</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">fn</span>(<span class="kw">_</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">DnsErr</span>::<span class="ident">Underlying</span>);
+            .<span class="ident">map_err</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">fn</span>(<span class="kw">_</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">DnsErr::Underlying</span>);
         <span class="prelude-val">Ok</span>(<span class="ident">listener</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">dial</span>(<span class="self">self</span>, <span class="ident">addr</span>: <span class="ident">Multiaddr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Dial</span>, <span class="ident">TransportError</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">dial</span>(<span class="self">self</span>, <span class="ident">addr</span>: <span class="ident">Multiaddr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Dial</span>, <span class="ident">TransportError</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="comment">// As an optimization, we immediately pass through if no component of the address contain</span>
         <span class="comment">// a DNS protocol.</span>
         <span class="kw">let</span> <span class="ident">contains_dns</span> <span class="op">=</span> <span class="ident">addr</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">cmp</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">cmp</span> {
-            <span class="ident">Protocol</span>::<span class="ident">Dns</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="ident">Protocol</span>::<span class="ident">Dns4</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="ident">Protocol</span>::<span class="ident">Dns6</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+            <span class="ident">Protocol::Dns</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+            <span class="ident">Protocol::Dns4</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+            <span class="ident">Protocol::Dns6</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
         });
 
         <span class="kw">if</span> <span class="op">!</span><span class="ident">contains_dns</span> {
-            <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Pass-through address without DNS: {}&quot;</span>, <span class="ident">addr</span>);
+            <span class="macro">trace!</span>(<span class="string">&quot;Pass-through address without DNS: {}&quot;</span>, <span class="ident">addr</span>);
             <span class="kw">let</span> <span class="ident">inner_dial</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">dial</span>(<span class="ident">addr</span>)
-                .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">map</span>(<span class="ident">DnsErr</span>::<span class="ident">Underlying</span>))<span class="question-mark">?</span>;
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">inner_dial</span>.<span class="ident">map_err</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">fn</span>(<span class="kw">_</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">DnsErr</span>::<span class="ident">Underlying</span>).<span class="ident">left_future</span>());
+                .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">map</span>(<span class="ident">DnsErr::Underlying</span>))<span class="question-mark">?</span>;
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">inner_dial</span>.<span class="ident">map_err</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">fn</span>(<span class="kw">_</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">DnsErr::Underlying</span>).<span class="ident">left_future</span>());
         }
 
-        <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Dialing address with DNS: {}&quot;</span>, <span class="ident">addr</span>);
+        <span class="macro">trace!</span>(<span class="string">&quot;Dialing address with DNS: {}&quot;</span>, <span class="ident">addr</span>);
         <span class="kw">let</span> <span class="ident">resolve_futs</span> <span class="op">=</span> <span class="ident">addr</span>.<span class="ident">iter</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">cmp</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">cmp</span> {
-                <span class="ident">Protocol</span>::<span class="ident">Dns</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">|</span> <span class="ident">Protocol</span>::<span class="ident">Dns4</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">|</span> <span class="ident">Protocol</span>::<span class="ident">Dns6</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">Protocol::Dns</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">|</span> <span class="ident">Protocol::Dns4</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">|</span> <span class="ident">Protocol::Dns6</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">to_string</span>();
-                    <span class="kw">let</span> <span class="ident">to_resolve</span> <span class="op">=</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}:0&quot;</span>, <span class="ident">name</span>);
-                    <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">oneshot</span>::<span class="ident">channel</span>();
-                    <span class="self">self</span>.<span class="ident">thread_pool</span>.<span class="ident">spawn_ok</span>(<span class="ident">async</span> {
+                    <span class="kw">let</span> <span class="ident">to_resolve</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}:0&quot;</span>, <span class="ident">name</span>);
+                    <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">oneshot::channel</span>();
+                    <span class="self">self</span>.<span class="ident">thread_pool</span>.<span class="ident">spawn_ok</span>(<span class="kw">async</span> {
                         <span class="kw">let</span> <span class="ident">to_resolve</span> <span class="op">=</span> <span class="ident">to_resolve</span>;
                         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">tx</span>.<span class="ident">send</span>(<span class="kw">match</span> <span class="ident">to_resolve</span>[..].<span class="ident">to_socket_addrs</span>() {
                             <span class="prelude-val">Ok</span>(<span class="ident">list</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">list</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">ip</span>()).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()),
@@ -475,19 +483,19 @@
                     });
 
                     <span class="kw">let</span> (<span class="ident">dns4</span>, <span class="ident">dns6</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">cmp</span> {
-                        <span class="ident">Protocol</span>::<span class="ident">Dns</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="bool-val">true</span>, <span class="bool-val">true</span>),
-                        <span class="ident">Protocol</span>::<span class="ident">Dns4</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="bool-val">true</span>, <span class="bool-val">false</span>),
-                        <span class="ident">Protocol</span>::<span class="ident">Dns6</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="bool-val">false</span>, <span class="bool-val">true</span>),
-                        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(),
+                        <span class="ident">Protocol::Dns</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="bool-val">true</span>, <span class="bool-val">true</span>),
+                        <span class="ident">Protocol::Dns4</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="bool-val">true</span>, <span class="bool-val">false</span>),
+                        <span class="ident">Protocol::Dns6</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="bool-val">false</span>, <span class="bool-val">true</span>),
+                        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
                     };
 
-                    <span class="ident">async</span> <span class="kw">move</span> {
-                        <span class="kw">let</span> <span class="ident">list</span> <span class="op">=</span> <span class="ident">rx</span>.<span class="ident">await</span>
+                    <span class="kw">async</span> <span class="kw">move</span> {
+                        <span class="kw">let</span> <span class="ident">list</span> <span class="op">=</span> <span class="ident">rx</span>.<span class="kw">await</span>
                             .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                                <span class="macro">error</span><span class="macro">!</span>(<span class="string">&quot;DNS resolver crashed&quot;</span>);
-                                <span class="ident">DnsErr</span>::<span class="ident">ResolveFail</span>(<span class="ident">name</span>.<span class="ident">clone</span>())
+                                <span class="macro">error!</span>(<span class="string">&quot;DNS resolver crashed&quot;</span>);
+                                <span class="ident">DnsErr::ResolveFail</span>(<span class="ident">name</span>.<span class="ident">clone</span>())
                             })<span class="question-mark">?</span>
-                            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">DnsErr</span>::<span class="ident">ResolveError</span> {
+                            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">DnsErr::ResolveError</span> {
                                 <span class="ident">domain_name</span>: <span class="ident">name</span>.<span class="ident">clone</span>(),
                                 <span class="ident">error</span>: <span class="ident">err</span>,
                             })<span class="question-mark">?</span>;
@@ -495,34 +503,38 @@
                         <span class="ident">list</span>.<span class="ident">into_iter</span>()
                             .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">addr</span><span class="op">|</span> {
                                 <span class="kw">if</span> (<span class="ident">dns4</span> <span class="op">&amp;&amp;</span> <span class="ident">addr</span>.<span class="ident">is_ipv4</span>()) <span class="op">|</span><span class="op">|</span> (<span class="ident">dns6</span> <span class="op">&amp;&amp;</span> <span class="ident">addr</span>.<span class="ident">is_ipv6</span>()) {
-                                    <span class="prelude-val">Some</span>(<span class="ident">Protocol</span>::<span class="ident">from</span>(<span class="ident">addr</span>))
+                                    <span class="prelude-val">Some</span>(<span class="ident">Protocol::from</span>(<span class="ident">addr</span>))
                                 } <span class="kw">else</span> {
                                     <span class="prelude-val">None</span>
                                 }
                             })
                             .<span class="ident">next</span>()
-                            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DnsErr</span>::<span class="ident">ResolveFail</span>(<span class="ident">name</span>))
+                            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DnsErr::ResolveFail</span>(<span class="ident">name</span>))
                     }.<span class="ident">left_future</span>()
                 },
-                <span class="ident">cmp</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">future</span>::<span class="ident">ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">cmp</span>.<span class="ident">acquire</span>())).<span class="ident">right_future</span>()
+                <span class="ident">cmp</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">future::ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">cmp</span>.<span class="ident">acquire</span>())).<span class="ident">right_future</span>()
             })
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">stream</span>::<span class="ident">FuturesOrdered</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">stream::FuturesOrdered</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
         <span class="kw">let</span> <span class="ident">future</span> <span class="op">=</span> <span class="ident">resolve_futs</span>.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-            .<span class="ident">then</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">outcome</span><span class="op">|</span> <span class="ident">async</span> <span class="kw">move</span> {
+            .<span class="ident">then</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">outcome</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
                 <span class="kw">let</span> <span class="ident">outcome</span> <span class="op">=</span> <span class="ident">outcome</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="ident">outcome</span> <span class="op">=</span> <span class="ident">outcome</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Multiaddr</span><span class="op">&gt;</span>();
-                <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;DNS resolution outcome: {} =&gt; {}&quot;</span>, <span class="ident">addr</span>, <span class="ident">outcome</span>);
+                <span class="macro">debug!</span>(<span class="string">&quot;DNS resolution outcome: {} =&gt; {}&quot;</span>, <span class="ident">addr</span>, <span class="ident">outcome</span>);
 
                 <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">dial</span>(<span class="ident">outcome</span>) {
-                    <span class="prelude-val">Ok</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">d</span>.<span class="ident">await</span>.<span class="ident">map_err</span>(<span class="ident">DnsErr</span>::<span class="ident">Underlying</span>),
-                    <span class="prelude-val">Err</span>(<span class="ident">TransportError</span>::<span class="ident">MultiaddrNotSupported</span>(<span class="ident">_addr</span>)) <span class="op">=</span><span class="op">&gt;</span>
-                        <span class="prelude-val">Err</span>(<span class="ident">DnsErr</span>::<span class="ident">MultiaddrNotSupported</span>),
-                    <span class="prelude-val">Err</span>(<span class="ident">TransportError</span>::<span class="ident">Other</span>(<span class="ident">err</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">DnsErr</span>::<span class="ident">Underlying</span>(<span class="ident">err</span>))
+                    <span class="prelude-val">Ok</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">d</span>.<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="ident">DnsErr::Underlying</span>),
+                    <span class="prelude-val">Err</span>(<span class="ident">TransportError::MultiaddrNotSupported</span>(<span class="ident">_addr</span>)) <span class="op">=</span><span class="op">&gt;</span>
+                        <span class="prelude-val">Err</span>(<span class="ident">DnsErr::MultiaddrNotSupported</span>),
+                    <span class="prelude-val">Err</span>(<span class="ident">TransportError::Other</span>(<span class="ident">err</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">DnsErr::Underlying</span>(<span class="ident">err</span>))
                 }
             });
 
         <span class="prelude-val">Ok</span>(<span class="ident">future</span>.<span class="ident">boxed</span>().<span class="ident">right_future</span>())
+    }
+
+    <span class="kw">fn</span> <span class="ident">address_translation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">server</span>: <span class="kw-2">&amp;</span><span class="ident">Multiaddr</span>, <span class="ident">observed</span>: <span class="kw-2">&amp;</span><span class="ident">Multiaddr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Multiaddr</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">address_translation</span>(<span class="ident">server</span>, <span class="ident">observed</span>)
     }
 }
 
@@ -536,49 +548,49 @@
     <span class="doccomment">/// Error while resolving a DNS address.</span>
     <span class="ident">ResolveError</span> {
         <span class="ident">domain_name</span>: <span class="ident">String</span>,
-        <span class="ident">error</span>: <span class="ident">io</span>::<span class="ident">Error</span>,
+        <span class="ident">error</span>: <span class="ident">io::Error</span>,
     },
     <span class="doccomment">/// Found an IP address, but the underlying transport doesn&#39;t support the multiaddr.</span>
     <span class="ident">MultiaddrNotSupported</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">TErr</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">DnsErr</span><span class="op">&lt;</span><span class="ident">TErr</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">TErr</span>: <span class="ident">fmt</span>::<span class="ident">Display</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">TErr</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">DnsErr</span><span class="op">&lt;</span><span class="ident">TErr</span><span class="op">&gt;</span>
+<span class="kw">where</span> <span class="ident">TErr</span>: <span class="ident">fmt::Display</span>
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">DnsErr</span>::<span class="ident">Underlying</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">err</span>),
-            <span class="ident">DnsErr</span>::<span class="ident">ResolveFail</span>(<span class="ident">addr</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;Failed to resolve DNS address: {:?}&quot;</span>, <span class="ident">addr</span>),
-            <span class="ident">DnsErr</span>::<span class="ident">ResolveError</span> { <span class="ident">domain_name</span>, <span class="ident">error</span> } <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;Failed to resolve DNS address: {:?}; {:?}&quot;</span>, <span class="ident">domain_name</span>, <span class="ident">error</span>)
+            <span class="ident">DnsErr::Underlying</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">err</span>),
+            <span class="ident">DnsErr::ResolveFail</span>(<span class="ident">addr</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Failed to resolve DNS address: {:?}&quot;</span>, <span class="ident">addr</span>),
+            <span class="ident">DnsErr::ResolveError</span> { <span class="ident">domain_name</span>, <span class="ident">error</span> } <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Failed to resolve DNS address: {:?}; {:?}&quot;</span>, <span class="ident">domain_name</span>, <span class="ident">error</span>)
             },
-            <span class="ident">DnsErr</span>::<span class="ident">MultiaddrNotSupported</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;Resolve multiaddr not supported&quot;</span>),
+            <span class="ident">DnsErr::MultiaddrNotSupported</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Resolve multiaddr not supported&quot;</span>),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">TErr</span><span class="op">&gt;</span> <span class="ident">error</span>::<span class="ident">Error</span> <span class="kw">for</span> <span class="ident">DnsErr</span><span class="op">&lt;</span><span class="ident">TErr</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">TErr</span>: <span class="ident">error</span>::<span class="ident">Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">TErr</span><span class="op">&gt;</span> <span class="ident">error::Error</span> <span class="kw">for</span> <span class="ident">DnsErr</span><span class="op">&lt;</span><span class="ident">TErr</span><span class="op">&gt;</span>
+<span class="kw">where</span> <span class="ident">TErr</span>: <span class="ident">error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>
 {
-    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="ident">dyn</span> <span class="ident">error</span>::<span class="ident">Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">DnsErr</span>::<span class="ident">Underlying</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>),
-            <span class="ident">DnsErr</span>::<span class="ident">ResolveFail</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="ident">DnsErr</span>::<span class="ident">ResolveError</span> { <span class="ident">error</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">error</span>),
-            <span class="ident">DnsErr</span>::<span class="ident">MultiaddrNotSupported</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">DnsErr::Underlying</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>),
+            <span class="ident">DnsErr::ResolveFail</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident">DnsErr::ResolveError</span> { <span class="ident">error</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">error</span>),
+            <span class="ident">DnsErr::MultiaddrNotSupported</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
         }
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">DnsConfig</span>;
-    <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">future</span>::<span class="ident">BoxFuture</span>, <span class="ident">prelude</span>::<span class="kw-2">*</span>, <span class="ident">stream</span>::<span class="ident">BoxStream</span>};
+    <span class="kw">use</span> <span class="kw">super</span><span class="ident">::DnsConfig</span>;
+    <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">future::BoxFuture</span>, <span class="ident">prelude</span>::<span class="kw-2">*</span>, <span class="ident">stream::BoxStream</span>};
     <span class="kw">use</span> <span class="ident">libp2p_core</span>::{
         <span class="ident">Transport</span>,
         <span class="ident">multiaddr</span>::{<span class="ident">Protocol</span>, <span class="ident">Multiaddr</span>},
-        <span class="ident">transport</span>::<span class="ident">ListenerEvent</span>,
-        <span class="ident">transport</span>::<span class="ident">TransportError</span>,
+        <span class="ident">transport::ListenerEvent</span>,
+        <span class="ident">transport::TransportError</span>,
     };
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -588,55 +600,60 @@
 
         <span class="kw">impl</span> <span class="ident">Transport</span> <span class="kw">for</span> <span class="ident">CustomTransport</span> {
             <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
-            <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">io</span>::<span class="ident">Error</span>;
-            <span class="kw">type</span> <span class="ident">Listener</span> <span class="op">=</span> <span class="ident">BoxStream</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ListenerEvent</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">ListenerUpgrade</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-            <span class="kw">type</span> <span class="ident">ListenerUpgrade</span> <span class="op">=</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Output</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-            <span class="kw">type</span> <span class="ident">Dial</span> <span class="op">=</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Output</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+            <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">std::io::Error</span>;
+            <span class="kw">type</span> <span class="ident">Listener</span> <span class="op">=</span> <span class="ident">BoxStream</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ListenerEvent</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::ListenerUpgrade</span>, <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span>, <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+            <span class="kw">type</span> <span class="ident">ListenerUpgrade</span> <span class="op">=</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span>, <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+            <span class="kw">type</span> <span class="ident">Dial</span> <span class="op">=</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span>, <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
-            <span class="kw">fn</span> <span class="ident">listen_on</span>(<span class="self">self</span>, <span class="kw">_</span>: <span class="ident">Multiaddr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Listener</span>, <span class="ident">TransportError</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-                <span class="macro">unreachable</span><span class="macro">!</span>()
+            <span class="kw">fn</span> <span class="ident">listen_on</span>(<span class="self">self</span>, <span class="kw">_</span>: <span class="ident">Multiaddr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Listener</span>, <span class="ident">TransportError</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+                <span class="macro">unreachable!</span>()
             }
 
-            <span class="kw">fn</span> <span class="ident">dial</span>(<span class="self">self</span>, <span class="ident">addr</span>: <span class="ident">Multiaddr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Dial</span>, <span class="ident">TransportError</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">dial</span>(<span class="self">self</span>, <span class="ident">addr</span>: <span class="ident">Multiaddr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Dial</span>, <span class="ident">TransportError</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="ident">addr</span>.<span class="ident">iter</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-                <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">addr</span>.<span class="ident">len</span>(), <span class="number">2</span>);
+                <span class="macro">assert_eq!</span>(<span class="ident">addr</span>.<span class="ident">len</span>(), <span class="number">2</span>);
                 <span class="kw">match</span> <span class="ident">addr</span>[<span class="number">1</span>] {
-                    <span class="ident">Protocol</span>::<span class="ident">Tcp</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> (),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(),
+                    <span class="ident">Protocol::Tcp</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> (),
+                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(),
                 };
                 <span class="kw">match</span> <span class="ident">addr</span>[<span class="number">0</span>] {
-                    <span class="ident">Protocol</span>::<span class="ident">Ip4</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> (),
-                    <span class="ident">Protocol</span>::<span class="ident">Ip6</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> (),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(),
+                    <span class="ident">Protocol::Ip4</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> (),
+                    <span class="ident">Protocol::Ip6</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> (),
+                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(),
                 };
-                <span class="prelude-val">Ok</span>(<span class="ident">Box</span>::<span class="ident">pin</span>(<span class="ident">future</span>::<span class="ident">ready</span>(<span class="prelude-val">Ok</span>(()))))
+                <span class="prelude-val">Ok</span>(<span class="ident">Box::pin</span>(<span class="ident">future::ready</span>(<span class="prelude-val">Ok</span>(()))))
+            }
+
+            <span class="kw">fn</span> <span class="ident">address_translation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Multiaddr</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Multiaddr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Multiaddr</span><span class="op">&gt;</span> {
+                <span class="prelude-val">None</span>
             }
         }
 
-        <span class="ident">futures</span>::<span class="ident">executor</span>::<span class="ident">block_on</span>(<span class="ident">async</span> <span class="kw">move</span> {
-            <span class="kw">let</span> <span class="ident">transport</span> <span class="op">=</span> <span class="ident">DnsConfig</span>::<span class="ident">new</span>(<span class="ident">CustomTransport</span>).<span class="ident">unwrap</span>();
+        <span class="ident">futures::executor::block_on</span>(<span class="kw">async</span> <span class="kw">move</span> {
+            <span class="kw">let</span> <span class="ident">transport</span> <span class="op">=</span> <span class="ident">DnsConfig::new</span>(<span class="ident">CustomTransport</span>).<span class="ident">unwrap</span>();
 
             <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">transport</span>
                 .<span class="ident">clone</span>()
                 .<span class="ident">dial</span>(<span class="string">&quot;/dns4/example.com/tcp/20000&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>())
                 .<span class="ident">unwrap</span>()
-                .<span class="ident">await</span>
+                .<span class="kw">await</span>
                 .<span class="ident">unwrap</span>();
 
             <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">transport</span>
                 .<span class="ident">clone</span>()
                 .<span class="ident">dial</span>(<span class="string">&quot;/dns6/example.com/tcp/20000&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>())
                 .<span class="ident">unwrap</span>()
-                .<span class="ident">await</span>
+                .<span class="kw">await</span>
                 .<span class="ident">unwrap</span>();
 
             <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">transport</span>
                 .<span class="ident">dial</span>(<span class="string">&quot;/ip4/1.2.3.4/tcp/20000&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>())
                 .<span class="ident">unwrap</span>()
-                .<span class="ident">await</span>
+                .<span class="kw">await</span>
                 .<span class="ident">unwrap</span>();
         });
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "libp2p_dns";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="libp2p_dns" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

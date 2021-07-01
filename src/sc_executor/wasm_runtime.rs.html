@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sc-executor-0.8.0/src/wasm_runtime.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>wasm_runtime.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sc-executor-0.9.0/src/wasm_runtime.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>wasm_runtime.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../sc_executor/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../sc_executor/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -428,38 +428,67 @@
 <span id="425">425</span>
 <span id="426">426</span>
 <span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="comment">// Copyright 2019-2020 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// This file is part of Substrate.</span>
 
-<span class="comment">// Substrate is free software: you can redistribute it and/or modify</span>
+<span class="comment">// Copyright (C) 2019-2021 Parity Technologies (UK) Ltd.</span>
+<span class="comment">// SPDX-License-Identifier: GPL-3.0-or-later WITH Classpath-exception-2.0</span>
+
+<span class="comment">// This program is free software: you can redistribute it and/or modify</span>
 <span class="comment">// it under the terms of the GNU General Public License as published by</span>
 <span class="comment">// the Free Software Foundation, either version 3 of the License, or</span>
 <span class="comment">// (at your option) any later version.</span>
 
-<span class="comment">// Substrate is distributed in the hope that it will be useful,</span>
+<span class="comment">// This program is distributed in the hope that it will be useful,</span>
 <span class="comment">// but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
-<span class="comment">// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="comment">// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the</span>
 <span class="comment">// GNU General Public License for more details.</span>
 
 <span class="comment">// You should have received a copy of the GNU General Public License</span>
-<span class="comment">// along with Substrate.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="comment">// along with this program. If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
 
 <span class="doccomment">//! Traits and accessor functions for calling into the Substrate Wasm runtime.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The primary means of accessing the runtimes is through a cache which saves the reusable</span>
 <span class="doccomment">//! components of the runtime that are expensive to initialize.</span>
 
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Arc</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">error</span>::{<span class="ident">Error</span>, <span class="ident">WasmError</span>};
-<span class="kw">use</span> <span class="ident">parking_lot</span>::<span class="ident">Mutex</span>;
-<span class="kw">use</span> <span class="ident">codec</span>::<span class="ident">Decode</span>;
-<span class="kw">use</span> <span class="ident">sp_core</span>::<span class="ident">traits</span>::{<span class="ident">Externalities</span>, <span class="ident">RuntimeCode</span>, <span class="ident">FetchRuntimeCode</span>};
-<span class="kw">use</span> <span class="ident">sp_version</span>::<span class="ident">RuntimeVersion</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">panic</span>::<span class="ident">AssertUnwindSafe</span>;
-<span class="kw">use</span> <span class="ident">sc_executor_common</span>::<span class="ident">wasm_runtime</span>::{<span class="ident">WasmModule</span>, <span class="ident">WasmInstance</span>};
+<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::error</span>::{<span class="ident">Error</span>, <span class="ident">WasmError</span>};
+<span class="kw">use</span> <span class="ident">parking_lot::Mutex</span>;
+<span class="kw">use</span> <span class="ident">codec::Decode</span>;
+<span class="kw">use</span> <span class="ident">sp_core::traits</span>::{<span class="ident">Externalities</span>, <span class="ident">RuntimeCode</span>, <span class="ident">FetchRuntimeCode</span>};
+<span class="kw">use</span> <span class="ident">sp_version::RuntimeVersion</span>;
+<span class="kw">use</span> <span class="ident">std::panic::AssertUnwindSafe</span>;
+<span class="kw">use</span> <span class="ident">std::path</span>::{<span class="ident">Path</span>, <span class="ident">PathBuf</span>};
+<span class="kw">use</span> <span class="ident">sc_executor_common::wasm_runtime</span>::{<span class="ident">WasmModule</span>, <span class="ident">WasmInstance</span>};
 
-<span class="kw">use</span> <span class="ident">sp_wasm_interface</span>::<span class="ident">Function</span>;
+<span class="kw">use</span> <span class="ident">sp_wasm_interface::Function</span>;
 
 <span class="doccomment">/// Specification of different methods of executing the runtime Wasm code.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
@@ -473,7 +502,7 @@
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">WasmExecutionMethod</span> {
 	<span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">WasmExecutionMethod</span> {
-		<span class="ident">WasmExecutionMethod</span>::<span class="ident">Interpreted</span>
+		<span class="ident">WasmExecutionMethod::Interpreted</span>
 	}
 }
 
@@ -484,26 +513,27 @@
 	<span class="doccomment">/// Wasm runtime type.</span>
 	<span class="ident">wasm_method</span>: <span class="ident">WasmExecutionMethod</span>,
 	<span class="doccomment">/// Shared runtime that can spawn instances.</span>
-	<span class="ident">module</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">WasmModule</span><span class="op">&gt;</span>,
+	<span class="ident">module</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">WasmModule</span><span class="op">&gt;</span>,
 	<span class="doccomment">/// The number of WebAssembly heap pages this instance was created with.</span>
 	<span class="ident">heap_pages</span>: <span class="ident">u64</span>,
 	<span class="doccomment">/// Runtime version according to `Core_version` if any.</span>
 	<span class="ident">version</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RuntimeVersion</span><span class="op">&gt;</span>,
 	<span class="doccomment">/// Cached instance pool.</span>
-	<span class="ident">instances</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">WasmInstance</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+	<span class="ident">instances</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">WasmInstance</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">VersionedRuntime</span> {
 	<span class="doccomment">/// Run the given closure `f` with an instance of this runtime.</span>
 	<span class="kw">fn</span> <span class="ident">with_instance</span><span class="op">&lt;</span><span class="lifetime">&#39;c</span>, <span class="ident">R</span>, <span class="ident">F</span><span class="op">&gt;</span>(
 		<span class="kw-2">&amp;</span><span class="self">self</span>,
-		<span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dyn</span> <span class="ident">Externalities</span>,
+		<span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">Externalities</span>,
 		<span class="ident">f</span>: <span class="ident">F</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Error</span><span class="op">&gt;</span>
 		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(
-			<span class="kw-2">&amp;</span><span class="ident">dyn</span> <span class="ident">WasmInstance</span>,
+			<span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">WasmModule</span><span class="op">&gt;</span>,
+			<span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">WasmInstance</span>,
 			<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">RuntimeVersion</span><span class="op">&gt;</span>,
-			<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dyn</span> <span class="ident">Externalities</span>)
+			<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">Externalities</span>)
 		<span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Error</span><span class="op">&gt;</span>,
 	{
 		<span class="comment">// Find a free instance</span>
@@ -518,16 +548,16 @@
 					.<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="prelude-val">Ok</span>((<span class="ident">r</span>, <span class="bool-val">false</span>)))
 					.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">module</span>.<span class="ident">new_instance</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> (<span class="ident">i</span>, <span class="bool-val">true</span>)))<span class="question-mark">?</span>;
 
-				<span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">instance</span>, <span class="self">self</span>.<span class="ident">version</span>.<span class="ident">as_ref</span>(), <span class="ident">ext</span>);
+				<span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">module</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">instance</span>, <span class="self">self</span>.<span class="ident">version</span>.<span class="ident">as_ref</span>(), <span class="ident">ext</span>);
 				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">result</span> {
 					<span class="kw">if</span> <span class="ident">new_inst</span> {
-						<span class="ident">log</span>::<span class="macro">warn</span><span class="macro">!</span>(
+						<span class="macro">log::warn!</span>(
 							<span class="ident">target</span>: <span class="string">&quot;wasm-runtime&quot;</span>,
 							<span class="string">&quot;Fresh runtime instance failed with {:?}&quot;</span>,
 							<span class="ident">e</span>,
 						)
 					} <span class="kw">else</span> {
-						<span class="ident">log</span>::<span class="macro">warn</span><span class="macro">!</span>(
+						<span class="macro">log::warn!</span>(
 							<span class="ident">target</span>: <span class="string">&quot;wasm-runtime&quot;</span>,
 							<span class="string">&quot;Evicting failed runtime instance: {:?}&quot;</span>,
 							<span class="ident">e</span>,
@@ -537,7 +567,7 @@
 					<span class="kw-2">*</span><span class="ident">locked</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">instance</span>);
 
 					<span class="kw">if</span> <span class="ident">new_inst</span> {
-						<span class="ident">log</span>::<span class="macro">debug</span><span class="macro">!</span>(
+						<span class="macro">log::debug!</span>(
 							<span class="ident">target</span>: <span class="string">&quot;wasm-runtime&quot;</span>,
 							<span class="string">&quot;Allocated WASM instance {}/{}&quot;</span>,
 							<span class="ident">index</span> <span class="op">+</span> <span class="number">1</span>,
@@ -549,12 +579,12 @@
 				<span class="ident">result</span>
 			},
 			<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
-				<span class="ident">log</span>::<span class="macro">warn</span><span class="macro">!</span>(<span class="ident">target</span>: <span class="string">&quot;wasm-runtime&quot;</span>, <span class="string">&quot;Ran out of free WASM instances&quot;</span>);
+				<span class="macro">log::warn!</span>(<span class="ident">target</span>: <span class="string">&quot;wasm-runtime&quot;</span>, <span class="string">&quot;Ran out of free WASM instances&quot;</span>);
 
 				<span class="comment">// Allocate a new instance</span>
 				<span class="kw">let</span> <span class="ident">instance</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">module</span>.<span class="ident">new_instance</span>()<span class="question-mark">?</span>;
 
-				<span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">instance</span>, <span class="self">self</span>.<span class="ident">version</span>.<span class="ident">as_ref</span>(), <span class="ident">ext</span>)
+				<span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">module</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">instance</span>, <span class="self">self</span>.<span class="ident">version</span>.<span class="ident">as_ref</span>(), <span class="ident">ext</span>)
 			}
 		}
 	}
@@ -580,14 +610,22 @@
 	<span class="ident">runtimes</span>: <span class="ident">Mutex</span><span class="op">&lt;</span>[<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">VersionedRuntime</span><span class="op">&gt;</span><span class="op">&gt;</span>; <span class="ident">MAX_RUNTIMES</span>]<span class="op">&gt;</span>,
 	<span class="doccomment">/// The size of the instances cache for each runtime.</span>
 	<span class="ident">max_runtime_instances</span>: <span class="ident">usize</span>,
+	<span class="ident">cache_path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">RuntimeCache</span> {
 	<span class="doccomment">/// Creates a new instance of a runtimes cache.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">max_runtime_instances</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RuntimeCache</span> {
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// `max_runtime_instances` specifies the number of runtime instances preserved in an in-memory</span>
+	<span class="doccomment">/// cache.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// `cache_path` allows to specify an optional directory where the executor can store files</span>
+	<span class="doccomment">/// for caching.</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">max_runtime_instances</span>: <span class="ident">usize</span>, <span class="ident">cache_path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RuntimeCache</span> {
 		<span class="ident">RuntimeCache</span> {
-			<span class="ident">runtimes</span>: <span class="ident">Default</span>::<span class="ident">default</span>(),
+			<span class="ident">runtimes</span>: <span class="ident">Default::default</span>(),
 			<span class="ident">max_runtime_instances</span>,
+			<span class="ident">cache_path</span>,
 		}
 	}
 
@@ -622,17 +660,18 @@
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_instance</span><span class="op">&lt;</span><span class="lifetime">&#39;c</span>, <span class="ident">R</span>, <span class="ident">F</span><span class="op">&gt;</span>(
 		<span class="kw-2">&amp;</span><span class="self">self</span>,
 		<span class="ident">runtime_code</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;c</span> <span class="ident">RuntimeCode</span><span class="op">&lt;</span><span class="lifetime">&#39;c</span><span class="op">&gt;</span>,
-		<span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dyn</span> <span class="ident">Externalities</span>,
+		<span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">Externalities</span>,
 		<span class="ident">wasm_method</span>: <span class="ident">WasmExecutionMethod</span>,
 		<span class="ident">default_heap_pages</span>: <span class="ident">u64</span>,
-		<span class="ident">host_functions</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">dyn</span> <span class="ident">Function</span>],
+		<span class="ident">host_functions</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">Function</span>],
 		<span class="ident">allow_missing_func_imports</span>: <span class="ident">bool</span>,
 		<span class="ident">f</span>: <span class="ident">F</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Error</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span>
 		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(
-			<span class="kw-2">&amp;</span><span class="ident">dyn</span> <span class="ident">WasmInstance</span>,
+			<span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">WasmModule</span><span class="op">&gt;</span>,
+			<span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">WasmInstance</span>,
 			<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">RuntimeVersion</span><span class="op">&gt;</span>,
-			<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dyn</span> <span class="ident">Externalities</span>)
+			<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">Externalities</span>)
 		<span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Error</span><span class="op">&gt;</span>,
 	{
 		<span class="kw">let</span> <span class="ident">code_hash</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">runtime_code</span>.<span class="ident">hash</span>;
@@ -651,7 +690,7 @@
 				.<span class="ident">clone</span>()
 				.<span class="ident">expect</span>(<span class="string">&quot;`position` only returns `Some` for entries that are `Some`&quot;</span>),
 			<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span>  {
-				<span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">runtime_code</span>.<span class="ident">fetch_runtime_code</span>().<span class="ident">ok_or</span>(<span class="ident">WasmError</span>::<span class="ident">CodeNotFound</span>)<span class="question-mark">?</span>;
+				<span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">runtime_code</span>.<span class="ident">fetch_runtime_code</span>().<span class="ident">ok_or</span>(<span class="ident">WasmError::CodeNotFound</span>)<span class="question-mark">?</span>;
 
 				<span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">create_versioned_wasm_runtime</span>(
 					<span class="kw-2">&amp;</span><span class="ident">code</span>,
@@ -662,11 +701,12 @@
 					<span class="ident">host_functions</span>.<span class="ident">into</span>(),
 					<span class="ident">allow_missing_func_imports</span>,
 					<span class="self">self</span>.<span class="ident">max_runtime_instances</span>,
+					<span class="self">self</span>.<span class="ident">cache_path</span>.<span class="ident">as_deref</span>(),
 				);
 				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span> <span class="ident">result</span> {
-					<span class="ident">log</span>::<span class="macro">warn</span><span class="macro">!</span>(<span class="ident">target</span>: <span class="string">&quot;wasm-runtime&quot;</span>, <span class="string">&quot;Cannot create a runtime: {:?}&quot;</span>, <span class="ident">err</span>);
+					<span class="macro">log::warn!</span>(<span class="ident">target</span>: <span class="string">&quot;wasm-runtime&quot;</span>, <span class="string">&quot;Cannot create a runtime: {:?}&quot;</span>, <span class="ident">err</span>);
 				}
-				<span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">result</span><span class="question-mark">?</span>)
+				<span class="ident">Arc::new</span>(<span class="ident">result</span><span class="question-mark">?</span>)
 			}
 		};
 
@@ -696,41 +736,51 @@
 	<span class="ident">wasm_method</span>: <span class="ident">WasmExecutionMethod</span>,
 	<span class="ident">heap_pages</span>: <span class="ident">u64</span>,
 	<span class="ident">code</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-	<span class="ident">host_functions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">dyn</span> <span class="ident">Function</span><span class="op">&gt;</span>,
+	<span class="ident">host_functions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">Function</span><span class="op">&gt;</span>,
 	<span class="ident">allow_missing_func_imports</span>: <span class="ident">bool</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">WasmModule</span><span class="op">&gt;</span>, <span class="ident">WasmError</span><span class="op">&gt;</span> {
+	<span class="ident">cache_path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Path</span><span class="op">&gt;</span>,
+) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">WasmModule</span><span class="op">&gt;</span>, <span class="ident">WasmError</span><span class="op">&gt;</span> {
 	<span class="kw">match</span> <span class="ident">wasm_method</span> {
-		<span class="ident">WasmExecutionMethod</span>::<span class="ident">Interpreted</span> <span class="op">=</span><span class="op">&gt;</span>
-			<span class="ident">sc_executor_wasmi</span>::<span class="ident">create_runtime</span>(
+		<span class="ident">WasmExecutionMethod::Interpreted</span> <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="comment">// Wasmi doesn&#39;t have any need in a cache directory.</span>
+			<span class="comment">//</span>
+			<span class="comment">// We drop the cache_path here to silence warnings that cache_path is not used if compiling</span>
+			<span class="comment">// without the `wasmtime` flag.</span>
+			<span class="ident">drop</span>(<span class="ident">cache_path</span>);
+
+			<span class="ident">sc_executor_wasmi::create_runtime</span>(
 				<span class="ident">code</span>,
 				<span class="ident">heap_pages</span>,
 				<span class="ident">host_functions</span>,
-				<span class="ident">allow_missing_func_imports</span>
-			).<span class="ident">map</span>(<span class="op">|</span><span class="ident">runtime</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">WasmModule</span><span class="op">&gt;</span> { <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">runtime</span>) }),
+				<span class="ident">allow_missing_func_imports</span>,
+			)
+			.<span class="ident">map</span>(<span class="op">|</span><span class="ident">runtime</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">WasmModule</span><span class="op">&gt;</span> { <span class="ident">Arc::new</span>(<span class="ident">runtime</span>) })
+		}
 		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;wasmtime&quot;</span>)]</span>
-		<span class="ident">WasmExecutionMethod</span>::<span class="ident">Compiled</span> <span class="op">=</span><span class="op">&gt;</span>
-			<span class="ident">sc_executor_wasmtime</span>::<span class="ident">create_runtime</span>(
+		<span class="ident">WasmExecutionMethod::Compiled</span> <span class="op">=</span><span class="op">&gt;</span>
+			<span class="ident">sc_executor_wasmtime::create_runtime</span>(
 				<span class="ident">code</span>,
 				<span class="ident">heap_pages</span>,
 				<span class="ident">host_functions</span>,
-				<span class="ident">allow_missing_func_imports</span>
-			).<span class="ident">map</span>(<span class="op">|</span><span class="ident">runtime</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">WasmModule</span><span class="op">&gt;</span> { <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">runtime</span>) }),
+				<span class="ident">allow_missing_func_imports</span>,
+				<span class="ident">cache_path</span>,
+			).<span class="ident">map</span>(<span class="op">|</span><span class="ident">runtime</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">WasmModule</span><span class="op">&gt;</span> { <span class="ident">Arc::new</span>(<span class="ident">runtime</span>) }),
 	}
 }
 
 <span class="kw">fn</span> <span class="ident">decode_version</span>(<span class="ident">version</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RuntimeVersion</span>, <span class="ident">WasmError</span><span class="op">&gt;</span> {
-	<span class="kw">let</span> <span class="ident">v</span>: <span class="ident">RuntimeVersion</span> <span class="op">=</span> <span class="ident">sp_api</span>::<span class="ident">OldRuntimeVersion</span>::<span class="ident">decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">&amp;</span><span class="ident">version</span>[..])
+	<span class="kw">let</span> <span class="ident">v</span>: <span class="ident">RuntimeVersion</span> <span class="op">=</span> <span class="ident">sp_api::OldRuntimeVersion::decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">&amp;</span><span class="ident">version</span>[..])
 		.<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span>
-				 <span class="ident">WasmError</span>::<span class="ident">Instantiation</span>(
+				 <span class="ident">WasmError::Instantiation</span>(
 					 <span class="string">&quot;failed to decode \&quot;Core_version\&quot; result using old runtime version&quot;</span>.<span class="ident">into</span>(),
 				 )
 		)<span class="question-mark">?</span>.<span class="ident">into</span>();
 
-	<span class="kw">let</span> <span class="ident">core_api_id</span> <span class="op">=</span> <span class="ident">sp_core</span>::<span class="ident">hashing</span>::<span class="ident">blake2_64</span>(<span class="string">b&quot;Core&quot;</span>);
+	<span class="kw">let</span> <span class="ident">core_api_id</span> <span class="op">=</span> <span class="ident">sp_core::hashing::blake2_64</span>(<span class="string">b&quot;Core&quot;</span>);
 	<span class="kw">if</span> <span class="ident">v</span>.<span class="ident">has_api_with</span>(<span class="kw-2">&amp;</span><span class="ident">core_api_id</span>, <span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">3</span>) {
-		<span class="ident">sp_api</span>::<span class="ident">RuntimeVersion</span>::<span class="ident">decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">&amp;</span><span class="ident">version</span>[..])
+		<span class="ident">sp_api::RuntimeVersion::decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">&amp;</span><span class="ident">version</span>[..])
 			.<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span>
-				<span class="ident">WasmError</span>::<span class="ident">Instantiation</span>(<span class="string">&quot;failed to decode \&quot;Core_version\&quot; result&quot;</span>.<span class="ident">into</span>())
+				<span class="ident">WasmError::Instantiation</span>(<span class="string">&quot;failed to decode \&quot;Core_version\&quot; result&quot;</span>.<span class="ident">into</span>())
 			)
 	} <span class="kw">else</span> {
 		<span class="prelude-val">Ok</span>(<span class="ident">v</span>)
@@ -740,21 +790,23 @@
 <span class="kw">fn</span> <span class="ident">create_versioned_wasm_runtime</span>(
 	<span class="ident">code</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
 	<span class="ident">code_hash</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-	<span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dyn</span> <span class="ident">Externalities</span>,
+	<span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">Externalities</span>,
 	<span class="ident">wasm_method</span>: <span class="ident">WasmExecutionMethod</span>,
 	<span class="ident">heap_pages</span>: <span class="ident">u64</span>,
-	<span class="ident">host_functions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">dyn</span> <span class="ident">Function</span><span class="op">&gt;</span>,
+	<span class="ident">host_functions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">Function</span><span class="op">&gt;</span>,
 	<span class="ident">allow_missing_func_imports</span>: <span class="ident">bool</span>,
 	<span class="ident">max_instances</span>: <span class="ident">usize</span>,
+	<span class="ident">cache_path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Path</span><span class="op">&gt;</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">VersionedRuntime</span>, <span class="ident">WasmError</span><span class="op">&gt;</span> {
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;unknown&quot;</span>))]</span>
-	<span class="kw">let</span> <span class="ident">time</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">time</span>::<span class="ident">Instant</span>::<span class="ident">now</span>();
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">runtime</span> <span class="op">=</span> <span class="ident">create_wasm_runtime_with_code</span>(
+	<span class="kw">let</span> <span class="ident">time</span> <span class="op">=</span> <span class="ident">std::time::Instant::now</span>();
+	<span class="kw">let</span> <span class="ident">runtime</span> <span class="op">=</span> <span class="ident">create_wasm_runtime_with_code</span>(
 		<span class="ident">wasm_method</span>,
 		<span class="ident">heap_pages</span>,
 		<span class="kw-2">&amp;</span><span class="ident">code</span>,
 		<span class="ident">host_functions</span>,
 		<span class="ident">allow_missing_func_imports</span>,
+		<span class="ident">cache_path</span>,
 	)<span class="question-mark">?</span>;
 
 	<span class="comment">// Call to determine runtime version.</span>
@@ -764,26 +816,26 @@
 
 		<span class="comment">// The following unwind safety assertion is OK because if the method call panics, the</span>
 		<span class="comment">// runtime will be dropped.</span>
-		<span class="kw">let</span> <span class="ident">runtime</span> <span class="op">=</span> <span class="ident">AssertUnwindSafe</span>(<span class="ident">runtime</span>.<span class="ident">as_mut</span>());
-		<span class="kw">crate</span>::<span class="ident">native_executor</span>::<span class="ident">with_externalities_safe</span>(
+		<span class="kw">let</span> <span class="ident">runtime</span> <span class="op">=</span> <span class="ident">AssertUnwindSafe</span>(<span class="ident">runtime</span>.<span class="ident">as_ref</span>());
+		<span class="kw">crate</span><span class="ident">::native_executor::with_externalities_safe</span>(
 			<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">ext</span>,
-			<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="ident">runtime</span>.<span class="ident">new_instance</span>()<span class="question-mark">?</span>.<span class="ident">call</span>(<span class="string">&quot;Core_version&quot;</span>, <span class="kw-2">&amp;</span>[])
-		).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">WasmError</span>::<span class="ident">Instantiation</span>(<span class="string">&quot;panic in call to get runtime version&quot;</span>.<span class="ident">into</span>()))<span class="question-mark">?</span>
+			<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="ident">runtime</span>.<span class="ident">new_instance</span>()<span class="question-mark">?</span>.<span class="ident">call</span>(<span class="string">&quot;Core_version&quot;</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span>[])
+		).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">WasmError::Instantiation</span>(<span class="string">&quot;panic in call to get runtime version&quot;</span>.<span class="ident">into</span>()))<span class="question-mark">?</span>
 	};
 	<span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">version_result</span> {
 		<span class="prelude-val">Ok</span>(<span class="ident">version</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">decode_version</span>(<span class="kw-2">&amp;</span><span class="ident">version</span>)<span class="question-mark">?</span>),
 		<span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
 	};
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;unknown&quot;</span>))]</span>
-	<span class="ident">log</span>::<span class="macro">debug</span><span class="macro">!</span>(
+	<span class="macro">log::debug!</span>(
 		<span class="ident">target</span>: <span class="string">&quot;wasm-runtime&quot;</span>,
 		<span class="string">&quot;Prepared new runtime version {:?} in {} ms.&quot;</span>,
 		<span class="ident">version</span>,
 		<span class="ident">time</span>.<span class="ident">elapsed</span>().<span class="ident">as_millis</span>(),
 	);
 
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">instances</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">with_capacity</span>(<span class="ident">max_instances</span>);
-	<span class="ident">instances</span>.<span class="ident">resize_with</span>(<span class="ident">max_instances</span>, <span class="op">|</span><span class="op">|</span> <span class="ident">Mutex</span>::<span class="ident">new</span>(<span class="prelude-val">None</span>));
+	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">instances</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">max_instances</span>);
+	<span class="ident">instances</span>.<span class="ident">resize_with</span>(<span class="ident">max_instances</span>, <span class="op">|</span><span class="op">|</span> <span class="ident">Mutex::new</span>(<span class="prelude-val">None</span>));
 
 	<span class="prelude-val">Ok</span>(<span class="ident">VersionedRuntime</span> {
 		<span class="ident">code_hash</span>,
@@ -798,43 +850,43 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
 	<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-	<span class="kw">use</span> <span class="ident">sp_wasm_interface</span>::<span class="ident">HostFunctions</span>;
+	<span class="kw">use</span> <span class="ident">sp_wasm_interface::HostFunctions</span>;
 	<span class="kw">use</span> <span class="ident">sp_api</span>::{<span class="ident">Core</span>, <span class="ident">RuntimeApiInfo</span>};
-	<span class="kw">use</span> <span class="ident">substrate_test_runtime</span>::<span class="ident">Block</span>;
-	<span class="kw">use</span> <span class="ident">codec</span>::<span class="ident">Encode</span>;
+	<span class="kw">use</span> <span class="ident">substrate_test_runtime::Block</span>;
+	<span class="kw">use</span> <span class="ident">codec::Encode</span>;
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">host_functions_are_equal</span>() {
-		<span class="kw">let</span> <span class="ident">host_functions</span> <span class="op">=</span> <span class="ident">sp_io</span>::<span class="ident">SubstrateHostFunctions</span>::<span class="ident">host_functions</span>();
+		<span class="kw">let</span> <span class="ident">host_functions</span> <span class="op">=</span> <span class="ident">sp_io::SubstrateHostFunctions::host_functions</span>();
 
 		<span class="kw">let</span> <span class="ident">equal</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">host_functions</span>[..] <span class="op">=</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">host_functions</span>[..];
-		<span class="macro">assert</span><span class="macro">!</span>(<span class="ident">equal</span>, <span class="string">&quot;Host functions are not equal&quot;</span>);
+		<span class="macro">assert!</span>(<span class="ident">equal</span>, <span class="string">&quot;Host functions are not equal&quot;</span>);
 	}
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">old_runtime_version_decodes</span>() {
-		<span class="kw">let</span> <span class="ident">old_runtime_version</span> <span class="op">=</span> <span class="ident">sp_api</span>::<span class="ident">OldRuntimeVersion</span> {
+		<span class="kw">let</span> <span class="ident">old_runtime_version</span> <span class="op">=</span> <span class="ident">sp_api::OldRuntimeVersion</span> {
 			<span class="ident">spec_name</span>: <span class="string">&quot;test&quot;</span>.<span class="ident">into</span>(),
 			<span class="ident">impl_name</span>: <span class="string">&quot;test&quot;</span>.<span class="ident">into</span>(),
 			<span class="ident">authoring_version</span>: <span class="number">1</span>,
 			<span class="ident">spec_version</span>: <span class="number">1</span>,
 			<span class="ident">impl_version</span>: <span class="number">1</span>,
-			<span class="ident">apis</span>: <span class="ident">sp_api</span>::<span class="macro">create_apis_vec</span><span class="macro">!</span>([(<span class="ident">Core</span>::<span class="op">&lt;</span><span class="ident">Block</span>, <span class="ident">Error</span> <span class="op">=</span> ()<span class="op">&gt;</span>::<span class="ident">ID</span>, <span class="number">1</span>)]),
+			<span class="ident">apis</span>: <span class="macro">sp_api::create_apis_vec!</span>([(<span class="ident">Core</span>::<span class="op">&lt;</span><span class="ident">Block</span>, <span class="ident">Error</span> <span class="op">=</span> ()<span class="op">&gt;</span><span class="ident">::ID</span>, <span class="number">1</span>)]),
 		};
 
 		<span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">decode_version</span>(<span class="kw-2">&amp;</span><span class="ident">old_runtime_version</span>.<span class="ident">encode</span>()).<span class="ident">unwrap</span>();
-		<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="number">1</span>, <span class="ident">version</span>.<span class="ident">transaction_version</span>);
+		<span class="macro">assert_eq!</span>(<span class="number">1</span>, <span class="ident">version</span>.<span class="ident">transaction_version</span>);
 	}
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">old_runtime_version_decodes_fails_with_version_3</span>() {
-		<span class="kw">let</span> <span class="ident">old_runtime_version</span> <span class="op">=</span> <span class="ident">sp_api</span>::<span class="ident">OldRuntimeVersion</span> {
+		<span class="kw">let</span> <span class="ident">old_runtime_version</span> <span class="op">=</span> <span class="ident">sp_api::OldRuntimeVersion</span> {
 			<span class="ident">spec_name</span>: <span class="string">&quot;test&quot;</span>.<span class="ident">into</span>(),
 			<span class="ident">impl_name</span>: <span class="string">&quot;test&quot;</span>.<span class="ident">into</span>(),
 			<span class="ident">authoring_version</span>: <span class="number">1</span>,
 			<span class="ident">spec_version</span>: <span class="number">1</span>,
 			<span class="ident">impl_version</span>: <span class="number">1</span>,
-			<span class="ident">apis</span>: <span class="ident">sp_api</span>::<span class="macro">create_apis_vec</span><span class="macro">!</span>([(<span class="ident">Core</span>::<span class="op">&lt;</span><span class="ident">Block</span>, <span class="ident">Error</span> <span class="op">=</span> ()<span class="op">&gt;</span>::<span class="ident">ID</span>, <span class="number">3</span>)]),
+			<span class="ident">apis</span>: <span class="macro">sp_api::create_apis_vec!</span>([(<span class="ident">Core</span>::<span class="op">&lt;</span><span class="ident">Block</span>, <span class="ident">Error</span> <span class="op">=</span> ()<span class="op">&gt;</span><span class="ident">::ID</span>, <span class="number">3</span>)]),
 		};
 
 		<span class="ident">decode_version</span>(<span class="kw-2">&amp;</span><span class="ident">old_runtime_version</span>.<span class="ident">encode</span>()).<span class="ident">unwrap_err</span>();
@@ -842,19 +894,20 @@
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">new_runtime_version_decodes</span>() {
-		<span class="kw">let</span> <span class="ident">old_runtime_version</span> <span class="op">=</span> <span class="ident">sp_api</span>::<span class="ident">RuntimeVersion</span> {
+		<span class="kw">let</span> <span class="ident">old_runtime_version</span> <span class="op">=</span> <span class="ident">sp_api::RuntimeVersion</span> {
 			<span class="ident">spec_name</span>: <span class="string">&quot;test&quot;</span>.<span class="ident">into</span>(),
 			<span class="ident">impl_name</span>: <span class="string">&quot;test&quot;</span>.<span class="ident">into</span>(),
 			<span class="ident">authoring_version</span>: <span class="number">1</span>,
 			<span class="ident">spec_version</span>: <span class="number">1</span>,
 			<span class="ident">impl_version</span>: <span class="number">1</span>,
-			<span class="ident">apis</span>: <span class="ident">sp_api</span>::<span class="macro">create_apis_vec</span><span class="macro">!</span>([(<span class="ident">Core</span>::<span class="op">&lt;</span><span class="ident">Block</span>, <span class="ident">Error</span> <span class="op">=</span> ()<span class="op">&gt;</span>::<span class="ident">ID</span>, <span class="number">3</span>)]),
+			<span class="ident">apis</span>: <span class="macro">sp_api::create_apis_vec!</span>([(<span class="ident">Core</span>::<span class="op">&lt;</span><span class="ident">Block</span>, <span class="ident">Error</span> <span class="op">=</span> ()<span class="op">&gt;</span><span class="ident">::ID</span>, <span class="number">3</span>)]),
 			<span class="ident">transaction_version</span>: <span class="number">3</span>,
 		};
 
 		<span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">decode_version</span>(<span class="kw-2">&amp;</span><span class="ident">old_runtime_version</span>.<span class="ident">encode</span>()).<span class="ident">unwrap</span>();
-		<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="number">3</span>, <span class="ident">version</span>.<span class="ident">transaction_version</span>);
+		<span class="macro">assert_eq!</span>(<span class="number">3</span>, <span class="ident">version</span>.<span class="ident">transaction_version</span>);
 	}
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "sc_executor";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sc_executor" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

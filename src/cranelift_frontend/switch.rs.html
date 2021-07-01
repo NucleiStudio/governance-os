@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/cranelift-frontend-0.66.0/src/switch.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>switch.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/cranelift-frontend-0.69.0/src/switch.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>switch.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../cranelift_frontend/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../cranelift_frontend/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -615,14 +615,61 @@
 <span id="612">612</span>
 <span id="613">613</span>
 <span id="614">614</span>
+<span id="615">615</span>
+<span id="616">616</span>
+<span id="617">617</span>
+<span id="618">618</span>
+<span id="619">619</span>
+<span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
+<span id="623">623</span>
+<span id="624">624</span>
+<span id="625">625</span>
+<span id="626">626</span>
+<span id="627">627</span>
+<span id="628">628</span>
+<span id="629">629</span>
+<span id="630">630</span>
+<span id="631">631</span>
+<span id="632">632</span>
+<span id="633">633</span>
+<span id="634">634</span>
+<span id="635">635</span>
+<span id="636">636</span>
+<span id="637">637</span>
+<span id="638">638</span>
+<span id="639">639</span>
+<span id="640">640</span>
+<span id="641">641</span>
+<span id="642">642</span>
+<span id="643">643</span>
+<span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
+<span id="648">648</span>
+<span id="649">649</span>
+<span id="650">650</span>
+<span id="651">651</span>
+<span id="652">652</span>
+<span id="653">653</span>
+<span id="654">654</span>
+<span id="655">655</span>
+<span id="656">656</span>
+<span id="657">657</span>
+<span id="658">658</span>
+<span id="659">659</span>
+<span id="660">660</span>
+<span id="661">661</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="kw">super</span>::<span class="ident">HashMap</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">frontend</span>::<span class="ident">FunctionBuilder</span>;
-<span class="kw">use</span> <span class="ident">alloc</span>::<span class="ident">vec</span>::<span class="ident">Vec</span>;
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">convert</span>::<span class="ident">TryFrom</span>;
-<span class="kw">use</span> <span class="ident">cranelift_codegen</span>::<span class="ident">ir</span>::<span class="ident">condcodes</span>::<span class="ident">IntCC</span>;
-<span class="kw">use</span> <span class="ident">cranelift_codegen</span>::<span class="ident">ir</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">log</span>::<span class="ident">debug</span>;
+<span class="kw">use</span> <span class="kw">super</span><span class="ident">::HashMap</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::frontend::FunctionBuilder</span>;
+<span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
+<span class="kw">use</span> <span class="ident">core::convert::TryFrom</span>;
+<span class="kw">use</span> <span class="ident">cranelift_codegen::ir::condcodes::IntCC</span>;
+<span class="kw">use</span> <span class="ident">cranelift_codegen::ir</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">log::debug</span>;
 
 <span class="kw">type</span> <span class="ident">EntryIndex</span> <span class="op">=</span> <span class="ident">u128</span>;
 
@@ -667,14 +714,14 @@
     <span class="doccomment">/// Create a new empty switch</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
-            <span class="ident">cases</span>: <span class="ident">HashMap</span>::<span class="ident">new</span>(),
+            <span class="ident">cases</span>: <span class="ident">HashMap::new</span>(),
         }
     }
 
     <span class="doccomment">/// Set a switch entry</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_entry</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">EntryIndex</span>, <span class="ident">block</span>: <span class="ident">Block</span>) {
         <span class="kw">let</span> <span class="ident">prev</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cases</span>.<span class="ident">insert</span>(<span class="ident">index</span>, <span class="ident">block</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(
+        <span class="macro">assert!</span>(
             <span class="ident">prev</span>.<span class="ident">is_none</span>(),
             <span class="string">&quot;Tried to set the same entry {} twice&quot;</span>,
             <span class="ident">index</span>
@@ -695,18 +742,18 @@
     <span class="doccomment">/// * Between two `ContiguousCaseRange`s there will be at least one entry index.</span>
     <span class="doccomment">/// * No `ContiguousCaseRange`s will be empty.</span>
     <span class="kw">fn</span> <span class="ident">collect_contiguous_case_ranges</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ContiguousCaseRange</span><span class="op">&gt;</span> {
-        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;build_contiguous_case_ranges before: {:#?}&quot;</span>, <span class="self">self</span>.<span class="ident">cases</span>);
+        <span class="macro">debug!</span>(<span class="string">&quot;build_contiguous_case_ranges before: {:#?}&quot;</span>, <span class="self">self</span>.<span class="ident">cases</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cases</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cases</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw">_</span>, <span class="kw">_</span>)<span class="op">&gt;</span><span class="op">&gt;</span>();
         <span class="ident">cases</span>.<span class="ident">sort_by_key</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="ident">index</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">index</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">contiguous_case_ranges</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ContiguousCaseRange</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[];
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">contiguous_case_ranges</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ContiguousCaseRange</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[];
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">last_index</span> <span class="op">=</span> <span class="prelude-val">None</span>;
         <span class="kw">for</span> (<span class="ident">index</span>, <span class="ident">block</span>) <span class="kw">in</span> <span class="ident">cases</span> {
             <span class="kw">match</span> <span class="ident">last_index</span> {
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">contiguous_case_ranges</span>.<span class="ident">push</span>(<span class="ident">ContiguousCaseRange</span>::<span class="ident">new</span>(<span class="ident">index</span>)),
+                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">contiguous_case_ranges</span>.<span class="ident">push</span>(<span class="ident">ContiguousCaseRange::new</span>(<span class="ident">index</span>)),
                 <span class="prelude-val">Some</span>(<span class="ident">last_index</span>) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="kw">if</span> <span class="ident">index</span> <span class="op">&gt;</span> <span class="ident">last_index</span> <span class="op">+</span> <span class="number">1</span> {
-                        <span class="ident">contiguous_case_ranges</span>.<span class="ident">push</span>(<span class="ident">ContiguousCaseRange</span>::<span class="ident">new</span>(<span class="ident">index</span>));
+                        <span class="ident">contiguous_case_ranges</span>.<span class="ident">push</span>(<span class="ident">ContiguousCaseRange::new</span>(<span class="ident">index</span>));
                     }
                 }
             }
@@ -718,7 +765,7 @@
             <span class="ident">last_index</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">index</span>);
         }
 
-        <span class="macro">debug</span><span class="macro">!</span>(
+        <span class="macro">debug!</span>(
             <span class="string">&quot;build_contiguous_case_ranges after: {:#?}&quot;</span>,
             <span class="ident">contiguous_case_ranges</span>
         );
@@ -733,11 +780,11 @@
         <span class="ident">otherwise</span>: <span class="ident">Block</span>,
         <span class="ident">contiguous_case_ranges</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ContiguousCaseRange</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">EntryIndex</span>, <span class="ident">Block</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cases_and_jt_blocks</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cases_and_jt_blocks</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
         <span class="comment">// Avoid allocation in the common case</span>
         <span class="kw">if</span> <span class="ident">contiguous_case_ranges</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">3</span> {
-            <span class="self">Self</span>::<span class="ident">build_search_branches</span>(
+            <span class="self">Self</span><span class="ident">::build_search_branches</span>(
                 <span class="ident">bx</span>,
                 <span class="ident">val</span>,
                 <span class="ident">otherwise</span>,
@@ -747,7 +794,7 @@
             <span class="kw">return</span> <span class="ident">cases_and_jt_blocks</span>;
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stack</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ContiguousCaseRange</span><span class="op">&gt;</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stack</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ContiguousCaseRange</span><span class="op">&gt;</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
         <span class="ident">stack</span>.<span class="ident">push</span>((<span class="prelude-val">None</span>, <span class="ident">contiguous_case_ranges</span>));
 
         <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">block</span>, <span class="ident">contiguous_case_ranges</span>)) <span class="op">=</span> <span class="ident">stack</span>.<span class="ident">pop</span>() {
@@ -756,7 +803,7 @@
             }
 
             <span class="kw">if</span> <span class="ident">contiguous_case_ranges</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">3</span> {
-                <span class="self">Self</span>::<span class="ident">build_search_branches</span>(
+                <span class="self">Self</span><span class="ident">::build_search_branches</span>(
                     <span class="ident">bx</span>,
                     <span class="ident">val</span>,
                     <span class="ident">otherwise</span>,
@@ -773,7 +820,7 @@
 
                 <span class="kw">let</span> <span class="ident">first_index</span> <span class="op">=</span> <span class="ident">right</span>[<span class="number">0</span>].<span class="ident">first_index</span>;
                 <span class="kw">let</span> <span class="ident">should_take_right_side</span> <span class="op">=</span>
-                    <span class="ident">icmp_imm_u128</span>(<span class="ident">bx</span>, <span class="ident">IntCC</span>::<span class="ident">UnsignedGreaterThanOrEqual</span>, <span class="ident">val</span>, <span class="ident">first_index</span>);
+                    <span class="ident">icmp_imm_u128</span>(<span class="ident">bx</span>, <span class="ident">IntCC::UnsignedGreaterThanOrEqual</span>, <span class="ident">val</span>, <span class="ident">first_index</span>);
                 <span class="ident">bx</span>.<span class="ident">ins</span>().<span class="ident">brnz</span>(<span class="ident">should_take_right_side</span>, <span class="ident">right_block</span>, <span class="kw-2">&amp;</span>[]);
                 <span class="ident">bx</span>.<span class="ident">ins</span>().<span class="ident">jump</span>(<span class="ident">left_block</span>, <span class="kw-2">&amp;</span>[]);
 
@@ -817,7 +864,7 @@
                 }
                 (<span class="number">1</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="ident">ins_fallthrough_jump</span>(<span class="ident">was_branch</span>, <span class="ident">bx</span>);
-                    <span class="kw">let</span> <span class="ident">is_good_val</span> <span class="op">=</span> <span class="ident">icmp_imm_u128</span>(<span class="ident">bx</span>, <span class="ident">IntCC</span>::<span class="ident">Equal</span>, <span class="ident">val</span>, <span class="ident">first_index</span>);
+                    <span class="kw">let</span> <span class="ident">is_good_val</span> <span class="op">=</span> <span class="ident">icmp_imm_u128</span>(<span class="ident">bx</span>, <span class="ident">IntCC::Equal</span>, <span class="ident">val</span>, <span class="ident">first_index</span>);
                     <span class="ident">bx</span>.<span class="ident">ins</span>().<span class="ident">brnz</span>(<span class="ident">is_good_val</span>, <span class="ident">blocks</span>[<span class="number">0</span>], <span class="kw-2">&amp;</span>[]);
                 }
                 (<span class="kw">_</span>, <span class="number">0</span>) <span class="op">=</span><span class="op">&gt;</span> {
@@ -835,7 +882,7 @@
                     <span class="ident">ins_fallthrough_jump</span>(<span class="ident">was_branch</span>, <span class="ident">bx</span>);
                     <span class="kw">let</span> <span class="ident">jt_block</span> <span class="op">=</span> <span class="ident">bx</span>.<span class="ident">create_block</span>();
                     <span class="kw">let</span> <span class="ident">is_good_val</span> <span class="op">=</span>
-                        <span class="ident">icmp_imm_u128</span>(<span class="ident">bx</span>, <span class="ident">IntCC</span>::<span class="ident">UnsignedGreaterThanOrEqual</span>, <span class="ident">val</span>, <span class="ident">first_index</span>);
+                        <span class="ident">icmp_imm_u128</span>(<span class="ident">bx</span>, <span class="ident">IntCC::UnsignedGreaterThanOrEqual</span>, <span class="ident">val</span>, <span class="ident">first_index</span>);
                     <span class="ident">bx</span>.<span class="ident">ins</span>().<span class="ident">brnz</span>(<span class="ident">is_good_val</span>, <span class="ident">jt_block</span>, <span class="kw-2">&amp;</span>[]);
                     <span class="ident">bx</span>.<span class="ident">seal_block</span>(<span class="ident">jt_block</span>);
                     <span class="ident">cases_and_jt_blocks</span>.<span class="ident">push</span>((<span class="ident">first_index</span>, <span class="ident">jt_block</span>, <span class="ident">blocks</span>));
@@ -857,12 +904,12 @@
         <span class="kw">for</span> (<span class="ident">first_index</span>, <span class="ident">jt_block</span>, <span class="ident">blocks</span>) <span class="kw">in</span> <span class="ident">cases_and_jt_blocks</span>.<span class="ident">into_iter</span>().<span class="ident">rev</span>() {
             <span class="comment">// There are currently no 128bit systems supported by rustc, but once we do ensure that</span>
             <span class="comment">// we don&#39;t silently ignore a part of the jump table for 128bit integers on 128bit systems.</span>
-            <span class="macro">assert</span><span class="macro">!</span>(
-                <span class="ident">u64</span>::<span class="ident">try_from</span>(<span class="ident">blocks</span>.<span class="ident">len</span>()).<span class="ident">is_ok</span>(),
-                <span class="string">&quot;Jump tables bigger than 2^64-1 are not yet supported&quot;</span>
+            <span class="macro">assert!</span>(
+                <span class="ident">u32::try_from</span>(<span class="ident">blocks</span>.<span class="ident">len</span>()).<span class="ident">is_ok</span>(),
+                <span class="string">&quot;Jump tables bigger than 2^32-1 are not yet supported&quot;</span>
             );
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">jt_data</span> <span class="op">=</span> <span class="ident">JumpTableData</span>::<span class="ident">new</span>();
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">jt_data</span> <span class="op">=</span> <span class="ident">JumpTableData::new</span>();
             <span class="kw">for</span> <span class="ident">block</span> <span class="kw">in</span> <span class="ident">blocks</span> {
                 <span class="ident">jt_data</span>.<span class="ident">push_entry</span>(<span class="ident">block</span>);
             }
@@ -872,29 +919,34 @@
             <span class="kw">let</span> <span class="ident">discr</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">first_index</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
                 <span class="ident">val</span>
             } <span class="kw">else</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">first_index</span>) <span class="op">=</span> <span class="ident">u64</span>::<span class="ident">try_from</span>(<span class="ident">first_index</span>) {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">first_index</span>) <span class="op">=</span> <span class="ident">u64::try_from</span>(<span class="ident">first_index</span>) {
                     <span class="ident">bx</span>.<span class="ident">ins</span>().<span class="ident">iadd_imm</span>(<span class="ident">val</span>, (<span class="ident">first_index</span> <span class="kw">as</span> <span class="ident">i64</span>).<span class="ident">wrapping_neg</span>())
                 } <span class="kw">else</span> {
                     <span class="kw">let</span> (<span class="ident">lsb</span>, <span class="ident">msb</span>) <span class="op">=</span> (<span class="ident">first_index</span> <span class="kw">as</span> <span class="ident">u64</span>, (<span class="ident">first_index</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">64</span>) <span class="kw">as</span> <span class="ident">u64</span>);
-                    <span class="kw">let</span> <span class="ident">lsb</span> <span class="op">=</span> <span class="ident">bx</span>.<span class="ident">ins</span>().<span class="ident">iconst</span>(<span class="ident">types</span>::<span class="ident">I64</span>, <span class="ident">lsb</span> <span class="kw">as</span> <span class="ident">i64</span>);
-                    <span class="kw">let</span> <span class="ident">msb</span> <span class="op">=</span> <span class="ident">bx</span>.<span class="ident">ins</span>().<span class="ident">iconst</span>(<span class="ident">types</span>::<span class="ident">I64</span>, <span class="ident">msb</span> <span class="kw">as</span> <span class="ident">i64</span>);
+                    <span class="kw">let</span> <span class="ident">lsb</span> <span class="op">=</span> <span class="ident">bx</span>.<span class="ident">ins</span>().<span class="ident">iconst</span>(<span class="ident">types::I64</span>, <span class="ident">lsb</span> <span class="kw">as</span> <span class="ident">i64</span>);
+                    <span class="kw">let</span> <span class="ident">msb</span> <span class="op">=</span> <span class="ident">bx</span>.<span class="ident">ins</span>().<span class="ident">iconst</span>(<span class="ident">types::I64</span>, <span class="ident">msb</span> <span class="kw">as</span> <span class="ident">i64</span>);
                     <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">bx</span>.<span class="ident">ins</span>().<span class="ident">iconcat</span>(<span class="ident">lsb</span>, <span class="ident">msb</span>);
                     <span class="ident">bx</span>.<span class="ident">ins</span>().<span class="ident">isub</span>(<span class="ident">val</span>, <span class="ident">index</span>)
                 }
             };
 
-            <span class="kw">let</span> <span class="ident">discr</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">bx</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">value_type</span>(<span class="ident">discr</span>).<span class="ident">bits</span>() <span class="op">&gt;</span> <span class="number">64</span> {
-                <span class="comment">// Check for overflow of cast to u64.</span>
+            <span class="kw">let</span> <span class="ident">discr</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">bx</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">value_type</span>(<span class="ident">discr</span>).<span class="ident">bits</span>() <span class="op">&gt;</span> <span class="number">32</span> {
+                <span class="comment">// Check for overflow of cast to u32.</span>
                 <span class="kw">let</span> <span class="ident">new_block</span> <span class="op">=</span> <span class="ident">bx</span>.<span class="ident">create_block</span>();
-                <span class="kw">let</span> <span class="ident">bigger_than_u64</span> <span class="op">=</span>
+                <span class="kw">let</span> <span class="ident">bigger_than_u32</span> <span class="op">=</span>
                     <span class="ident">bx</span>.<span class="ident">ins</span>()
-                        .<span class="ident">icmp_imm</span>(<span class="ident">IntCC</span>::<span class="ident">UnsignedGreaterThan</span>, <span class="ident">discr</span>, <span class="ident">u64</span>::<span class="ident">max_value</span>() <span class="kw">as</span> <span class="ident">i64</span>);
-                <span class="ident">bx</span>.<span class="ident">ins</span>().<span class="ident">brnz</span>(<span class="ident">bigger_than_u64</span>, <span class="ident">otherwise</span>, <span class="kw-2">&amp;</span>[]);
+                        .<span class="ident">icmp_imm</span>(<span class="ident">IntCC::UnsignedGreaterThan</span>, <span class="ident">discr</span>, <span class="ident">u32::max_value</span>() <span class="kw">as</span> <span class="ident">i64</span>);
+                <span class="ident">bx</span>.<span class="ident">ins</span>().<span class="ident">brnz</span>(<span class="ident">bigger_than_u32</span>, <span class="ident">otherwise</span>, <span class="kw-2">&amp;</span>[]);
                 <span class="ident">bx</span>.<span class="ident">ins</span>().<span class="ident">jump</span>(<span class="ident">new_block</span>, <span class="kw-2">&amp;</span>[]);
                 <span class="ident">bx</span>.<span class="ident">switch_to_block</span>(<span class="ident">new_block</span>);
 
-                <span class="comment">// Cast to u64, as br_table is not implemented for integers bigger than 64bits.</span>
-                <span class="ident">bx</span>.<span class="ident">ins</span>().<span class="ident">ireduce</span>(<span class="ident">types</span>::<span class="ident">I64</span>, <span class="ident">discr</span>)
+                <span class="comment">// Cast to u32, as br_table is not implemented for integers bigger than 32bits.</span>
+                <span class="kw">let</span> <span class="ident">discr</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">bx</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">value_type</span>(<span class="ident">discr</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">types::I128</span> {
+                    <span class="ident">bx</span>.<span class="ident">ins</span>().<span class="ident">isplit</span>(<span class="ident">discr</span>).<span class="number">0</span>
+                } <span class="kw">else</span> {
+                    <span class="ident">discr</span>
+                };
+                <span class="ident">bx</span>.<span class="ident">ins</span>().<span class="ident">ireduce</span>(<span class="ident">types::I32</span>, <span class="ident">discr</span>)
             } <span class="kw">else</span> {
                 <span class="ident">discr</span>
             };
@@ -913,24 +965,24 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emit</span>(<span class="self">self</span>, <span class="ident">bx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">FunctionBuilder</span>, <span class="ident">val</span>: <span class="ident">Value</span>, <span class="ident">otherwise</span>: <span class="ident">Block</span>) {
         <span class="comment">// FIXME icmp(_imm) doesn&#39;t have encodings for i8 and i16 on x86(_64) yet</span>
         <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">bx</span>.<span class="ident">func</span>.<span class="ident">dfg</span>.<span class="ident">value_type</span>(<span class="ident">val</span>) {
-            <span class="ident">types</span>::<span class="ident">I8</span> <span class="op">|</span> <span class="ident">types</span>::<span class="ident">I16</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">bx</span>.<span class="ident">ins</span>().<span class="ident">uextend</span>(<span class="ident">types</span>::<span class="ident">I32</span>, <span class="ident">val</span>),
+            <span class="ident">types::I8</span> <span class="op">|</span> <span class="ident">types::I16</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">bx</span>.<span class="ident">ins</span>().<span class="ident">uextend</span>(<span class="ident">types::I32</span>, <span class="ident">val</span>),
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">val</span>,
         };
 
         <span class="kw">let</span> <span class="ident">contiguous_case_ranges</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">collect_contiguous_case_ranges</span>();
         <span class="kw">let</span> <span class="ident">cases_and_jt_blocks</span> <span class="op">=</span>
-            <span class="self">Self</span>::<span class="ident">build_search_tree</span>(<span class="ident">bx</span>, <span class="ident">val</span>, <span class="ident">otherwise</span>, <span class="ident">contiguous_case_ranges</span>);
-        <span class="self">Self</span>::<span class="ident">build_jump_tables</span>(<span class="ident">bx</span>, <span class="ident">val</span>, <span class="ident">otherwise</span>, <span class="ident">cases_and_jt_blocks</span>);
+            <span class="self">Self</span><span class="ident">::build_search_tree</span>(<span class="ident">bx</span>, <span class="ident">val</span>, <span class="ident">otherwise</span>, <span class="ident">contiguous_case_ranges</span>);
+        <span class="self">Self</span><span class="ident">::build_jump_tables</span>(<span class="ident">bx</span>, <span class="ident">val</span>, <span class="ident">otherwise</span>, <span class="ident">cases_and_jt_blocks</span>);
     }
 }
 
 <span class="kw">fn</span> <span class="ident">icmp_imm_u128</span>(<span class="ident">bx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">FunctionBuilder</span>, <span class="ident">cond</span>: <span class="ident">IntCC</span>, <span class="ident">x</span>: <span class="ident">Value</span>, <span class="ident">y</span>: <span class="ident">u128</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Value</span> {
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">index</span>) <span class="op">=</span> <span class="ident">u64</span>::<span class="ident">try_from</span>(<span class="ident">y</span>) {
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">index</span>) <span class="op">=</span> <span class="ident">u64::try_from</span>(<span class="ident">y</span>) {
         <span class="ident">bx</span>.<span class="ident">ins</span>().<span class="ident">icmp_imm</span>(<span class="ident">cond</span>, <span class="ident">x</span>, <span class="ident">index</span> <span class="kw">as</span> <span class="ident">i64</span>)
     } <span class="kw">else</span> {
         <span class="kw">let</span> (<span class="ident">lsb</span>, <span class="ident">msb</span>) <span class="op">=</span> (<span class="ident">y</span> <span class="kw">as</span> <span class="ident">u64</span>, (<span class="ident">y</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">64</span>) <span class="kw">as</span> <span class="ident">u64</span>);
-        <span class="kw">let</span> <span class="ident">lsb</span> <span class="op">=</span> <span class="ident">bx</span>.<span class="ident">ins</span>().<span class="ident">iconst</span>(<span class="ident">types</span>::<span class="ident">I64</span>, <span class="ident">lsb</span> <span class="kw">as</span> <span class="ident">i64</span>);
-        <span class="kw">let</span> <span class="ident">msb</span> <span class="op">=</span> <span class="ident">bx</span>.<span class="ident">ins</span>().<span class="ident">iconst</span>(<span class="ident">types</span>::<span class="ident">I64</span>, <span class="ident">msb</span> <span class="kw">as</span> <span class="ident">i64</span>);
+        <span class="kw">let</span> <span class="ident">lsb</span> <span class="op">=</span> <span class="ident">bx</span>.<span class="ident">ins</span>().<span class="ident">iconst</span>(<span class="ident">types::I64</span>, <span class="ident">lsb</span> <span class="kw">as</span> <span class="ident">i64</span>);
+        <span class="kw">let</span> <span class="ident">msb</span> <span class="op">=</span> <span class="ident">bx</span>.<span class="ident">ins</span>().<span class="ident">iconst</span>(<span class="ident">types::I64</span>, <span class="ident">msb</span> <span class="kw">as</span> <span class="ident">i64</span>);
         <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">bx</span>.<span class="ident">ins</span>().<span class="ident">iconcat</span>(<span class="ident">lsb</span>, <span class="ident">msb</span>);
         <span class="ident">bx</span>.<span class="ident">ins</span>().<span class="ident">icmp</span>(<span class="ident">cond</span>, <span class="ident">x</span>, <span class="ident">index</span>)
     }
@@ -959,7 +1011,7 @@
     <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">first_index</span>: <span class="ident">EntryIndex</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">first_index</span>,
-            <span class="ident">blocks</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
+            <span class="ident">blocks</span>: <span class="ident">Vec::new</span>(),
         }
     }
 }
@@ -967,25 +1019,25 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">frontend</span>::<span class="ident">FunctionBuilderContext</span>;
-    <span class="kw">use</span> <span class="ident">alloc</span>::<span class="ident">string</span>::<span class="ident">ToString</span>;
-    <span class="kw">use</span> <span class="ident">cranelift_codegen</span>::<span class="ident">ir</span>::<span class="ident">Function</span>;
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::frontend::FunctionBuilderContext</span>;
+    <span class="kw">use</span> <span class="ident">alloc::string::ToString</span>;
+    <span class="kw">use</span> <span class="ident">cranelift_codegen::ir::Function</span>;
 
-    <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">setup</span> {
+    <span class="macro">macro_rules!</span> <span class="ident">setup</span> {
         (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">default</span>:<span class="ident">expr</span>, [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">index</span>:<span class="ident">expr</span>,)<span class="kw-2">*</span>]) <span class="op">=</span><span class="op">&gt;</span> {{
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">func</span> <span class="op">=</span> <span class="ident">Function</span>::<span class="ident">new</span>();
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">func_ctx</span> <span class="op">=</span> <span class="ident">FunctionBuilderContext</span>::<span class="ident">new</span>();
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">func</span> <span class="op">=</span> <span class="ident">Function::new</span>();
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">func_ctx</span> <span class="op">=</span> <span class="ident">FunctionBuilderContext::new</span>();
             {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bx</span> <span class="op">=</span> <span class="ident">FunctionBuilder</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">func</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">func_ctx</span>);
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bx</span> <span class="op">=</span> <span class="ident">FunctionBuilder::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">func</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">func_ctx</span>);
                 <span class="kw">let</span> <span class="ident">block</span> <span class="op">=</span> <span class="ident">bx</span>.<span class="ident">create_block</span>();
                 <span class="ident">bx</span>.<span class="ident">switch_to_block</span>(<span class="ident">block</span>);
-                <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">bx</span>.<span class="ident">ins</span>().<span class="ident">iconst</span>(<span class="ident">types</span>::<span class="ident">I8</span>, <span class="number">0</span>);
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">switch</span> <span class="op">=</span> <span class="ident">Switch</span>::<span class="ident">new</span>();
+                <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">bx</span>.<span class="ident">ins</span>().<span class="ident">iconst</span>(<span class="ident">types::I8</span>, <span class="number">0</span>);
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">switch</span> <span class="op">=</span> <span class="ident">Switch::new</span>();
                 $(
                     <span class="kw">let</span> <span class="ident">block</span> <span class="op">=</span> <span class="ident">bx</span>.<span class="ident">create_block</span>();
                     <span class="ident">switch</span>.<span class="ident">set_entry</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">index</span>, <span class="ident">block</span>);
                 )<span class="op">*</span>
-                <span class="ident">switch</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bx</span>, <span class="ident">val</span>, <span class="ident">Block</span>::<span class="ident">with_number</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">default</span>).<span class="ident">unwrap</span>());
+                <span class="ident">switch</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bx</span>, <span class="ident">val</span>, <span class="ident">Block::with_number</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">default</span>).<span class="ident">unwrap</span>());
             }
             <span class="ident">func</span>
                 .<span class="ident">to_string</span>()
@@ -997,8 +1049,8 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">switch_zero</span>() {
-        <span class="kw">let</span> <span class="ident">func</span> <span class="op">=</span> <span class="macro">setup</span><span class="macro">!</span>(<span class="number">0</span>, [<span class="number">0</span>,]);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="kw">let</span> <span class="ident">func</span> <span class="op">=</span> <span class="macro">setup!</span>(<span class="number">0</span>, [<span class="number">0</span>,]);
+        <span class="macro">assert_eq!</span>(
             <span class="ident">func</span>,
             <span class="string">&quot;block0:
     v0 = iconst.i8 0
@@ -1010,8 +1062,8 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">switch_single</span>() {
-        <span class="kw">let</span> <span class="ident">func</span> <span class="op">=</span> <span class="macro">setup</span><span class="macro">!</span>(<span class="number">0</span>, [<span class="number">1</span>,]);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="kw">let</span> <span class="ident">func</span> <span class="op">=</span> <span class="macro">setup!</span>(<span class="number">0</span>, [<span class="number">1</span>,]);
+        <span class="macro">assert_eq!</span>(
             <span class="ident">func</span>,
             <span class="string">&quot;block0:
     v0 = iconst.i8 0
@@ -1024,8 +1076,8 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">switch_bool</span>() {
-        <span class="kw">let</span> <span class="ident">func</span> <span class="op">=</span> <span class="macro">setup</span><span class="macro">!</span>(<span class="number">0</span>, [<span class="number">0</span>, <span class="number">1</span>,]);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="kw">let</span> <span class="ident">func</span> <span class="op">=</span> <span class="macro">setup!</span>(<span class="number">0</span>, [<span class="number">0</span>, <span class="number">1</span>,]);
+        <span class="macro">assert_eq!</span>(
             <span class="ident">func</span>,
             <span class="string">&quot;    jt0 = jump_table [block1, block2]
 
@@ -1041,8 +1093,8 @@ block3:
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">switch_two_gap</span>() {
-        <span class="kw">let</span> <span class="ident">func</span> <span class="op">=</span> <span class="macro">setup</span><span class="macro">!</span>(<span class="number">0</span>, [<span class="number">0</span>, <span class="number">2</span>,]);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="kw">let</span> <span class="ident">func</span> <span class="op">=</span> <span class="macro">setup!</span>(<span class="number">0</span>, [<span class="number">0</span>, <span class="number">2</span>,]);
+        <span class="macro">assert_eq!</span>(
             <span class="ident">func</span>,
             <span class="string">&quot;block0:
     v0 = iconst.i8 0
@@ -1059,8 +1111,8 @@ block3:
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">switch_many</span>() {
-        <span class="kw">let</span> <span class="ident">func</span> <span class="op">=</span> <span class="macro">setup</span><span class="macro">!</span>(<span class="number">0</span>, [<span class="number">0</span>, <span class="number">1</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">10</span>, <span class="number">11</span>, <span class="number">12</span>,]);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="kw">let</span> <span class="ident">func</span> <span class="op">=</span> <span class="macro">setup!</span>(<span class="number">0</span>, [<span class="number">0</span>, <span class="number">1</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">10</span>, <span class="number">11</span>, <span class="number">12</span>,]);
+        <span class="macro">assert_eq!</span>(
             <span class="ident">func</span>,
             <span class="string">&quot;    jt0 = jump_table [block1, block2]
     jt1 = jump_table [block5, block6, block7]
@@ -1098,8 +1150,8 @@ block10:
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">switch_min_index_value</span>() {
-        <span class="kw">let</span> <span class="ident">func</span> <span class="op">=</span> <span class="macro">setup</span><span class="macro">!</span>(<span class="number">0</span>, [::<span class="ident">core</span>::<span class="ident">i64</span>::<span class="ident">MIN</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="kw">as</span> <span class="ident">u128</span>, <span class="number">1</span>,]);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="kw">let</span> <span class="ident">func</span> <span class="op">=</span> <span class="macro">setup!</span>(<span class="number">0</span>, [<span class="ident">::core::i64::MIN</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="kw">as</span> <span class="ident">u128</span>, <span class="number">1</span>,]);
+        <span class="macro">assert_eq!</span>(
             <span class="ident">func</span>,
             <span class="string">&quot;block0:
     v0 = iconst.i8 0
@@ -1117,8 +1169,8 @@ block3:
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">switch_max_index_value</span>() {
-        <span class="kw">let</span> <span class="ident">func</span> <span class="op">=</span> <span class="macro">setup</span><span class="macro">!</span>(<span class="number">0</span>, [::<span class="ident">core</span>::<span class="ident">i64</span>::<span class="ident">MAX</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="kw">as</span> <span class="ident">u128</span>, <span class="number">1</span>,]);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="kw">let</span> <span class="ident">func</span> <span class="op">=</span> <span class="macro">setup!</span>(<span class="number">0</span>, [<span class="ident">::core::i64::MAX</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="kw">as</span> <span class="ident">u128</span>, <span class="number">1</span>,]);
+        <span class="macro">assert_eq!</span>(
             <span class="ident">func</span>,
             <span class="string">&quot;block0:
     v0 = iconst.i8 0
@@ -1136,8 +1188,8 @@ block3:
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">switch_optimal_codegen</span>() {
-        <span class="kw">let</span> <span class="ident">func</span> <span class="op">=</span> <span class="macro">setup</span><span class="macro">!</span>(<span class="number">0</span>, [<span class="op">-</span><span class="number">1i64</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="kw">as</span> <span class="ident">u128</span>, <span class="number">0</span>, <span class="number">1</span>,]);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="kw">let</span> <span class="ident">func</span> <span class="op">=</span> <span class="macro">setup!</span>(<span class="number">0</span>, [<span class="op">-</span><span class="number">1i64</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="kw">as</span> <span class="ident">u128</span>, <span class="number">0</span>, <span class="number">1</span>,]);
+        <span class="macro">assert_eq!</span>(
             <span class="ident">func</span>,
             <span class="string">&quot;    jt0 = jump_table [block2, block3]
 
@@ -1157,13 +1209,13 @@ block4:
     <span class="kw">fn</span> <span class="ident">switch_seal_generated_blocks</span>() {
         <span class="kw">let</span> <span class="ident">keys</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">10</span>, <span class="number">11</span>, <span class="number">12</span>, <span class="number">20</span>, <span class="number">30</span>, <span class="number">40</span>, <span class="number">50</span>];
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">func</span> <span class="op">=</span> <span class="ident">Function</span>::<span class="ident">new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder_ctx</span> <span class="op">=</span> <span class="ident">FunctionBuilderContext</span>::<span class="ident">new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">FunctionBuilder</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">func</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">builder_ctx</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">func</span> <span class="op">=</span> <span class="ident">Function::new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder_ctx</span> <span class="op">=</span> <span class="ident">FunctionBuilderContext::new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">FunctionBuilder::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">func</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">builder_ctx</span>);
 
         <span class="kw">let</span> <span class="ident">root_block</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">create_block</span>();
         <span class="kw">let</span> <span class="ident">default_block</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">create_block</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">switch</span> <span class="op">=</span> <span class="ident">Switch</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">switch</span> <span class="op">=</span> <span class="ident">Switch::new</span>();
 
         <span class="kw">let</span> <span class="ident">case_blocks</span> <span class="op">=</span> <span class="ident">keys</span>
             .<span class="ident">iter</span>()
@@ -1177,10 +1229,10 @@ block4:
         <span class="ident">builder</span>.<span class="ident">seal_block</span>(<span class="ident">root_block</span>);
         <span class="ident">builder</span>.<span class="ident">switch_to_block</span>(<span class="ident">root_block</span>);
 
-        <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">ins</span>().<span class="ident">iconst</span>(<span class="ident">types</span>::<span class="ident">I32</span>, <span class="number">1</span>);
+        <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">ins</span>().<span class="ident">iconst</span>(<span class="ident">types::I32</span>, <span class="number">1</span>);
         <span class="ident">switch</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">builder</span>, <span class="ident">val</span>, <span class="ident">default_block</span>);
 
-        <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">block</span> <span class="kw">in</span> <span class="ident">case_blocks</span>.<span class="ident">iter</span>().<span class="ident">chain</span>(<span class="ident">std</span>::<span class="ident">iter</span>::<span class="ident">once</span>(<span class="kw-2">&amp;</span><span class="ident">default_block</span>)) {
+        <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">block</span> <span class="kw">in</span> <span class="ident">case_blocks</span>.<span class="ident">iter</span>().<span class="ident">chain</span>(<span class="ident">std::iter::once</span>(<span class="kw-2">&amp;</span><span class="ident">default_block</span>)) {
             <span class="ident">builder</span>.<span class="ident">seal_block</span>(<span class="ident">block</span>);
             <span class="ident">builder</span>.<span class="ident">switch_to_block</span>(<span class="ident">block</span>);
             <span class="ident">builder</span>.<span class="ident">ins</span>().<span class="ident">return_</span>(<span class="kw-2">&amp;</span>[]);
@@ -1190,15 +1242,15 @@ block4:
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">switch_128bit</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">func</span> <span class="op">=</span> <span class="ident">Function</span>::<span class="ident">new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">func_ctx</span> <span class="op">=</span> <span class="ident">FunctionBuilderContext</span>::<span class="ident">new</span>();
+    <span class="kw">fn</span> <span class="ident">switch_64bit</span>() {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">func</span> <span class="op">=</span> <span class="ident">Function::new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">func_ctx</span> <span class="op">=</span> <span class="ident">FunctionBuilderContext::new</span>();
         {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bx</span> <span class="op">=</span> <span class="ident">FunctionBuilder</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">func</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">func_ctx</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bx</span> <span class="op">=</span> <span class="ident">FunctionBuilder::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">func</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">func_ctx</span>);
             <span class="kw">let</span> <span class="ident">block0</span> <span class="op">=</span> <span class="ident">bx</span>.<span class="ident">create_block</span>();
             <span class="ident">bx</span>.<span class="ident">switch_to_block</span>(<span class="ident">block0</span>);
-            <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">bx</span>.<span class="ident">ins</span>().<span class="ident">iconst</span>(<span class="ident">types</span>::<span class="ident">I128</span>, <span class="number">0</span>);
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">switch</span> <span class="op">=</span> <span class="ident">Switch</span>::<span class="ident">new</span>();
+            <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">bx</span>.<span class="ident">ins</span>().<span class="ident">iconst</span>(<span class="ident">types::I64</span>, <span class="number">0</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">switch</span> <span class="op">=</span> <span class="ident">Switch::new</span>();
             <span class="kw">let</span> <span class="ident">block1</span> <span class="op">=</span> <span class="ident">bx</span>.<span class="ident">create_block</span>();
             <span class="ident">switch</span>.<span class="ident">set_entry</span>(<span class="number">1</span>, <span class="ident">block1</span>);
             <span class="kw">let</span> <span class="ident">block2</span> <span class="op">=</span> <span class="ident">bx</span>.<span class="ident">create_block</span>();
@@ -1211,7 +1263,48 @@ block4:
             .<span class="ident">trim_start_matches</span>(<span class="string">&quot;function u0:0() fast {\n&quot;</span>)
             .<span class="ident">trim_end_matches</span>(<span class="string">&quot;\n}\n&quot;</span>)
             .<span class="ident">to_string</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">func</span>,
+            <span class="string">&quot;    jt0 = jump_table [block2, block1]
+
+block0:
+    v0 = iconst.i64 0
+    jump block4
+
+block4:
+    v1 = icmp_imm.i64 ugt v0, 0xffff_ffff
+    brnz v1, block3
+    jump block5
+
+block5:
+    v2 = ireduce.i32 v0
+    br_table v2, block3, jt0&quot;</span>
+        );
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">switch_128bit</span>() {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">func</span> <span class="op">=</span> <span class="ident">Function::new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">func_ctx</span> <span class="op">=</span> <span class="ident">FunctionBuilderContext::new</span>();
+        {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bx</span> <span class="op">=</span> <span class="ident">FunctionBuilder::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">func</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">func_ctx</span>);
+            <span class="kw">let</span> <span class="ident">block0</span> <span class="op">=</span> <span class="ident">bx</span>.<span class="ident">create_block</span>();
+            <span class="ident">bx</span>.<span class="ident">switch_to_block</span>(<span class="ident">block0</span>);
+            <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">bx</span>.<span class="ident">ins</span>().<span class="ident">iconst</span>(<span class="ident">types::I128</span>, <span class="number">0</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">switch</span> <span class="op">=</span> <span class="ident">Switch::new</span>();
+            <span class="kw">let</span> <span class="ident">block1</span> <span class="op">=</span> <span class="ident">bx</span>.<span class="ident">create_block</span>();
+            <span class="ident">switch</span>.<span class="ident">set_entry</span>(<span class="number">1</span>, <span class="ident">block1</span>);
+            <span class="kw">let</span> <span class="ident">block2</span> <span class="op">=</span> <span class="ident">bx</span>.<span class="ident">create_block</span>();
+            <span class="ident">switch</span>.<span class="ident">set_entry</span>(<span class="number">0</span>, <span class="ident">block2</span>);
+            <span class="kw">let</span> <span class="ident">block3</span> <span class="op">=</span> <span class="ident">bx</span>.<span class="ident">create_block</span>();
+            <span class="ident">switch</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bx</span>, <span class="ident">val</span>, <span class="ident">block3</span>);
+        }
+        <span class="kw">let</span> <span class="ident">func</span> <span class="op">=</span> <span class="ident">func</span>
+            .<span class="ident">to_string</span>()
+            .<span class="ident">trim_start_matches</span>(<span class="string">&quot;function u0:0() fast {\n&quot;</span>)
+            .<span class="ident">trim_end_matches</span>(<span class="string">&quot;\n}\n&quot;</span>)
+            .<span class="ident">to_string</span>();
+        <span class="macro">assert_eq!</span>(
             <span class="ident">func</span>,
             <span class="string">&quot;    jt0 = jump_table [block2, block1]
 
@@ -1220,15 +1313,17 @@ block0:
     jump block4
 
 block4:
-    v1 = icmp_imm.i128 ugt v0, -1
+    v1 = icmp_imm.i128 ugt v0, 0xffff_ffff
     brnz v1, block3
     jump block5
 
 block5:
-    v2 = ireduce.i64 v0
-    br_table v2, block3, jt0&quot;</span>
+    v2, v3 = isplit.i128 v0
+    v4 = ireduce.i32 v2
+    br_table v4, block3, jt0&quot;</span>
         );
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "cranelift_frontend";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="cranelift_frontend" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

@@ -1,7 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sc-finality-grandpa-0.8.0/src/authorities.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>authorities.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sc-finality-grandpa-0.9.0/src/authorities.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>authorities.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../sc_finality_grandpa/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../sc_finality_grandpa/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1337,10 +1337,304 @@
 <span id="1334">1334</span>
 <span id="1335">1335</span>
 <span id="1336">1336</span>
+<span id="1337">1337</span>
+<span id="1338">1338</span>
+<span id="1339">1339</span>
+<span id="1340">1340</span>
+<span id="1341">1341</span>
+<span id="1342">1342</span>
+<span id="1343">1343</span>
+<span id="1344">1344</span>
+<span id="1345">1345</span>
+<span id="1346">1346</span>
+<span id="1347">1347</span>
+<span id="1348">1348</span>
+<span id="1349">1349</span>
+<span id="1350">1350</span>
+<span id="1351">1351</span>
+<span id="1352">1352</span>
+<span id="1353">1353</span>
+<span id="1354">1354</span>
+<span id="1355">1355</span>
+<span id="1356">1356</span>
+<span id="1357">1357</span>
+<span id="1358">1358</span>
+<span id="1359">1359</span>
+<span id="1360">1360</span>
+<span id="1361">1361</span>
+<span id="1362">1362</span>
+<span id="1363">1363</span>
+<span id="1364">1364</span>
+<span id="1365">1365</span>
+<span id="1366">1366</span>
+<span id="1367">1367</span>
+<span id="1368">1368</span>
+<span id="1369">1369</span>
+<span id="1370">1370</span>
+<span id="1371">1371</span>
+<span id="1372">1372</span>
+<span id="1373">1373</span>
+<span id="1374">1374</span>
+<span id="1375">1375</span>
+<span id="1376">1376</span>
+<span id="1377">1377</span>
+<span id="1378">1378</span>
+<span id="1379">1379</span>
+<span id="1380">1380</span>
+<span id="1381">1381</span>
+<span id="1382">1382</span>
+<span id="1383">1383</span>
+<span id="1384">1384</span>
+<span id="1385">1385</span>
+<span id="1386">1386</span>
+<span id="1387">1387</span>
+<span id="1388">1388</span>
+<span id="1389">1389</span>
+<span id="1390">1390</span>
+<span id="1391">1391</span>
+<span id="1392">1392</span>
+<span id="1393">1393</span>
+<span id="1394">1394</span>
+<span id="1395">1395</span>
+<span id="1396">1396</span>
+<span id="1397">1397</span>
+<span id="1398">1398</span>
+<span id="1399">1399</span>
+<span id="1400">1400</span>
+<span id="1401">1401</span>
+<span id="1402">1402</span>
+<span id="1403">1403</span>
+<span id="1404">1404</span>
+<span id="1405">1405</span>
+<span id="1406">1406</span>
+<span id="1407">1407</span>
+<span id="1408">1408</span>
+<span id="1409">1409</span>
+<span id="1410">1410</span>
+<span id="1411">1411</span>
+<span id="1412">1412</span>
+<span id="1413">1413</span>
+<span id="1414">1414</span>
+<span id="1415">1415</span>
+<span id="1416">1416</span>
+<span id="1417">1417</span>
+<span id="1418">1418</span>
+<span id="1419">1419</span>
+<span id="1420">1420</span>
+<span id="1421">1421</span>
+<span id="1422">1422</span>
+<span id="1423">1423</span>
+<span id="1424">1424</span>
+<span id="1425">1425</span>
+<span id="1426">1426</span>
+<span id="1427">1427</span>
+<span id="1428">1428</span>
+<span id="1429">1429</span>
+<span id="1430">1430</span>
+<span id="1431">1431</span>
+<span id="1432">1432</span>
+<span id="1433">1433</span>
+<span id="1434">1434</span>
+<span id="1435">1435</span>
+<span id="1436">1436</span>
+<span id="1437">1437</span>
+<span id="1438">1438</span>
+<span id="1439">1439</span>
+<span id="1440">1440</span>
+<span id="1441">1441</span>
+<span id="1442">1442</span>
+<span id="1443">1443</span>
+<span id="1444">1444</span>
+<span id="1445">1445</span>
+<span id="1446">1446</span>
+<span id="1447">1447</span>
+<span id="1448">1448</span>
+<span id="1449">1449</span>
+<span id="1450">1450</span>
+<span id="1451">1451</span>
+<span id="1452">1452</span>
+<span id="1453">1453</span>
+<span id="1454">1454</span>
+<span id="1455">1455</span>
+<span id="1456">1456</span>
+<span id="1457">1457</span>
+<span id="1458">1458</span>
+<span id="1459">1459</span>
+<span id="1460">1460</span>
+<span id="1461">1461</span>
+<span id="1462">1462</span>
+<span id="1463">1463</span>
+<span id="1464">1464</span>
+<span id="1465">1465</span>
+<span id="1466">1466</span>
+<span id="1467">1467</span>
+<span id="1468">1468</span>
+<span id="1469">1469</span>
+<span id="1470">1470</span>
+<span id="1471">1471</span>
+<span id="1472">1472</span>
+<span id="1473">1473</span>
+<span id="1474">1474</span>
+<span id="1475">1475</span>
+<span id="1476">1476</span>
+<span id="1477">1477</span>
+<span id="1478">1478</span>
+<span id="1479">1479</span>
+<span id="1480">1480</span>
+<span id="1481">1481</span>
+<span id="1482">1482</span>
+<span id="1483">1483</span>
+<span id="1484">1484</span>
+<span id="1485">1485</span>
+<span id="1486">1486</span>
+<span id="1487">1487</span>
+<span id="1488">1488</span>
+<span id="1489">1489</span>
+<span id="1490">1490</span>
+<span id="1491">1491</span>
+<span id="1492">1492</span>
+<span id="1493">1493</span>
+<span id="1494">1494</span>
+<span id="1495">1495</span>
+<span id="1496">1496</span>
+<span id="1497">1497</span>
+<span id="1498">1498</span>
+<span id="1499">1499</span>
+<span id="1500">1500</span>
+<span id="1501">1501</span>
+<span id="1502">1502</span>
+<span id="1503">1503</span>
+<span id="1504">1504</span>
+<span id="1505">1505</span>
+<span id="1506">1506</span>
+<span id="1507">1507</span>
+<span id="1508">1508</span>
+<span id="1509">1509</span>
+<span id="1510">1510</span>
+<span id="1511">1511</span>
+<span id="1512">1512</span>
+<span id="1513">1513</span>
+<span id="1514">1514</span>
+<span id="1515">1515</span>
+<span id="1516">1516</span>
+<span id="1517">1517</span>
+<span id="1518">1518</span>
+<span id="1519">1519</span>
+<span id="1520">1520</span>
+<span id="1521">1521</span>
+<span id="1522">1522</span>
+<span id="1523">1523</span>
+<span id="1524">1524</span>
+<span id="1525">1525</span>
+<span id="1526">1526</span>
+<span id="1527">1527</span>
+<span id="1528">1528</span>
+<span id="1529">1529</span>
+<span id="1530">1530</span>
+<span id="1531">1531</span>
+<span id="1532">1532</span>
+<span id="1533">1533</span>
+<span id="1534">1534</span>
+<span id="1535">1535</span>
+<span id="1536">1536</span>
+<span id="1537">1537</span>
+<span id="1538">1538</span>
+<span id="1539">1539</span>
+<span id="1540">1540</span>
+<span id="1541">1541</span>
+<span id="1542">1542</span>
+<span id="1543">1543</span>
+<span id="1544">1544</span>
+<span id="1545">1545</span>
+<span id="1546">1546</span>
+<span id="1547">1547</span>
+<span id="1548">1548</span>
+<span id="1549">1549</span>
+<span id="1550">1550</span>
+<span id="1551">1551</span>
+<span id="1552">1552</span>
+<span id="1553">1553</span>
+<span id="1554">1554</span>
+<span id="1555">1555</span>
+<span id="1556">1556</span>
+<span id="1557">1557</span>
+<span id="1558">1558</span>
+<span id="1559">1559</span>
+<span id="1560">1560</span>
+<span id="1561">1561</span>
+<span id="1562">1562</span>
+<span id="1563">1563</span>
+<span id="1564">1564</span>
+<span id="1565">1565</span>
+<span id="1566">1566</span>
+<span id="1567">1567</span>
+<span id="1568">1568</span>
+<span id="1569">1569</span>
+<span id="1570">1570</span>
+<span id="1571">1571</span>
+<span id="1572">1572</span>
+<span id="1573">1573</span>
+<span id="1574">1574</span>
+<span id="1575">1575</span>
+<span id="1576">1576</span>
+<span id="1577">1577</span>
+<span id="1578">1578</span>
+<span id="1579">1579</span>
+<span id="1580">1580</span>
+<span id="1581">1581</span>
+<span id="1582">1582</span>
+<span id="1583">1583</span>
+<span id="1584">1584</span>
+<span id="1585">1585</span>
+<span id="1586">1586</span>
+<span id="1587">1587</span>
+<span id="1588">1588</span>
+<span id="1589">1589</span>
+<span id="1590">1590</span>
+<span id="1591">1591</span>
+<span id="1592">1592</span>
+<span id="1593">1593</span>
+<span id="1594">1594</span>
+<span id="1595">1595</span>
+<span id="1596">1596</span>
+<span id="1597">1597</span>
+<span id="1598">1598</span>
+<span id="1599">1599</span>
+<span id="1600">1600</span>
+<span id="1601">1601</span>
+<span id="1602">1602</span>
+<span id="1603">1603</span>
+<span id="1604">1604</span>
+<span id="1605">1605</span>
+<span id="1606">1606</span>
+<span id="1607">1607</span>
+<span id="1608">1608</span>
+<span id="1609">1609</span>
+<span id="1610">1610</span>
+<span id="1611">1611</span>
+<span id="1612">1612</span>
+<span id="1613">1613</span>
+<span id="1614">1614</span>
+<span id="1615">1615</span>
+<span id="1616">1616</span>
+<span id="1617">1617</span>
+<span id="1618">1618</span>
+<span id="1619">1619</span>
+<span id="1620">1620</span>
+<span id="1621">1621</span>
+<span id="1622">1622</span>
+<span id="1623">1623</span>
+<span id="1624">1624</span>
+<span id="1625">1625</span>
+<span id="1626">1626</span>
+<span id="1627">1627</span>
+<span id="1628">1628</span>
+<span id="1629">1629</span>
+<span id="1630">1630</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// This file is part of Substrate.</span>
 
-<span class="comment">// Copyright (C) 2018-2020 Parity Technologies (UK) Ltd.</span>
+<span class="comment">// Copyright (C) 2018-2021 Parity Technologies (UK) Ltd.</span>
 <span class="comment">// SPDX-License-Identifier: GPL-3.0-or-later WITH Classpath-exception-2.0</span>
 
 <span class="comment">// This program is free software: you can redistribute it and/or modify</span>
@@ -1358,26 +1652,54 @@
 
 <span class="doccomment">//! Utilities for dealing with authorities, authority sets, and handoffs.</span>
 
-<span class="kw">use</span> <span class="ident">fork_tree</span>::<span class="ident">ForkTree</span>;
-<span class="kw">use</span> <span class="ident">parking_lot</span>::<span class="ident">RwLock</span>;
-<span class="kw">use</span> <span class="ident">finality_grandpa</span>::<span class="ident">voter_set</span>::<span class="ident">VoterSet</span>;
+<span class="kw">use</span> <span class="ident">fork_tree::ForkTree</span>;
+<span class="kw">use</span> <span class="ident">parking_lot::RwLock</span>;
+<span class="kw">use</span> <span class="ident">finality_grandpa::voter_set::VoterSet</span>;
 <span class="kw">use</span> <span class="ident">parity_scale_codec</span>::{<span class="ident">Encode</span>, <span class="ident">Decode</span>};
-<span class="kw">use</span> <span class="ident">log</span>::<span class="ident">debug</span>;
+<span class="kw">use</span> <span class="ident">log::debug</span>;
 <span class="kw">use</span> <span class="ident">sc_telemetry</span>::{<span class="ident">telemetry</span>, <span class="ident">CONSENSUS_INFO</span>};
 <span class="kw">use</span> <span class="ident">sp_finality_grandpa</span>::{<span class="ident">AuthorityId</span>, <span class="ident">AuthorityList</span>};
 
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">Ord</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Debug</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ops</span>::<span class="ident">Add</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Arc</span>;
+<span class="kw">use</span> <span class="ident">std::cmp::Ord</span>;
+<span class="kw">use</span> <span class="ident">std::fmt::Debug</span>;
+<span class="kw">use</span> <span class="ident">std::ops::Add</span>;
+<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
 <span class="doccomment">/// Error type returned on operations on the `AuthoritySet`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">derive_more</span>::<span class="ident">Display</span>, <span class="ident">derive_more</span>::<span class="ident">From</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
-	<span class="attribute">#[<span class="ident">display</span>(<span class="string">&quot;Invalid authority set, either empty or with an authority weight set to 0.&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">derive_more::Display</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span><span class="op">&gt;</span> {
+	<span class="attribute">#[<span class="ident">display</span>(<span class="ident">fmt</span> <span class="op">=</span> <span class="string">&quot;Invalid authority set, either empty or with an authority weight set to 0.&quot;</span>)]</span>
 	<span class="ident">InvalidAuthoritySet</span>,
+	<span class="attribute">#[<span class="ident">display</span>(<span class="ident">fmt</span> <span class="op">=</span> <span class="string">&quot;Client error during ancestry lookup: {}&quot;</span>, <span class="ident">_0</span>)]</span>
+	<span class="ident">Client</span>(<span class="ident">E</span>),
+	<span class="attribute">#[<span class="ident">display</span>(<span class="ident">fmt</span> <span class="op">=</span> <span class="string">&quot;Duplicate authority set change.&quot;</span>)]</span>
+	<span class="ident">DuplicateAuthoritySetChange</span>,
+	<span class="attribute">#[<span class="ident">display</span>(<span class="ident">fmt</span> <span class="op">=</span> <span class="string">&quot;Multiple pending forced authority set changes are not allowed.&quot;</span>)]</span>
+	<span class="ident">MultiplePendingForcedAuthoritySetChanges</span>,
+	<span class="attribute">#[<span class="ident">display</span>(
+		<span class="ident">fmt</span> <span class="op">=</span> <span class="string">&quot;A pending forced authority set change could not be applied since it must be applied after \
+		 the pending standard change at #{}&quot;</span>,
+		<span class="ident">_0</span>
+	)]</span>
+	<span class="ident">ForcedAuthoritySetChangeDependencyUnsatisfied</span>(<span class="ident">N</span>),
 	<span class="attribute">#[<span class="ident">display</span>(<span class="ident">fmt</span> <span class="op">=</span> <span class="string">&quot;Invalid operation in the pending changes tree: {}&quot;</span>, <span class="ident">_0</span>)]</span>
-	<span class="ident">ForkTree</span>(<span class="ident">fork_tree</span>::<span class="ident">Error</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>),
+	<span class="ident">ForkTree</span>(<span class="ident">fork_tree::Error</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>),
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">fork_tree::Error</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">fork_tree::Error</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span><span class="op">&gt;</span> {
+		<span class="kw">match</span> <span class="ident">err</span> {
+			<span class="ident">fork_tree::Error::Client</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Error::Client</span>(<span class="ident">err</span>),
+			<span class="ident">fork_tree::Error::Duplicate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Error::DuplicateAuthoritySetChange</span>,
+			<span class="ident">err</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Error::ForkTree</span>(<span class="ident">err</span>),
+		}
+	}
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>: <span class="ident">std::error::Error</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span><span class="op">&gt;</span> {
+	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">E</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span><span class="op">&gt;</span> {
+		<span class="ident">Error::Client</span>(<span class="ident">err</span>)
+	}
 }
 
 <span class="doccomment">/// A shared authority set.</span>
@@ -1415,17 +1737,27 @@
 
 	<span class="doccomment">/// Get the current authorities and their weights (for the current set ID).</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">current_authorities</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">VoterSet</span><span class="op">&lt;</span><span class="ident">AuthorityId</span><span class="op">&gt;</span> {
-		<span class="ident">VoterSet</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read</span>().<span class="ident">current_authorities</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>()).<span class="ident">expect</span>(
+		<span class="ident">VoterSet::new</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read</span>().<span class="ident">current_authorities</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>()).<span class="ident">expect</span>(
 			<span class="string">&quot;current_authorities is non-empty and weights are non-zero; \
 			 constructor and all mutating operations on `AuthoritySet` ensure this; \
 			 qed.&quot;</span>,
 		)
 	}
+
+	<span class="doccomment">/// Clone the inner `AuthoritySet`.</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clone_inner</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AuthoritySet</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">N</span><span class="op">&gt;</span> {
+		<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read</span>().<span class="ident">clone</span>()
+	}
+
+	<span class="doccomment">/// Clone the inner `AuthoritySetChanges`.</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">authority_set_changes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AuthoritySetChanges</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
+		<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read</span>().<span class="ident">authority_set_changes</span>.<span class="ident">clone</span>()
+	}
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">N</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">AuthoritySet</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">N</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SharedAuthoritySet</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">N</span><span class="op">&gt;</span> {
 	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">set</span>: <span class="ident">AuthoritySet</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">N</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-		<span class="ident">SharedAuthoritySet</span> { <span class="ident">inner</span>: <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">RwLock</span>::<span class="ident">new</span>(<span class="ident">set</span>)) }
+		<span class="ident">SharedAuthoritySet</span> { <span class="ident">inner</span>: <span class="ident">Arc::new</span>(<span class="ident">RwLock::new</span>(<span class="ident">set</span>)) }
 	}
 }
 
@@ -1441,7 +1773,7 @@
 
 <span class="doccomment">/// A set of authorities.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">AuthoritySet</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">N</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AuthoritySet</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">N</span><span class="op">&gt;</span> {
 	<span class="doccomment">/// The current active authorities.</span>
 	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">current_authorities</span>: <span class="ident">AuthorityList</span>,
 	<span class="doccomment">/// The current set id.</span>
@@ -1451,14 +1783,24 @@
 	<span class="doccomment">/// a given branch</span>
 	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">pending_standard_changes</span>: <span class="ident">ForkTree</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">N</span>, <span class="ident">PendingChange</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">N</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 	<span class="doccomment">/// Pending forced changes across different forks (at most one per fork).</span>
-	<span class="doccomment">/// Forced changes are enacted on block depth (not finality), for this reason</span>
-	<span class="doccomment">/// only one forced change should exist per fork.</span>
+	<span class="doccomment">/// Forced changes are enacted on block depth (not finality), for this</span>
+	<span class="doccomment">/// reason only one forced change should exist per fork. When trying to</span>
+	<span class="doccomment">/// apply forced changes we keep track of any pending standard changes that</span>
+	<span class="doccomment">/// they may depend on, this is done by making sure that any pending change</span>
+	<span class="doccomment">/// that is an ancestor of the forced changed and its effective block number</span>
+	<span class="doccomment">/// is lower than the last finalized block (as signaled in the forced</span>
+	<span class="doccomment">/// change) must be applied beforehand.</span>
 	<span class="ident">pending_forced_changes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PendingChange</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">N</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+	<span class="doccomment">/// Track at which blocks the set id changed. This is useful when we need to prove finality for a</span>
+	<span class="doccomment">/// given block since we can figure out what set the block belongs to and when the set</span>
+	<span class="doccomment">/// started/ended.</span>
+	<span class="ident">authority_set_changes</span>: <span class="ident">AuthoritySetChanges</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">N</span><span class="op">&gt;</span> <span class="ident">AuthoritySet</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">N</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">H</span>: <span class="ident">PartialEq</span>,
-	  <span class="ident">N</span>: <span class="ident">Ord</span>,
+<span class="kw">where</span>
+	<span class="ident">H</span>: <span class="ident">PartialEq</span>,
+	<span class="ident">N</span>: <span class="ident">Ord</span> <span class="op">+</span> <span class="ident">Clone</span>,
 {
 	<span class="comment">// authority sets must be non-empty and all weights must be greater than 0</span>
 	<span class="kw">fn</span> <span class="ident">invalid_authority_list</span>(<span class="ident">authorities</span>: <span class="kw-2">&amp;</span><span class="ident">AuthorityList</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
@@ -1467,15 +1809,16 @@
 
 	<span class="doccomment">/// Get a genesis set with given authorities.</span>
 	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">genesis</span>(<span class="ident">initial</span>: <span class="ident">AuthorityList</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-		<span class="kw">if</span> <span class="self">Self</span>::<span class="ident">invalid_authority_list</span>(<span class="kw-2">&amp;</span><span class="ident">initial</span>) {
+		<span class="kw">if</span> <span class="self">Self</span><span class="ident">::invalid_authority_list</span>(<span class="kw-2">&amp;</span><span class="ident">initial</span>) {
 			<span class="kw">return</span> <span class="prelude-val">None</span>;
 		}
 
 		<span class="prelude-val">Some</span>(<span class="ident">AuthoritySet</span> {
 			<span class="ident">current_authorities</span>: <span class="ident">initial</span>,
 			<span class="ident">set_id</span>: <span class="number">0</span>,
-			<span class="ident">pending_standard_changes</span>: <span class="ident">ForkTree</span>::<span class="ident">new</span>(),
-			<span class="ident">pending_forced_changes</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
+			<span class="ident">pending_standard_changes</span>: <span class="ident">ForkTree::new</span>(),
+			<span class="ident">pending_forced_changes</span>: <span class="ident">Vec::new</span>(),
+			<span class="ident">authority_set_changes</span>: <span class="ident">AuthoritySetChanges::empty</span>(),
 		})
 	}
 
@@ -1485,8 +1828,9 @@
 		<span class="ident">set_id</span>: <span class="ident">u64</span>,
 		<span class="ident">pending_standard_changes</span>: <span class="ident">ForkTree</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">N</span>, <span class="ident">PendingChange</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">N</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 		<span class="ident">pending_forced_changes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PendingChange</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">N</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+		<span class="ident">authority_set_changes</span>: <span class="ident">AuthoritySetChanges</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>,
 	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-		<span class="kw">if</span> <span class="self">Self</span>::<span class="ident">invalid_authority_list</span>(<span class="kw-2">&amp;</span><span class="ident">authorities</span>) {
+		<span class="kw">if</span> <span class="self">Self</span><span class="ident">::invalid_authority_list</span>(<span class="kw-2">&amp;</span><span class="ident">authorities</span>) {
 			<span class="kw">return</span> <span class="prelude-val">None</span>;
 		}
 
@@ -1495,6 +1839,7 @@
 			<span class="ident">set_id</span>,
 			<span class="ident">pending_standard_changes</span>,
 			<span class="ident">pending_forced_changes</span>,
+			<span class="ident">authority_set_changes</span>,
 		})
 	}
 
@@ -1520,10 +1865,10 @@
 		<span class="kw-2">&amp;</span><span class="self">self</span>,
 		<span class="ident">best_hash</span>: <span class="kw-2">&amp;</span><span class="ident">H</span>,
 		<span class="ident">is_descendent_of</span>: <span class="kw-2">&amp;</span><span class="ident">F</span>,
-	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">H</span>, <span class="ident">N</span>)<span class="op">&gt;</span>, <span class="ident">fork_tree</span>::<span class="ident">Error</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>
+	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">H</span>, <span class="ident">N</span>)<span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>
 	<span class="kw">where</span>
 		<span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">H</span>, <span class="kw-2">&amp;</span><span class="ident">H</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">E</span><span class="op">&gt;</span>,
-		<span class="ident">E</span>: <span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span>,
+		<span class="ident">E</span>: <span class="ident">std::error::Error</span>,
 	{
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">forced</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 		<span class="kw">for</span> <span class="ident">change</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pending_forced_changes</span> {
@@ -1559,14 +1904,15 @@
 		<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
 		<span class="ident">pending</span>: <span class="ident">PendingChange</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">N</span><span class="op">&gt;</span>,
 		<span class="ident">is_descendent_of</span>: <span class="kw-2">&amp;</span><span class="ident">F</span>,
-	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">where</span>
+	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>
+	<span class="kw">where</span>
 		<span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">H</span>, <span class="kw-2">&amp;</span><span class="ident">H</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">E</span><span class="op">&gt;</span>,
-		<span class="ident">E</span>: <span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span>,
+		<span class="ident">E</span>: <span class="ident">std::error::Error</span>,
 	{
 		<span class="kw">let</span> <span class="ident">hash</span> <span class="op">=</span> <span class="ident">pending</span>.<span class="ident">canon_hash</span>.<span class="ident">clone</span>();
 		<span class="kw">let</span> <span class="ident">number</span> <span class="op">=</span> <span class="ident">pending</span>.<span class="ident">canon_height</span>.<span class="ident">clone</span>();
 
-		<span class="macro">debug</span><span class="macro">!</span>(<span class="ident">target</span>: <span class="string">&quot;afg&quot;</span>, <span class="string">&quot;Inserting potential standard set change signaled at block {:?} \
+		<span class="macro">debug!</span>(<span class="ident">target</span>: <span class="string">&quot;afg&quot;</span>, <span class="string">&quot;Inserting potential standard set change signaled at block {:?} \
 							   (delayed by {:?} blocks).&quot;</span>,
 			   (<span class="kw-2">&amp;</span><span class="ident">number</span>, <span class="kw-2">&amp;</span><span class="ident">hash</span>), <span class="ident">pending</span>.<span class="ident">delay</span>);
 
@@ -1577,7 +1923,7 @@
 			<span class="ident">is_descendent_of</span>,
 		)<span class="question-mark">?</span>;
 
-		<span class="macro">debug</span><span class="macro">!</span>(<span class="ident">target</span>: <span class="string">&quot;afg&quot;</span>, <span class="string">&quot;There are now {} alternatives for the next pending standard change (roots), \
+		<span class="macro">debug!</span>(<span class="ident">target</span>: <span class="string">&quot;afg&quot;</span>, <span class="string">&quot;There are now {} alternatives for the next pending standard change (roots), \
 							   and a total of {} pending standard changes (across all forks).&quot;</span>,
 			<span class="self">self</span>.<span class="ident">pending_standard_changes</span>.<span class="ident">roots</span>().<span class="ident">count</span>(),
 			<span class="self">self</span>.<span class="ident">pending_standard_changes</span>.<span class="ident">iter</span>().<span class="ident">count</span>(),
@@ -1590,16 +1936,18 @@
 		<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
 		<span class="ident">pending</span>: <span class="ident">PendingChange</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">N</span><span class="op">&gt;</span>,
 		<span class="ident">is_descendent_of</span>: <span class="kw-2">&amp;</span><span class="ident">F</span>,
-	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">where</span>
+	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>
+	<span class="kw">where</span>
 		<span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">H</span>, <span class="kw-2">&amp;</span><span class="ident">H</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">E</span><span class="op">&gt;</span>,
-		<span class="ident">E</span>: <span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span>,
+		<span class="ident">E</span>: <span class="ident">std::error::Error</span>,
 	{
-		<span class="kw">for</span> <span class="ident">change</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">pending_forced_changes</span>.<span class="ident">iter</span>() {
-			<span class="kw">if</span> <span class="ident">change</span>.<span class="ident">canon_hash</span> <span class="op">=</span><span class="op">=</span> <span class="ident">pending</span>.<span class="ident">canon_hash</span> <span class="op">|</span><span class="op">|</span>
-				<span class="ident">is_descendent_of</span>(<span class="kw-2">&amp;</span><span class="ident">change</span>.<span class="ident">canon_hash</span>, <span class="kw-2">&amp;</span><span class="ident">pending</span>.<span class="ident">canon_hash</span>)
-					.<span class="ident">map_err</span>(<span class="ident">fork_tree</span>::<span class="ident">Error</span>::<span class="ident">Client</span>)<span class="question-mark">?</span>
-			{
-				<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">fork_tree</span>::<span class="ident">Error</span>::<span class="ident">UnfinalizedAncestor</span>.<span class="ident">into</span>());
+		<span class="kw">for</span> <span class="ident">change</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pending_forced_changes</span> {
+			<span class="kw">if</span> <span class="ident">change</span>.<span class="ident">canon_hash</span> <span class="op">=</span><span class="op">=</span> <span class="ident">pending</span>.<span class="ident">canon_hash</span> {
+				<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::DuplicateAuthoritySetChange</span>);
+			}
+
+			<span class="kw">if</span> <span class="ident">is_descendent_of</span>(<span class="kw-2">&amp;</span><span class="ident">change</span>.<span class="ident">canon_hash</span>, <span class="kw-2">&amp;</span><span class="ident">pending</span>.<span class="ident">canon_hash</span>)<span class="question-mark">?</span> {
+				<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::MultiplePendingForcedAuthoritySetChanges</span>);
 			}
 		}
 
@@ -1612,13 +1960,13 @@
 			))
 			.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>);
 
-		<span class="macro">debug</span><span class="macro">!</span>(<span class="ident">target</span>: <span class="string">&quot;afg&quot;</span>, <span class="string">&quot;Inserting potential forced set change at block {:?} \
+		<span class="macro">debug!</span>(<span class="ident">target</span>: <span class="string">&quot;afg&quot;</span>, <span class="string">&quot;Inserting potential forced set change at block {:?} \
 							   (delayed by {:?} blocks).&quot;</span>,
 			   (<span class="kw-2">&amp;</span><span class="ident">pending</span>.<span class="ident">canon_height</span>, <span class="kw-2">&amp;</span><span class="ident">pending</span>.<span class="ident">canon_hash</span>), <span class="ident">pending</span>.<span class="ident">delay</span>);
 
 		<span class="self">self</span>.<span class="ident">pending_forced_changes</span>.<span class="ident">insert</span>(<span class="ident">idx</span>, <span class="ident">pending</span>);
 
-		<span class="macro">debug</span><span class="macro">!</span>(<span class="ident">target</span>: <span class="string">&quot;afg&quot;</span>, <span class="string">&quot;There are now {} pending forced changes.&quot;</span>, <span class="self">self</span>.<span class="ident">pending_forced_changes</span>.<span class="ident">len</span>());
+		<span class="macro">debug!</span>(<span class="ident">target</span>: <span class="string">&quot;afg&quot;</span>, <span class="string">&quot;There are now {} pending forced changes.&quot;</span>, <span class="self">self</span>.<span class="ident">pending_forced_changes</span>.<span class="ident">len</span>());
 
 		<span class="prelude-val">Ok</span>(())
 	}
@@ -1633,19 +1981,20 @@
 		<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
 		<span class="ident">pending</span>: <span class="ident">PendingChange</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">N</span><span class="op">&gt;</span>,
 		<span class="ident">is_descendent_of</span>: <span class="kw-2">&amp;</span><span class="ident">F</span>,
-	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">where</span>
+	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>
+	<span class="kw">where</span>
 		<span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">H</span>, <span class="kw-2">&amp;</span><span class="ident">H</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">E</span><span class="op">&gt;</span>,
-		<span class="ident">E</span>: <span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span>,
+		<span class="ident">E</span>: <span class="ident">std::error::Error</span>,
 	{
-		<span class="kw">if</span> <span class="self">Self</span>::<span class="ident">invalid_authority_list</span>(<span class="kw-2">&amp;</span><span class="ident">pending</span>.<span class="ident">next_authorities</span>) {
-			<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">InvalidAuthoritySet</span>);
+		<span class="kw">if</span> <span class="self">Self</span><span class="ident">::invalid_authority_list</span>(<span class="kw-2">&amp;</span><span class="ident">pending</span>.<span class="ident">next_authorities</span>) {
+			<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidAuthoritySet</span>);
 		}
 
 		<span class="kw">match</span> <span class="ident">pending</span>.<span class="ident">delay_kind</span> {
-			<span class="ident">DelayKind</span>::<span class="ident">Best</span> { .. } <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="ident">DelayKind::Best</span> { .. } <span class="op">=</span><span class="op">&gt;</span> {
 				<span class="self">self</span>.<span class="ident">add_forced_change</span>(<span class="ident">pending</span>, <span class="ident">is_descendent_of</span>)
 			},
-			<span class="ident">DelayKind</span>::<span class="ident">Finalized</span> <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="ident">DelayKind::Finalized</span> <span class="op">=</span><span class="op">&gt;</span> {
 				<span class="self">self</span>.<span class="ident">add_standard_change</span>(<span class="ident">pending</span>, <span class="ident">is_descendent_of</span>)
 			},
 		}
@@ -1681,52 +2030,96 @@
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// These transitions are always forced and do not lead to justifications</span>
 	<span class="doccomment">/// which light clients can follow.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// Forced changes can only be applied after all pending standard changes</span>
+	<span class="doccomment">/// that it depends on have been applied. If any pending standard change</span>
+	<span class="doccomment">/// exists that is an ancestor of a given forced changed and which effective</span>
+	<span class="doccomment">/// block number is lower than the last finalized block (as defined by the</span>
+	<span class="doccomment">/// forced change), then the forced change cannot be applied. An error will</span>
+	<span class="doccomment">/// be returned in that case which will prevent block import.</span>
 	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">apply_forced_changes</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">E</span><span class="op">&gt;</span>(
 		<span class="kw-2">&amp;</span><span class="self">self</span>,
 		<span class="ident">best_hash</span>: <span class="ident">H</span>,
 		<span class="ident">best_number</span>: <span class="ident">N</span>,
 		<span class="ident">is_descendent_of</span>: <span class="kw-2">&amp;</span><span class="ident">F</span>,
 		<span class="ident">initial_sync</span>: <span class="ident">bool</span>,
-	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">N</span>, <span class="self">Self</span>)<span class="op">&gt;</span>, <span class="ident">E</span><span class="op">&gt;</span>
-		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">H</span>, <span class="kw-2">&amp;</span><span class="ident">H</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">E</span><span class="op">&gt;</span>,
+	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">N</span>, <span class="self">Self</span>)<span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>
+	<span class="kw">where</span>
+		<span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">H</span>, <span class="kw-2">&amp;</span><span class="ident">H</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">E</span><span class="op">&gt;</span>,
+		<span class="ident">E</span>: <span class="ident">std::error::Error</span>,
 	{
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_set</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 
-		<span class="kw">for</span> <span class="ident">change</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">pending_forced_changes</span>.<span class="ident">iter</span>()
+		<span class="kw">for</span> <span class="ident">change</span> <span class="kw">in</span> <span class="self">self</span>
+			.<span class="ident">pending_forced_changes</span>
+			.<span class="ident">iter</span>()
 			.<span class="ident">take_while</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">effective_number</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">best_number</span>) <span class="comment">// to prevent iterating too far</span>
 			.<span class="ident">filter</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">effective_number</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">best_number</span>)
 		{
 			<span class="comment">// check if the given best block is in the same branch as</span>
 			<span class="comment">// the block that signaled the change.</span>
 			<span class="kw">if</span> <span class="ident">change</span>.<span class="ident">canon_hash</span> <span class="op">=</span><span class="op">=</span> <span class="ident">best_hash</span> <span class="op">|</span><span class="op">|</span> <span class="ident">is_descendent_of</span>(<span class="kw-2">&amp;</span><span class="ident">change</span>.<span class="ident">canon_hash</span>, <span class="kw-2">&amp;</span><span class="ident">best_hash</span>)<span class="question-mark">?</span> {
+				<span class="kw">let</span> <span class="ident">median_last_finalized</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">change</span>.<span class="ident">delay_kind</span> {
+					<span class="ident">DelayKind::Best</span> {
+						<span class="kw-2">ref</span> <span class="ident">median_last_finalized</span>,
+					} <span class="op">=</span><span class="op">&gt;</span> <span class="ident">median_last_finalized</span>.<span class="ident">clone</span>(),
+					<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(
+						<span class="string">&quot;pending_forced_changes only contains forced changes; forced changes have delay kind Best; qed.&quot;</span>
+					),
+				};
+
+				<span class="comment">// check if there&#39;s any pending standard change that we depend on</span>
+				<span class="kw">for</span> (<span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">standard_change</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">pending_standard_changes</span>.<span class="ident">roots</span>() {
+					<span class="kw">if</span> <span class="ident">standard_change</span>.<span class="ident">effective_number</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">median_last_finalized</span>
+						<span class="op">&amp;&amp;</span> <span class="ident">is_descendent_of</span>(<span class="kw-2">&amp;</span><span class="ident">standard_change</span>.<span class="ident">canon_hash</span>, <span class="kw-2">&amp;</span><span class="ident">change</span>.<span class="ident">canon_hash</span>)<span class="question-mark">?</span>
+					{
+						<span class="macro">log::info!</span>(<span class="ident">target</span>: <span class="string">&quot;afg&quot;</span>,
+							<span class="string">&quot;Not applying authority set change forced at block #{:?}, due to pending standard change at block #{:?}&quot;</span>,
+							<span class="ident">change</span>.<span class="ident">canon_height</span>,
+							<span class="ident">standard_change</span>.<span class="ident">effective_number</span>(),
+						);
+
+						<span class="kw">return</span> <span class="prelude-val">Err</span>(
+							<span class="ident">Error::ForcedAuthoritySetChangeDependencyUnsatisfied</span>(
+								<span class="ident">standard_change</span>.<span class="ident">effective_number</span>()
+							)
+						);
+					}
+				}
+
 				<span class="comment">// apply this change: make the set canonical</span>
-				<span class="macro">afg_log</span><span class="macro">!</span>(<span class="ident">initial_sync</span>,
+				<span class="macro">afg_log!</span>(
+					<span class="ident">initial_sync</span>,
 					<span class="string">&quot;👴 Applying authority set change forced at block #{:?}&quot;</span>,
 					<span class="ident">change</span>.<span class="ident">canon_height</span>,
 				);
-				<span class="macro">telemetry</span><span class="macro">!</span>(<span class="ident">CONSENSUS_INFO</span>; <span class="string">&quot;afg.applying_forced_authority_set_change&quot;</span>;
+
+				<span class="macro">telemetry!</span>(
+					<span class="ident">CONSENSUS_INFO</span>;
+					<span class="string">&quot;afg.applying_forced_authority_set_change&quot;</span>;
 					<span class="string">&quot;block&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="question-mark">?</span><span class="ident">change</span>.<span class="ident">canon_height</span>
 				);
 
-				<span class="kw">let</span> <span class="ident">median_last_finalized</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">change</span>.<span class="ident">delay_kind</span> {
-					<span class="ident">DelayKind</span>::<span class="ident">Best</span> { <span class="kw-2">ref</span> <span class="ident">median_last_finalized</span> } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">median_last_finalized</span>.<span class="ident">clone</span>(),
-					<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(<span class="string">&quot;pending_forced_changes only contains forced changes; forced changes have delay kind Best; qed.&quot;</span>),
-				};
+				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">authority_set_changes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">authority_set_changes</span>.<span class="ident">clone</span>();
+				<span class="ident">authority_set_changes</span>.<span class="ident">append</span>(<span class="self">self</span>.<span class="ident">set_id</span>, <span class="ident">median_last_finalized</span>.<span class="ident">clone</span>());
 
-				<span class="ident">new_set</span> <span class="op">=</span> <span class="prelude-val">Some</span>((<span class="ident">median_last_finalized</span>, <span class="ident">AuthoritySet</span> {
-					<span class="ident">current_authorities</span>: <span class="ident">change</span>.<span class="ident">next_authorities</span>.<span class="ident">clone</span>(),
-					<span class="ident">set_id</span>: <span class="self">self</span>.<span class="ident">set_id</span> <span class="op">+</span> <span class="number">1</span>,
-					<span class="ident">pending_standard_changes</span>: <span class="ident">ForkTree</span>::<span class="ident">new</span>(), <span class="comment">// new set, new changes.</span>
-					<span class="ident">pending_forced_changes</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
-				}));
+				<span class="ident">new_set</span> <span class="op">=</span> <span class="prelude-val">Some</span>((
+					<span class="ident">median_last_finalized</span>,
+					<span class="ident">AuthoritySet</span> {
+						<span class="ident">current_authorities</span>: <span class="ident">change</span>.<span class="ident">next_authorities</span>.<span class="ident">clone</span>(),
+						<span class="ident">set_id</span>: <span class="self">self</span>.<span class="ident">set_id</span> <span class="op">+</span> <span class="number">1</span>,
+						<span class="ident">pending_standard_changes</span>: <span class="ident">ForkTree::new</span>(), <span class="comment">// new set, new changes.</span>
+						<span class="ident">pending_forced_changes</span>: <span class="ident">Vec::new</span>(),
+						<span class="ident">authority_set_changes</span>,
+					},
+				));
 
 				<span class="kw">break</span>;
 			}
-
-			<span class="comment">// we don&#39;t wipe forced changes until another change is</span>
-			<span class="comment">// applied</span>
 		}
 
+		<span class="comment">// we don&#39;t wipe forced changes until another change is applied, hence</span>
+		<span class="comment">// why we return a new set instead of mutating.</span>
 		<span class="prelude-val">Ok</span>(<span class="ident">new_set</span>)
 	}
 
@@ -1746,9 +2139,10 @@
 		<span class="ident">finalized_number</span>: <span class="ident">N</span>,
 		<span class="ident">is_descendent_of</span>: <span class="kw-2">&amp;</span><span class="ident">F</span>,
 		<span class="ident">initial_sync</span>: <span class="ident">bool</span>,
-	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Status</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">N</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">where</span>
+	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Status</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">N</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>
+	<span class="kw">where</span>
 		<span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">H</span>, <span class="kw-2">&amp;</span><span class="ident">H</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">E</span><span class="op">&gt;</span>,
-		<span class="ident">E</span>: <span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span>,
+		<span class="ident">E</span>: <span class="ident">std::error::Error</span>,
 	{
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">Status</span> {
 			<span class="ident">changed</span>: <span class="bool-val">false</span>,
@@ -1761,33 +2155,35 @@
 			<span class="ident">is_descendent_of</span>,
 			<span class="op">|</span><span class="ident">change</span><span class="op">|</span> <span class="ident">change</span>.<span class="ident">effective_number</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">finalized_number</span>
 		)<span class="question-mark">?</span> {
-			<span class="ident">fork_tree</span>::<span class="ident">FinalizationResult</span>::<span class="ident">Changed</span>(<span class="ident">change</span>) <span class="op">=</span><span class="op">&gt;</span> {
+			<span class="ident">fork_tree::FinalizationResult::Changed</span>(<span class="ident">change</span>) <span class="op">=</span><span class="op">&gt;</span> {
 				<span class="ident">status</span>.<span class="ident">changed</span> <span class="op">=</span> <span class="bool-val">true</span>;
 
-				<span class="kw">let</span> <span class="ident">pending_forced_changes</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">replace</span>(
+				<span class="kw">let</span> <span class="ident">pending_forced_changes</span> <span class="op">=</span> <span class="ident">std::mem::replace</span>(
 					<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">pending_forced_changes</span>,
-					<span class="ident">Vec</span>::<span class="ident">new</span>(),
+					<span class="ident">Vec::new</span>(),
 				);
 
-				<span class="comment">// we will keep all forced change for any later blocks and that are a</span>
-				<span class="comment">// descendent of the finalized block (i.e. they are from this fork).</span>
+				<span class="comment">// we will keep all forced changes for any later blocks and that are a</span>
+				<span class="comment">// descendent of the finalized block (i.e. they are part of this branch).</span>
 				<span class="kw">for</span> <span class="ident">change</span> <span class="kw">in</span> <span class="ident">pending_forced_changes</span> {
 					<span class="kw">if</span> <span class="ident">change</span>.<span class="ident">effective_number</span>() <span class="op">&gt;</span> <span class="ident">finalized_number</span> <span class="op">&amp;&amp;</span>
-						<span class="ident">is_descendent_of</span>(<span class="kw-2">&amp;</span><span class="ident">finalized_hash</span>, <span class="kw-2">&amp;</span><span class="ident">change</span>.<span class="ident">canon_hash</span>)
-							.<span class="ident">map_err</span>(<span class="ident">fork_tree</span>::<span class="ident">Error</span>::<span class="ident">Client</span>)<span class="question-mark">?</span>
+						<span class="ident">is_descendent_of</span>(<span class="kw-2">&amp;</span><span class="ident">finalized_hash</span>, <span class="kw-2">&amp;</span><span class="ident">change</span>.<span class="ident">canon_hash</span>)<span class="question-mark">?</span>
 					{
 						<span class="self">self</span>.<span class="ident">pending_forced_changes</span>.<span class="ident">push</span>(<span class="ident">change</span>)
 					}
 				}
 
 				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">change</span>) <span class="op">=</span> <span class="ident">change</span> {
-					<span class="macro">afg_log</span><span class="macro">!</span>(<span class="ident">initial_sync</span>,
+					<span class="macro">afg_log!</span>(<span class="ident">initial_sync</span>,
 						<span class="string">&quot;👴 Applying authority set change scheduled at block #{:?}&quot;</span>,
 						<span class="ident">change</span>.<span class="ident">canon_height</span>,
 					);
-					<span class="macro">telemetry</span><span class="macro">!</span>(<span class="ident">CONSENSUS_INFO</span>; <span class="string">&quot;afg.applying_scheduled_authority_set_change&quot;</span>;
+					<span class="macro">telemetry!</span>(<span class="ident">CONSENSUS_INFO</span>; <span class="string">&quot;afg.applying_scheduled_authority_set_change&quot;</span>;
 						<span class="string">&quot;block&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="question-mark">?</span><span class="ident">change</span>.<span class="ident">canon_height</span>
 					);
+
+					<span class="comment">// Store the set_id together with the last block_number for the set</span>
+					<span class="self">self</span>.<span class="ident">authority_set_changes</span>.<span class="ident">append</span>(<span class="self">self</span>.<span class="ident">set_id</span>, <span class="ident">finalized_number</span>.<span class="ident">clone</span>());
 
 					<span class="self">self</span>.<span class="ident">current_authorities</span> <span class="op">=</span> <span class="ident">change</span>.<span class="ident">next_authorities</span>;
 					<span class="self">self</span>.<span class="ident">set_id</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
@@ -1798,7 +2194,7 @@
 					));
 				}
 			},
-			<span class="ident">fork_tree</span>::<span class="ident">FinalizationResult</span>::<span class="ident">Unchanged</span> <span class="op">=</span><span class="op">&gt;</span> {},
+			<span class="ident">fork_tree::FinalizationResult::Unchanged</span> <span class="op">=</span><span class="op">&gt;</span> {},
 		}
 
 		<span class="prelude-val">Ok</span>(<span class="ident">status</span>)
@@ -1819,22 +2215,23 @@
 		<span class="ident">finalized_hash</span>: <span class="ident">H</span>,
 		<span class="ident">finalized_number</span>: <span class="ident">N</span>,
 		<span class="ident">is_descendent_of</span>: <span class="kw-2">&amp;</span><span class="ident">F</span>,
-	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">where</span>
+	) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>
+	<span class="kw">where</span>
 		<span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">H</span>, <span class="kw-2">&amp;</span><span class="ident">H</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">E</span><span class="op">&gt;</span>,
-		<span class="ident">E</span>: <span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span>,
+		<span class="ident">E</span>: <span class="ident">std::error::Error</span>,
 	{
 		<span class="self">self</span>.<span class="ident">pending_standard_changes</span>.<span class="ident">finalizes_any_with_descendent_if</span>(
 			<span class="kw-2">&amp;</span><span class="ident">finalized_hash</span>,
 			<span class="ident">finalized_number</span>.<span class="ident">clone</span>(),
 			<span class="ident">is_descendent_of</span>,
 			<span class="op">|</span><span class="ident">change</span><span class="op">|</span> <span class="ident">change</span>.<span class="ident">effective_number</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">finalized_number</span>
-		).<span class="ident">map_err</span>(<span class="ident">Error</span>::<span class="ident">ForkTree</span>)
+		).<span class="ident">map_err</span>(<span class="ident">Error::ForkTree</span>)
 	}
 }
 
 <span class="doccomment">/// Kinds of delays for pending changes.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">DelayKind</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DelayKind</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
 	<span class="doccomment">/// Depth in finalized chain.</span>
 	<span class="ident">Finalized</span>,
 	<span class="doccomment">/// Depth in best chain. The median last finalized block is calculated at the time the</span>
@@ -1847,7 +2244,7 @@
 <span class="doccomment">/// This will be applied when the announcing block is at some depth within</span>
 <span class="doccomment">/// the finalized or unfinalized chain.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Encode</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">PendingChange</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">N</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PendingChange</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">N</span><span class="op">&gt;</span> {
 	<span class="doccomment">/// The new authorities and weights to apply.</span>
 	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">next_authorities</span>: <span class="ident">AuthorityList</span>,
 	<span class="doccomment">/// How deep in the chain the announcing block must be</span>
@@ -1862,13 +2259,13 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">Decode</span>, <span class="ident">N</span>: <span class="ident">Decode</span><span class="op">&gt;</span> <span class="ident">Decode</span> <span class="kw">for</span> <span class="ident">PendingChange</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">N</span><span class="op">&gt;</span> {
-	<span class="kw">fn</span> <span class="ident">decode</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">parity_scale_codec</span>::<span class="ident">Input</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">parity_scale_codec</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="ident">next_authorities</span> <span class="op">=</span> <span class="ident">Decode</span>::<span class="ident">decode</span>(<span class="ident">value</span>)<span class="question-mark">?</span>;
-		<span class="kw">let</span> <span class="ident">delay</span> <span class="op">=</span> <span class="ident">Decode</span>::<span class="ident">decode</span>(<span class="ident">value</span>)<span class="question-mark">?</span>;
-		<span class="kw">let</span> <span class="ident">canon_height</span> <span class="op">=</span> <span class="ident">Decode</span>::<span class="ident">decode</span>(<span class="ident">value</span>)<span class="question-mark">?</span>;
-		<span class="kw">let</span> <span class="ident">canon_hash</span> <span class="op">=</span> <span class="ident">Decode</span>::<span class="ident">decode</span>(<span class="ident">value</span>)<span class="question-mark">?</span>;
+	<span class="kw">fn</span> <span class="ident">decode</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">parity_scale_codec::Input</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">parity_scale_codec::Error</span><span class="op">&gt;</span> {
+		<span class="kw">let</span> <span class="ident">next_authorities</span> <span class="op">=</span> <span class="ident">Decode::decode</span>(<span class="ident">value</span>)<span class="question-mark">?</span>;
+		<span class="kw">let</span> <span class="ident">delay</span> <span class="op">=</span> <span class="ident">Decode::decode</span>(<span class="ident">value</span>)<span class="question-mark">?</span>;
+		<span class="kw">let</span> <span class="ident">canon_height</span> <span class="op">=</span> <span class="ident">Decode::decode</span>(<span class="ident">value</span>)<span class="question-mark">?</span>;
+		<span class="kw">let</span> <span class="ident">canon_hash</span> <span class="op">=</span> <span class="ident">Decode::decode</span>(<span class="ident">value</span>)<span class="question-mark">?</span>;
 
-		<span class="kw">let</span> <span class="ident">delay_kind</span> <span class="op">=</span> <span class="ident">DelayKind</span>::<span class="ident">decode</span>(<span class="ident">value</span>).<span class="ident">unwrap_or</span>(<span class="ident">DelayKind</span>::<span class="ident">Finalized</span>);
+		<span class="kw">let</span> <span class="ident">delay_kind</span> <span class="op">=</span> <span class="ident">DelayKind::decode</span>(<span class="ident">value</span>).<span class="ident">unwrap_or</span>(<span class="ident">DelayKind::Finalized</span>);
 
 		<span class="prelude-val">Ok</span>(<span class="ident">PendingChange</span> {
 			<span class="ident">next_authorities</span>,
@@ -1887,18 +2284,57 @@
 	}
 }
 
+<span class="comment">// Tracks historical authority set changes. We store the block numbers for the first block of each</span>
+<span class="comment">// authority set, once they have been finalized.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Encode</span>, <span class="ident">Decode</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AuthoritySetChanges</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>(<span class="kw">pub</span> <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">u64</span>, <span class="ident">N</span>)<span class="op">&gt;</span>);
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">Ord</span> <span class="op">+</span> <span class="ident">Clone</span><span class="op">&gt;</span> <span class="ident">AuthoritySetChanges</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">empty</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+		<span class="self">Self</span>(<span class="ident">Default::default</span>())
+	}
+
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">append</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">set_id</span>: <span class="ident">u64</span>, <span class="ident">block_number</span>: <span class="ident">N</span>) {
+		<span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>((<span class="ident">set_id</span>, <span class="ident">block_number</span>));
+	}
+
+	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_set_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">block_number</span>: <span class="ident">N</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">u64</span>, <span class="ident">N</span>)<span class="op">&gt;</span> {
+		<span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>
+			.<span class="ident">binary_search_by_key</span>(<span class="kw-2">&amp;</span><span class="ident">block_number</span>, <span class="op">|</span>(<span class="kw">_</span>, <span class="ident">n</span>)<span class="op">|</span> <span class="ident">n</span>.<span class="ident">clone</span>())
+			.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span>);
+		<span class="kw">if</span> <span class="ident">idx</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">len</span>() {
+			<span class="kw">let</span> (<span class="ident">set_id</span>, <span class="ident">block_number</span>) <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>[<span class="ident">idx</span>].<span class="ident">clone</span>();
+			<span class="comment">// To make sure we have the right set we need to check that the one before it also exists.</span>
+			<span class="kw">if</span> <span class="ident">idx</span> <span class="op">&gt;</span> <span class="number">0</span> {
+				<span class="kw">let</span> (<span class="ident">prev_set_id</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>[<span class="ident">idx</span> <span class="op">-</span> <span class="number">1usize</span>];
+				<span class="kw">if</span> <span class="ident">set_id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">prev_set_id</span> <span class="op">+</span> <span class="number">1u64</span> {
+					<span class="comment">// Without the preceding set_id we don&#39;t have a well-defined start.</span>
+					<span class="kw">return</span> <span class="prelude-val">None</span>;
+				}
+			} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">set_id</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
+				<span class="comment">// If this is the first index, yet not the first set id then it&#39;s not well-defined</span>
+				<span class="comment">// that we are in the right set id.</span>
+				<span class="kw">return</span> <span class="prelude-val">None</span>;
+			}
+			<span class="prelude-val">Some</span>((<span class="ident">set_id</span>, <span class="ident">block_number</span>))
+		} <span class="kw">else</span> {
+			<span class="prelude-val">None</span>
+		}
+	}
+}
+
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
 	<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-	<span class="kw">use</span> <span class="ident">sp_core</span>::<span class="ident">crypto</span>::<span class="ident">Public</span>;
+	<span class="kw">use</span> <span class="ident">sp_core::crypto::Public</span>;
 
 	<span class="kw">fn</span> <span class="ident">static_is_descendent_of</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="ident">bool</span>)
-		<span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">A</span>, <span class="kw-2">&amp;</span><span class="ident">A</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">std</span>::<span class="ident">io</span>::<span class="ident">Error</span><span class="op">&gt;</span>
+		<span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">A</span>, <span class="kw-2">&amp;</span><span class="ident">A</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">std::io::Error</span><span class="op">&gt;</span>
 	{
 		<span class="kw">move</span> <span class="op">|</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="ident">value</span>)
 	}
 
-	<span class="kw">fn</span> <span class="ident">is_descendent_of</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">A</span>, <span class="kw-2">&amp;</span><span class="ident">A</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">std</span>::<span class="ident">io</span>::<span class="ident">Error</span><span class="op">&gt;</span>
+	<span class="kw">fn</span> <span class="ident">is_descendent_of</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">A</span>, <span class="kw-2">&amp;</span><span class="ident">A</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">std::io::Error</span><span class="op">&gt;</span>
 		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">A</span>, <span class="kw-2">&amp;</span><span class="ident">A</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>
 	{
 		<span class="kw">move</span> <span class="op">|</span><span class="ident">base</span>, <span class="ident">hash</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="ident">f</span>(<span class="ident">base</span>, <span class="ident">hash</span>))
@@ -1906,13 +2342,14 @@
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">current_limit_filters_min</span>() {
-		<span class="kw">let</span> <span class="ident">current_authorities</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[(<span class="ident">AuthorityId</span>::<span class="ident">from_slice</span>(<span class="kw-2">&amp;</span>[<span class="number">1</span>; <span class="number">32</span>]), <span class="number">1</span>)];
+		<span class="kw">let</span> <span class="ident">current_authorities</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="ident">AuthorityId::from_slice</span>(<span class="kw-2">&amp;</span>[<span class="number">1</span>; <span class="number">32</span>]), <span class="number">1</span>)];
 
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">authorities</span> <span class="op">=</span> <span class="ident">AuthoritySet</span> {
 			<span class="ident">current_authorities</span>: <span class="ident">current_authorities</span>.<span class="ident">clone</span>(),
 			<span class="ident">set_id</span>: <span class="number">0</span>,
-			<span class="ident">pending_standard_changes</span>: <span class="ident">ForkTree</span>::<span class="ident">new</span>(),
-			<span class="ident">pending_forced_changes</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
+			<span class="ident">pending_standard_changes</span>: <span class="ident">ForkTree::new</span>(),
+			<span class="ident">pending_forced_changes</span>: <span class="ident">Vec::new</span>(),
+			<span class="ident">authority_set_changes</span>: <span class="ident">AuthoritySetChanges::empty</span>(),
 		};
 
 		<span class="kw">let</span> <span class="ident">change</span> <span class="op">=</span> <span class="op">|</span><span class="ident">height</span><span class="op">|</span> {
@@ -1921,7 +2358,7 @@
 				<span class="ident">delay</span>: <span class="number">0</span>,
 				<span class="ident">canon_height</span>: <span class="ident">height</span>,
 				<span class="ident">canon_hash</span>: <span class="ident">height</span>.<span class="ident">to_string</span>(),
-				<span class="ident">delay_kind</span>: <span class="ident">DelayKind</span>::<span class="ident">Finalized</span>,
+				<span class="ident">delay_kind</span>: <span class="ident">DelayKind::Finalized</span>,
 			}
 		};
 
@@ -1930,22 +2367,22 @@
 		<span class="ident">authorities</span>.<span class="ident">add_pending_change</span>(<span class="ident">change</span>(<span class="number">1</span>), <span class="kw-2">&amp;</span><span class="ident">is_descendent_of</span>).<span class="ident">unwrap</span>();
 		<span class="ident">authorities</span>.<span class="ident">add_pending_change</span>(<span class="ident">change</span>(<span class="number">2</span>), <span class="kw-2">&amp;</span><span class="ident">is_descendent_of</span>).<span class="ident">unwrap</span>();
 
-		<span class="macro">assert_eq</span><span class="macro">!</span>(
+		<span class="macro">assert_eq!</span>(
 			<span class="ident">authorities</span>.<span class="ident">current_limit</span>(<span class="number">0</span>),
 			<span class="prelude-val">Some</span>(<span class="number">1</span>),
 		);
 
-		<span class="macro">assert_eq</span><span class="macro">!</span>(
+		<span class="macro">assert_eq!</span>(
 			<span class="ident">authorities</span>.<span class="ident">current_limit</span>(<span class="number">1</span>),
 			<span class="prelude-val">Some</span>(<span class="number">1</span>),
 		);
 
-		<span class="macro">assert_eq</span><span class="macro">!</span>(
+		<span class="macro">assert_eq!</span>(
 			<span class="ident">authorities</span>.<span class="ident">current_limit</span>(<span class="number">2</span>),
 			<span class="prelude-val">Some</span>(<span class="number">2</span>),
 		);
 
-		<span class="macro">assert_eq</span><span class="macro">!</span>(
+		<span class="macro">assert_eq!</span>(
 			<span class="ident">authorities</span>.<span class="ident">current_limit</span>(<span class="number">3</span>),
 			<span class="prelude-val">None</span>,
 		);
@@ -1953,13 +2390,14 @@
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">changes_iterated_in_pre_order</span>() {
-		<span class="kw">let</span> <span class="ident">current_authorities</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[(<span class="ident">AuthorityId</span>::<span class="ident">from_slice</span>(<span class="kw-2">&amp;</span>[<span class="number">1</span>; <span class="number">32</span>]), <span class="number">1</span>)];
+		<span class="kw">let</span> <span class="ident">current_authorities</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="ident">AuthorityId::from_slice</span>(<span class="kw-2">&amp;</span>[<span class="number">1</span>; <span class="number">32</span>]), <span class="number">1</span>)];
 
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">authorities</span> <span class="op">=</span> <span class="ident">AuthoritySet</span> {
 			<span class="ident">current_authorities</span>: <span class="ident">current_authorities</span>.<span class="ident">clone</span>(),
 			<span class="ident">set_id</span>: <span class="number">0</span>,
-			<span class="ident">pending_standard_changes</span>: <span class="ident">ForkTree</span>::<span class="ident">new</span>(),
-			<span class="ident">pending_forced_changes</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
+			<span class="ident">pending_standard_changes</span>: <span class="ident">ForkTree::new</span>(),
+			<span class="ident">pending_forced_changes</span>: <span class="ident">Vec::new</span>(),
+			<span class="ident">authority_set_changes</span>: <span class="ident">AuthoritySetChanges::empty</span>(),
 		};
 
 		<span class="kw">let</span> <span class="ident">change_a</span> <span class="op">=</span> <span class="ident">PendingChange</span> {
@@ -1967,7 +2405,7 @@
 			<span class="ident">delay</span>: <span class="number">10</span>,
 			<span class="ident">canon_height</span>: <span class="number">5</span>,
 			<span class="ident">canon_hash</span>: <span class="string">&quot;hash_a&quot;</span>,
-			<span class="ident">delay_kind</span>: <span class="ident">DelayKind</span>::<span class="ident">Finalized</span>,
+			<span class="ident">delay_kind</span>: <span class="ident">DelayKind::Finalized</span>,
 		};
 
 		<span class="kw">let</span> <span class="ident">change_b</span> <span class="op">=</span> <span class="ident">PendingChange</span> {
@@ -1975,7 +2413,7 @@
 			<span class="ident">delay</span>: <span class="number">0</span>,
 			<span class="ident">canon_height</span>: <span class="number">5</span>,
 			<span class="ident">canon_hash</span>: <span class="string">&quot;hash_b&quot;</span>,
-			<span class="ident">delay_kind</span>: <span class="ident">DelayKind</span>::<span class="ident">Finalized</span>,
+			<span class="ident">delay_kind</span>: <span class="ident">DelayKind::Finalized</span>,
 		};
 
 		<span class="kw">let</span> <span class="ident">change_c</span> <span class="op">=</span> <span class="ident">PendingChange</span> {
@@ -1983,7 +2421,7 @@
 			<span class="ident">delay</span>: <span class="number">5</span>,
 			<span class="ident">canon_height</span>: <span class="number">10</span>,
 			<span class="ident">canon_hash</span>: <span class="string">&quot;hash_c&quot;</span>,
-			<span class="ident">delay_kind</span>: <span class="ident">DelayKind</span>::<span class="ident">Finalized</span>,
+			<span class="ident">delay_kind</span>: <span class="ident">DelayKind::Finalized</span>,
 		};
 
 		<span class="ident">authorities</span>.<span class="ident">add_pending_change</span>(<span class="ident">change_a</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="ident">static_is_descendent_of</span>(<span class="bool-val">false</span>)).<span class="ident">unwrap</span>();
@@ -1991,7 +2429,7 @@
 		<span class="ident">authorities</span>.<span class="ident">add_pending_change</span>(<span class="ident">change_c</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="ident">is_descendent_of</span>(<span class="op">|</span><span class="ident">base</span>, <span class="ident">hash</span><span class="op">|</span> <span class="kw">match</span> (<span class="kw-2">*</span><span class="ident">base</span>, <span class="kw-2">*</span><span class="ident">hash</span>) {
 			(<span class="string">&quot;hash_a&quot;</span>, <span class="string">&quot;hash_c&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
 			(<span class="string">&quot;hash_b&quot;</span>, <span class="string">&quot;hash_c&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-			<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(),
+			<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
 		})).<span class="ident">unwrap</span>();
 
 		<span class="comment">// forced changes are iterated last</span>
@@ -2000,7 +2438,7 @@
 			<span class="ident">delay</span>: <span class="number">2</span>,
 			<span class="ident">canon_height</span>: <span class="number">1</span>,
 			<span class="ident">canon_hash</span>: <span class="string">&quot;hash_d&quot;</span>,
-			<span class="ident">delay_kind</span>: <span class="ident">DelayKind</span>::<span class="ident">Best</span> { <span class="ident">median_last_finalized</span>: <span class="number">0</span> },
+			<span class="ident">delay_kind</span>: <span class="ident">DelayKind::Best</span> { <span class="ident">median_last_finalized</span>: <span class="number">0</span> },
 		};
 
 		<span class="kw">let</span> <span class="ident">change_e</span> <span class="op">=</span> <span class="ident">PendingChange</span> {
@@ -2008,29 +2446,31 @@
 			<span class="ident">delay</span>: <span class="number">2</span>,
 			<span class="ident">canon_height</span>: <span class="number">0</span>,
 			<span class="ident">canon_hash</span>: <span class="string">&quot;hash_e&quot;</span>,
-			<span class="ident">delay_kind</span>: <span class="ident">DelayKind</span>::<span class="ident">Best</span> { <span class="ident">median_last_finalized</span>: <span class="number">0</span> },
+			<span class="ident">delay_kind</span>: <span class="ident">DelayKind::Best</span> { <span class="ident">median_last_finalized</span>: <span class="number">0</span> },
 		};
 
 		<span class="ident">authorities</span>.<span class="ident">add_pending_change</span>(<span class="ident">change_d</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="ident">static_is_descendent_of</span>(<span class="bool-val">false</span>)).<span class="ident">unwrap</span>();
 		<span class="ident">authorities</span>.<span class="ident">add_pending_change</span>(<span class="ident">change_e</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="ident">static_is_descendent_of</span>(<span class="bool-val">false</span>)).<span class="ident">unwrap</span>();
 
-		<span class="macro">assert_eq</span><span class="macro">!</span>(
+		<span class="comment">// ordered by subtree depth</span>
+		<span class="macro">assert_eq!</span>(
 			<span class="ident">authorities</span>.<span class="ident">pending_changes</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
-			<span class="macro">vec</span><span class="macro">!</span>[<span class="kw-2">&amp;</span><span class="ident">change_b</span>, <span class="kw-2">&amp;</span><span class="ident">change_a</span>, <span class="kw-2">&amp;</span><span class="ident">change_c</span>, <span class="kw-2">&amp;</span><span class="ident">change_e</span>, <span class="kw-2">&amp;</span><span class="ident">change_d</span>],
+			<span class="macro">vec!</span>[<span class="kw-2">&amp;</span><span class="ident">change_a</span>, <span class="kw-2">&amp;</span><span class="ident">change_c</span>, <span class="kw-2">&amp;</span><span class="ident">change_b</span>, <span class="kw-2">&amp;</span><span class="ident">change_e</span>, <span class="kw-2">&amp;</span><span class="ident">change_d</span>],
 		);
 	}
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">apply_change</span>() {
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">authorities</span> <span class="op">=</span> <span class="ident">AuthoritySet</span> {
-			<span class="ident">current_authorities</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
+			<span class="ident">current_authorities</span>: <span class="ident">Vec::new</span>(),
 			<span class="ident">set_id</span>: <span class="number">0</span>,
-			<span class="ident">pending_standard_changes</span>: <span class="ident">ForkTree</span>::<span class="ident">new</span>(),
-			<span class="ident">pending_forced_changes</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
+			<span class="ident">pending_standard_changes</span>: <span class="ident">ForkTree::new</span>(),
+			<span class="ident">pending_forced_changes</span>: <span class="ident">Vec::new</span>(),
+			<span class="ident">authority_set_changes</span>: <span class="ident">AuthoritySetChanges::empty</span>(),
 		};
 
-		<span class="kw">let</span> <span class="ident">set_a</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[(<span class="ident">AuthorityId</span>::<span class="ident">from_slice</span>(<span class="kw-2">&amp;</span>[<span class="number">1</span>; <span class="number">32</span>]), <span class="number">5</span>)];
-		<span class="kw">let</span> <span class="ident">set_b</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[(<span class="ident">AuthorityId</span>::<span class="ident">from_slice</span>(<span class="kw-2">&amp;</span>[<span class="number">2</span>; <span class="number">32</span>]), <span class="number">5</span>)];
+		<span class="kw">let</span> <span class="ident">set_a</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="ident">AuthorityId::from_slice</span>(<span class="kw-2">&amp;</span>[<span class="number">1</span>; <span class="number">32</span>]), <span class="number">5</span>)];
+		<span class="kw">let</span> <span class="ident">set_b</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="ident">AuthorityId::from_slice</span>(<span class="kw-2">&amp;</span>[<span class="number">2</span>; <span class="number">32</span>]), <span class="number">5</span>)];
 
 		<span class="comment">// two competing changes at the same height on different forks</span>
 		<span class="kw">let</span> <span class="ident">change_a</span> <span class="op">=</span> <span class="ident">PendingChange</span> {
@@ -2038,7 +2478,7 @@
 			<span class="ident">delay</span>: <span class="number">10</span>,
 			<span class="ident">canon_height</span>: <span class="number">5</span>,
 			<span class="ident">canon_hash</span>: <span class="string">&quot;hash_a&quot;</span>,
-			<span class="ident">delay_kind</span>: <span class="ident">DelayKind</span>::<span class="ident">Finalized</span>,
+			<span class="ident">delay_kind</span>: <span class="ident">DelayKind::Finalized</span>,
 		};
 
 		<span class="kw">let</span> <span class="ident">change_b</span> <span class="op">=</span> <span class="ident">PendingChange</span> {
@@ -2046,15 +2486,15 @@
 			<span class="ident">delay</span>: <span class="number">10</span>,
 			<span class="ident">canon_height</span>: <span class="number">5</span>,
 			<span class="ident">canon_hash</span>: <span class="string">&quot;hash_b&quot;</span>,
-			<span class="ident">delay_kind</span>: <span class="ident">DelayKind</span>::<span class="ident">Finalized</span>,
+			<span class="ident">delay_kind</span>: <span class="ident">DelayKind::Finalized</span>,
 		};
 
 		<span class="ident">authorities</span>.<span class="ident">add_pending_change</span>(<span class="ident">change_a</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="ident">static_is_descendent_of</span>(<span class="bool-val">true</span>)).<span class="ident">unwrap</span>();
 		<span class="ident">authorities</span>.<span class="ident">add_pending_change</span>(<span class="ident">change_b</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="ident">static_is_descendent_of</span>(<span class="bool-val">true</span>)).<span class="ident">unwrap</span>();
 
-		<span class="macro">assert_eq</span><span class="macro">!</span>(
+		<span class="macro">assert_eq!</span>(
 			<span class="ident">authorities</span>.<span class="ident">pending_changes</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
-			<span class="macro">vec</span><span class="macro">!</span>[<span class="kw-2">&amp;</span><span class="ident">change_b</span>, <span class="kw-2">&amp;</span><span class="ident">change_a</span>],
+			<span class="macro">vec!</span>[<span class="kw-2">&amp;</span><span class="ident">change_a</span>, <span class="kw-2">&amp;</span><span class="ident">change_b</span>],
 		);
 
 		<span class="comment">// finalizing &quot;hash_c&quot; won&#39;t enact the change signaled at &quot;hash_a&quot; but it will prune out &quot;hash_b&quot;</span>
@@ -2064,17 +2504,18 @@
 			<span class="kw-2">&amp;</span><span class="ident">is_descendent_of</span>(<span class="op">|</span><span class="ident">base</span>, <span class="ident">hash</span><span class="op">|</span> <span class="kw">match</span> (<span class="kw-2">*</span><span class="ident">base</span>, <span class="kw-2">*</span><span class="ident">hash</span>) {
 				(<span class="string">&quot;hash_a&quot;</span>, <span class="string">&quot;hash_c&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
 				(<span class="string">&quot;hash_b&quot;</span>, <span class="string">&quot;hash_c&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-				<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(),
+				<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
 			}),
 			<span class="bool-val">false</span>,
 		).<span class="ident">unwrap</span>();
 
-		<span class="macro">assert</span><span class="macro">!</span>(<span class="ident">status</span>.<span class="ident">changed</span>);
-		<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">status</span>.<span class="ident">new_set_block</span>, <span class="prelude-val">None</span>);
-		<span class="macro">assert_eq</span><span class="macro">!</span>(
+		<span class="macro">assert!</span>(<span class="ident">status</span>.<span class="ident">changed</span>);
+		<span class="macro">assert_eq!</span>(<span class="ident">status</span>.<span class="ident">new_set_block</span>, <span class="prelude-val">None</span>);
+		<span class="macro">assert_eq!</span>(
 			<span class="ident">authorities</span>.<span class="ident">pending_changes</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
-			<span class="macro">vec</span><span class="macro">!</span>[<span class="kw-2">&amp;</span><span class="ident">change_a</span>],
+			<span class="macro">vec!</span>[<span class="kw-2">&amp;</span><span class="ident">change_a</span>],
 		);
+		<span class="macro">assert_eq!</span>(<span class="ident">authorities</span>.<span class="ident">authority_set_changes</span>, <span class="ident">AuthoritySetChanges::empty</span>());
 
 		<span class="comment">// finalizing &quot;hash_d&quot; will enact the change signaled at &quot;hash_a&quot;</span>
 		<span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">authorities</span>.<span class="ident">apply_standard_changes</span>(
@@ -2082,30 +2523,32 @@
 			<span class="number">15</span>,
 			<span class="kw-2">&amp;</span><span class="ident">is_descendent_of</span>(<span class="op">|</span><span class="ident">base</span>, <span class="ident">hash</span><span class="op">|</span> <span class="kw">match</span> (<span class="kw-2">*</span><span class="ident">base</span>, <span class="kw-2">*</span><span class="ident">hash</span>) {
 				(<span class="string">&quot;hash_a&quot;</span>, <span class="string">&quot;hash_d&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-				<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(),
+				<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
 			}),
 			<span class="bool-val">false</span>,
 		).<span class="ident">unwrap</span>();
 
-		<span class="macro">assert</span><span class="macro">!</span>(<span class="ident">status</span>.<span class="ident">changed</span>);
-		<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">status</span>.<span class="ident">new_set_block</span>, <span class="prelude-val">Some</span>((<span class="string">&quot;hash_d&quot;</span>, <span class="number">15</span>)));
+		<span class="macro">assert!</span>(<span class="ident">status</span>.<span class="ident">changed</span>);
+		<span class="macro">assert_eq!</span>(<span class="ident">status</span>.<span class="ident">new_set_block</span>, <span class="prelude-val">Some</span>((<span class="string">&quot;hash_d&quot;</span>, <span class="number">15</span>)));
 
-		<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">authorities</span>.<span class="ident">current_authorities</span>, <span class="ident">set_a</span>);
-		<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">authorities</span>.<span class="ident">set_id</span>, <span class="number">1</span>);
-		<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">authorities</span>.<span class="ident">pending_changes</span>().<span class="ident">count</span>(), <span class="number">0</span>);
+		<span class="macro">assert_eq!</span>(<span class="ident">authorities</span>.<span class="ident">current_authorities</span>, <span class="ident">set_a</span>);
+		<span class="macro">assert_eq!</span>(<span class="ident">authorities</span>.<span class="ident">set_id</span>, <span class="number">1</span>);
+		<span class="macro">assert_eq!</span>(<span class="ident">authorities</span>.<span class="ident">pending_changes</span>().<span class="ident">count</span>(), <span class="number">0</span>);
+		<span class="macro">assert_eq!</span>(<span class="ident">authorities</span>.<span class="ident">authority_set_changes</span>, <span class="ident">AuthoritySetChanges</span>(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">15</span>)]));
 	}
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">disallow_multiple_changes_being_finalized_at_once</span>() {
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">authorities</span> <span class="op">=</span> <span class="ident">AuthoritySet</span> {
-			<span class="ident">current_authorities</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
+			<span class="ident">current_authorities</span>: <span class="ident">Vec::new</span>(),
 			<span class="ident">set_id</span>: <span class="number">0</span>,
-			<span class="ident">pending_standard_changes</span>: <span class="ident">ForkTree</span>::<span class="ident">new</span>(),
-			<span class="ident">pending_forced_changes</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
+			<span class="ident">pending_standard_changes</span>: <span class="ident">ForkTree::new</span>(),
+			<span class="ident">pending_forced_changes</span>: <span class="ident">Vec::new</span>(),
+			<span class="ident">authority_set_changes</span>: <span class="ident">AuthoritySetChanges::empty</span>(),
 		};
 
-		<span class="kw">let</span> <span class="ident">set_a</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[(<span class="ident">AuthorityId</span>::<span class="ident">from_slice</span>(<span class="kw-2">&amp;</span>[<span class="number">1</span>; <span class="number">32</span>]), <span class="number">5</span>)];
-		<span class="kw">let</span> <span class="ident">set_c</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[(<span class="ident">AuthorityId</span>::<span class="ident">from_slice</span>(<span class="kw-2">&amp;</span>[<span class="number">2</span>; <span class="number">32</span>]), <span class="number">5</span>)];
+		<span class="kw">let</span> <span class="ident">set_a</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="ident">AuthorityId::from_slice</span>(<span class="kw-2">&amp;</span>[<span class="number">1</span>; <span class="number">32</span>]), <span class="number">5</span>)];
+		<span class="kw">let</span> <span class="ident">set_c</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="ident">AuthorityId::from_slice</span>(<span class="kw-2">&amp;</span>[<span class="number">2</span>; <span class="number">32</span>]), <span class="number">5</span>)];
 
 		<span class="comment">// two competing changes at the same height on different forks</span>
 		<span class="kw">let</span> <span class="ident">change_a</span> <span class="op">=</span> <span class="ident">PendingChange</span> {
@@ -2113,7 +2556,7 @@
 			<span class="ident">delay</span>: <span class="number">10</span>,
 			<span class="ident">canon_height</span>: <span class="number">5</span>,
 			<span class="ident">canon_hash</span>: <span class="string">&quot;hash_a&quot;</span>,
-			<span class="ident">delay_kind</span>: <span class="ident">DelayKind</span>::<span class="ident">Finalized</span>,
+			<span class="ident">delay_kind</span>: <span class="ident">DelayKind::Finalized</span>,
 		};
 
 		<span class="kw">let</span> <span class="ident">change_c</span> <span class="op">=</span> <span class="ident">PendingChange</span> {
@@ -2121,7 +2564,7 @@
 			<span class="ident">delay</span>: <span class="number">10</span>,
 			<span class="ident">canon_height</span>: <span class="number">30</span>,
 			<span class="ident">canon_hash</span>: <span class="string">&quot;hash_c&quot;</span>,
-			<span class="ident">delay_kind</span>: <span class="ident">DelayKind</span>::<span class="ident">Finalized</span>,
+			<span class="ident">delay_kind</span>: <span class="ident">DelayKind::Finalized</span>,
 		};
 
 		<span class="ident">authorities</span>.<span class="ident">add_pending_change</span>(<span class="ident">change_a</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="ident">static_is_descendent_of</span>(<span class="bool-val">true</span>)).<span class="ident">unwrap</span>();
@@ -2136,14 +2579,15 @@
 			(<span class="string">&quot;hash_c&quot;</span>, <span class="string">&quot;hash_d&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
 
 			(<span class="string">&quot;hash_b&quot;</span>, <span class="string">&quot;hash_c&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-			<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(),
+			<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
 		});
 
 		<span class="comment">// trying to finalize past `change_c` without finalizing `change_a` first</span>
-		<span class="macro">assert</span><span class="macro">!</span>(<span class="macro">matches</span><span class="macro">!</span>(
+		<span class="macro">assert!</span>(<span class="macro">matches!</span>(
 			<span class="ident">authorities</span>.<span class="ident">apply_standard_changes</span>(<span class="string">&quot;hash_d&quot;</span>, <span class="number">40</span>, <span class="kw-2">&amp;</span><span class="ident">is_descendent_of</span>, <span class="bool-val">false</span>),
-			<span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">ForkTree</span>(<span class="ident">fork_tree</span>::<span class="ident">Error</span>::<span class="ident">UnfinalizedAncestor</span>))
+			<span class="prelude-val">Err</span>(<span class="ident">Error::ForkTree</span>(<span class="ident">fork_tree::Error::UnfinalizedAncestor</span>))
 		));
+		<span class="macro">assert_eq!</span>(<span class="ident">authorities</span>.<span class="ident">authority_set_changes</span>, <span class="ident">AuthoritySetChanges::empty</span>());
 
 		<span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">authorities</span>.<span class="ident">apply_standard_changes</span>(
 			<span class="string">&quot;hash_b&quot;</span>,
@@ -2152,11 +2596,12 @@
 			<span class="bool-val">false</span>,
 		).<span class="ident">unwrap</span>();
 
-		<span class="macro">assert</span><span class="macro">!</span>(<span class="ident">status</span>.<span class="ident">changed</span>);
-		<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">status</span>.<span class="ident">new_set_block</span>, <span class="prelude-val">Some</span>((<span class="string">&quot;hash_b&quot;</span>, <span class="number">15</span>)));
+		<span class="macro">assert!</span>(<span class="ident">status</span>.<span class="ident">changed</span>);
+		<span class="macro">assert_eq!</span>(<span class="ident">status</span>.<span class="ident">new_set_block</span>, <span class="prelude-val">Some</span>((<span class="string">&quot;hash_b&quot;</span>, <span class="number">15</span>)));
 
-		<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">authorities</span>.<span class="ident">current_authorities</span>, <span class="ident">set_a</span>);
-		<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">authorities</span>.<span class="ident">set_id</span>, <span class="number">1</span>);
+		<span class="macro">assert_eq!</span>(<span class="ident">authorities</span>.<span class="ident">current_authorities</span>, <span class="ident">set_a</span>);
+		<span class="macro">assert_eq!</span>(<span class="ident">authorities</span>.<span class="ident">set_id</span>, <span class="number">1</span>);
+		<span class="macro">assert_eq!</span>(<span class="ident">authorities</span>.<span class="ident">authority_set_changes</span>, <span class="ident">AuthoritySetChanges</span>(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">15</span>)]));
 
 		<span class="comment">// after finalizing `change_a` it should be possible to finalize `change_c`</span>
 		<span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">authorities</span>.<span class="ident">apply_standard_changes</span>(
@@ -2166,30 +2611,32 @@
 			<span class="bool-val">false</span>,
 		).<span class="ident">unwrap</span>();
 
-		<span class="macro">assert</span><span class="macro">!</span>(<span class="ident">status</span>.<span class="ident">changed</span>);
-		<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">status</span>.<span class="ident">new_set_block</span>, <span class="prelude-val">Some</span>((<span class="string">&quot;hash_d&quot;</span>, <span class="number">40</span>)));
+		<span class="macro">assert!</span>(<span class="ident">status</span>.<span class="ident">changed</span>);
+		<span class="macro">assert_eq!</span>(<span class="ident">status</span>.<span class="ident">new_set_block</span>, <span class="prelude-val">Some</span>((<span class="string">&quot;hash_d&quot;</span>, <span class="number">40</span>)));
 
-		<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">authorities</span>.<span class="ident">current_authorities</span>, <span class="ident">set_c</span>);
-		<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">authorities</span>.<span class="ident">set_id</span>, <span class="number">2</span>);
+		<span class="macro">assert_eq!</span>(<span class="ident">authorities</span>.<span class="ident">current_authorities</span>, <span class="ident">set_c</span>);
+		<span class="macro">assert_eq!</span>(<span class="ident">authorities</span>.<span class="ident">set_id</span>, <span class="number">2</span>);
+		<span class="macro">assert_eq!</span>(<span class="ident">authorities</span>.<span class="ident">authority_set_changes</span>, <span class="ident">AuthoritySetChanges</span>(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">15</span>), (<span class="number">1</span>, <span class="number">40</span>)]));
 	}
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">enacts_standard_change_works</span>() {
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">authorities</span> <span class="op">=</span> <span class="ident">AuthoritySet</span> {
-			<span class="ident">current_authorities</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
+			<span class="ident">current_authorities</span>: <span class="ident">Vec::new</span>(),
 			<span class="ident">set_id</span>: <span class="number">0</span>,
-			<span class="ident">pending_standard_changes</span>: <span class="ident">ForkTree</span>::<span class="ident">new</span>(),
-			<span class="ident">pending_forced_changes</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
+			<span class="ident">pending_standard_changes</span>: <span class="ident">ForkTree::new</span>(),
+			<span class="ident">pending_forced_changes</span>: <span class="ident">Vec::new</span>(),
+			<span class="ident">authority_set_changes</span>: <span class="ident">AuthoritySetChanges::empty</span>(),
 		};
 
-		<span class="kw">let</span> <span class="ident">set_a</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[(<span class="ident">AuthorityId</span>::<span class="ident">from_slice</span>(<span class="kw-2">&amp;</span>[<span class="number">1</span>; <span class="number">32</span>]), <span class="number">5</span>)];
+		<span class="kw">let</span> <span class="ident">set_a</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="ident">AuthorityId::from_slice</span>(<span class="kw-2">&amp;</span>[<span class="number">1</span>; <span class="number">32</span>]), <span class="number">5</span>)];
 
 		<span class="kw">let</span> <span class="ident">change_a</span> <span class="op">=</span> <span class="ident">PendingChange</span> {
 			<span class="ident">next_authorities</span>: <span class="ident">set_a</span>.<span class="ident">clone</span>(),
 			<span class="ident">delay</span>: <span class="number">10</span>,
 			<span class="ident">canon_height</span>: <span class="number">5</span>,
 			<span class="ident">canon_hash</span>: <span class="string">&quot;hash_a&quot;</span>,
-			<span class="ident">delay_kind</span>: <span class="ident">DelayKind</span>::<span class="ident">Finalized</span>,
+			<span class="ident">delay_kind</span>: <span class="ident">DelayKind::Finalized</span>,
 		};
 
 		<span class="kw">let</span> <span class="ident">change_b</span> <span class="op">=</span> <span class="ident">PendingChange</span> {
@@ -2197,7 +2644,7 @@
 			<span class="ident">delay</span>: <span class="number">10</span>,
 			<span class="ident">canon_height</span>: <span class="number">20</span>,
 			<span class="ident">canon_hash</span>: <span class="string">&quot;hash_b&quot;</span>,
-			<span class="ident">delay_kind</span>: <span class="ident">DelayKind</span>::<span class="ident">Finalized</span>,
+			<span class="ident">delay_kind</span>: <span class="ident">DelayKind::Finalized</span>,
 		};
 
 		<span class="ident">authorities</span>.<span class="ident">add_pending_change</span>(<span class="ident">change_a</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="ident">static_is_descendent_of</span>(<span class="bool-val">false</span>)).<span class="ident">unwrap</span>();
@@ -2210,30 +2657,30 @@
 			(<span class="string">&quot;hash_b&quot;</span>, <span class="string">&quot;hash_e&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
 			(<span class="string">&quot;hash_a&quot;</span>, <span class="string">&quot;hash_c&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
 			(<span class="string">&quot;hash_b&quot;</span>, <span class="string">&quot;hash_c&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-			<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(),
+			<span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
 		});
 
 		<span class="comment">// &quot;hash_c&quot; won&#39;t finalize the existing change since it isn&#39;t a descendent</span>
-		<span class="macro">assert_eq</span><span class="macro">!</span>(
+		<span class="macro">assert_eq!</span>(
 			<span class="ident">authorities</span>.<span class="ident">enacts_standard_change</span>(<span class="string">&quot;hash_c&quot;</span>, <span class="number">15</span>, <span class="kw-2">&amp;</span><span class="ident">is_descendent_of</span>).<span class="ident">unwrap</span>(),
 			<span class="prelude-val">None</span>,
 		);
 
 		<span class="comment">// &quot;hash_d&quot; at depth 14 won&#39;t work either</span>
-		<span class="macro">assert_eq</span><span class="macro">!</span>(
+		<span class="macro">assert_eq!</span>(
 			<span class="ident">authorities</span>.<span class="ident">enacts_standard_change</span>(<span class="string">&quot;hash_d&quot;</span>, <span class="number">14</span>, <span class="kw-2">&amp;</span><span class="ident">is_descendent_of</span>).<span class="ident">unwrap</span>(),
 			<span class="prelude-val">None</span>,
 		);
 
 		<span class="comment">// but it should work at depth 15 (change height + depth)</span>
-		<span class="macro">assert_eq</span><span class="macro">!</span>(
+		<span class="macro">assert_eq!</span>(
 			<span class="ident">authorities</span>.<span class="ident">enacts_standard_change</span>(<span class="string">&quot;hash_d&quot;</span>, <span class="number">15</span>, <span class="kw-2">&amp;</span><span class="ident">is_descendent_of</span>).<span class="ident">unwrap</span>(),
 			<span class="prelude-val">Some</span>(<span class="bool-val">true</span>),
 		);
 
 		<span class="comment">// finalizing &quot;hash_e&quot; at depth 20 will trigger change at &quot;hash_b&quot;, but</span>
 		<span class="comment">// it can&#39;t be applied yet since &quot;hash_a&quot; must be applied first</span>
-		<span class="macro">assert_eq</span><span class="macro">!</span>(
+		<span class="macro">assert_eq!</span>(
 			<span class="ident">authorities</span>.<span class="ident">enacts_standard_change</span>(<span class="string">&quot;hash_e&quot;</span>, <span class="number">30</span>, <span class="kw-2">&amp;</span><span class="ident">is_descendent_of</span>).<span class="ident">unwrap</span>(),
 			<span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
 		);
@@ -2242,21 +2689,22 @@
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">forced_changes</span>() {
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">authorities</span> <span class="op">=</span> <span class="ident">AuthoritySet</span> {
-			<span class="ident">current_authorities</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
+			<span class="ident">current_authorities</span>: <span class="ident">Vec::new</span>(),
 			<span class="ident">set_id</span>: <span class="number">0</span>,
-			<span class="ident">pending_standard_changes</span>: <span class="ident">ForkTree</span>::<span class="ident">new</span>(),
-			<span class="ident">pending_forced_changes</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
+			<span class="ident">pending_standard_changes</span>: <span class="ident">ForkTree::new</span>(),
+			<span class="ident">pending_forced_changes</span>: <span class="ident">Vec::new</span>(),
+			<span class="ident">authority_set_changes</span>: <span class="ident">AuthoritySetChanges::empty</span>(),
 		};
 
-		<span class="kw">let</span> <span class="ident">set_a</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[(<span class="ident">AuthorityId</span>::<span class="ident">from_slice</span>(<span class="kw-2">&amp;</span>[<span class="number">1</span>; <span class="number">32</span>]), <span class="number">5</span>)];
-		<span class="kw">let</span> <span class="ident">set_b</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[(<span class="ident">AuthorityId</span>::<span class="ident">from_slice</span>(<span class="kw-2">&amp;</span>[<span class="number">2</span>; <span class="number">32</span>]), <span class="number">5</span>)];
+		<span class="kw">let</span> <span class="ident">set_a</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="ident">AuthorityId::from_slice</span>(<span class="kw-2">&amp;</span>[<span class="number">1</span>; <span class="number">32</span>]), <span class="number">5</span>)];
+		<span class="kw">let</span> <span class="ident">set_b</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="ident">AuthorityId::from_slice</span>(<span class="kw-2">&amp;</span>[<span class="number">2</span>; <span class="number">32</span>]), <span class="number">5</span>)];
 
 		<span class="kw">let</span> <span class="ident">change_a</span> <span class="op">=</span> <span class="ident">PendingChange</span> {
 			<span class="ident">next_authorities</span>: <span class="ident">set_a</span>.<span class="ident">clone</span>(),
 			<span class="ident">delay</span>: <span class="number">10</span>,
 			<span class="ident">canon_height</span>: <span class="number">5</span>,
 			<span class="ident">canon_hash</span>: <span class="string">&quot;hash_a&quot;</span>,
-			<span class="ident">delay_kind</span>: <span class="ident">DelayKind</span>::<span class="ident">Best</span> { <span class="ident">median_last_finalized</span>: <span class="number">42</span> },
+			<span class="ident">delay_kind</span>: <span class="ident">DelayKind::Best</span> { <span class="ident">median_last_finalized</span>: <span class="number">42</span> },
 		};
 
 		<span class="kw">let</span> <span class="ident">change_b</span> <span class="op">=</span> <span class="ident">PendingChange</span> {
@@ -2264,64 +2712,74 @@
 			<span class="ident">delay</span>: <span class="number">10</span>,
 			<span class="ident">canon_height</span>: <span class="number">5</span>,
 			<span class="ident">canon_hash</span>: <span class="string">&quot;hash_b&quot;</span>,
-			<span class="ident">delay_kind</span>: <span class="ident">DelayKind</span>::<span class="ident">Best</span> { <span class="ident">median_last_finalized</span>: <span class="number">0</span> },
+			<span class="ident">delay_kind</span>: <span class="ident">DelayKind::Best</span> { <span class="ident">median_last_finalized</span>: <span class="number">0</span> },
 		};
 
 		<span class="ident">authorities</span>.<span class="ident">add_pending_change</span>(<span class="ident">change_a</span>, <span class="kw-2">&amp;</span><span class="ident">static_is_descendent_of</span>(<span class="bool-val">false</span>)).<span class="ident">unwrap</span>();
-		<span class="ident">authorities</span>.<span class="ident">add_pending_change</span>(<span class="ident">change_b</span>, <span class="kw-2">&amp;</span><span class="ident">static_is_descendent_of</span>(<span class="bool-val">false</span>)).<span class="ident">unwrap</span>();
+		<span class="ident">authorities</span>.<span class="ident">add_pending_change</span>(<span class="ident">change_b</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="ident">static_is_descendent_of</span>(<span class="bool-val">false</span>)).<span class="ident">unwrap</span>();
+
+		<span class="comment">// no duplicates are allowed</span>
+		<span class="macro">assert!</span>(<span class="macro">matches!</span>(
+			<span class="ident">authorities</span>.<span class="ident">add_pending_change</span>(<span class="ident">change_b</span>, <span class="kw-2">&amp;</span><span class="ident">static_is_descendent_of</span>(<span class="bool-val">false</span>)),
+			<span class="prelude-val">Err</span>(<span class="ident">Error::DuplicateAuthoritySetChange</span>)
+		));
 
 		<span class="comment">// there&#39;s an effective change triggered at block 15 but not a standard one.</span>
 		<span class="comment">// so this should do nothing.</span>
-		<span class="macro">assert_eq</span><span class="macro">!</span>(
+		<span class="macro">assert_eq!</span>(
 			<span class="ident">authorities</span>.<span class="ident">enacts_standard_change</span>(<span class="string">&quot;hash_c&quot;</span>, <span class="number">15</span>, <span class="kw-2">&amp;</span><span class="ident">static_is_descendent_of</span>(<span class="bool-val">true</span>)).<span class="ident">unwrap</span>(),
 			<span class="prelude-val">None</span>,
 		);
 
-		<span class="comment">// throw a standard change into the mix to prove that it&#39;s discarded</span>
-		<span class="comment">// for being on the same fork.</span>
-		<span class="comment">//</span>
-		<span class="comment">// NOTE: after https://github.com/paritytech/substrate/issues/1861</span>
-		<span class="comment">// this should still be rejected based on the &quot;span&quot; rule -- it overlaps</span>
-		<span class="comment">// with another change on the same fork.</span>
+		<span class="comment">// there can only be one pending forced change per fork</span>
 		<span class="kw">let</span> <span class="ident">change_c</span> <span class="op">=</span> <span class="ident">PendingChange</span> {
 			<span class="ident">next_authorities</span>: <span class="ident">set_b</span>.<span class="ident">clone</span>(),
 			<span class="ident">delay</span>: <span class="number">3</span>,
 			<span class="ident">canon_height</span>: <span class="number">8</span>,
 			<span class="ident">canon_hash</span>: <span class="string">&quot;hash_a8&quot;</span>,
-			<span class="ident">delay_kind</span>: <span class="ident">DelayKind</span>::<span class="ident">Best</span> { <span class="ident">median_last_finalized</span>: <span class="number">0</span> },
+			<span class="ident">delay_kind</span>: <span class="ident">DelayKind::Best</span> { <span class="ident">median_last_finalized</span>: <span class="number">0</span> },
 		};
 
-		<span class="kw">let</span> <span class="ident">is_descendent_of_a</span> <span class="op">=</span> <span class="ident">is_descendent_of</span>(<span class="op">|</span><span class="ident">base</span>: <span class="op">&amp;&amp;</span><span class="ident">str</span>, <span class="kw">_</span><span class="op">|</span> {
-			<span class="ident">base</span>.<span class="ident">starts_with</span>(<span class="string">&quot;hash_a&quot;</span>)
-		});
+		<span class="kw">let</span> <span class="ident">is_descendent_of_a</span> <span class="op">=</span> <span class="ident">is_descendent_of</span>(<span class="op">|</span><span class="ident">base</span>: <span class="op">&amp;&amp;</span><span class="ident">str</span>, <span class="kw">_</span><span class="op">|</span> <span class="ident">base</span>.<span class="ident">starts_with</span>(<span class="string">&quot;hash_a&quot;</span>));
 
-		<span class="macro">assert</span><span class="macro">!</span>(<span class="ident">authorities</span>.<span class="ident">add_pending_change</span>(<span class="ident">change_c</span>, <span class="kw-2">&amp;</span><span class="ident">is_descendent_of_a</span>).<span class="ident">is_err</span>());
+		<span class="macro">assert!</span>(<span class="macro">matches!</span>(
+			<span class="ident">authorities</span>.<span class="ident">add_pending_change</span>(<span class="ident">change_c</span>, <span class="kw-2">&amp;</span><span class="ident">is_descendent_of_a</span>),
+			<span class="prelude-val">Err</span>(<span class="ident">Error::MultiplePendingForcedAuthoritySetChanges</span>)
+		));
 
-		<span class="comment">// too early.</span>
-		<span class="macro">assert</span><span class="macro">!</span>(
-			<span class="ident">authorities</span>.<span class="ident">apply_forced_changes</span>(<span class="string">&quot;hash_a10&quot;</span>, <span class="number">10</span>, <span class="kw-2">&amp;</span><span class="ident">static_is_descendent_of</span>(<span class="bool-val">true</span>), <span class="bool-val">false</span>)
+		<span class="comment">// let&#39;s try and apply the forced changes.</span>
+		<span class="comment">// too early and there&#39;s no forced changes to apply.</span>
+		<span class="macro">assert!</span>(
+			<span class="ident">authorities</span>
+				.<span class="ident">apply_forced_changes</span>(<span class="string">&quot;hash_a10&quot;</span>, <span class="number">10</span>, <span class="kw-2">&amp;</span><span class="ident">static_is_descendent_of</span>(<span class="bool-val">true</span>), <span class="bool-val">false</span>)
 				.<span class="ident">unwrap</span>()
 				.<span class="ident">is_none</span>()
 		);
 
 		<span class="comment">// too late.</span>
-		<span class="macro">assert</span><span class="macro">!</span>(
-			<span class="ident">authorities</span>.<span class="ident">apply_forced_changes</span>(<span class="string">&quot;hash_a16&quot;</span>, <span class="number">16</span>, <span class="kw-2">&amp;</span><span class="ident">static_is_descendent_of</span>(<span class="bool-val">true</span>), <span class="bool-val">false</span>)
+		<span class="macro">assert!</span>(
+			<span class="ident">authorities</span>
+				.<span class="ident">apply_forced_changes</span>(<span class="string">&quot;hash_a16&quot;</span>, <span class="number">16</span>, <span class="kw-2">&amp;</span><span class="ident">is_descendent_of_a</span>, <span class="bool-val">false</span>)
 				.<span class="ident">unwrap</span>()
 				.<span class="ident">is_none</span>()
 		);
 
-		<span class="comment">// on time -- chooses the right change.</span>
-		<span class="macro">assert_eq</span><span class="macro">!</span>(
-			<span class="ident">authorities</span>.<span class="ident">apply_forced_changes</span>(<span class="string">&quot;hash_a15&quot;</span>, <span class="number">15</span>, <span class="kw-2">&amp;</span><span class="ident">is_descendent_of_a</span>, <span class="bool-val">false</span>)
+		<span class="comment">// on time -- chooses the right change for this fork.</span>
+		<span class="macro">assert_eq!</span>(
+			<span class="ident">authorities</span>
+				.<span class="ident">apply_forced_changes</span>(<span class="string">&quot;hash_a15&quot;</span>, <span class="number">15</span>, <span class="kw-2">&amp;</span><span class="ident">is_descendent_of_a</span>, <span class="bool-val">false</span>)
 				.<span class="ident">unwrap</span>()
 				.<span class="ident">unwrap</span>(),
-			(<span class="number">42</span>, <span class="ident">AuthoritySet</span> {
-				<span class="ident">current_authorities</span>: <span class="ident">set_a</span>,
-				<span class="ident">set_id</span>: <span class="number">1</span>,
-				<span class="ident">pending_standard_changes</span>: <span class="ident">ForkTree</span>::<span class="ident">new</span>(),
-				<span class="ident">pending_forced_changes</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
-			}),
+			(
+				<span class="number">42</span>,
+				<span class="ident">AuthoritySet</span> {
+					<span class="ident">current_authorities</span>: <span class="ident">set_a</span>,
+					<span class="ident">set_id</span>: <span class="number">1</span>,
+					<span class="ident">pending_standard_changes</span>: <span class="ident">ForkTree::new</span>(),
+					<span class="ident">pending_forced_changes</span>: <span class="ident">Vec::new</span>(),
+					<span class="ident">authority_set_changes</span>: <span class="ident">AuthoritySetChanges</span>(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">42</span>)]),
+				},
+			)
 		);
 	}
 
@@ -2329,13 +2787,14 @@
 	<span class="kw">fn</span> <span class="ident">forced_changes_with_no_delay</span>() {
 		<span class="comment">// NOTE: this is a regression test</span>
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">authorities</span> <span class="op">=</span> <span class="ident">AuthoritySet</span> {
-			<span class="ident">current_authorities</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
+			<span class="ident">current_authorities</span>: <span class="ident">Vec::new</span>(),
 			<span class="ident">set_id</span>: <span class="number">0</span>,
-			<span class="ident">pending_standard_changes</span>: <span class="ident">ForkTree</span>::<span class="ident">new</span>(),
-			<span class="ident">pending_forced_changes</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
+			<span class="ident">pending_standard_changes</span>: <span class="ident">ForkTree::new</span>(),
+			<span class="ident">pending_forced_changes</span>: <span class="ident">Vec::new</span>(),
+			<span class="ident">authority_set_changes</span>: <span class="ident">AuthoritySetChanges::empty</span>(),
 		};
 
-		<span class="kw">let</span> <span class="ident">set_a</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[(<span class="ident">AuthorityId</span>::<span class="ident">from_slice</span>(<span class="kw-2">&amp;</span>[<span class="number">1</span>; <span class="number">32</span>]), <span class="number">5</span>)];
+		<span class="kw">let</span> <span class="ident">set_a</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="ident">AuthorityId::from_slice</span>(<span class="kw-2">&amp;</span>[<span class="number">1</span>; <span class="number">32</span>]), <span class="number">5</span>)];
 
 		<span class="comment">// we create a forced change with no delay</span>
 		<span class="kw">let</span> <span class="ident">change_a</span> <span class="op">=</span> <span class="ident">PendingChange</span> {
@@ -2343,7 +2802,7 @@
 			<span class="ident">delay</span>: <span class="number">0</span>,
 			<span class="ident">canon_height</span>: <span class="number">5</span>,
 			<span class="ident">canon_hash</span>: <span class="string">&quot;hash_a&quot;</span>,
-			<span class="ident">delay_kind</span>: <span class="ident">DelayKind</span>::<span class="ident">Best</span> {
+			<span class="ident">delay_kind</span>: <span class="ident">DelayKind::Best</span> {
 				<span class="ident">median_last_finalized</span>: <span class="number">0</span>,
 			},
 		};
@@ -2354,7 +2813,7 @@
 			.<span class="ident">unwrap</span>();
 
 		<span class="comment">// it should be enacted at the same block that signaled it</span>
-		<span class="macro">assert</span><span class="macro">!</span>(
+		<span class="macro">assert!</span>(
 			<span class="ident">authorities</span>
 				.<span class="ident">apply_forced_changes</span>(<span class="string">&quot;hash_a&quot;</span>, <span class="number">5</span>, <span class="kw-2">&amp;</span><span class="ident">static_is_descendent_of</span>(<span class="bool-val">false</span>), <span class="bool-val">false</span>)
 				.<span class="ident">unwrap</span>()
@@ -2363,14 +2822,122 @@
 	}
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
+	<span class="kw">fn</span> <span class="ident">forced_changes_blocked_by_standard_changes</span>() {
+		<span class="kw">let</span> <span class="ident">set_a</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="ident">AuthorityId::from_slice</span>(<span class="kw-2">&amp;</span>[<span class="number">1</span>; <span class="number">32</span>]), <span class="number">1</span>)];
+
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">authorities</span> <span class="op">=</span> <span class="ident">AuthoritySet</span> {
+			<span class="ident">current_authorities</span>: <span class="ident">set_a</span>.<span class="ident">clone</span>(),
+			<span class="ident">set_id</span>: <span class="number">0</span>,
+			<span class="ident">pending_standard_changes</span>: <span class="ident">ForkTree::new</span>(),
+			<span class="ident">pending_forced_changes</span>: <span class="ident">Vec::new</span>(),
+			<span class="ident">authority_set_changes</span>: <span class="ident">AuthoritySetChanges::empty</span>(),
+		};
+
+		<span class="comment">// effective at #15</span>
+		<span class="kw">let</span> <span class="ident">change_a</span> <span class="op">=</span> <span class="ident">PendingChange</span> {
+			<span class="ident">next_authorities</span>: <span class="ident">set_a</span>.<span class="ident">clone</span>(),
+			<span class="ident">delay</span>: <span class="number">5</span>,
+			<span class="ident">canon_height</span>: <span class="number">10</span>,
+			<span class="ident">canon_hash</span>: <span class="string">&quot;hash_a&quot;</span>,
+			<span class="ident">delay_kind</span>: <span class="ident">DelayKind::Finalized</span>,
+		};
+
+		<span class="comment">// effective #20</span>
+		<span class="kw">let</span> <span class="ident">change_b</span> <span class="op">=</span> <span class="ident">PendingChange</span> {
+			<span class="ident">next_authorities</span>: <span class="ident">set_a</span>.<span class="ident">clone</span>(),
+			<span class="ident">delay</span>: <span class="number">0</span>,
+			<span class="ident">canon_height</span>: <span class="number">20</span>,
+			<span class="ident">canon_hash</span>: <span class="string">&quot;hash_b&quot;</span>,
+			<span class="ident">delay_kind</span>: <span class="ident">DelayKind::Finalized</span>,
+		};
+
+		<span class="comment">// effective at #35</span>
+		<span class="kw">let</span> <span class="ident">change_c</span> <span class="op">=</span> <span class="ident">PendingChange</span> {
+			<span class="ident">next_authorities</span>: <span class="ident">set_a</span>.<span class="ident">clone</span>(),
+			<span class="ident">delay</span>: <span class="number">5</span>,
+			<span class="ident">canon_height</span>: <span class="number">30</span>,
+			<span class="ident">canon_hash</span>: <span class="string">&quot;hash_c&quot;</span>,
+			<span class="ident">delay_kind</span>: <span class="ident">DelayKind::Finalized</span>,
+		};
+
+		<span class="comment">// add some pending standard changes all on the same fork</span>
+		<span class="ident">authorities</span>.<span class="ident">add_pending_change</span>(<span class="ident">change_a</span>, <span class="kw-2">&amp;</span><span class="ident">static_is_descendent_of</span>(<span class="bool-val">true</span>)).<span class="ident">unwrap</span>();
+		<span class="ident">authorities</span>.<span class="ident">add_pending_change</span>(<span class="ident">change_b</span>, <span class="kw-2">&amp;</span><span class="ident">static_is_descendent_of</span>(<span class="bool-val">true</span>)).<span class="ident">unwrap</span>();
+		<span class="ident">authorities</span>.<span class="ident">add_pending_change</span>(<span class="ident">change_c</span>, <span class="kw-2">&amp;</span><span class="ident">static_is_descendent_of</span>(<span class="bool-val">true</span>)).<span class="ident">unwrap</span>();
+
+		<span class="comment">// effective at #45</span>
+		<span class="kw">let</span> <span class="ident">change_d</span> <span class="op">=</span> <span class="ident">PendingChange</span> {
+			<span class="ident">next_authorities</span>: <span class="ident">set_a</span>.<span class="ident">clone</span>(),
+			<span class="ident">delay</span>: <span class="number">5</span>,
+			<span class="ident">canon_height</span>: <span class="number">40</span>,
+			<span class="ident">canon_hash</span>: <span class="string">&quot;hash_d&quot;</span>,
+			<span class="ident">delay_kind</span>: <span class="ident">DelayKind::Best</span> {
+				<span class="ident">median_last_finalized</span>: <span class="number">31</span>,
+			},
+		};
+
+		<span class="comment">// now add a forced change on the same fork</span>
+		<span class="ident">authorities</span>.<span class="ident">add_pending_change</span>(<span class="ident">change_d</span>, <span class="kw-2">&amp;</span><span class="ident">static_is_descendent_of</span>(<span class="bool-val">true</span>)).<span class="ident">unwrap</span>();
+
+		<span class="comment">// the forced change cannot be applied since the pending changes it depends on</span>
+		<span class="comment">// have not been applied yet.</span>
+		<span class="macro">assert!</span>(<span class="macro">matches!</span>(
+			<span class="ident">authorities</span>.<span class="ident">apply_forced_changes</span>(<span class="string">&quot;hash_d45&quot;</span>, <span class="number">45</span>, <span class="kw-2">&amp;</span><span class="ident">static_is_descendent_of</span>(<span class="bool-val">true</span>), <span class="bool-val">false</span>),
+			<span class="prelude-val">Err</span>(<span class="ident">Error::ForcedAuthoritySetChangeDependencyUnsatisfied</span>(<span class="number">15</span>))
+		));
+		<span class="macro">assert_eq!</span>(<span class="ident">authorities</span>.<span class="ident">authority_set_changes</span>, <span class="ident">AuthoritySetChanges::empty</span>());
+
+		<span class="comment">// we apply the first pending standard change at #15</span>
+		<span class="ident">authorities</span>
+			.<span class="ident">apply_standard_changes</span>(<span class="string">&quot;hash_a15&quot;</span>, <span class="number">15</span>, <span class="kw-2">&amp;</span><span class="ident">static_is_descendent_of</span>(<span class="bool-val">true</span>), <span class="bool-val">false</span>)
+			.<span class="ident">unwrap</span>();
+		<span class="macro">assert_eq!</span>(<span class="ident">authorities</span>.<span class="ident">authority_set_changes</span>, <span class="ident">AuthoritySetChanges</span>(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">15</span>)]));
+
+		<span class="comment">// but the forced change still depends on the next standard change</span>
+		<span class="macro">assert!</span>(<span class="macro">matches!</span>(
+			<span class="ident">authorities</span>.<span class="ident">apply_forced_changes</span>(<span class="string">&quot;hash_d&quot;</span>, <span class="number">45</span>, <span class="kw-2">&amp;</span><span class="ident">static_is_descendent_of</span>(<span class="bool-val">true</span>), <span class="bool-val">false</span>),
+			<span class="prelude-val">Err</span>(<span class="ident">Error::ForcedAuthoritySetChangeDependencyUnsatisfied</span>(<span class="number">20</span>))
+		));
+		<span class="macro">assert_eq!</span>(<span class="ident">authorities</span>.<span class="ident">authority_set_changes</span>, <span class="ident">AuthoritySetChanges</span>(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">15</span>)]));
+
+		<span class="comment">// we apply the pending standard change at #20</span>
+		<span class="ident">authorities</span>
+			.<span class="ident">apply_standard_changes</span>(<span class="string">&quot;hash_b&quot;</span>, <span class="number">20</span>, <span class="kw-2">&amp;</span><span class="ident">static_is_descendent_of</span>(<span class="bool-val">true</span>), <span class="bool-val">false</span>)
+			.<span class="ident">unwrap</span>();
+		<span class="macro">assert_eq!</span>(<span class="ident">authorities</span>.<span class="ident">authority_set_changes</span>, <span class="ident">AuthoritySetChanges</span>(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">15</span>), (<span class="number">1</span>, <span class="number">20</span>)]));
+
+		<span class="comment">// afterwards the forced change at #45 can already be applied since it signals</span>
+		<span class="comment">// that finality stalled at #31, and the next pending standard change is effective</span>
+		<span class="comment">// at #35. subsequent forced changes on the same branch must be kept</span>
+		<span class="macro">assert_eq!</span>(
+			<span class="ident">authorities</span>
+				.<span class="ident">apply_forced_changes</span>(<span class="string">&quot;hash_d&quot;</span>, <span class="number">45</span>, <span class="kw-2">&amp;</span><span class="ident">static_is_descendent_of</span>(<span class="bool-val">true</span>), <span class="bool-val">false</span>)
+				.<span class="ident">unwrap</span>()
+				.<span class="ident">unwrap</span>(),
+			(
+				<span class="number">31</span>,
+				<span class="ident">AuthoritySet</span> {
+					<span class="ident">current_authorities</span>: <span class="ident">set_a</span>.<span class="ident">clone</span>(),
+					<span class="ident">set_id</span>: <span class="number">3</span>,
+					<span class="ident">pending_standard_changes</span>: <span class="ident">ForkTree::new</span>(),
+					<span class="ident">pending_forced_changes</span>: <span class="ident">Vec::new</span>(),
+					<span class="ident">authority_set_changes</span>: <span class="ident">AuthoritySetChanges</span>(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">15</span>), (<span class="number">1</span>, <span class="number">20</span>), (<span class="number">2</span>, <span class="number">31</span>)]),
+				}
+			),
+		);
+		<span class="macro">assert_eq!</span>(<span class="ident">authorities</span>.<span class="ident">authority_set_changes</span>, <span class="ident">AuthoritySetChanges</span>(<span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">15</span>), (<span class="number">1</span>, <span class="number">20</span>)]));
+	}
+
+	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">next_change_works</span>() {
-		<span class="kw">let</span> <span class="ident">current_authorities</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[(<span class="ident">AuthorityId</span>::<span class="ident">from_slice</span>(<span class="kw-2">&amp;</span>[<span class="number">1</span>; <span class="number">32</span>]), <span class="number">1</span>)];
+		<span class="kw">let</span> <span class="ident">current_authorities</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="ident">AuthorityId::from_slice</span>(<span class="kw-2">&amp;</span>[<span class="number">1</span>; <span class="number">32</span>]), <span class="number">1</span>)];
 
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">authorities</span> <span class="op">=</span> <span class="ident">AuthoritySet</span> {
 			<span class="ident">current_authorities</span>: <span class="ident">current_authorities</span>.<span class="ident">clone</span>(),
 			<span class="ident">set_id</span>: <span class="number">0</span>,
-			<span class="ident">pending_standard_changes</span>: <span class="ident">ForkTree</span>::<span class="ident">new</span>(),
-			<span class="ident">pending_forced_changes</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
+			<span class="ident">pending_standard_changes</span>: <span class="ident">ForkTree::new</span>(),
+			<span class="ident">pending_forced_changes</span>: <span class="ident">Vec::new</span>(),
+			<span class="ident">authority_set_changes</span>: <span class="ident">AuthoritySetChanges::empty</span>(),
 		};
 
 		<span class="kw">let</span> <span class="ident">new_set</span> <span class="op">=</span> <span class="ident">current_authorities</span>.<span class="ident">clone</span>();
@@ -2382,7 +2949,7 @@
 			<span class="ident">delay</span>: <span class="number">0</span>,
 			<span class="ident">canon_height</span>: <span class="number">5</span>,
 			<span class="ident">canon_hash</span>: <span class="string">&quot;hash_a0&quot;</span>,
-			<span class="ident">delay_kind</span>: <span class="ident">DelayKind</span>::<span class="ident">Finalized</span>,
+			<span class="ident">delay_kind</span>: <span class="ident">DelayKind::Finalized</span>,
 		};
 
 		<span class="kw">let</span> <span class="ident">change_a1</span> <span class="op">=</span> <span class="ident">PendingChange</span> {
@@ -2390,7 +2957,7 @@
 			<span class="ident">delay</span>: <span class="number">0</span>,
 			<span class="ident">canon_height</span>: <span class="number">10</span>,
 			<span class="ident">canon_hash</span>: <span class="string">&quot;hash_a1&quot;</span>,
-			<span class="ident">delay_kind</span>: <span class="ident">DelayKind</span>::<span class="ident">Finalized</span>,
+			<span class="ident">delay_kind</span>: <span class="ident">DelayKind::Finalized</span>,
 		};
 
 		<span class="kw">let</span> <span class="ident">change_b</span> <span class="op">=</span> <span class="ident">PendingChange</span> {
@@ -2398,7 +2965,7 @@
 			<span class="ident">delay</span>: <span class="number">0</span>,
 			<span class="ident">canon_height</span>: <span class="number">4</span>,
 			<span class="ident">canon_hash</span>: <span class="string">&quot;hash_b&quot;</span>,
-			<span class="ident">delay_kind</span>: <span class="ident">DelayKind</span>::<span class="ident">Finalized</span>,
+			<span class="ident">delay_kind</span>: <span class="ident">DelayKind::Finalized</span>,
 		};
 
 		<span class="comment">// A0 (#5) &lt;- A10 (#8) &lt;- A1 (#10) &lt;- best_a</span>
@@ -2424,7 +2991,7 @@
 			.<span class="ident">unwrap</span>();
 
 		<span class="comment">// the earliest change at block `best_a` should be the change at A0 (#5)</span>
-		<span class="macro">assert_eq</span><span class="macro">!</span>(
+		<span class="macro">assert_eq!</span>(
 			<span class="ident">authorities</span>
 				.<span class="ident">next_change</span>(<span class="kw-2">&amp;</span><span class="string">&quot;best_a&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">is_descendent_of</span>)
 				.<span class="ident">unwrap</span>(),
@@ -2432,7 +2999,7 @@
 		);
 
 		<span class="comment">// the earliest change at block `best_b` should be the change at B (#4)</span>
-		<span class="macro">assert_eq</span><span class="macro">!</span>(
+		<span class="macro">assert_eq!</span>(
 			<span class="ident">authorities</span>
 				.<span class="ident">next_change</span>(<span class="kw-2">&amp;</span><span class="string">&quot;best_b&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">is_descendent_of</span>)
 				.<span class="ident">unwrap</span>(),
@@ -2445,7 +3012,7 @@
 			.<span class="ident">unwrap</span>();
 
 		<span class="comment">// the next change is now at A1 (#10)</span>
-		<span class="macro">assert_eq</span><span class="macro">!</span>(
+		<span class="macro">assert_eq!</span>(
 			<span class="ident">authorities</span>
 				.<span class="ident">next_change</span>(<span class="kw-2">&amp;</span><span class="string">&quot;best_a&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">is_descendent_of</span>)
 				.<span class="ident">unwrap</span>(),
@@ -2453,7 +3020,7 @@
 		);
 
 		<span class="comment">// there&#39;s no longer any pending change at `best_b` fork</span>
-		<span class="macro">assert_eq</span><span class="macro">!</span>(
+		<span class="macro">assert_eq!</span>(
 			<span class="ident">authorities</span>
 				.<span class="ident">next_change</span>(<span class="kw-2">&amp;</span><span class="string">&quot;best_b&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">is_descendent_of</span>)
 				.<span class="ident">unwrap</span>(),
@@ -2466,7 +3033,7 @@
 			<span class="ident">delay</span>: <span class="number">0</span>,
 			<span class="ident">canon_height</span>: <span class="number">8</span>,
 			<span class="ident">canon_hash</span>: <span class="string">&quot;hash_a10&quot;</span>,
-			<span class="ident">delay_kind</span>: <span class="ident">DelayKind</span>::<span class="ident">Best</span> {
+			<span class="ident">delay_kind</span>: <span class="ident">DelayKind::Best</span> {
 				<span class="ident">median_last_finalized</span>: <span class="number">0</span>,
 			},
 		};
@@ -2476,7 +3043,7 @@
 			.<span class="ident">unwrap</span>();
 
 		<span class="comment">// it should take precedence over the change at A1 (#10)</span>
-		<span class="macro">assert_eq</span><span class="macro">!</span>(
+		<span class="macro">assert_eq!</span>(
 			<span class="ident">authorities</span>
 				.<span class="ident">next_change</span>(<span class="kw-2">&amp;</span><span class="string">&quot;best_a&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">is_descendent_of</span>)
 				.<span class="ident">unwrap</span>(),
@@ -2487,50 +3054,57 @@
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">maintains_authority_list_invariants</span>() {
 		<span class="comment">// empty authority lists are invalid</span>
-		<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">AuthoritySet</span>::<span class="op">&lt;</span>(), ()<span class="op">&gt;</span>::<span class="ident">genesis</span>(<span class="macro">vec</span><span class="macro">!</span>[]), <span class="prelude-val">None</span>);
-		<span class="macro">assert_eq</span><span class="macro">!</span>(
-			<span class="ident">AuthoritySet</span>::<span class="op">&lt;</span>(), ()<span class="op">&gt;</span>::<span class="ident">new</span>(<span class="macro">vec</span><span class="macro">!</span>[], <span class="number">0</span>, <span class="ident">ForkTree</span>::<span class="ident">new</span>(), <span class="ident">Vec</span>::<span class="ident">new</span>()),
+		<span class="macro">assert_eq!</span>(<span class="ident">AuthoritySet</span>::<span class="op">&lt;</span>(), ()<span class="op">&gt;</span><span class="ident">::genesis</span>(<span class="macro">vec!</span>[]), <span class="prelude-val">None</span>);
+		<span class="macro">assert_eq!</span>(
+			<span class="ident">AuthoritySet</span>::<span class="op">&lt;</span>(), ()<span class="op">&gt;</span><span class="ident">::new</span>(
+				<span class="macro">vec!</span>[],
+				<span class="number">0</span>,
+				<span class="ident">ForkTree::new</span>(),
+				<span class="ident">Vec::new</span>(),
+				<span class="ident">AuthoritySetChanges::empty</span>(),
+			),
 			<span class="prelude-val">None</span>,
 		);
 
-		<span class="kw">let</span> <span class="ident">invalid_authorities_weight</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[
-			(<span class="ident">AuthorityId</span>::<span class="ident">from_slice</span>(<span class="kw-2">&amp;</span>[<span class="number">1</span>; <span class="number">32</span>]), <span class="number">5</span>),
-			(<span class="ident">AuthorityId</span>::<span class="ident">from_slice</span>(<span class="kw-2">&amp;</span>[<span class="number">2</span>; <span class="number">32</span>]), <span class="number">0</span>),
+		<span class="kw">let</span> <span class="ident">invalid_authorities_weight</span> <span class="op">=</span> <span class="macro">vec!</span>[
+			(<span class="ident">AuthorityId::from_slice</span>(<span class="kw-2">&amp;</span>[<span class="number">1</span>; <span class="number">32</span>]), <span class="number">5</span>),
+			(<span class="ident">AuthorityId::from_slice</span>(<span class="kw-2">&amp;</span>[<span class="number">2</span>; <span class="number">32</span>]), <span class="number">0</span>),
 		];
 
 		<span class="comment">// authority weight of zero is invalid</span>
-		<span class="macro">assert_eq</span><span class="macro">!</span>(
-			<span class="ident">AuthoritySet</span>::<span class="op">&lt;</span>(), ()<span class="op">&gt;</span>::<span class="ident">genesis</span>(<span class="ident">invalid_authorities_weight</span>.<span class="ident">clone</span>()),
+		<span class="macro">assert_eq!</span>(
+			<span class="ident">AuthoritySet</span>::<span class="op">&lt;</span>(), ()<span class="op">&gt;</span><span class="ident">::genesis</span>(<span class="ident">invalid_authorities_weight</span>.<span class="ident">clone</span>()),
 			<span class="prelude-val">None</span>
 		);
-		<span class="macro">assert_eq</span><span class="macro">!</span>(
-			<span class="ident">AuthoritySet</span>::<span class="op">&lt;</span>(), ()<span class="op">&gt;</span>::<span class="ident">new</span>(
+		<span class="macro">assert_eq!</span>(
+			<span class="ident">AuthoritySet</span>::<span class="op">&lt;</span>(), ()<span class="op">&gt;</span><span class="ident">::new</span>(
 				<span class="ident">invalid_authorities_weight</span>.<span class="ident">clone</span>(),
 				<span class="number">0</span>,
-				<span class="ident">ForkTree</span>::<span class="ident">new</span>(),
-				<span class="ident">Vec</span>::<span class="ident">new</span>()
+				<span class="ident">ForkTree::new</span>(),
+				<span class="ident">Vec::new</span>(),
+				<span class="ident">AuthoritySetChanges::empty</span>(),
 			),
 			<span class="prelude-val">None</span>,
 		);
 
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">authority_set</span> <span class="op">=</span>
-			<span class="ident">AuthoritySet</span>::<span class="op">&lt;</span>(), <span class="ident">u64</span><span class="op">&gt;</span>::<span class="ident">genesis</span>(<span class="macro">vec</span><span class="macro">!</span>[(<span class="ident">AuthorityId</span>::<span class="ident">from_slice</span>(<span class="kw-2">&amp;</span>[<span class="number">1</span>; <span class="number">32</span>]), <span class="number">5</span>)]).<span class="ident">unwrap</span>();
+			<span class="ident">AuthoritySet</span>::<span class="op">&lt;</span>(), <span class="ident">u64</span><span class="op">&gt;</span><span class="ident">::genesis</span>(<span class="macro">vec!</span>[(<span class="ident">AuthorityId::from_slice</span>(<span class="kw-2">&amp;</span>[<span class="number">1</span>; <span class="number">32</span>]), <span class="number">5</span>)]).<span class="ident">unwrap</span>();
 
 		<span class="kw">let</span> <span class="ident">invalid_change_empty_authorities</span> <span class="op">=</span> <span class="ident">PendingChange</span> {
-			<span class="ident">next_authorities</span>: <span class="macro">vec</span><span class="macro">!</span>[],
+			<span class="ident">next_authorities</span>: <span class="macro">vec!</span>[],
 			<span class="ident">delay</span>: <span class="number">10</span>,
 			<span class="ident">canon_height</span>: <span class="number">5</span>,
 			<span class="ident">canon_hash</span>: (),
-			<span class="ident">delay_kind</span>: <span class="ident">DelayKind</span>::<span class="ident">Finalized</span>,
+			<span class="ident">delay_kind</span>: <span class="ident">DelayKind::Finalized</span>,
 		};
 
 		<span class="comment">// pending change contains an empty authority set</span>
-		<span class="macro">assert</span><span class="macro">!</span>(<span class="macro">matches</span><span class="macro">!</span>(
+		<span class="macro">assert!</span>(<span class="macro">matches!</span>(
 			<span class="ident">authority_set</span>.<span class="ident">add_pending_change</span>(
 				<span class="ident">invalid_change_empty_authorities</span>.<span class="ident">clone</span>(),
 				<span class="kw-2">&amp;</span><span class="ident">static_is_descendent_of</span>(<span class="bool-val">false</span>)
 			),
-			<span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">InvalidAuthoritySet</span>)
+			<span class="prelude-val">Err</span>(<span class="ident">Error::InvalidAuthoritySet</span>)
 		));
 
 		<span class="kw">let</span> <span class="ident">invalid_change_authorities_weight</span> <span class="op">=</span> <span class="ident">PendingChange</span> {
@@ -2538,31 +3112,32 @@
 			<span class="ident">delay</span>: <span class="number">10</span>,
 			<span class="ident">canon_height</span>: <span class="number">5</span>,
 			<span class="ident">canon_hash</span>: (),
-			<span class="ident">delay_kind</span>: <span class="ident">DelayKind</span>::<span class="ident">Best</span> {
+			<span class="ident">delay_kind</span>: <span class="ident">DelayKind::Best</span> {
 				<span class="ident">median_last_finalized</span>: <span class="number">0</span>,
 			},
 		};
 
 		<span class="comment">// pending change contains an an authority set</span>
 		<span class="comment">// where one authority has weight of 0</span>
-		<span class="macro">assert</span><span class="macro">!</span>(<span class="macro">matches</span><span class="macro">!</span>(
+		<span class="macro">assert!</span>(<span class="macro">matches!</span>(
 			<span class="ident">authority_set</span>.<span class="ident">add_pending_change</span>(
 				<span class="ident">invalid_change_authorities_weight</span>,
 				<span class="kw-2">&amp;</span><span class="ident">static_is_descendent_of</span>(<span class="bool-val">false</span>)
 			),
-			<span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">InvalidAuthoritySet</span>)
+			<span class="prelude-val">Err</span>(<span class="ident">Error::InvalidAuthoritySet</span>)
 		));
 	}
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">cleans_up_stale_forced_changes_when_applying_standard_change</span>() {
-		<span class="kw">let</span> <span class="ident">current_authorities</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[(<span class="ident">AuthorityId</span>::<span class="ident">from_slice</span>(<span class="kw-2">&amp;</span>[<span class="number">1</span>; <span class="number">32</span>]), <span class="number">1</span>)];
+		<span class="kw">let</span> <span class="ident">current_authorities</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="ident">AuthorityId::from_slice</span>(<span class="kw-2">&amp;</span>[<span class="number">1</span>; <span class="number">32</span>]), <span class="number">1</span>)];
 
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">authorities</span> <span class="op">=</span> <span class="ident">AuthoritySet</span> {
 			<span class="ident">current_authorities</span>: <span class="ident">current_authorities</span>.<span class="ident">clone</span>(),
 			<span class="ident">set_id</span>: <span class="number">0</span>,
-			<span class="ident">pending_standard_changes</span>: <span class="ident">ForkTree</span>::<span class="ident">new</span>(),
-			<span class="ident">pending_forced_changes</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
+			<span class="ident">pending_standard_changes</span>: <span class="ident">ForkTree::new</span>(),
+			<span class="ident">pending_forced_changes</span>: <span class="ident">Vec::new</span>(),
+			<span class="ident">authority_set_changes</span>: <span class="ident">AuthoritySetChanges::empty</span>(),
 		};
 
 		<span class="kw">let</span> <span class="ident">new_set</span> <span class="op">=</span> <span class="ident">current_authorities</span>.<span class="ident">clone</span>();
@@ -2581,7 +3156,7 @@
 		<span class="comment">// [] - Forced change</span>
 
 		<span class="kw">let</span> <span class="ident">is_descendent_of</span> <span class="op">=</span> {
-			<span class="kw">let</span> <span class="ident">hashes</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="string">&quot;B&quot;</span>, <span class="string">&quot;C0&quot;</span>, <span class="string">&quot;C1&quot;</span>, <span class="string">&quot;C2&quot;</span>, <span class="string">&quot;C3&quot;</span>, <span class="string">&quot;D&quot;</span>];
+			<span class="kw">let</span> <span class="ident">hashes</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="string">&quot;B&quot;</span>, <span class="string">&quot;C0&quot;</span>, <span class="string">&quot;C1&quot;</span>, <span class="string">&quot;C2&quot;</span>, <span class="string">&quot;C3&quot;</span>, <span class="string">&quot;D&quot;</span>];
 			<span class="ident">is_descendent_of</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">base</span>, <span class="ident">hash</span><span class="op">|</span> <span class="kw">match</span> (<span class="kw-2">*</span><span class="ident">base</span>, <span class="kw-2">*</span><span class="ident">hash</span>) {
 				(<span class="string">&quot;B&quot;</span>, <span class="string">&quot;B&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>, <span class="comment">// required to have the simpler case below</span>
 				(<span class="string">&quot;A&quot;</span>, <span class="ident">b</span>) <span class="op">|</span> (<span class="string">&quot;B&quot;</span>, <span class="ident">b</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">hashes</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">h</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">h</span> <span class="op">=</span><span class="op">=</span> <span class="ident">b</span>),
@@ -2597,11 +3172,11 @@
 				<span class="ident">canon_height</span>,
 				<span class="ident">canon_hash</span>,
 				<span class="ident">delay_kind</span>: <span class="kw">if</span> <span class="ident">forced</span> {
-					<span class="ident">DelayKind</span>::<span class="ident">Best</span> {
+					<span class="ident">DelayKind::Best</span> {
 						<span class="ident">median_last_finalized</span>: <span class="number">0</span>,
 					}
 				} <span class="kw">else</span> {
-					<span class="ident">DelayKind</span>::<span class="ident">Finalized</span>
+					<span class="ident">DelayKind::Finalized</span>
 				},
 			};
 
@@ -2618,35 +3193,20 @@
 		<span class="ident">add_pending_change</span>(<span class="number">15</span>, <span class="string">&quot;C3&quot;</span>, <span class="bool-val">true</span>);
 		<span class="ident">add_pending_change</span>(<span class="number">20</span>, <span class="string">&quot;D&quot;</span>, <span class="bool-val">true</span>);
 
-		<span class="macro">println</span><span class="macro">!</span>(
-			<span class="string">&quot;pending_changes: {:?}&quot;</span>,
-			<span class="ident">authorities</span>
-				.<span class="ident">pending_changes</span>()
-				.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">canon_hash</span>)
-				.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-		);
-
 		<span class="comment">// applying the standard change at A should not prune anything</span>
 		<span class="comment">// other then the change that was applied</span>
 		<span class="ident">authorities</span>
 			.<span class="ident">apply_standard_changes</span>(<span class="string">&quot;A&quot;</span>, <span class="number">5</span>, <span class="kw-2">&amp;</span><span class="ident">is_descendent_of</span>, <span class="bool-val">false</span>)
 			.<span class="ident">unwrap</span>();
-		<span class="macro">println</span><span class="macro">!</span>(
-			<span class="string">&quot;pending_changes: {:?}&quot;</span>,
-			<span class="ident">authorities</span>
-				.<span class="ident">pending_changes</span>()
-				.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">canon_hash</span>)
-				.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-		);
 
-		<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">authorities</span>.<span class="ident">pending_changes</span>().<span class="ident">count</span>(), <span class="number">6</span>);
+		<span class="macro">assert_eq!</span>(<span class="ident">authorities</span>.<span class="ident">pending_changes</span>().<span class="ident">count</span>(), <span class="number">6</span>);
 
 		<span class="comment">// same for B</span>
 		<span class="ident">authorities</span>
 			.<span class="ident">apply_standard_changes</span>(<span class="string">&quot;B&quot;</span>, <span class="number">10</span>, <span class="kw-2">&amp;</span><span class="ident">is_descendent_of</span>, <span class="bool-val">false</span>)
 			.<span class="ident">unwrap</span>();
 
-		<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">authorities</span>.<span class="ident">pending_changes</span>().<span class="ident">count</span>(), <span class="number">5</span>);
+		<span class="macro">assert_eq!</span>(<span class="ident">authorities</span>.<span class="ident">pending_changes</span>().<span class="ident">count</span>(), <span class="number">5</span>);
 
 		<span class="kw">let</span> <span class="ident">authorities2</span> <span class="op">=</span> <span class="ident">authorities</span>.<span class="ident">clone</span>();
 
@@ -2655,7 +3215,7 @@
 			.<span class="ident">apply_standard_changes</span>(<span class="string">&quot;C2&quot;</span>, <span class="number">15</span>, <span class="kw-2">&amp;</span><span class="ident">is_descendent_of</span>, <span class="bool-val">false</span>)
 			.<span class="ident">unwrap</span>();
 
-		<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">authorities</span>.<span class="ident">pending_forced_changes</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+		<span class="macro">assert_eq!</span>(<span class="ident">authorities</span>.<span class="ident">pending_forced_changes</span>.<span class="ident">len</span>(), <span class="number">0</span>);
 
 		<span class="comment">// finalizing C0 should clear all forced changes but D</span>
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">authorities</span> <span class="op">=</span> <span class="ident">authorities2</span>;
@@ -2663,8 +3223,8 @@
 			.<span class="ident">apply_standard_changes</span>(<span class="string">&quot;C0&quot;</span>, <span class="number">15</span>, <span class="kw-2">&amp;</span><span class="ident">is_descendent_of</span>, <span class="bool-val">false</span>)
 			.<span class="ident">unwrap</span>();
 
-		<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">authorities</span>.<span class="ident">pending_forced_changes</span>.<span class="ident">len</span>(), <span class="number">1</span>);
-		<span class="macro">assert_eq</span><span class="macro">!</span>(
+		<span class="macro">assert_eq!</span>(<span class="ident">authorities</span>.<span class="ident">pending_forced_changes</span>.<span class="ident">len</span>(), <span class="number">1</span>);
+		<span class="macro">assert_eq!</span>(
 			<span class="ident">authorities</span>
 				.<span class="ident">pending_forced_changes</span>
 				.<span class="ident">first</span>()
@@ -2673,6 +3233,35 @@
 			<span class="string">&quot;D&quot;</span>
 		);
 	}
+
+	<span class="attribute">#[<span class="ident">test</span>]</span>
+	<span class="kw">fn</span> <span class="ident">authority_set_changes_for_complete_data</span>() {
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">authority_set_changes</span> <span class="op">=</span> <span class="ident">AuthoritySetChanges::empty</span>();
+		<span class="ident">authority_set_changes</span>.<span class="ident">append</span>(<span class="number">0</span>, <span class="number">41</span>);
+		<span class="ident">authority_set_changes</span>.<span class="ident">append</span>(<span class="number">1</span>, <span class="number">81</span>);
+		<span class="ident">authority_set_changes</span>.<span class="ident">append</span>(<span class="number">2</span>, <span class="number">121</span>);
+
+		<span class="macro">assert_eq!</span>(<span class="ident">authority_set_changes</span>.<span class="ident">get_set_id</span>(<span class="number">20</span>), <span class="prelude-val">Some</span>((<span class="number">0</span>, <span class="number">41</span>)));
+		<span class="macro">assert_eq!</span>(<span class="ident">authority_set_changes</span>.<span class="ident">get_set_id</span>(<span class="number">40</span>), <span class="prelude-val">Some</span>((<span class="number">0</span>, <span class="number">41</span>)));
+		<span class="macro">assert_eq!</span>(<span class="ident">authority_set_changes</span>.<span class="ident">get_set_id</span>(<span class="number">41</span>), <span class="prelude-val">Some</span>((<span class="number">0</span>, <span class="number">41</span>)));
+		<span class="macro">assert_eq!</span>(<span class="ident">authority_set_changes</span>.<span class="ident">get_set_id</span>(<span class="number">42</span>), <span class="prelude-val">Some</span>((<span class="number">1</span>, <span class="number">81</span>)));
+		<span class="macro">assert_eq!</span>(<span class="ident">authority_set_changes</span>.<span class="ident">get_set_id</span>(<span class="number">141</span>), <span class="prelude-val">None</span>);
+	}
+
+	<span class="attribute">#[<span class="ident">test</span>]</span>
+	<span class="kw">fn</span> <span class="ident">authority_set_changes_for_incomplete_data</span>() {
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">authority_set_changes</span> <span class="op">=</span> <span class="ident">AuthoritySetChanges::empty</span>();
+		<span class="ident">authority_set_changes</span>.<span class="ident">append</span>(<span class="number">2</span>, <span class="number">41</span>);
+		<span class="ident">authority_set_changes</span>.<span class="ident">append</span>(<span class="number">3</span>, <span class="number">81</span>);
+		<span class="ident">authority_set_changes</span>.<span class="ident">append</span>(<span class="number">4</span>, <span class="number">121</span>);
+
+		<span class="macro">assert_eq!</span>(<span class="ident">authority_set_changes</span>.<span class="ident">get_set_id</span>(<span class="number">20</span>), <span class="prelude-val">None</span>);
+		<span class="macro">assert_eq!</span>(<span class="ident">authority_set_changes</span>.<span class="ident">get_set_id</span>(<span class="number">40</span>), <span class="prelude-val">None</span>);
+		<span class="macro">assert_eq!</span>(<span class="ident">authority_set_changes</span>.<span class="ident">get_set_id</span>(<span class="number">41</span>), <span class="prelude-val">None</span>);
+		<span class="macro">assert_eq!</span>(<span class="ident">authority_set_changes</span>.<span class="ident">get_set_id</span>(<span class="number">42</span>), <span class="prelude-val">Some</span>((<span class="number">3</span>, <span class="number">81</span>)));
+		<span class="macro">assert_eq!</span>(<span class="ident">authority_set_changes</span>.<span class="ident">get_set_id</span>(<span class="number">141</span>), <span class="prelude-val">None</span>);
+	}
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "sc_finality_grandpa";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sc_finality_grandpa" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

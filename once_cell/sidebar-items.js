@@ -1,1 +1,1 @@
-initSidebarItems({"macro":[["sync_lazy","Creates a new lazy value initialized by the given closure block. This macro works in const contexts. If you need a `move` closure, use `Lazy::new` constructor function."],["unsync_lazy","Creates a new lazy value initialized by the given closure block. This macro works in const contexts. If you need a `move` closure, use `Lazy::new` constructor function."]],"mod":[["sync",""],["unsync",""]]});
+initSidebarItems({"mod":[["race","“First one wins” flavor of `OnceCell`."],["sync",""],["unsync",""]]});
