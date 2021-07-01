@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-use crate::{constants::time, weights, Aura, Call, Event, Grandpa, Runtime};
+use crate::{constants::time, Aura, Call, Event, Grandpa, Runtime};
 use frame_support::{parameter_types, traits::KeyOwnerProofSystem};
 use governance_os_primitives::Moment;
 pub use pallet_grandpa::AuthorityId as GrandpaId;
@@ -30,11 +30,11 @@ impl_opaque_keys! {
     }
 }
 
-impl pallet_aura::Trait for Runtime {
+impl pallet_aura::Config for Runtime {
     type AuthorityId = AuraId;
 }
 
-impl pallet_grandpa::Trait for Runtime {
+impl pallet_grandpa::Config for Runtime {
     type Event = Event;
     type Call = Call;
     type KeyOwnerProofSystem = ();
@@ -45,17 +45,17 @@ impl pallet_grandpa::Trait for Runtime {
         GrandpaId,
     )>>::IdentificationTuple;
     type HandleEquivocation = ();
-    type WeightInfo = weights::pallet_grandpa::WeightInfo;
+    type WeightInfo = ();
 }
 
 parameter_types! {
     pub const MinimumPeriod: Moment = time::SLOT_DURATION / 2;
 }
 
-impl pallet_timestamp::Trait for Runtime {
+impl pallet_timestamp::Config for Runtime {
     /// A timestamp: milliseconds since the unix epoch.
     type Moment = Moment;
     type OnTimestampSet = Aura;
     type MinimumPeriod = MinimumPeriod;
-    type WeightInfo = weights::pallet_timestamp::WeightInfo;
+    type WeightInfo = ();
 }

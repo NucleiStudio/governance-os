@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-use crate::{mutations::Mutation, Locks, Module, RawEvent, Trait};
+use crate::{mutations::Mutation, Config, Locks, Module, RawEvent};
 use frame_support::{
     traits::{BalanceStatus, LockIdentifier},
     IterableStorageDoubleMap, StorageDoubleMap,
@@ -25,7 +25,7 @@ use sp_runtime::{
     DispatchError, DispatchResult,
 };
 
-impl<T: Trait> Currencies<T::AccountId> for Module<T> {
+impl<T: Config> Currencies<T::AccountId> for Module<T> {
     type CurrencyId = T::CurrencyId;
     type Balance = T::Balance;
 
@@ -102,7 +102,7 @@ impl<T: Trait> Currencies<T::AccountId> for Module<T> {
     }
 }
 
-impl<T: Trait> ReservableCurrencies<T::AccountId> for Module<T> {
+impl<T: Config> ReservableCurrencies<T::AccountId> for Module<T> {
     fn can_reserve(
         currency_id: Self::CurrencyId,
         who: &T::AccountId,
@@ -197,7 +197,7 @@ impl<T: Trait> ReservableCurrencies<T::AccountId> for Module<T> {
 }
 
 // Some helper to avoid code repetition when using locks
-impl<T: Trait> Module<T> {
+impl<T: Config> Module<T> {
     fn conditionally_write_lock<Cond: FnOnce(T::Balance) -> bool>(
         currency_id: T::CurrencyId,
         lock_id: LockIdentifier,
@@ -219,7 +219,13 @@ impl<T: Trait> Module<T> {
                     }
 
                     // A new lock is being created, inc the system ref
-                    frame_system::Module::<T>::inc_ref(who);
+                    if frame_system::Pallet::<T>::inc_consumers(who).is_err() {
+                        log::warn!(
+                            target: "runtime::tokens",
+                            "Warning: Attempt to introduce lock consumer reference, yet no providers. \
+                            This is unexpected but should be safe."
+                        );
+                    }
                 } else {
                     // We are overwriting an existing lock
                     let existing_lock = maybe_existing_lock
@@ -257,7 +263,7 @@ impl<T: Trait> Module<T> {
     }
 }
 
-impl<T: Trait> LockableCurrencies<T::AccountId> for Module<T> {
+impl<T: Config> LockableCurrencies<T::AccountId> for Module<T> {
     fn locked_balance(currency_id: Self::CurrencyId, who: &T::AccountId) -> Self::Balance {
         Self::get_currency_account(currency_id, who).frozen
     }
@@ -288,7 +294,7 @@ impl<T: Trait> LockableCurrencies<T::AccountId> for Module<T> {
         who: &T::AccountId,
     ) -> DispatchResult {
         Locks::<T>::remove((who, currency_id), lock_id);
-        frame_system::Module::<T>::dec_ref(who);
+        frame_system::Pallet::<T>::dec_consumers(who);
 
         let highest_lock_value = Locks::<T>::iter_prefix((who, currency_id)).fold(
             Zero::zero(),

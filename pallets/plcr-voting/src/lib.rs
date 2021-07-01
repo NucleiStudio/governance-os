@@ -42,23 +42,23 @@ pub use types::{VoteData, VotingParameters};
 
 pub const PLCR_VOTING_LOCK_ID: LockIdentifier = *b"plcrvote";
 
-pub trait Trait: frame_system::Trait {
+pub trait Config: frame_system::Config {
     /// Because this pallet emits events, it depends on the runtime's definition of an event.
-    type Event: From<Event<Self>> + Into<<Self as frame_system::Trait>::Event>;
+    type Event: From<Event<Self>> + Into<<Self as frame_system::Config>::Event>;
     /// Pallet in charge of currencies. Used so that we can lock tokens etc...
     type Currencies: LockableCurrencies<Self::AccountId>;
 }
 
 type BalanceOf<T> =
-    <<T as Trait>::Currencies as Currencies<<T as frame_system::Trait>::AccountId>>::Balance;
+    <<T as Config>::Currencies as Currencies<<T as frame_system::Config>::AccountId>>::Balance;
 type CurrencyIdOf<T> =
-    <<T as Trait>::Currencies as Currencies<<T as frame_system::Trait>::AccountId>>::CurrencyId;
+    <<T as Config>::Currencies as Currencies<<T as frame_system::Config>::AccountId>>::CurrencyId;
 type PlcrProposalStateOf<T> =
-    ProposalState<BalanceOf<T>, <T as frame_system::Trait>::BlockNumber, CurrencyIdOf<T>>;
+    ProposalState<BalanceOf<T>, <T as frame_system::Config>::BlockNumber, CurrencyIdOf<T>>;
 type PlcrVoteData<Balance, Hash> = VoteData<Balance, Hash>;
 
 decl_storage! {
-    trait Store for Module<T: Trait> as PlcrVoting {
+    trait Store for Module<T: Config> as PlcrVoting {
         /// Proposals actively opened and linked to this voting implementation. Erased when closed or vetoed.
         pub Proposals get(fn proposals): map hasher(blake2_128_concat) T::Hash => PlcrProposalStateOf<T>;
         /// Keeps track of locks set on user's balances and to which proposal they were linked to.
@@ -69,7 +69,7 @@ decl_storage! {
 }
 
 decl_error! {
-    pub enum Error for Module<T: Trait> {
+    pub enum Error for Module<T: Config> {
         /// The reveal vote does not match our saved commit.
         RevealCommitMismatch,
         /// We were not able to find a commit for the given reveal vote.
@@ -91,8 +91,8 @@ decl_error! {
 decl_event!(
     pub enum Event<T>
     where
-        Hash = <T as frame_system::Trait>::Hash,
-        AccountId = <T as frame_system::Trait>::AccountId,
+        Hash = <T as frame_system::Config>::Hash,
+        AccountId = <T as frame_system::Config>::AccountId,
     {
         /// A commit vote was registered. \[voter, proposal, commit\]
         VoteCommited(AccountId, Hash, Hash),
@@ -102,12 +102,12 @@ decl_event!(
 );
 
 decl_module! {
-    pub struct Module<T: Trait> for enum Call where origin: T::Origin {
+    pub struct Module<T: Config> for enum Call where origin: T::Origin {
         fn deposit_event() = default;
     }
 }
 
-impl<T: Trait> StandardizedVoting for Module<T> {
+impl<T: Config> StandardizedVoting for Module<T> {
     type ProposalId = T::Hash;
     type Parameters = VotingParameters<T::BlockNumber, CurrencyIdOf<T>>;
     type VoteData = VoteData<BalanceOf<T>, T::Hash>;
@@ -224,7 +224,7 @@ impl<T: Trait> StandardizedVoting for Module<T> {
     }
 }
 
-impl<T: Trait> Module<T> {
+impl<T: Config> Module<T> {
     /// Just a helper function to return the current block number. Simply sexier
     /// than calling the actual `frame_system::Module::<T>::block_number()` function.
     fn now() -> T::BlockNumber {

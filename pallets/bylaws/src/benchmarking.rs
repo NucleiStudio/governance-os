@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-use crate::*;
+use super::*;
 use frame_benchmarking::{account, benchmarks, whitelisted_caller};
+use frame_support::traits::Get;
 use frame_system::RawOrigin;
-use governance_os_support::{benchmarking::SEED, traits::RoleManager};
+use governance_os_support::traits::RoleManager;
 use sp_runtime::traits::StaticLookup;
 use sp_std::prelude::*;
 
-fn prepare_benchmark<T: Trait>(
+const SEED: u32 = 0;
+
+fn prepare_benchmark<T: Config>(
     b: u32,
 ) -> (
     T::AccountId,
@@ -49,8 +52,6 @@ fn prepare_benchmark<T: Trait>(
 }
 
 benchmarks! {
-    _ { }
-
     grant_role {
         let b in 0 .. T::MaxRoles::get();
 
@@ -71,17 +72,14 @@ benchmarks! {
     }
 }
 
-#[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::mock::{ExtBuilder, Test};
-    use frame_support::assert_ok;
-    use governance_os_support::create_benchmarking_test;
+    use crate::Pallet as Bylaws;
+    use frame_benchmarking::impl_benchmark_test_suite;
 
-    fn new_test_ext() -> sp_io::TestExternalities {
-        ExtBuilder::default().build()
-    }
-
-    create_benchmarking_test!(new_test_ext, Test, grant_role, test_benchmark_grant_role);
-    create_benchmarking_test!(new_test_ext, Test, revoke_role, test_benchmark_revoke_role);
+    impl_benchmark_test_suite!(
+        Bylaws,
+        crate::tests::mock::ExtBuilder::default().build(),
+        crate::tests::mock::Test
+    );
 }

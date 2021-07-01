@@ -22,58 +22,70 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use frame_support::{
-    decl_event, decl_module, decl_storage,
-    dispatch::DispatchResultWithPostInfo,
-    traits::{Get, UnfilteredDispatchable},
-    weights::{GetDispatchInfo, Pays, Weight},
-    Parameter,
-};
-use governance_os_pallet_bylaws::RoleBuilder;
-use governance_os_support::traits::RoleManager;
-use sp_runtime::{traits::StaticLookup, DispatchResult};
-use sp_std::boxed::Box;
-
 #[cfg(test)]
 mod tests;
 
-pub trait Trait: frame_system::Trait {
-    /// Because this pallet emits events, it depends on the runtime's definition of an event.
-    type Event: From<Event> + Into<<Self as frame_system::Trait>::Event>;
+pub use pallet::*;
 
-    /// A sudo-able call.
-    type Call: Parameter + UnfilteredDispatchable<Origin = Self::Origin> + GetDispatchInfo;
+#[frame_support::pallet]
+pub mod pallet {
+    use frame_support::{
+        dispatch::{DispatchResult, DispatchResultWithPostInfo},
+        pallet_prelude::*,
+        traits::UnfilteredDispatchable,
+        weights::GetDispatchInfo,
+        Parameter,
+    };
+    use frame_system::pallet_prelude::*;
+    use governance_os_pallet_bylaws::RoleBuilder;
+    use governance_os_support::traits::RoleManager;
+    use sp_runtime::traits::StaticLookup;
+    use sp_std::boxed::Box;
 
-    /// The role builder used by the `bylaws` pallet
-    type RoleBuilder: RoleBuilder<Role = <RoleManagerOf<Self> as RoleManager>::Role>;
+    #[pallet::config]
+    pub trait Config: frame_system::Config {
+        /// Because this pallet emits events, it depends on the runtime's definition of an event.
+        type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
 
-    /// Pallet used to manage and check for roles.
-    type RoleManager: RoleManager<AccountId = Self::AccountId>;
-}
+        /// A sudo-able call.
+        type Call: Parameter + UnfilteredDispatchable<Origin = Self::Origin> + GetDispatchInfo;
 
-type RoleBuilderOf<T> = <T as Trait>::RoleBuilder;
-type RoleManagerOf<T> = <T as Trait>::RoleManager;
+        /// The role builder used by the `bylaws` pallet
+        type RoleBuilder: RoleBuilder<Role = <RoleManagerOf<Self> as RoleManager>::Role>;
 
-decl_storage! {
-    trait Store for Module<T: Trait> as Compat {}
-}
+        /// Pallet used to manage and check for roles.
+        type RoleManager: RoleManager<AccountId = Self::AccountId>;
+    }
 
-decl_event!(
-    pub enum Event {
+    pub type RoleBuilderOf<T> = <T as Config>::RoleBuilder;
+    pub type RoleManagerOf<T> = <T as Config>::RoleManager;
+
+    #[pallet::event]
+    #[pallet::generate_deposit(pub(super) fn deposit_event)]
+    pub enum Event<T: Config> {
         /// A sudo just took place. \[result\]
         CompatSudid(DispatchResult),
         /// A root user just performed a call as someone else. \[result\]
         CompatDidAs(DispatchResult),
     }
-);
 
-decl_module! {
-    pub struct Module<T: Trait> for enum Call where origin: T::Origin {
-        fn deposit_event() = default;
+    #[pallet::pallet]
+    pub struct Pallet<T>(PhantomData<T>);
 
+    #[pallet::hooks]
+    impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {}
+
+    #[pallet::call]
+    impl<T: Config> Pallet<T> {
         /// Dispatches the given call with a `Root` origin.
-        #[weight = (call.get_dispatch_info().weight + 10_000, call.get_dispatch_info().class)]
-        fn sudo(origin, call: Box<<T as Trait>::Call>) -> DispatchResultWithPostInfo {
+        #[pallet::weight({
+            let dispatch_info = call.get_dispatch_info();
+            (dispatch_info.weight.saturating_add(10_000), dispatch_info.class)
+        })]
+        pub(crate) fn sudo(
+            origin: OriginFor<T>,
+            call: Box<<T as Config>::Call>,
+        ) -> DispatchResultWithPostInfo {
             RoleManagerOf::<T>::ensure_has_role(origin, RoleBuilderOf::<T>::root())?;
 
             let res = call.dispatch_bypass_filter(frame_system::RawOrigin::Root.into());
@@ -85,25 +97,33 @@ decl_module! {
 
         /// A variant of the `sudo` dispatchable that will let caller specify its weight. This could be
         /// useful when trying to push a runtime upgrade but should be used with parcimony.
-        #[weight = (*_weight, call.get_dispatch_info().class)]
-        fn sudo_custom_weight(origin, call: Box<<T as Trait>::Call>, _weight: Weight) -> DispatchResultWithPostInfo {
+        #[pallet::weight({(*_weight, call.get_dispatch_info().class)})]
+        pub(crate) fn sudo_custom_weight(
+            origin: OriginFor<T>,
+            call: Box<<T as Config>::Call>,
+            _weight: Weight,
+        ) -> DispatchResultWithPostInfo {
             // Just proxy back to the `sudo` call
             Self::sudo(origin, call)
         }
 
         // Dispatches the call with the origin set to `who`.
-        #[weight = (
-            call.get_dispatch_info().weight
-                .saturating_add(10_000)
-                // AccountData for inner call origin accountdata.
-                .saturating_add(T::DbWeight::get().reads_writes(1, 1))
-                // Two read performed by ensure_has_role
-                .saturating_add(T::DbWeight::get().reads(2)),
-            call.get_dispatch_info().class
-        )]
-        fn doas(origin,
+        #[pallet::weight({
+            let dispatch_info = call.get_dispatch_info();
+            (
+                dispatch_info.weight
+                    .saturating_add(10_000)
+                    // AccountData for inner call origin accountdata.
+                    .saturating_add(T::DbWeight::get().reads_writes(1, 1))
+                    // Two read performed by ensure_has_role
+                    .saturating_add(T::DbWeight::get().reads(2)),
+                dispatch_info.class
+            )
+        })]
+        pub(crate) fn doas(
+            origin: OriginFor<T>,
             who: <T::Lookup as StaticLookup>::Source,
-            call: Box<<T as Trait>::Call>
+            call: Box<<T as Config>::Call>,
         ) -> DispatchResultWithPostInfo {
             RoleManagerOf::<T>::ensure_has_role(origin, RoleBuilderOf::<T>::root())?;
 

@@ -20,13 +20,10 @@
 
 mod acl;
 mod currencies;
-mod voting;
-
-#[cfg(feature = "runtime-benchmarks")]
-pub mod benchmarking;
 pub mod errors;
 pub mod testing;
 pub mod traits;
+mod voting;
 
 #[macro_export]
 /// Use this macro to easily implement `Default` for a given enum. This avoids

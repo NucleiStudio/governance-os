@@ -162,9 +162,10 @@ pub fn run() -> sc_cli::Result<()> {
         }
         None => {
             let runner = cli.create_runner(&cli.run)?;
-            runner.run_node_until_exit(|config| {
-                info!(
-                    r#"
+            runner.run_node_until_exit(|config| async move {
+                {
+                    info!(
+                        r#"
 
                      __/>^^^;:,
         __  __      /-.       :,/|/|
@@ -184,16 +185,18 @@ pub fn run() -> sc_cli::Result<()> {
                    ,--____>    /\.         ./
                    '-__________>  \.______/
                 "#
-                );
+                    );
 
-                info!(
-                    "✨ Core organization account id: {}",
-                    core_org().to_ss58check(),
-                );
+                    info!(
+                        "✨ Core organization account id: {}",
+                        core_org().to_ss58check(),
+                    );
 
-                match config.role {
-                    Role::Light => new_light(config),
-                    _ => new_full(config),
+                    match config.role {
+                        Role::Light => new_light(config),
+                        _ => new_full(config),
+                    }
+                    .map_err(sc_cli::Error::Service)
                 }
             })
         }

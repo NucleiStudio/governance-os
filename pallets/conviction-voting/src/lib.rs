@@ -47,7 +47,7 @@ pub use types::{Conviction, ProposalState, VotingParameters};
 
 pub const CONVICTION_VOTING_LOCK_ID: LockIdentifier = *b"convvote";
 
-pub trait Trait: frame_system::Trait {
+pub trait Config: frame_system::Config {
     /// Pallet in charge of currencies. Used so that we can lock tokens etc...
     type Currencies: LockableCurrencies<Self::AccountId>;
     /// Decay constant as part of the conviction voting / decay curve formula.
@@ -60,25 +60,25 @@ pub trait Trait: frame_system::Trait {
 }
 
 type BalanceOf<T> =
-    <<T as Trait>::Currencies as Currencies<<T as frame_system::Trait>::AccountId>>::Balance;
+    <<T as Config>::Currencies as Currencies<<T as frame_system::Config>::AccountId>>::Balance;
 type CurrencyIdOf<T> =
-    <<T as Trait>::Currencies as Currencies<<T as frame_system::Trait>::AccountId>>::CurrencyId;
+    <<T as Config>::Currencies as Currencies<<T as frame_system::Config>::AccountId>>::CurrencyId;
 type ConvictionProposalStateOf<T> = ProposalState<
-    <T as frame_system::Trait>::AccountId,
+    <T as frame_system::Config>::AccountId,
     BalanceOf<T>,
-    <T as frame_system::Trait>::BlockNumber,
+    <T as frame_system::Config>::BlockNumber,
     CurrencyIdOf<T>,
 >;
 
 decl_storage! {
-    trait Store for Module<T: Trait> as PlcrVoting {
+    trait Store for Module<T: Config> as PlcrVoting {
         pub Proposals get(fn proposals): map hasher(blake2_128_concat) T::Hash => ConvictionProposalStateOf<T>;
         pub Locks get(fn locks): map hasher(blake2_128_concat) (CurrencyIdOf<T>, T::AccountId) => Vec<(T::Hash, bool, BalanceOf<T>)>;
     }
 }
 
 decl_error! {
-    pub enum Error for Module<T: Trait> {
+    pub enum Error for Module<T: Config> {
         /// There are not enough tokens in the user's balance to proceed
         /// to this action.
         NotEnoughBalance,
@@ -90,11 +90,11 @@ decl_error! {
 }
 
 decl_module! {
-    pub struct Module<T: Trait> for enum Call where origin: T::Origin {
+    pub struct Module<T: Config> for enum Call where origin: T::Origin {
     }
 }
 
-impl<T: Trait> StandardizedVoting for Module<T> {
+impl<T: Config> StandardizedVoting for Module<T> {
     type ProposalId = T::Hash;
     type Parameters = VotingParameters<T::BlockNumber, CurrencyIdOf<T>>;
     type VoteData = Conviction<BalanceOf<T>>;
@@ -217,7 +217,7 @@ impl<T: Trait> StandardizedVoting for Module<T> {
     }
 }
 
-impl<T: Trait> Module<T> {
+impl<T: Config> Module<T> {
     /// Simple helper function to return the current block number.
     pub fn now() -> T::BlockNumber {
         frame_system::Module::<T>::block_number()
